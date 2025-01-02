@@ -39,11 +39,11 @@ class _Cluster:
         self._base_angle: float | None = None
         self._options = options
 
-    def _add_stroke(self, stroke: Line) -> None:
+    def add_stroke(self, stroke: Line) -> None:
         """Add a stroke to this cluster."""
         self._strokes.append(stroke)
 
-    def _validate_stroke(self, stroke: Line, neighboring_clusters: List['_Cluster']) -> Line | None:
+    def validate_stroke(self, stroke: Line, neighboring_clusters: List['_Cluster']) -> Line | None:
         """Validate and potentially clip a stroke against neighboring clusters."""
         start, end = stroke
         min_t_start = 0
@@ -164,11 +164,11 @@ def _draw_crosshatch_with_clusters(
             end_y = py - offset * dx_base + dy
 
             new_stroke = ((start_x, start_y), (end_x, end_y))
-            clipped_stroke = cluster._validate_stroke(new_stroke, clusters[:-1])
+            clipped_stroke = cluster.validate_stroke(new_stroke, clusters[:-1])
 
             if clipped_stroke:
                 canvas.drawLine(*clipped_stroke[0], *clipped_stroke[1], line_paint)
-                cluster._add_stroke(clipped_stroke)
+                cluster.add_stroke(clipped_stroke)
 
 def draw_crosshatches(
     options: Options,
