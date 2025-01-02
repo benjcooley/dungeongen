@@ -4,35 +4,59 @@ import math
 import random
 from typing import List, Optional, Sequence
 from algorithms.types import Point
+from algorithms.shapes import ShapeGroup
 
 class PoissonDiskSampler:
-    def __init__(self, width, height, min_distance, max_attempts=30):
+    def __init__(
+        self,
+        width: float,
+        height: float,
+        min_distance: float,
+        shape_group: ShapeGroup,
+        max_attempts: int = 30
+    ) -> None:
+        """Initialize the Poisson disk sampler.
+        
+        Args:
+            width: Width of the sampling area
+            height: Height of the sampling area
+            min_distance: Minimum distance between points
+            shape_group: Shape group defining valid sampling areas
+            max_attempts: Maximum sampling attempts per point
+        """
         self.width = width
         self.height = height
         self.min_distance = min_distance
         self.cell_size = min_distance / math.sqrt(2)
         self.max_attempts = max_attempts
+        self.shape_group = shape_group
 
         self.grid_width = int(width / self.cell_size) + 1
         self.grid_height = int(height / self.cell_size) + 1
-        self.grid = [[None for _ in range(self.grid_height)] for _ in range(self.grid_width)]
-        self.points = []
-        self.spawn_points = []
-        self.shape_group = None
+        self.grid: List[List[Optional[Point]]] = [
+            [None for _ in range(self.grid_height)] 
+            for _ in range(self.grid_width)
+        ]
+        self.points: List[Point] = []
+        self.spawn_points: List[Point] = []
 
-    def set_shape_group(self, shape_group):
-        """Set the shape group to constrain point sampling."""
-        self.shape_group = shape_group
-        for x in range(0, self.width, int(self.min_distance)):
-            for y in range(0, self.height, int(self.min_distance)):
+        # Initialize spawn points within the shape
+        for x in range(0, int(self.width), int(self.min_distance)):
+            for y in range(0, int(self.height), int(self.min_distance)):
                 if shape_group.contains(x, y):
                     self.spawn_points.append((x, y))
 
-    def is_point_valid(self, x, y):
-        if self.shape_group is None:
-            return True
+    def is_point_valid(self, x: float, y: float) -> bool:
+        """Check if a point is valid for sampling.
+        
+        Args:
+            x: X coordinate to check
+            y: Y coordinate to check
+            
+        Returns:
+            True if the point is valid for sampling
+        """
         return self.shape_group.contains(x, y)
-        return True
 
     def get_neighbours(self, x, y):
         grid_x = int(x / self.cell_size)

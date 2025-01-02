@@ -157,12 +157,13 @@ def draw_crosshatches(
         Style=skia.Paint.kStroke_Style,
     )
     
-    # Set up the sampler
-    sampler = PoissonDiskSampler(options.canvas_width, options.canvas_height, 
-                                options.crosshatch_poisson_radius)
-    
-    # Set shape group for sampler
-    sampler.set_shape_group(shape_group)
+    # Set up the sampler with shape constraints
+    sampler = PoissonDiskSampler(
+        width=options.canvas_width,
+        height=options.canvas_height,
+        min_distance=options.crosshatch_poisson_radius,
+        shape_group=shape_group
+    )
     
     # Sample points
     points = sampler.sample()
