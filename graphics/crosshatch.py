@@ -27,11 +27,11 @@ class _Cluster:
         self._base_angle: float | None = None
         self._options = options
 
-    def add_stroke(self, stroke: Line) -> None:
+    def _add_stroke(self, stroke: Line) -> None:
         """Add a stroke to this cluster."""
         self._strokes.append(stroke)
 
-    def validate_stroke(self, stroke: Line, neighboring_clusters: List['_Cluster']) -> Line | None:
+    def _validate_stroke(self, stroke: Line, neighboring_clusters: List['_Cluster']) -> Line | None:
         """Validate and potentially clip a stroke against neighboring clusters."""
         start, end = stroke
         min_t_start = 0
@@ -67,7 +67,7 @@ class _Cluster:
         return (new_start, new_end)
 
 
-def _get_neighbouring_clusters(cluster: '_Cluster', clusters: List['_Cluster'], radius: float) -> List['_Cluster']:
+def __get_neighbouring_clusters(cluster: '_Cluster', clusters: List['_Cluster'], radius: float) -> List['_Cluster']:
     """Get clusters within radius distance of the given cluster."""
     return [
         other_cluster for other_cluster in clusters
@@ -75,7 +75,7 @@ def _get_neighbouring_clusters(cluster: '_Cluster', clusters: List['_Cluster'], 
         and math.dist(cluster.origin, other_cluster.origin) <= radius
     ]
 
-def _draw_crosshatch_with_clusters(
+def __draw_crosshatch_with_clusters(
     options: Options,
     points: List[Point],
     center_point: Point,
@@ -96,7 +96,7 @@ def _draw_crosshatch_with_clusters(
         # Generate a base angle for alignment
         base_angle = None
         max_attempts = 20
-        neighbours = _get_neighbouring_clusters(cluster, clusters[:-1], options.crosshatch_neighbor_radius)
+        neighbours = __get_neighbouring_clusters(cluster, clusters[:-1], options.crosshatch_neighbor_radius)
         
         for _ in range(max_attempts):
             angle_candidate = random.uniform(0, 2 * math.pi)
@@ -131,11 +131,11 @@ def _draw_crosshatch_with_clusters(
             end_y = py - offset * dx_base + dy
 
             new_stroke = ((start_x, start_y), (end_x, end_y))
-            clipped_stroke = cluster.validate_stroke(new_stroke, clusters[:-1])
+            clipped_stroke = cluster._validate_stroke(new_stroke, clusters[:-1])
 
             if clipped_stroke:
                 canvas.drawLine(*clipped_stroke[0], *clipped_stroke[1], line_paint)
-                cluster.add_stroke(clipped_stroke)
+                cluster._add_stroke(clipped_stroke)
 
 def draw_crosshatches(
     options: Options,
@@ -177,7 +177,7 @@ def draw_crosshatches(
         center_point = (options.canvas_width / 2, options.canvas_height / 2)
     
     # Draw the crosshatch patterns
-    _draw_crosshatch_with_clusters(
+    __draw_crosshatch_with_clusters(
         options,
         points,
         center_point,
