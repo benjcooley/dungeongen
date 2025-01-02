@@ -20,14 +20,14 @@ class Options:
     crosshatch_angle_variation: float = math.radians(10)
     
     @property
-    def poisson_radius(self) -> float:
+    def crosshatch_poisson_radius(self) -> float:
         """Radius for Poisson disk sampling of crosshatch clusters."""
         return self.crosshatch_stroke_spacing * (self.crosshatch_strokes_per_cluster - 1)
     
     @property
-    def cluster_neighbor_radius(self) -> float:
+    def crosshatch_neighbor_radius(self) -> float:
         """Radius for detecting neighboring crosshatch clusters."""
-        return self.poisson_radius * 1.5
+        return self.crosshatch_poisson_radius * 1.5
     
     @property
     def crosshatch_stroke_length(self) -> float:

@@ -20,13 +20,13 @@ _canvas = _surface.getCanvas()
 def draw_background(options: Options, canvas: skia.Canvas) -> None:
     """Fill the background with white."""
     background_paint = skia.Paint(AntiAlias=True, Color=skia.ColorWHITE)
-    canvas.drawRect(skia.Rect.MakeWH(options.width, options.height), background_paint)
+    canvas.drawRect(skia.Rect.MakeWH(options.canvas_width, options.canvas_height), background_paint)
 
 def create_line_paint(options: Options) -> skia.Paint:
     """Create a paint object for drawing lines."""
     return skia.Paint(
         AntiAlias=True,
-        StrokeWidth=options.stroke_width,
+        StrokeWidth=options.crosshatch_stroke_width,
         Color=skia.ColorBLACK,
         Style=skia.Paint.kStroke_Style,
     )
@@ -73,7 +73,7 @@ class Cluster:
 
         # Ensure the stroke length is not below the minimum
         new_length = math.sqrt((new_end[0] - new_start[0])**2 + (new_end[1] - new_start[1])**2)
-        if new_length < self.options.min_stroke_length:
+        if new_length < self.options.min_crosshatch_stroke_length:
             return None
 
         return (new_start, new_end)
@@ -129,7 +129,7 @@ def draw_crosshatch_with_clusters(
         # Generate a base angle for alignment
         base_angle = None
         max_attempts = 20
-        neighbours = get_neighbouring_clusters(cluster, clusters[:-1], options.neighbor_radius)
+        neighbours = get_neighbouring_clusters(cluster, clusters[:-1], options.crosshatch_neighbor_radius)
         
         for _ in range(max_attempts):
             angle_candidate = random.uniform(0, 2 * math.pi)
@@ -152,11 +152,11 @@ def draw_crosshatch_with_clusters(
         dy_base = math.sin(base_angle)
 
         # Draw parallel lines for the cluster
-        for i in range(options.num_strokes):
-            offset = (i - options.num_strokes // 2) * options.spacing
-            variation = random.uniform(-options.random_length_variation, options.random_length_variation) * options.stroke_length
-            dx = dx_base * (options.stroke_length / 2 + variation)
-            dy = dy_base * (options.stroke_length / 2 + variation)
+        for i in range(options.crosshatch_strokes_per_cluster):
+            offset = (i - options.crosshatch_strokes_per_cluster // 2) * options.crosshatch_stroke_spacing
+            variation = random.uniform(-options.crosshatch_length_variation, options.crosshatch_length_variation) * options.crosshatch_stroke_length
+            dx = dx_base * (options.crosshatch_stroke_length / 2 + variation)
+            dy = dy_base * (options.crosshatch_stroke_length / 2 + variation)
 
             start_x = px + offset * dy_base - dx
             start_y = py - offset * dx_base - dy

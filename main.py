@@ -22,7 +22,7 @@ def main():
     line_paint = create_line_paint(options)
 
     # Set up the sampler with shapes
-    sampler = PoissonDiskSampler(options.width, options.height, options.poisson_radius)
+    sampler = PoissonDiskSampler(options.canvas_width, options.canvas_height, options.crosshatch_poisson_radius)
 
     # Add include and exclude shapes
     include_shape = Rectangle(100, 100, options.width - 200, options.height - 200, inflate=40)
