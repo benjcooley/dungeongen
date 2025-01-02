@@ -139,7 +139,7 @@ def _draw_crosshatch_with_clusters(
 
 def draw_crosshatches(
     options: Options,
-    shape_group: ShapeGroup,
+    shape_group: Shape,
     canvas: skia.Canvas
 ) -> None:
     """Draw crosshatch patterns within the given shape group.
