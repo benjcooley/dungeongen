@@ -20,7 +20,6 @@ def main():
     
     # Initialize canvas and background
     draw_background(options, canvas)
-    line_paint = create_line_paint(options)
 
     # Create shapes for crosshatching
     include_shape = Rectangle(100, 100, options.canvas_width - 200, options.canvas_height - 200, inflate=40)

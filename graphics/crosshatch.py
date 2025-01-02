@@ -142,6 +142,15 @@ def _draw_crosshatch_with_clusters(
                 canvas.drawLine(*clipped_stroke[0], *clipped_stroke[1], line_paint)
                 cluster.add_stroke(clipped_stroke)
 
+def create_line_paint(options: Options) -> skia.Paint:
+    """Create a paint object for drawing lines."""
+    return skia.Paint(
+        AntiAlias=True,
+        StrokeWidth=options.crosshatch_stroke_width,
+        Color=skia.ColorBLACK,
+        Style=skia.Paint.kStroke_Style,
+    )
+
 def draw_crosshatches(
     options: Options,
     include_shapes: Sequence[Rectangle],
