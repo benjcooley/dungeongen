@@ -29,6 +29,7 @@ def create_line_paint(options: Options) -> skia.Paint:
         Color=skia.ColorBLACK,
         Style=skia.Paint.kStroke_Style,
     )
+
 class _Cluster:
     """A cluster of crosshatch strokes around a central point."""
     
