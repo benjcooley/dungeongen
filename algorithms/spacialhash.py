@@ -27,10 +27,10 @@ class SpatialHash[T]:
             self.grid[cell] = []
         self.grid[cell].append(obj)
 
-    def get_neighbours(self, obj: T, radius: float) -> List[T]:
+    def get_neighbors(self, obj: T, radius: float) -> List[T]:
         cx, cy = obj.get_position()
         cell_x, cell_y = self._hash(cx, cy)
-        neighbours: List[T] = []
+        neighbors: List[T] = []
         cells_to_check = [
             (cell_x + dx, cell_y + dy)
             for dx in range(-1, 2)
@@ -40,5 +40,5 @@ class SpatialHash[T]:
             if cell in self.grid:
                 for other_obj in self.grid[cell]:
                     if other_obj is not obj and math.dist(obj.get_position(), other_obj.get_position()) <= radius:
-                        neighbours.append(other_obj)
-        return neighbours
+                        neighbors.append(other_obj)
+        return neighbors

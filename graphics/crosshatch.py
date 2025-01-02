@@ -67,7 +67,7 @@ class _Cluster:
         return (new_start, new_end)
 
 
-def _get_neighbouring_clusters(cluster: '_Cluster', clusters: List['_Cluster'], radius: float) -> List['_Cluster']:
+def _get_neighboring_clusters(cluster: '_Cluster', clusters: List['_Cluster'], radius: float) -> List['_Cluster']:
     """Get clusters within radius distance of the given cluster."""
     return [
         other_cluster for other_cluster in clusters
@@ -96,13 +96,13 @@ def _draw_crosshatch_with_clusters(
         # Generate a base angle for alignment
         base_angle = None
         max_attempts = 20
-        neighbours = _get_neighbouring_clusters(cluster, clusters[:-1], options.crosshatch_neighbor_radius)
+        neighbors = _get_neighboring_clusters(cluster, clusters[:-1], options.crosshatch_neighbor_radius)
         
         for _ in range(max_attempts):
             angle_candidate = random.uniform(0, 2 * math.pi)
             if not any(
                 abs(math.cos(angle_candidate - neighbor._base_angle)) > 0.9
-                for neighbor in neighbours
+                for neighbor in neighbors
                 if neighbor._base_angle is not None
             ):
                 base_angle = angle_candidate
@@ -110,7 +110,7 @@ def _draw_crosshatch_with_clusters(
 
         if base_angle is None:
             base_angle = random.uniform(0, 2 * math.pi)
-            for neighbor in neighbours:
+            for neighbor in neighbors:
                 if neighbor._base_angle is not None:
                     base_angle += options.random_angle_variation
 

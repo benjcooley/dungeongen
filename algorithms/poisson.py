@@ -57,15 +57,15 @@ class PoissonDiskSampler:
         """
         return self.shape.contains(x, y)
 
-    def _get_neighbours(self, x, y):
+    def _get_neighbors(self, x, y):
         grid_x = int(x / self.cell_size)
         grid_y = int(y / self.cell_size)
-        neighbours = []
+        neighbors = []
         for gx in range(max(0, grid_x - 2), min(self.grid_width, grid_x + 3)):
             for gy in range(max(0, grid_y - 2), min(self.grid_height, grid_y + 3)):
                 if self.grid[gx][gy] is not None:
-                    neighbours.append(self.grid[gx][gy])
-        return neighbours
+                    neighbors.append(self.grid[gx][gy])
+        return neighbors
 
     def sample(self):
         while self.spawn_points:
