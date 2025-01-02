@@ -18,24 +18,20 @@ class PoissonDiskSampler:
         self.grid = [[None for _ in range(self.grid_height)] for _ in range(self.grid_width)]
         self.points = []
         self.spawn_points = []
-        self.include_shapes = []
-        self.exclude_shapes = []
+        self.shape_group = None
 
-    def add_include_shape(self, shape):
-        self.include_shapes.append(shape)
+    def set_shape_group(self, shape_group):
+        """Set the shape group to constrain point sampling."""
+        self.shape_group = shape_group
         for x in range(0, self.width, int(self.min_distance)):
             for y in range(0, self.height, int(self.min_distance)):
-                if shape.contains(x, y):
+                if shape_group.contains(x, y):
                     self.spawn_points.append((x, y))
 
-    def add_exclude_shape(self, shape):
-        self.exclude_shapes.append(shape)
-
     def is_point_valid(self, x, y):
-        if self.include_shapes and not any(shape.contains(x, y) for shape in self.include_shapes):
-            return False
-        if any(shape.contains(x, y) for shape in self.exclude_shapes):
-            return False
+        if self.shape_group is None:
+            return True
+        return self.shape_group.contains(x, y)
         return True
 
     def get_neighbours(self, x, y):

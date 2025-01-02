@@ -1,7 +1,22 @@
 """Shape definitions for the crosshatch pattern generator."""
 
 import math
+from typing import List, Sequence
 from algorithms.types import Point
+
+class ShapeGroup:
+    """A group of shapes that can be combined to create complex shapes."""
+    
+    def __init__(self, includes: Sequence['Shape'], excludes: Sequence['Shape']) -> None:
+        self.includes = list(includes)
+        self.excludes = list(excludes)
+    
+    def contains(self, px: float, py: float) -> bool:
+        """Check if a point is contained within this shape group."""
+        return (
+            any(shape.contains(px, py) for shape in self.includes) and
+            not any(shape.contains(px, py) for shape in self.excludes)
+        )
 
 class Rectangle:
     """A rectangle that can be inflated to create a rounded rectangle effect.

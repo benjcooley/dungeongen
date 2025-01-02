@@ -4,7 +4,7 @@ Main entry point for the crosshatch pattern generator.
 import skia
 
 from graphics.crosshatch import draw_crosshatches
-from algorithms.shapes import Rectangle
+from algorithms.shapes import Rectangle, ShapeGroup
 from options import Options
 
 def main():
@@ -18,13 +18,15 @@ def main():
     background_paint = skia.Paint(AntiAlias=True, Color=skia.ColorWHITE)
     canvas.drawRect(skia.Rect.MakeWH(options.canvas_width, options.canvas_height), background_paint)
 
-    # Create shapes for crosshatching
-    include_shape = Rectangle(100, 100, options.canvas_width - 200, options.canvas_height - 200, inflate=40)
-    exclude_shape = Rectangle(options.canvas_width // 3, options.canvas_height // 3,
-                            options.canvas_width // 3, options.canvas_height // 3)
+    # Create shape group for crosshatching
+    shape_group = ShapeGroup(
+        includes=[Rectangle(100, 100, options.canvas_width - 200, options.canvas_height - 200, inflate=40)],
+        excludes=[Rectangle(options.canvas_width // 3, options.canvas_height // 3,
+                          options.canvas_width // 3, options.canvas_height // 3)]
+    )
 
     # Draw crosshatch patterns
-    draw_crosshatches(options, [include_shape], [exclude_shape], canvas)
+    draw_crosshatches(options, shape_group, canvas)
 
     # Save the result
     image = surface.makeImageSnapshot()
