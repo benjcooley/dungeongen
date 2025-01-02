@@ -67,7 +67,7 @@ class _Cluster:
         return (new_start, new_end)
 
 
-def __get_neighbouring_clusters(cluster: '_Cluster', clusters: List['_Cluster'], radius: float) -> List['_Cluster']:
+def _get_neighbouring_clusters(cluster: '_Cluster', clusters: List['_Cluster'], radius: float) -> List['_Cluster']:
     """Get clusters within radius distance of the given cluster."""
     return [
         other_cluster for other_cluster in clusters
@@ -75,7 +75,7 @@ def __get_neighbouring_clusters(cluster: '_Cluster', clusters: List['_Cluster'],
         and math.dist(cluster.origin, other_cluster.origin) <= radius
     ]
 
-def __draw_crosshatch_with_clusters(
+def _draw_crosshatch_with_clusters(
     options: Options,
     points: List[Point],
     center_point: Point,
@@ -177,7 +177,7 @@ def draw_crosshatches(
         center_point = (options.canvas_width / 2, options.canvas_height / 2)
     
     # Draw the crosshatch patterns
-    __draw_crosshatch_with_clusters(
+    _draw_crosshatch_with_clusters(
         options,
         points,
         center_point,
