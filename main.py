@@ -4,7 +4,6 @@ Main entry point for the crosshatch pattern generator.
 import skia
 
 from graphics.crosshatch import draw_crosshatches
-from algorithms.poisson import PoissonDiskSampler
 from algorithms.shapes import Rectangle
 from options import Options
 
