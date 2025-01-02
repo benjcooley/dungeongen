@@ -75,3 +75,27 @@ class PoissonDiskSampler:
                         break
 
         return self.points
+
+def test_poisson_sampling():
+    """Test the Poisson disk sampling implementation."""
+    # Create a sampler with test parameters
+    width = height = 100
+    min_distance = 10
+    sampler = PoissonDiskSampler(width, height, min_distance)
+    
+    # Sample points
+    points = sampler.sample()
+    
+    # Verify minimum distance between points
+    for i, p1 in enumerate(points):
+        for p2 in points[i+1:]:
+            distance = math.dist(p1, p2)
+            assert distance >= min_distance, f"Points too close: {distance} < {min_distance}"
+    
+    # Verify points are within bounds
+    for x, y in points:
+        assert 0 <= x < width, f"X coordinate out of bounds: {x}"
+        assert 0 <= y < height, f"Y coordinate out of bounds: {y}"
+    
+    print(f"Generated {len(points)} points with minimum distance {min_distance}")
+    return points
