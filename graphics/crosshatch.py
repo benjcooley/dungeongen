@@ -13,6 +13,7 @@ import skia
 from algorithms.types import Point, Line
 from algorithms.shapes import Rectangle
 from algorithms.poisson import PoissonDiskSampler
+from algorithms.lines import intersect_lines
 from options import Options
 
 
@@ -53,7 +54,7 @@ class _Cluster:
         # Check intersections and update t values
         for cluster in neighboring_clusters:
             for existing_stroke in cluster._strokes:
-                intersection = _intersect_lines(stroke, existing_stroke)
+                intersection = intersect_lines(stroke, existing_stroke)
                 if intersection:
                     found_intersection = True
                     _, t = intersection
@@ -78,27 +79,6 @@ class _Cluster:
 
         return (new_start, new_end)
 
-def _intersect_lines(line1: Line, line2: Line) -> Tuple[Point, float] | None:
-    """Check if lines intersect and return intersection point and t value."""
-    (x1, y1), (x2, y2) = line1
-    (x3, y3), (x4, y4) = line2
-
-    dx1, dy1 = x2 - x1, y2 - y1
-    dx2, dy2 = x4 - x3, y4 - y3
-
-    determinant = dx1 * dy2 - dy1 * dx2
-    if determinant == 0:
-        return None  # Parallel lines
-
-    t2 = ((dy1 * (x3 - x1)) - (dx1 * (y3 - y1))) / determinant
-    t1 = ((x3 - x1) + dx2 * t2) / dx1 if abs(dx1) > abs(dy1) else ((y3 - y1) + dy2 * t2) / dy1
-
-    if 0 <= t1 <= 1 and 0 <= t2 <= 1:
-        intersection_x = x1 + t1 * dx1
-        intersection_y = y1 + t1 * dy1
-        return ((intersection_x, intersection_y), t1)
-
-    return None
 
 def _get_neighbouring_clusters(cluster: '_Cluster', clusters: List['_Cluster'], radius: float) -> List['_Cluster']:
     """Get clusters within radius distance of the given cluster."""
