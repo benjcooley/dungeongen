@@ -10,8 +10,7 @@ import math
 import random
 import skia
 
-from algorithms.types import Point, Line
-from algorithms.shapes import ShapeGroup
+from algorithms.types import Point, Line, Shape
 from algorithms.poisson import PoissonDiskSampler
 from algorithms.lines import intersect_lines
 from options import Options
@@ -139,14 +138,14 @@ def _draw_crosshatch_with_clusters(
 
 def draw_crosshatches(
     options: Options,
-    shape_group: Shape,
+    shape: Shape,
     canvas: skia.Canvas
 ) -> None:
-    """Draw crosshatch patterns within the given shape group.
+    """Draw crosshatch patterns within the given shape.
     
     Args:
         options: Drawing configuration options
-        shape_group: ShapeGroup defining areas to draw within and exclude
+        shape: Shape defining area to draw within
         canvas: The canvas to draw on
     """
     # Initialize paint for lines
@@ -157,20 +156,19 @@ def draw_crosshatches(
         Style=skia.Paint.kStroke_Style,
     )
     
-    # Set up the sampler with shape constraints
+    # Set up the sampler with shape constraint
     sampler = PoissonDiskSampler(
         width=options.canvas_width,
         height=options.canvas_height,
         min_distance=options.crosshatch_poisson_radius,
-        shape_group=shape_group
+        shape=shape
     )
     
     # Sample points
     points = sampler.sample()
     
-    # Calculate center point (using first include shape as reference)
-    if shape_group.includes:
-        shape = shape_group.includes[0]
+    # Calculate center point
+    if hasattr(shape, 'x') and hasattr(shape, 'width') and hasattr(shape, 'y') and hasattr(shape, 'height'):
         center_point = (shape.x + shape.width / 2,
                        shape.y + shape.height / 2)
     else:

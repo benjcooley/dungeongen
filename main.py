@@ -18,15 +18,11 @@ def main():
     background_paint = skia.Paint(AntiAlias=True, Color=skia.ColorWHITE)
     canvas.drawRect(skia.Rect.MakeWH(options.canvas_width, options.canvas_height), background_paint)
 
-    # Create shape group for crosshatching
-    shape_group = ShapeGroup(
-        includes=[Rectangle(100, 100, options.canvas_width - 200, options.canvas_height - 200, inflate=40)],
-        excludes=[Rectangle(options.canvas_width // 3, options.canvas_height // 3,
-                          options.canvas_width // 3, options.canvas_height // 3)]
-    )
+    # Create shape for crosshatching
+    shape = Rectangle(100, 100, options.canvas_width - 200, options.canvas_height - 200, inflate=40)
 
     # Draw crosshatch patterns
-    draw_crosshatches(options, shape_group, canvas)
+    draw_crosshatches(options, shape, canvas)
 
     # Save the result
     image = surface.makeImageSnapshot()
