@@ -12,7 +12,7 @@ import random
 import skia
 
 from algorithms.poisson import PoissonDiskSampler
-from algorithms.shapes import Rectangle, Circle
+from algorithms.shapes import Rectangle, Circle, Point, Line
 from options import (
     WIDTH, HEIGHT, STROKE_WIDTH, NUM_STROKES, SPACING,
     RANDOM_ANGLE_VARIATION, POISSON_RADIUS, NEIGHBOR_RADIUS,

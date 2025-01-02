@@ -2,9 +2,8 @@
 
 import math
 import random
-from typing import List, Tuple, Optional, Sequence
-
-Point = Tuple[float, float]
+from typing import List, Optional, Sequence
+from algorithms.shapes import Point
 
 class PoissonDiskSampler:
     def __init__(self, width, height, min_distance, max_attempts=30):
