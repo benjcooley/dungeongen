@@ -30,20 +30,20 @@ def create_line_paint(options: Options) -> skia.Paint:
         Color=skia.ColorBLACK,
         Style=skia.Paint.kStroke_Style,
     )
-class Cluster:
+class _Cluster:
     """A cluster of crosshatch strokes around a central point."""
     
     def __init__(self, origin: Point, options: Options) -> None:
-        self.origin = origin
-        self.strokes: List[Line] = []
-        self.base_angle: float | None = None
-        self.options = options
+        self._origin = origin
+        self._strokes: List[Line] = []
+        self._base_angle: float | None = None
+        self._options = options
 
-    def add_stroke(self, stroke: Line) -> None:
+    def _add_stroke(self, stroke: Line) -> None:
         """Add a stroke to this cluster."""
-        self.strokes.append(stroke)
+        self._strokes.append(stroke)
 
-    def validate_stroke(self, stroke: Line, neighboring_clusters: List['Cluster']) -> Line | None:
+    def _validate_stroke(self, stroke: Line, neighboring_clusters: List['_Cluster']) -> Line | None:
         """Validate and potentially clip a stroke against neighboring clusters."""
         start, end = stroke
         min_t_start = 0
@@ -52,8 +52,8 @@ class Cluster:
 
         # Check intersections and update t values
         for cluster in neighboring_clusters:
-            for existing_stroke in cluster.strokes:
-                intersection = intersect_lines(stroke, existing_stroke)
+            for existing_stroke in cluster._strokes:
+                intersection = _intersect_lines(stroke, existing_stroke)
                 if intersection:
                     found_intersection = True
                     _, t = intersection
@@ -73,12 +73,12 @@ class Cluster:
 
         # Ensure the stroke length is not below the minimum
         new_length = math.sqrt((new_end[0] - new_start[0])**2 + (new_end[1] - new_start[1])**2)
-        if new_length < self.options.min_crosshatch_stroke_length:
+        if new_length < self._options.min_crosshatch_stroke_length:
             return None
 
         return (new_start, new_end)
 
-def intersect_lines(line1: Line, line2: Line) -> Tuple[Point, float] | None:
+def _intersect_lines(line1: Line, line2: Line) -> Tuple[Point, float] | None:
     """Check if lines intersect and return intersection point and t value."""
     (x1, y1), (x2, y2) = line1
     (x3, y3), (x4, y4) = line2
@@ -100,7 +100,7 @@ def intersect_lines(line1: Line, line2: Line) -> Tuple[Point, float] | None:
 
     return None
 
-def get_neighbouring_clusters(cluster: Cluster, clusters: List[Cluster], radius: float) -> List[Cluster]:
+def _get_neighbouring_clusters(cluster: '_Cluster', clusters: List['_Cluster'], radius: float) -> List['_Cluster']:
     """Get clusters within radius distance of the given cluster."""
     return [
         other_cluster for other_cluster in clusters
@@ -123,20 +123,20 @@ def draw_crosshatch_with_clusters(
 
     for point in points:
         px, py = point
-        cluster = Cluster((px, py), options)
+        cluster = _Cluster((px, py), options)
         clusters.append(cluster)
 
         # Generate a base angle for alignment
         base_angle = None
         max_attempts = 20
-        neighbours = get_neighbouring_clusters(cluster, clusters[:-1], options.crosshatch_neighbor_radius)
+        neighbours = _get_neighbouring_clusters(cluster, clusters[:-1], options.crosshatch_neighbor_radius)
         
         for _ in range(max_attempts):
             angle_candidate = random.uniform(0, 2 * math.pi)
             if not any(
-                abs(math.cos(angle_candidate - neighbor.base_angle)) > 0.9
+                abs(math.cos(angle_candidate - neighbor._base_angle)) > 0.9
                 for neighbor in neighbours
-                if neighbor.base_angle is not None
+                if neighbor._base_angle is not None
             ):
                 base_angle = angle_candidate
                 break
@@ -144,10 +144,10 @@ def draw_crosshatch_with_clusters(
         if base_angle is None:
             base_angle = random.uniform(0, 2 * math.pi)
             for neighbor in neighbours:
-                if neighbor.base_angle is not None:
+                if neighbor._base_angle is not None:
                     base_angle += options.random_angle_variation
 
-        cluster.base_angle = base_angle
+        cluster._base_angle = base_angle
         dx_base = math.cos(base_angle)
         dy_base = math.sin(base_angle)
 
@@ -164,8 +164,8 @@ def draw_crosshatch_with_clusters(
             end_y = py - offset * dx_base + dy
 
             new_stroke = ((start_x, start_y), (end_x, end_y))
-            clipped_stroke = cluster.validate_stroke(new_stroke, clusters[:-1])
+            clipped_stroke = cluster._validate_stroke(new_stroke, clusters[:-1])
 
             if clipped_stroke:
                 canvas.drawLine(*clipped_stroke[0], *clipped_stroke[1], line_paint)
-                cluster.add_stroke(clipped_stroke)
+                cluster._add_stroke(clipped_stroke)
