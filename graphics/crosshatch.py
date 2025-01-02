@@ -96,7 +96,7 @@ def _draw_crosshatch_with_clusters(
         # Generate a base angle for alignment
         base_angle = None
         max_attempts = 20
-        neighbours = __get_neighbouring_clusters(cluster, clusters[:-1], options.crosshatch_neighbor_radius)
+        neighbours = _get_neighbouring_clusters(cluster, clusters[:-1], options.crosshatch_neighbor_radius)
         
         for _ in range(max_attempts):
             angle_candidate = random.uniform(0, 2 * math.pi)
