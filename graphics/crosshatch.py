@@ -116,7 +116,7 @@ def draw_crosshatch_with_clusters(
     line_paint: skia.Paint
 ) -> None:
     """Draw crosshatch patterns with clusters of strokes."""
-    clusters: List[Cluster] = []
+    clusters: List[_Cluster] = []
 
     # Sort points by distance to the center point
     points.sort(key=lambda p: math.dist(p, center_point))
