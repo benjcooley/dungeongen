@@ -3,7 +3,7 @@
 import math
 import random
 from typing import List, Optional, Sequence
-from algorithms.shapes import Point
+from algorithms.types import Point
 
 class PoissonDiskSampler:
     def __init__(self, width, height, min_distance, max_attempts=30):

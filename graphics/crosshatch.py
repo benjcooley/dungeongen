@@ -6,7 +6,8 @@ within defined shapes using Poisson disk sampling for point distribution.
 """
 
 from dataclasses import dataclass
-from typing import List, Tuple, Optional, Sequence
+from typing import List, Optional, Sequence
+from algorithms.types import Point, Line
 import math
 import random
 import skia
@@ -19,9 +20,6 @@ from options import (
     STROKE_LENGTH, MIN_STROKE_LENGTH, RANDOM_LENGTH_VARIATION
 )
 
-# Type aliases
-Point = Tuple[float, float]
-Line = Tuple[Point, Point]
 
 # Initialize Skia canvas
 _surface = skia.Surface(WIDTH, HEIGHT)

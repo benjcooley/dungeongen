@@ -1,11 +1,7 @@
 """Shape definitions for the crosshatch pattern generator."""
 
 import math
-from typing import Tuple
-
-# Type aliases
-Point = Tuple[float, float]
-Line = Tuple[Point, Point]
+from algorithms.types import Point
 
 class Rectangle:
     def __init__(self, x, y, width, height, inflate=0):
