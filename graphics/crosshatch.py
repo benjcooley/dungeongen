@@ -32,18 +32,18 @@ Point = Tuple[float, float]
 Line = Tuple[Point, Point]
 
 # Initialize Skia canvas
-_surface = skia.Surface(_WIDTH, _HEIGHT)
+_surface = skia.Surface(WIDTH, HEIGHT)
 _canvas = _surface.getCanvas()
 
 # Fill the background with white
 def draw_background(canvas):
     background_paint = skia.Paint(AntiAlias=True, Color=skia.ColorWHITE)
-    canvas.drawRect(skia.Rect.MakeWH(_WIDTH, _HEIGHT), background_paint)
+    canvas.drawRect(skia.Rect.MakeWH(WIDTH, HEIGHT), background_paint)
 
 def create_line_paint():
     return skia.Paint(
         AntiAlias=True,
-        StrokeWidth=_STROKE_WIDTH,
+        StrokeWidth=STROKE_WIDTH,
         Color=skia.ColorBLACK,
         Style=skia.Paint.kStroke_Style,
     )
@@ -150,14 +150,14 @@ class PoissonDiskSampler:
 
 # Test Poisson Disk Sampling with shapes
 def test_poisson_sampling():
-    sampler = PoissonDiskSampler(_WIDTH, _HEIGHT, _SPACING)
+    sampler = PoissonDiskSampler(WIDTH, HEIGHT, SPACING)
 
     # Add an include shape (inset rectangle)
-    include_shape = Rectangle(50, 50, _WIDTH - 100, _HEIGHT - 100)
+    include_shape = Rectangle(50, 50, WIDTH - 100, HEIGHT - 100)
     sampler.add_include_shape(include_shape)
 
     # Add an exclude shape (central rectangle)
-    exclude_shape = Rectangle(_WIDTH // 3, _HEIGHT // 3, _WIDTH // 3, _HEIGHT // 3)
+    exclude_shape = Rectangle(WIDTH // 3, HEIGHT // 3, WIDTH // 3, HEIGHT // 3)
     sampler.add_exclude_shape(exclude_shape)
 
     points = sampler.sample()
@@ -167,9 +167,9 @@ def test_poisson_sampling():
     shape_paint_exclude = skia.Paint(AntiAlias=True, Color=skia.ColorRED, Style=skia.Paint.kStroke_Style, StrokeWidth=1)
 
     # Draw the include shape
-    _canvas.drawRect(skia.Rect.MakeLTRB(50, 50, _WIDTH - 50, _HEIGHT - 50), shape_paint_include)
+    _canvas.drawRect(skia.Rect.MakeLTRB(50, 50, WIDTH - 50, HEIGHT - 50), shape_paint_include)
     # Draw the exclude shape
-    _canvas.drawRect(skia.Rect.MakeLTRB(_WIDTH // 3, _HEIGHT // 3, _WIDTH * 2 // 3, _HEIGHT * 2 // 3), shape_paint_exclude)
+    _canvas.drawRect(skia.Rect.MakeLTRB(WIDTH // 3, HEIGHT // 3, WIDTH * 2 // 3, HEIGHT * 2 // 3), shape_paint_exclude)
 
     # Draw the points
     for x, y in points:
@@ -221,7 +221,7 @@ class Cluster:
 
         # Ensure the stroke length is not below the minimum
         new_length = math.sqrt((new_end[0] - new_start[0])**2 + (new_end[1] - new_start[1])**2)
-        if new_length < _MIN_STROKE_LENGTH:
+        if new_length < MIN_STROKE_LENGTH:
             return None
 
         return (new_start, new_end)
@@ -271,7 +271,7 @@ def draw_crosshatch_with_clusters(points, sampler, center_point, canvas, line_pa
         # Generate a base angle for alignment
         base_angle = None
         max_attempts = 20  # Increased attempts to find a non-parallel angle
-        neighbours = get_neighbouring_clusters(cluster, clusters[:-1], _NEIGHBOR_RADIUS)
+        neighbours = get_neighbouring_clusters(cluster, clusters[:-1], NEIGHBOR_RADIUS)
         for _ in range(max_attempts):
             angle_candidate = random.uniform(0, 2 * math.pi)
             # Check if this angle is not parallel to nearby clusters
@@ -287,19 +287,19 @@ def draw_crosshatch_with_clusters(points, sampler, center_point, canvas, line_pa
             base_angle = random.uniform(0, 2 * math.pi)
             for neighbor in neighbours:
                 if neighbor.base_angle is not None:
-                    base_angle += _RANDOM_ANGLE_VARIATION
+                    base_angle += RANDOM_ANGLE_VARIATION
 
         cluster.base_angle = base_angle
         dx_base = math.cos(base_angle)
         dy_base = math.sin(base_angle)
 
         # Draw parallel lines for the cluster
-        for i in range(_NUM_STROKES):
+        for i in range(NUM_STROKES):
             # Adjust spacing and stroke length dynamically
-            offset = (i - _NUM_STROKES // 2) * _SPACING
-            variation = random.uniform(-_RANDOM_LENGTH_VARIATION, _RANDOM_LENGTH_VARIATION) * _STROKE_LENGTH
-            dx = dx_base * (_STROKE_LENGTH / 2 + variation)
-            dy = dy_base * (_STROKE_LENGTH / 2 + variation)
+            offset = (i - NUM_STROKES // 2) * SPACING
+            variation = random.uniform(-RANDOM_LENGTH_VARIATION, RANDOM_LENGTH_VARIATION) * STROKE_LENGTH
+            dx = dx_base * (STROKE_LENGTH / 2 + variation)
+            dy = dy_base * (STROKE_LENGTH / 2 + variation)
 
             start_x = px + offset * dy_base - dx
             start_y = py - offset * dx_base - dy
@@ -314,13 +314,13 @@ def draw_crosshatch_with_clusters(points, sampler, center_point, canvas, line_pa
                 cluster.add_stroke(clipped_stroke)
 
 # Generate points using Poisson Disk Sampling
-sampler = PoissonDiskSampler(_WIDTH, _HEIGHT, _POISSON_RADIUS)
+sampler = PoissonDiskSampler(WIDTH, HEIGHT, POISSON_RADIUS)
 
 # Add include and exclude shapes
-include_shape = Rectangle(100, 100, _WIDTH - 200, _HEIGHT - 200, inflate=40)
+include_shape = Rectangle(100, 100, WIDTH - 200, HEIGHT - 200, inflate=40)
 sampler.add_include_shape(include_shape)
 
-exclude_shape = Rectangle(_WIDTH // 3, _HEIGHT // 3, _WIDTH // 3, _HEIGHT // 3)
+exclude_shape = Rectangle(WIDTH // 3, HEIGHT // 3, WIDTH // 3, HEIGHT // 3)
 sampler.add_exclude_shape(exclude_shape)
 
 # Sample points
