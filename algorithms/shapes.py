@@ -15,6 +15,16 @@ class Rectangle:
         self._inflated_width = width + 2 * inflate
         self._inflated_height = height + 2 * inflate
 
+    @property
+    def inflated(self) -> 'Rectangle':
+        """Return a new Rectangle instance with the inflated dimensions."""
+        return Rectangle(
+            self._inflated_x,
+            self._inflated_y,
+            self._inflated_width,
+            self._inflated_height
+        )
+
     def contains(self, px: float, py: float) -> bool:
         dx = max(0, abs(px - (self._inflated_x + self._inflated_width / 2)) - self._inflated_width / 2)
         dy = max(0, abs(py - (self._inflated_y + self._inflated_height / 2)) - self._inflated_height / 2)
@@ -26,6 +36,11 @@ class Circle:
         self.cy = cy
         self.radius = radius  # Original radius
         self._inflated_radius = radius + inflate
+
+    @property
+    def inflated(self) -> 'Circle':
+        """Return a new Circle instance with the inflated radius."""
+        return Circle(self.cx, self.cy, self._inflated_radius)
 
     def contains(self, px: float, py: float) -> bool:
         return math.sqrt((px - self.cx)**2 + (py - self.cy)**2) <= self._inflated_radius
