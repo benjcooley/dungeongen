@@ -151,8 +151,7 @@ def draw_crosshatches(
         points,
         center_point,
         canvas,
-        line_paint
-) -> None:
+        line_paint)
     """Draw crosshatch patterns with clusters of strokes."""
     clusters: List[_Cluster] = []
 
