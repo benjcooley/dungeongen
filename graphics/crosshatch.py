@@ -11,26 +11,22 @@ import random
 import skia
 
 from algorithms.types import Point, Line
-from options import (
-    WIDTH, HEIGHT, STROKE_WIDTH, NUM_STROKES, SPACING,
-    RANDOM_ANGLE_VARIATION, NEIGHBOR_RADIUS,
-    STROKE_LENGTH, MIN_STROKE_LENGTH, RANDOM_LENGTH_VARIATION
-)
+from options import Options
 
 # Initialize Skia canvas
-_surface = skia.Surface(WIDTH, HEIGHT)
+_surface = skia.Surface(400, 400)  # Default size, will be updated when used
 _canvas = _surface.getCanvas()
 
-def draw_background(canvas: skia.Canvas) -> None:
+def draw_background(options: Options, canvas: skia.Canvas) -> None:
     """Fill the background with white."""
     background_paint = skia.Paint(AntiAlias=True, Color=skia.ColorWHITE)
-    canvas.drawRect(skia.Rect.MakeWH(WIDTH, HEIGHT), background_paint)
+    canvas.drawRect(skia.Rect.MakeWH(options.width, options.height), background_paint)
 
-def create_line_paint() -> skia.Paint:
+def create_line_paint(options: Options) -> skia.Paint:
     """Create a paint object for drawing lines."""
     return skia.Paint(
         AntiAlias=True,
-        StrokeWidth=STROKE_WIDTH,
+        StrokeWidth=options.stroke_width,
         Color=skia.ColorBLACK,
         Style=skia.Paint.kStroke_Style,
     )
@@ -112,6 +108,7 @@ def get_neighbouring_clusters(cluster: Cluster, clusters: List[Cluster], radius:
     ]
 
 def draw_crosshatch_with_clusters(
+    options: Options,
     points: List[Point],
     center_point: Point,
     canvas: skia.Canvas,
@@ -131,7 +128,7 @@ def draw_crosshatch_with_clusters(
         # Generate a base angle for alignment
         base_angle = None
         max_attempts = 20
-        neighbours = get_neighbouring_clusters(cluster, clusters[:-1], NEIGHBOR_RADIUS)
+        neighbours = get_neighbouring_clusters(cluster, clusters[:-1], options.neighbor_radius)
         
         for _ in range(max_attempts):
             angle_candidate = random.uniform(0, 2 * math.pi)
@@ -147,18 +144,18 @@ def draw_crosshatch_with_clusters(
             base_angle = random.uniform(0, 2 * math.pi)
             for neighbor in neighbours:
                 if neighbor.base_angle is not None:
-                    base_angle += RANDOM_ANGLE_VARIATION
+                    base_angle += options.random_angle_variation
 
         cluster.base_angle = base_angle
         dx_base = math.cos(base_angle)
         dy_base = math.sin(base_angle)
 
         # Draw parallel lines for the cluster
-        for i in range(NUM_STROKES):
-            offset = (i - NUM_STROKES // 2) * SPACING
-            variation = random.uniform(-RANDOM_LENGTH_VARIATION, RANDOM_LENGTH_VARIATION) * STROKE_LENGTH
-            dx = dx_base * (STROKE_LENGTH / 2 + variation)
-            dy = dy_base * (STROKE_LENGTH / 2 + variation)
+        for i in range(options.num_strokes):
+            offset = (i - options.num_strokes // 2) * options.spacing
+            variation = random.uniform(-options.random_length_variation, options.random_length_variation) * options.stroke_length
+            dx = dx_base * (options.stroke_length / 2 + variation)
+            dy = dy_base * (options.stroke_length / 2 + variation)
 
             start_x = px + offset * dy_base - dx
             start_y = py - offset * dx_base - dy
