@@ -17,11 +17,6 @@ from algorithms.lines import intersect_lines
 from options import Options
 
 
-def draw_background(options: Options, canvas: skia.Canvas) -> None:
-    """Fill the background with white."""
-    background_paint = skia.Paint(AntiAlias=True, Color=skia.ColorWHITE)
-    canvas.drawRect(skia.Rect.MakeWH(options.canvas_width, options.canvas_height), background_paint)
-
 
 class _Cluster:
     """A cluster of crosshatch strokes around a central point."""

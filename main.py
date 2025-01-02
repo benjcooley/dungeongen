@@ -3,10 +3,7 @@ Main entry point for the crosshatch pattern generator.
 """
 import skia
 
-from graphics.crosshatch import (
-    draw_background,
-    draw_crosshatches
-)
+from graphics.crosshatch import draw_crosshatches
 from algorithms.poisson import PoissonDiskSampler
 from algorithms.shapes import Rectangle
 from options import Options
@@ -19,7 +16,8 @@ def main():
     canvas = surface.getCanvas()
     
     # Initialize canvas and background
-    draw_background(options, canvas)
+    background_paint = skia.Paint(AntiAlias=True, Color=skia.ColorWHITE)
+    canvas.drawRect(skia.Rect.MakeWH(options.canvas_width, options.canvas_height), background_paint)
 
     # Create shapes for crosshatching
     include_shape = Rectangle(100, 100, options.canvas_width - 200, options.canvas_height - 200, inflate=40)
