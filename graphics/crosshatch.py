@@ -11,7 +11,7 @@ import random
 import skia
 
 from algorithms.types import Point, Line
-from algorithms.shapes import Rectangle
+from algorithms.shapes import Rectangle, Circle
 from algorithms.poisson import PoissonDiskSampler
 from algorithms.lines import intersect_lines
 from options import Options
@@ -139,16 +139,16 @@ def _draw_crosshatch_with_clusters(
 
 def draw_crosshatches(
     options: Options,
-    include_shapes: Sequence[Rectangle],
-    exclude_shapes: Sequence[Rectangle],
+    include_shapes: Sequence[Rectangle | Circle],
+    exclude_shapes: Sequence[Rectangle | Circle],
     canvas: skia.Canvas
 ) -> None:
     """Draw crosshatch patterns within the given shapes.
     
     Args:
         options: Drawing configuration options
-        include_shapes: Shapes to draw crosshatches within
-        exclude_shapes: Shapes to exclude crosshatches from
+        include_shapes: Shapes to draw crosshatches within (must implement contains() method)
+        exclude_shapes: Shapes to exclude crosshatches from (must implement contains() method)
         canvas: The canvas to draw on
     """
     # Initialize paint for lines
