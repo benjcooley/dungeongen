@@ -10,10 +10,10 @@ class Shape(Protocol):
         """Check if a point is contained within this shape."""
         ...
 
-class ShapeGroup:
+class ShapeGroup(Shape):
     """A group of shapes that can be combined to create complex shapes."""
     
-    def __init__(self, includes: Sequence['Shape'], excludes: Sequence['Shape']) -> None:
+    def __init__(self, includes: Sequence[Shape], excludes: Sequence[Shape]) -> None:
         self.includes = list(includes)
         self.excludes = list(excludes)
     

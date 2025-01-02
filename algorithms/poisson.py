@@ -12,7 +12,7 @@ class PoissonDiskSampler:
         width: float,
         height: float,
         min_distance: float,
-        shape_group: ShapeGroup,
+        shape: Shape,
         max_attempts: int = 30
     ) -> None:
         """Initialize the Poisson disk sampler.
@@ -29,7 +29,7 @@ class PoissonDiskSampler:
         self.min_distance = min_distance
         self.cell_size = min_distance / math.sqrt(2)
         self.max_attempts = max_attempts
-        self.shape_group = shape_group
+        self.shape = shape
 
         self.grid_width = int(width / self.cell_size) + 1
         self.grid_height = int(height / self.cell_size) + 1
@@ -43,7 +43,7 @@ class PoissonDiskSampler:
         # Initialize spawn points within the shape
         for x in range(0, int(self.width), int(self.min_distance)):
             for y in range(0, int(self.height), int(self.min_distance)):
-                if shape_group.contains(x, y):
+                if shape.contains(x, y):
                     self.spawn_points.append((x, y))
 
     def is_point_valid(self, x: float, y: float) -> bool:
@@ -56,7 +56,7 @@ class PoissonDiskSampler:
         Returns:
             True if the point is valid for sampling
         """
-        return self.shape_group.contains(x, y)
+        return self.shape.contains(x, y)
 
     def get_neighbours(self, x, y):
         grid_x = int(x / self.cell_size)
