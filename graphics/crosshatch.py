@@ -1,24 +1,36 @@
-import skia
+"""
+Crosshatch pattern generator using Poisson disk sampling and Skia graphics.
+
+This module provides functionality to generate artistic crosshatch patterns
+within defined shapes using Poisson disk sampling for point distribution.
+"""
+
+from dataclasses import dataclass
+from typing import List, Tuple, Optional, Sequence
 import math
 import random
+import skia
 
-# Configuration/Settings (Default values from JavaScript code)
-RANDOM_ANGLE_VARIATION = math.radians(10)  # Reduced random angle variation
+# Private module constants
+_RANDOM_ANGLE_VARIATION: float = math.radians(10)
+_NUM_STROKES: int = 3
+_STROKE_WIDTH: float = 1.2
+_SPACING: float = 10
+_POISSON_RADIUS: float = _SPACING * (_NUM_STROKES - 1)
+_NEIGHBOR_RADIUS: float = _POISSON_RADIUS * 1.5
+_WIDTH: int = 400
+_HEIGHT: int = 400
+_STROKE_LENGTH: float = _POISSON_RADIUS * 2
+_MIN_STROKE_LENGTH: float = _STROKE_LENGTH * 0.35
+_RANDOM_LENGTH_VARIATION: float = 0.1
 
-# Configuration/Settings (Default values from JavaScript code)
-NUM_STROKES = 3  # Number of strokes per cluster (JavaScript default)
-STROKE_WIDTH = 1.2  # Stroke weight for lines
-SPACING = 10  # Distance between strokes in a cluster
-POISSON_RADIUS = SPACING * (NUM_STROKES - 1)  # Minimum distance between clusters
-NEIGHBOR_RADIUS = POISSON_RADIUS * 1.5  # Radius for finding neighboring clusters
-WIDTH, HEIGHT = 400, 400  # Canvas dimensions
-STROKE_LENGTH = POISSON_RADIUS * 2  # Stroke length matches the Poisson radius
-MIN_STROKE_LENGTH = STROKE_LENGTH * 0.35  # Minimum line length is 25% of regular length
-RANDOM_LENGTH_VARIATION = 0.1  # Percentage variation in stroke lengths
+# Type aliases
+Point = Tuple[float, float]
+Line = Tuple[Point, Point]
 
-# Create a surface and canvas
-surface = skia.Surface(WIDTH, HEIGHT)
-canvas = surface.getCanvas()
+# Initialize Skia canvas
+_surface = skia.Surface(_WIDTH, _HEIGHT)
+_canvas = _surface.getCanvas()
 
 # Fill the background with white
 def draw_background(canvas):
