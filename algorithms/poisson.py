@@ -45,7 +45,7 @@ class PoissonDiskSampler:
                 if shape.contains(x, y):
                     self.spawn_points.append((x, y))
 
-    def is_point_valid(self, x: float, y: float) -> bool:
+    def _is_point_valid(self, x: float, y: float) -> bool:
         """Check if a point is valid for sampling.
         
         Args:
@@ -57,7 +57,7 @@ class PoissonDiskSampler:
         """
         return self.shape.contains(x, y)
 
-    def get_neighbours(self, x, y):
+    def _get_neighbours(self, x, y):
         grid_x = int(x / self.cell_size)
         grid_y = int(y / self.cell_size)
         neighbours = []
@@ -78,7 +78,7 @@ class PoissonDiskSampler:
                 candidate_x = spawn_point[0] + math.cos(angle) * radius
                 candidate_y = spawn_point[1] + math.sin(angle) * radius
 
-                if 0 <= candidate_x < self.width and 0 <= candidate_y < self.height and self.is_point_valid(candidate_x, candidate_y):
+                if 0 <= candidate_x < self.width and 0 <= candidate_y < self.height and self._is_point_valid(candidate_x, candidate_y):
                     grid_x = int(candidate_x / self.cell_size)
                     grid_y = int(candidate_y / self.cell_size)
 
