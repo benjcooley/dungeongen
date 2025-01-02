@@ -5,7 +5,6 @@ import skia
 
 from graphics.crosshatch import (
     draw_background,
-    create_line_paint,
     draw_crosshatches
 )
 from algorithms.poisson import PoissonDiskSampler

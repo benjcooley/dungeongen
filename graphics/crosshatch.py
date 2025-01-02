@@ -22,14 +22,6 @@ def draw_background(options: Options, canvas: skia.Canvas) -> None:
     background_paint = skia.Paint(AntiAlias=True, Color=skia.ColorWHITE)
     canvas.drawRect(skia.Rect.MakeWH(options.canvas_width, options.canvas_height), background_paint)
 
-def create_line_paint(options: Options) -> skia.Paint:
-    """Create a paint object for drawing lines."""
-    return skia.Paint(
-        AntiAlias=True,
-        StrokeWidth=options.crosshatch_stroke_width,
-        Color=skia.ColorBLACK,
-        Style=skia.Paint.kStroke_Style,
-    )
 
 class _Cluster:
     """A cluster of crosshatch strokes around a central point."""
