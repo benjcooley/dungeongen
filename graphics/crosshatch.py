@@ -11,18 +11,21 @@ import math
 import random
 import skia
 
-# Private module constants
-_RANDOM_ANGLE_VARIATION: float = math.radians(10)
-_NUM_STROKES: int = 3
-_STROKE_WIDTH: float = 1.2
-_SPACING: float = 10
-_POISSON_RADIUS: float = _SPACING * (_NUM_STROKES - 1)
-_NEIGHBOR_RADIUS: float = _POISSON_RADIUS * 1.5
-_WIDTH: int = 400
-_HEIGHT: int = 400
-_STROKE_LENGTH: float = _POISSON_RADIUS * 2
-_MIN_STROKE_LENGTH: float = _STROKE_LENGTH * 0.35
-_RANDOM_LENGTH_VARIATION: float = 0.1
+from algorithms.poisson import PoissonDiskSampler
+from algorithms.shapes import Rectangle, Circle
+from options import (
+    WIDTH, HEIGHT, STROKE_WIDTH, NUM_STROKES, SPACING,
+    RANDOM_ANGLE_VARIATION, POISSON_RADIUS, NEIGHBOR_RADIUS,
+    STROKE_LENGTH, MIN_STROKE_LENGTH, RANDOM_LENGTH_VARIATION
+)
+
+# Type aliases
+Point = Tuple[float, float]
+Line = Tuple[Point, Point]
+
+# Initialize Skia canvas
+_surface = skia.Surface(WIDTH, HEIGHT)
+_canvas = _surface.getCanvas()
 
 # Type aliases
 Point = Tuple[float, float]
