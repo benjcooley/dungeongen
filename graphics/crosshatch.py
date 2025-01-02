@@ -33,10 +33,11 @@ def create_line_paint(options: Options) -> skia.Paint:
 class Cluster:
     """A cluster of crosshatch strokes around a central point."""
     
-    def __init__(self, origin: Point) -> None:
+    def __init__(self, origin: Point, options: Options) -> None:
         self.origin = origin
         self.strokes: List[Line] = []
         self.base_angle: float | None = None
+        self.options = options
 
     def add_stroke(self, stroke: Line) -> None:
         """Add a stroke to this cluster."""
@@ -72,7 +73,7 @@ class Cluster:
 
         # Ensure the stroke length is not below the minimum
         new_length = math.sqrt((new_end[0] - new_start[0])**2 + (new_end[1] - new_start[1])**2)
-        if new_length < MIN_STROKE_LENGTH:
+        if new_length < self.options.min_stroke_length:
             return None
 
         return (new_start, new_end)
@@ -122,7 +123,7 @@ def draw_crosshatch_with_clusters(
 
     for point in points:
         px, py = point
-        cluster = Cluster((px, py))
+        cluster = Cluster((px, py), options)
         clusters.append(cluster)
 
         # Generate a base angle for alignment
