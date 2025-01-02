@@ -107,45 +107,6 @@ def _get_neighbouring_clusters(cluster: '_Cluster', clusters: List['_Cluster'], 
         and math.dist(cluster.origin, other_cluster.origin) <= radius
     ]
 
-def draw_crosshatches(
-    options: Options,
-    include_shapes: Sequence[Rectangle],
-    exclude_shapes: Sequence[Rectangle],
-    canvas: skia.Canvas
-) -> None:
-    """Draw crosshatch patterns within the given shapes.
-    
-    Args:
-        options: Drawing configuration options
-        include_shapes: Shapes to draw crosshatches within
-        exclude_shapes: Shapes to exclude crosshatches from
-        canvas: The canvas to draw on
-    """
-    # Initialize paint for lines
-    line_paint = create_line_paint(options)
-    
-    # Set up the sampler
-    sampler = PoissonDiskSampler(options.canvas_width, options.canvas_height, 
-                                options.crosshatch_poisson_radius)
-    
-    # Add shapes to sampler
-    for shape in include_shapes:
-        sampler.add_include_shape(shape)
-    for shape in exclude_shapes:
-        sampler.add_exclude_shape(shape)
-    
-    # Sample points
-    points = sampler.sample()
-    
-    # Calculate center point (using first include shape as reference)
-    if include_shapes:
-        shape = include_shapes[0]
-        center_point = (shape.x + shape.width / 2,
-                       shape.y + shape.height / 2)
-    else:
-        center_point = (options.canvas_width / 2, options.canvas_height / 2)
-    
-    # Draw the crosshatch patterns
 def _draw_crosshatch_with_clusters(
     options: Options,
     points: List[Point],
@@ -207,3 +168,49 @@ def _draw_crosshatch_with_clusters(
             if clipped_stroke:
                 canvas.drawLine(*clipped_stroke[0], *clipped_stroke[1], line_paint)
                 cluster._add_stroke(clipped_stroke)
+
+def draw_crosshatches(
+    options: Options,
+    include_shapes: Sequence[Rectangle],
+    exclude_shapes: Sequence[Rectangle],
+    canvas: skia.Canvas
+) -> None:
+    """Draw crosshatch patterns within the given shapes.
+    
+    Args:
+        options: Drawing configuration options
+        include_shapes: Shapes to draw crosshatches within
+        exclude_shapes: Shapes to exclude crosshatches from
+        canvas: The canvas to draw on
+    """
+    # Initialize paint for lines
+    line_paint = create_line_paint(options)
+    
+    # Set up the sampler
+    sampler = PoissonDiskSampler(options.canvas_width, options.canvas_height, 
+                                options.crosshatch_poisson_radius)
+    
+    # Add shapes to sampler
+    for shape in include_shapes:
+        sampler.add_include_shape(shape)
+    for shape in exclude_shapes:
+        sampler.add_exclude_shape(shape)
+    
+    # Sample points
+    points = sampler.sample()
+    
+    # Calculate center point (using first include shape as reference)
+    if include_shapes:
+        shape = include_shapes[0]
+        center_point = (shape.x + shape.width / 2,
+                       shape.y + shape.height / 2)
+    else:
+        center_point = (options.canvas_width / 2, options.canvas_height / 2)
+    
+    # Draw the crosshatch patterns
+    _draw_crosshatch_with_clusters(
+        options,
+        points,
+        center_point,
+        canvas,
+        line_paint)
