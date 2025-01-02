@@ -4,6 +4,12 @@ import math
 from algorithms.types import Point
 
 class Rectangle:
+    """A rectangle that can be inflated to create a rounded rectangle effect.
+    
+    When inflated, the rectangle's corners become rounded with radius equal to
+    the inflation amount, effectively creating a rounded rectangle shape.
+    """
+    
     def __init__(self, x: float, y: float, width: float, height: float, inflate: float = 0) -> None:
         self.x = x  # Original x
         self.y = y  # Original y
@@ -17,7 +23,12 @@ class Rectangle:
 
     @property
     def inflated(self) -> 'Rectangle':
-        """Return a new Rectangle instance with the inflated dimensions."""
+        """Return a new Rectangle instance with the inflated dimensions.
+        
+        Note: The inflated rectangle effectively becomes a rounded rectangle,
+        where the corner radius equals the inflation amount. This is because
+        the contains() method uses a distance check that creates rounded corners.
+        """
         return Rectangle(
             self._inflated_x,
             self._inflated_y,
