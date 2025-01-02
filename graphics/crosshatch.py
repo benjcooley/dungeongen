@@ -146,12 +146,13 @@ def draw_crosshatches(
         center_point = (options.canvas_width / 2, options.canvas_height / 2)
     
     # Draw the crosshatch patterns
-    _draw_crosshatch_with_clusters(
-        options,
-        points,
-        center_point,
-        canvas,
-        line_paint)
+def _draw_crosshatch_with_clusters(
+    options: Options,
+    points: List[Point],
+    center_point: Point,
+    canvas: skia.Canvas,
+    line_paint: skia.Paint
+):
     """Draw crosshatch patterns with clusters of strokes."""
     clusters: List[_Cluster] = []
 
