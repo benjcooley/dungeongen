@@ -6,19 +6,21 @@ import skia
 from graphics.crosshatch import (
     draw_background,
     create_line_paint,
-    draw_crosshatch_with_clusters,
-    PoissonDiskSampler,
-    Rectangle,
-    _surface,
-    _canvas
+    draw_crosshatch_with_clusters
 )
+from algorithms.poisson import PoissonDiskSampler
+from algorithms.shapes import Rectangle
 from options import Options
 
 def main():
     options = Options()
     
+    # Initialize Skia canvas
+    surface = skia.Surface(options.canvas_width, options.canvas_height)
+    canvas = surface.getCanvas()
+    
     # Initialize canvas and background
-    draw_background(options, _canvas)
+    draw_background(options, canvas)
     line_paint = create_line_paint(options)
 
     # Set up the sampler with shapes
@@ -43,7 +45,7 @@ def main():
     draw_crosshatch_with_clusters(options, points, center_point, _canvas, line_paint)
 
     # Save the result
-    image = _surface.makeImageSnapshot()
+    image = surface.makeImageSnapshot()
     image.save('crosshatch_output.png', skia.kPNG)
     print("Crosshatch drawing completed and saved to 'crosshatch_output.png'")
 

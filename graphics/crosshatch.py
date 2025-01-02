@@ -13,9 +13,6 @@ import skia
 from algorithms.types import Point, Line
 from options import Options
 
-# Initialize Skia canvas
-_surface = skia.Surface(400, 400)  # Default size, will be updated when used
-_canvas = _surface.getCanvas()
 
 def draw_background(options: Options, canvas: skia.Canvas) -> None:
     """Fill the background with white."""
