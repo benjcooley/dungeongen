@@ -23,26 +23,13 @@ def main():
     draw_background(options, canvas)
     line_paint = create_line_paint(options)
 
-    # Set up the sampler with shapes
-    sampler = PoissonDiskSampler(options.canvas_width, options.canvas_height, options.crosshatch_poisson_radius)
-
-    # Add include and exclude shapes
-    include_shape = Rectangle(100, 100, options.width - 200, options.height - 200, inflate=40)
-    sampler.add_include_shape(include_shape)
-
-    exclude_shape = Rectangle(options.width // 3, options.height // 3, 
-                            options.width // 3, options.height // 3)
-    sampler.add_exclude_shape(exclude_shape)
-
-    # Sample points
-    points = sampler.sample()
-
-    # Calculate center of the include shape
-    center_point = (include_shape.x + include_shape.width / 2, 
-                   include_shape.y + include_shape.height / 2)
+    # Create shapes for crosshatching
+    include_shape = Rectangle(100, 100, options.canvas_width - 200, options.canvas_height - 200, inflate=40)
+    exclude_shape = Rectangle(options.canvas_width // 3, options.canvas_height // 3,
+                            options.canvas_width // 3, options.canvas_height // 3)
 
     # Draw crosshatch patterns
-    draw_crosshatch_with_clusters(options, points, center_point, canvas, line_paint)
+    draw_crosshatches(options, [include_shape], [exclude_shape], canvas)
 
     # Save the result
     image = surface.makeImageSnapshot()
