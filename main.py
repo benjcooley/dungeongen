@@ -42,7 +42,7 @@ def main():
                    include_shape.y + include_shape.height / 2)
 
     # Draw crosshatch patterns
-    draw_crosshatch_with_clusters(options, points, center_point, _canvas, line_paint)
+    draw_crosshatch_with_clusters(options, points, center_point, canvas, line_paint)
 
     # Save the result
     image = surface.makeImageSnapshot()
