@@ -2,6 +2,7 @@
 
 import math
 from dataclasses import dataclass
+from map.grid import GridStyle
 
 @dataclass
 class Options:
