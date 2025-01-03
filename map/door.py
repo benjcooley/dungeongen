@@ -3,6 +3,7 @@
 from algorithms.shapes import Rectangle, ShapeGroup
 from map.mapelement import MapElement
 from algorithms.types import Shape
+from graphics.conversions import grid_to_drawing, grid_to_drawing_size
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -17,20 +18,21 @@ class Door(MapElement):
     When open, it forms an I-shaped passage connecting the sides.
     """
     
-    def __init__(self, x: float, y: float, width: float, height: float, map_: 'Map', open: bool = False) -> None:
-        """Initialize a door with position and size.
+    def __init__(self, grid_x: float, grid_y: float, horizontal: bool, map_: 'Map', open: bool = False) -> None:
+        """Initialize a door with position and orientation.
         
-        The door's orientation (horizontal/vertical) is determined by its dimensions.
+        Args:
+            grid_x: X coordinate in grid units
+            grid_y: Y coordinate in grid units
+            horizontal: True for horizontal door, False for vertical
+            map_: Parent map instance
+            open: Initial open/closed state
         """
-        # Store basic properties
-        self._x = x
-        self._y = y
-        self._width = width
-        self._height = height
+        # Convert grid coordinates to drawing coordinates
+        self._x, self._y = grid_to_drawing(grid_x, grid_y, map_.options)
+        self._width, self._height = grid_to_drawing_size(1, 1, map_.options)
         self._open = open
-        
-        # Determine if door is horizontal (wider) or vertical (taller)
-        self._is_horizontal = width > height
+        self._is_horizontal = horizontal
         
         # Calculate side rectangle dimensions (1/3 of total size)
         if self._is_horizontal:
