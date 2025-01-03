@@ -226,9 +226,5 @@ class Map:
             Color=skia.ColorBLACK
         )
         
-        # Draw all elements
-        for element in self._elements:
-            element.shape.draw(canvas, paint)
-        
         # Restore canvas state
         canvas.restore()
