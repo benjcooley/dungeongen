@@ -26,6 +26,12 @@ class Map:
         self._elements.append(element)
         self._bounds_dirty = True
     
+    def remove_element(self, element: MapElement) -> None:
+        """Remove a map element."""
+        if element in self._elements:
+            self._elements.remove(element)
+            self._bounds_dirty = True
+    
     @property
     def rooms(self) -> Iterator[Room]:
         """Get all rooms in the map."""

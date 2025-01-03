@@ -68,6 +68,15 @@ class MapElement:
             self._connections.remove(other)
             other.disconnect_from(self)
     
+    def delete(self) -> None:
+        """Remove this element from its connections and map."""
+        # Disconnect from all connected elements
+        for connection in self.connections:
+            self.disconnect_from(connection)
+        # Remove from map
+        if self._map is not None:
+            self._map.remove_element(self)
+    
     def draw_occupied(self, grid: 'OccupancyGrid', element_idx: int) -> None:
         """Draw this element's shape into the occupancy grid.
         
