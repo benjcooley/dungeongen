@@ -211,8 +211,21 @@ class Map:
             background_paint
         )
         
-        # Get all regions
+        # Get all regions and create crosshatch shape
         regions = self.get_regions()
+        crosshatch_shapes = []
+        for region in regions:
+            # Create inflated version of included shapes
+            inflated_includes = [shape.inflated(self.options.crosshatch_inflation) 
+                               for shape in region.includes]
+            # Excluded shapes are not inflated
+            crosshatch_shapes.append(ShapeGroup(
+                includes=inflated_includes,
+                excludes=region.excludes
+            ))
+        
+        # Combine all regions into single crosshatch shape
+        crosshatch_shape = ShapeGroup.combine(crosshatch_shapes)
         
         # Save canvas state and apply transform
         canvas.save()
