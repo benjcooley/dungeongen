@@ -1,7 +1,8 @@
 """Map container class definition."""
 
-from typing import List, Iterator, Optional, TYPE_CHECKING
+from typing import List, Iterator, Optional, Tuple, TYPE_CHECKING
 
+import skia
 if TYPE_CHECKING:
     from options import Options
 from map.occupancy import OccupancyGrid
@@ -161,3 +162,60 @@ class Map:
                 regions.append(ShapeGroup.combine(shapes))
         
         return regions
+
+    def _calculate_default_transform(self, canvas_width: int, canvas_height: int) -> Tuple[float, float, float]:
+        """Calculate a default transform to fit the map in the canvas.
+        
+        Returns:
+            Tuple of (scale, translate_x, translate_y)
+        """
+        bounds = self.bounds
+        
+        # Calculate scale to fit in canvas with padding
+        padding = 20  # pixels of padding around the map
+        scale_x = (canvas_width - 2 * padding) / bounds.width
+        scale_y = (canvas_height - 2 * padding) / bounds.height
+        scale = min(scale_x, scale_y)
+        
+        # Calculate translation to center the map
+        translate_x = (canvas_width - bounds.width * scale) / 2 - bounds.x * scale
+        translate_y = (canvas_height - bounds.height * scale) / 2 - bounds.y * scale
+        
+        return scale, translate_x, translate_y
+
+    def render(self, canvas: skia.Canvas, transform: Optional[Tuple[float, float, float]] = None) -> None:
+        """Render the map to a canvas.
+        
+        Args:
+            canvas: The Skia canvas to render to
+            transform: Optional (scale, translate_x, translate_y) transform.
+                      If None, calculates a transform to fit the map in the canvas.
+        """
+        # Get canvas dimensions
+        canvas_width = canvas.imageInfo().width()
+        canvas_height = canvas.imageInfo().height()
+        
+        # Calculate or use provided transform
+        if transform is None:
+            transform = self._calculate_default_transform(canvas_width, canvas_height)
+        scale, translate_x, translate_y = transform
+        
+        # Save canvas state and apply transform
+        canvas.save()
+        canvas.translate(translate_x, translate_y)
+        canvas.scale(scale, scale)
+        
+        # Create paint for map elements
+        paint = skia.Paint(
+            AntiAlias=True,
+            Style=skia.Paint.kStroke_Style,
+            StrokeWidth=1.0,
+            Color=skia.ColorBLACK
+        )
+        
+        # Draw all elements
+        for element in self._elements:
+            element.shape.draw(canvas, paint)
+        
+        # Restore canvas state
+        canvas.restore()
