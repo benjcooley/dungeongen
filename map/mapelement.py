@@ -3,8 +3,9 @@
 from map.base import MapElement
 """Base map element class definition."""
 
-from typing import List, Protocol
+from typing import List
 from algorithms.shapes import Rectangle, ShapeGroup
+from algorithms.types import Shape
 
 class MapElement:
     """Base class for all map elements.
@@ -15,7 +16,7 @@ class MapElement:
     - Connections to other map elements
     """
     
-    def __init__(self, shape: Rectangle | ShapeGroup) -> None:
+    def __init__(self, shape: Shape) -> None:
         self._shape = shape
         self._connections: List['MapElement'] = []
     
@@ -56,7 +57,7 @@ class MapElement:
         return self.recalculate_bounds()
     
     @property
-    def shape(self) -> Rectangle | ShapeGroup:
+    def shape(self) -> Shape:
         """Get the shape of this element."""
         return self._shape
     

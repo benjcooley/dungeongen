@@ -4,7 +4,7 @@ import math
 from typing import List, Sequence
 from algorithms.types import Point, Shape
 
-class ShapeGroup(Shape):
+class ShapeGroup:
     """A group of shapes that can be combined to create complex shapes."""
     
     def __init__(self, includes: Sequence[Shape], excludes: Sequence[Shape]) -> None:
