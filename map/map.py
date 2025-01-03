@@ -342,12 +342,13 @@ class Map:
             Color=skia.ColorBLACK
         )
         
-        # Draw region borders last
+        # Draw region borders last with rounded corners
         border_paint = skia.Paint(
             AntiAlias=True,
             Style=skia.Paint.kStroke_Style,
             StrokeWidth=self.options.border_width,
-            Color=self.options.border_color
+            Color=self.options.border_color,
+            StrokeJoin=skia.Paint.kRound_Join  # Round the corners
         )
         for region in regions:
             region.draw(canvas, border_paint)
