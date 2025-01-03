@@ -5,7 +5,7 @@ from typing import List, Iterator, Optional, TYPE_CHECKING
 if TYPE_CHECKING:
     from options import Options
 from map.occupancy import OccupancyGrid
-from algorithms.shapes import ShapeGroup
+from algorithms.shapes import ShapeGroup, Rectangle
 from map.mapelement import MapElement
 from map.room import Room
 from map.door import Door
