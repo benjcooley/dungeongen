@@ -7,6 +7,25 @@ from algorithms.types import Point, Shape
 class ShapeGroup:
     """A group of shapes that can be combined to create complex shapes."""
     
+    @classmethod
+    def combine(cls, shapes: Sequence[Shape]) -> 'ShapeGroup':
+        """Combine multiple shapes into a new ShapeGroup.
+        
+        Combines ShapeGroups by merging their includes/excludes lists.
+        Other shapes are added to includes list.
+        """
+        includes: List[Shape] = []
+        excludes: List[Shape] = []
+        
+        for shape in shapes:
+            if isinstance(shape, ShapeGroup):
+                includes.extend(shape.includes)
+                excludes.extend(shape.excludes)
+            else:
+                includes.append(shape)
+        
+        return cls(includes=includes, excludes=excludes)
+    
     def __init__(self, includes: Sequence[Shape], excludes: Sequence[Shape]) -> None:
         self.includes = list(includes)
         self.excludes = list(excludes)
