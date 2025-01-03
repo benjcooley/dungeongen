@@ -37,6 +37,45 @@ class ShapeGroup:
             not any(shape.contains(px, py) for shape in self.excludes)
         )
     
+    def draw(self, canvas: skia.Canvas, paint: skia.Paint) -> None:
+        """Draw this shape group using Skia's path operations."""
+        if not self.includes:
+            return
+            
+        # Create path for included shapes
+        include_path = skia.Path()
+        for shape in self.includes:
+            shape_path = skia.Path()
+            if isinstance(shape, Rectangle):
+                shape_path.addRect(skia.Rect.MakeXYWH(
+                    shape._inflated_x, shape._inflated_y,
+                    shape._inflated_width, shape._inflated_height
+                ))
+            elif isinstance(shape, Circle):
+                shape_path.addCircle(shape.cx, shape.cy, shape._inflated_radius)
+            include_path.addPath(shape_path, skia.Path.kUnion_Op)
+            
+        # Subtract excluded shapes
+        for shape in self.excludes:
+            exclude_path = skia.Path()
+            if isinstance(shape, Rectangle):
+                exclude_path.addRect(skia.Rect.MakeXYWH(
+                    shape._inflated_x, shape._inflated_y,
+                    shape._inflated_width, shape._inflated_height
+                ))
+            elif isinstance(shape, Circle):
+                exclude_path.addCircle(shape.cx, shape.cy, shape._inflated_radius)
+            include_path.op(exclude_path, skia.Path.kDifference_Op)
+            
+        canvas.drawPath(include_path, paint)
+    
+    def inflated(self, amount: float) -> 'ShapeGroup':
+        """Return a new shape group with all shapes inflated."""
+        return ShapeGroup(
+            includes=[s.inflated(amount) for s in self.includes],
+            excludes=[s.inflated(amount) for s in self.excludes]
+        )
+    
     def recalculate_bounds(self) -> 'Rectangle':
         """Calculate bounds by combining all included shapes' bounds."""
         if not self.includes:
@@ -98,6 +137,22 @@ class Rectangle:
         dx = max(0, abs(px - (self._inflated_x + self._inflated_width / 2)) - self._inflated_width / 2)
         dy = max(0, abs(py - (self._inflated_y + self._inflated_height / 2)) - self._inflated_height / 2)
         return math.sqrt(dx ** 2 + dy ** 2) <= self._inflate
+    
+    def draw(self, canvas: skia.Canvas, paint: skia.Paint) -> None:
+        """Draw this rectangle on a canvas."""
+        canvas.drawRect(
+            skia.Rect.MakeXYWH(
+                self._inflated_x,
+                self._inflated_y,
+                self._inflated_width,
+                self._inflated_height
+            ),
+            paint
+        )
+    
+    def inflated(self, amount: float) -> 'Rectangle':
+        """Return a new rectangle inflated by the given amount."""
+        return Rectangle(self.x, self.y, self.width, self.height, self._inflate + amount)
 
 class Circle:
     def __init__(self, cx: float, cy: float, radius: float, inflate: float = 0) -> None:
@@ -122,3 +177,11 @@ class Circle:
             self._inflated_radius * 2,
             self._inflated_radius * 2
         )
+    
+    def draw(self, canvas: skia.Canvas, paint: skia.Paint) -> None:
+        """Draw this circle on a canvas."""
+        canvas.drawCircle(self.cx, self.cy, self._inflated_radius, paint)
+    
+    def inflated(self, amount: float) -> 'Circle':
+        """Return a new circle inflated by the given amount."""
+        return Circle(self.cx, self.cy, self.radius, self._inflate + amount)

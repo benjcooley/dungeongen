@@ -16,3 +16,11 @@ class Shape(Protocol):
     def recalculate_bounds(self) -> 'Rectangle':
         """Calculate the bounding rectangle that encompasses this shape."""
         ...
+    
+    def draw(self, canvas: 'skia.Canvas', paint: 'skia.Paint') -> None:
+        """Draw this shape on a canvas with the given paint."""
+        ...
+    
+    def inflated(self, amount: float) -> 'Shape':
+        """Return a new shape inflated by the given amount."""
+        ...
