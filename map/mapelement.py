@@ -8,6 +8,7 @@ from typing import List, TYPE_CHECKING
 if TYPE_CHECKING:
     from map.map import Map
     from options import Options
+    from map.occupancy import OccupancyGrid
 from algorithms.shapes import Rectangle, ShapeGroup
 from algorithms.types import Shape
 

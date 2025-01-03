@@ -1,7 +1,10 @@
 """Grid-based occupancy tracking for map elements."""
 
-from typing import Set, Tuple
+from typing import Set, Tuple, TYPE_CHECKING
 from algorithms.shapes import Rectangle
+
+if TYPE_CHECKING:
+    from options import Options
 from graphics.conversions import drawing_to_grid
 
 GridPosition = Tuple[int, int]
