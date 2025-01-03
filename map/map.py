@@ -322,6 +322,15 @@ class Map:
             )
             region.draw(canvas, room_paint)
             
+            # Draw region border
+            border_paint = skia.Paint(
+                AntiAlias=True,
+                Style=skia.Paint.kStroke_Style,
+                StrokeWidth=self.options.border_width,
+                Color=self.options.border_color
+            )
+            region.draw(canvas, border_paint)
+            
             # Draw grid if enabled
             if self.options.grid_style not in (None, GridStyle.NONE):
                 self._draw_region_grid(canvas, region)

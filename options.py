@@ -64,3 +64,7 @@ class Options:
     grid_color: int = 0xFF808080  # Gray color for grid
     grid_dot_size: float = 1.6  # Size of grid dots (1/20th of cell_size)
     grid_dots_per_cell: int = 5  # Number of dots to draw per cell
+    
+    # Border options
+    border_color: int = 0xFF000000  # Black color for region borders
+    border_width: float = 2.0  # Width of region borders in pixels
