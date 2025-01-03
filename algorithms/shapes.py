@@ -140,15 +140,32 @@ class Rectangle:
     
     def draw(self, canvas: skia.Canvas, paint: skia.Paint) -> None:
         """Draw this rectangle on a canvas."""
-        canvas.drawRect(
-            skia.Rect.MakeXYWH(
-                self._inflated_x,
-                self._inflated_y,
-                self._inflated_width,
-                self._inflated_height
-            ),
-            paint
-        )
+        if self._inflate > 0:
+            # Draw with rounded corners when inflated
+            canvas.drawRRect(
+                skia.RRect.MakeRectXY(
+                    skia.Rect.MakeXYWH(
+                        self._inflated_x,
+                        self._inflated_y,
+                        self._inflated_width,
+                        self._inflated_height
+                    ),
+                    self._inflate,  # x radius
+                    self._inflate   # y radius
+                ),
+                paint
+            )
+        else:
+            # Draw regular rectangle when not inflated
+            canvas.drawRect(
+                skia.Rect.MakeXYWH(
+                    self._inflated_x,
+                    self._inflated_y,
+                    self._inflated_width,
+                    self._inflated_height
+                ),
+                paint
+            )
     
     def inflated(self, amount: float) -> 'Rectangle':
         """Return a new rectangle inflated by the given amount."""
