@@ -239,6 +239,10 @@ class Map:
         )
         crosshatch_shape.draw(canvas, shading_paint)
         
+        # Draw crosshatching pattern
+        from graphics.crosshatch import draw_crosshatches
+        draw_crosshatches(self.options, crosshatch_shape, canvas)
+        
         # Create paint for map elements
         paint = skia.Paint(
             AntiAlias=True,
