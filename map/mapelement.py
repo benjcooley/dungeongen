@@ -77,6 +77,17 @@ class MapElement:
         if self._map is not None:
             self._map.remove_element(self)
     
+    def draw(self, canvas: 'skia.Canvas') -> None:
+        """Draw any additional details for this element.
+        
+        This method is called after the main shape is drawn, allowing elements
+        to draw additional details like props, decorations, etc.
+        
+        Args:
+            canvas: The canvas to draw on
+        """
+        pass  # Base implementation does nothing
+    
     def draw_occupied(self, grid: 'OccupancyGrid', element_idx: int) -> None:
         """Draw this element's shape into the occupancy grid.
         

@@ -326,6 +326,11 @@ class Map:
             if self.options.grid_style == GridStyle.DOTS:
                 self._draw_region_grid(canvas, region)
             
+            # Draw element details
+            for element in self._elements:
+                if any(element.shape in region_shape.includes for region_shape in regions):
+                    element.draw(canvas)
+            
             # Restore canvas state
             canvas.restore()
         
