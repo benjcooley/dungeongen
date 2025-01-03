@@ -71,7 +71,7 @@ def _get_neighboring_clusters(cluster: '_Cluster', clusters: List['_Cluster'], r
     return [
         other_cluster for other_cluster in clusters
         if other_cluster is not cluster 
-        and math.dist(cluster.origin, other_cluster.origin) <= radius
+        and math.dist(cluster._origin, other_cluster._origin) <= radius
     ]
 
 def _draw_crosshatch_with_clusters(
