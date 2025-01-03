@@ -1,6 +1,7 @@
 """Shape definitions for the crosshatch pattern generator."""
 
 import math
+import skia
 from typing import List, Sequence
 from algorithms.types import Point, Shape
 
