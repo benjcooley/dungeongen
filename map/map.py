@@ -1,6 +1,7 @@
 """Map container class definition."""
 
 from typing import List, Iterator
+from algorithms.shapes import ShapeGroup
 from map.mapelement import MapElement
 from map.room import Room
 from map.door import Door
