@@ -40,17 +40,23 @@ class Door(MapElement):
         self._open = open
         self._orientation = orientation
         
-        # Calculate side rectangle dimensions (1/3 of total size)
+        # Calculate rectangle dimensions (1/3 of size in both dimensions)
         if self._orientation == DoorOrientation.HORIZONTAL:
             side_width = self._width / 3
+            middle_height = self._height / 3
+            middle_y = self._y + (self._height - middle_height) / 2  # Center vertically
+            
             self._left_rect = Rectangle(self._x, self._y, side_width, self._height)
             self._right_rect = Rectangle(self._x + self._width - side_width, self._y, side_width, self._height)
-            self._middle_rect = Rectangle(self._x + side_width, self._y, side_width, self._height)
+            self._middle_rect = Rectangle(self._x + side_width, middle_y, side_width, middle_height)
         else:
             side_height = self._height / 3
+            middle_width = self._width / 3
+            middle_x = self._x + (self._width - middle_width) / 2  # Center horizontally
+            
             self._top_rect = Rectangle(self._x, self._y, self._width, side_height)
             self._bottom_rect = Rectangle(self._x, self._y + self._height - side_height, self._width, side_height)
-            self._middle_rect = Rectangle(self._x, self._y + side_height, self._width, side_height)
+            self._middle_rect = Rectangle(middle_x, self._y + side_height, middle_width, side_height)
         
         # Initialize with empty shape if closed, or full I-shape if open
         shape = self._calculate_shape()
