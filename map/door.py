@@ -18,18 +18,18 @@ class Door(MapElement):
     When open, it forms an I-shaped passage connecting the sides.
     """
     
-    def __init__(self, grid_x: float, grid_y: float, horizontal: bool, map_: 'Map', open: bool = False) -> None:
+    def __init__(self, x: float, y: float, horizontal: bool, map_: 'Map', open: bool = False) -> None:
         """Initialize a door with position and orientation.
         
         Args:
-            grid_x: X coordinate in grid units
-            grid_y: Y coordinate in grid units
+            x: X coordinate in map units
+            y: Y coordinate in map units
             horizontal: True for horizontal door, False for vertical
             map_: Parent map instance
             open: Initial open/closed state
         """
-        # Convert grid coordinates to drawing coordinates and use cell_size for dimensions
-        self._x, self._y = grid_to_drawing(grid_x, grid_y, map_.options)
+        self._x = x
+        self._y = y
         self._width = self._height = map_.options.cell_size
         self._open = open
         self._is_horizontal = horizontal
@@ -95,3 +95,19 @@ class Door(MapElement):
         if self._open != value:
             self._open = value
             self._shape = self._calculate_shape()
+    @classmethod
+    def from_grid(cls, grid_x: float, grid_y: float, horizontal: bool, map_: 'Map', open: bool = False) -> 'Door':
+        """Create a door using grid coordinates.
+        
+        Args:
+            grid_x: X coordinate in grid units
+            grid_y: Y coordinate in grid units
+            horizontal: True for horizontal door, False for vertical
+            map_: Parent map instance
+            open: Initial open/closed state
+            
+        Returns:
+            A new Door instance
+        """
+        x, y = grid_to_drawing(grid_x, grid_y, map_.options)
+        return cls(x, y, horizontal, map_, open)
