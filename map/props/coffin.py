@@ -3,6 +3,7 @@
 import skia
 from typing import TYPE_CHECKING
 from map.props.prop import Prop
+from map.props.rotation import Rotation
 from graphics.conversions import grid_to_drawing, grid_to_drawing_size
 
 if TYPE_CHECKING:
