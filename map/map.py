@@ -4,6 +4,7 @@ from typing import List, Iterator, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from options import Options
+from map.occupancy import OccupancyGrid
 from algorithms.shapes import ShapeGroup
 from map.mapelement import MapElement
 from map.room import Room
@@ -16,6 +17,7 @@ class Map:
     def __init__(self, options: 'Options') -> None:
         self._elements: List[MapElement] = []
         self.options = options
+        self._occupancy = OccupancyGrid()
     
     def add_element(self, element: MapElement) -> None:
         """Add a map element."""
@@ -53,6 +55,16 @@ class Map:
                 region.append(connection.get_side_shape(element))
                 continue
             self._trace_connected_region(connection, visited, region)
+    
+    def recalculate_occupied(self) -> None:
+        """Recalculate which grid spaces are occupied by map elements."""
+        self._occupancy.clear()
+        for element in self._elements:
+            element.draw_occupied(self._occupancy)
+    
+    def is_occupied(self, x: int, y: int) -> bool:
+        """Check if a grid position is occupied by any map element."""
+        return self._occupancy.is_occupied(x, y)
     
     def get_regions(self) -> list[ShapeGroup]:
         """Get ShapeGroups for each contiguous region of the map.
