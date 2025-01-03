@@ -1,6 +1,6 @@
 """Map container class definition."""
 
-from typing import List, Iterator, Optional, Tuple, TYPE_CHECKING
+from typing import List, Iterator, Optional, TYPE_CHECKING
 
 import skia
 if TYPE_CHECKING:
@@ -163,11 +163,11 @@ class Map:
         
         return regions
 
-    def _calculate_default_transform(self, canvas_width: int, canvas_height: int) -> Tuple[float, float, float, float]:
+    def _calculate_default_transform(self, canvas_width: int, canvas_height: int) -> skia.Matrix:
         """Calculate a default transform to fit the map in the canvas.
         
         Returns:
-            Tuple of (scale, translate_x, translate_y, rotation_degrees)
+            A Skia Matrix configured to fit the map in the canvas
         """
         bounds = self.bounds
         
@@ -181,14 +181,18 @@ class Map:
         translate_x = (canvas_width - bounds.width * scale) / 2 - bounds.x * scale
         translate_y = (canvas_height - bounds.height * scale) / 2 - bounds.y * scale
         
-        return scale, translate_x, translate_y, 0.0  # Default 0 degree rotation
+        # Create transform matrix
+        matrix = skia.Matrix()
+        matrix.setScale(scale, scale)
+        matrix.postTranslate(translate_x, translate_y)
+        return matrix
 
-    def render(self, canvas: skia.Canvas, transform: Optional[Tuple[float, float, float, float]] = None) -> None:
+    def render(self, canvas: skia.Canvas, transform: Optional[skia.Matrix] = None) -> None:
         """Render the map to a canvas.
         
         Args:
             canvas: The Skia canvas to render to
-            transform: Optional (scale, translate_x, translate_y, rotation_degrees) transform.
+            transform: Optional Skia Matrix transform.
                       If None, calculates a transform to fit the map in the canvas.
         """
         # Get canvas dimensions
@@ -196,22 +200,11 @@ class Map:
         canvas_height = canvas.imageInfo().height()
         
         # Calculate or use provided transform
-        if transform is None:
-            transform = self._calculate_default_transform(canvas_width, canvas_height)
-        scale, translate_x, translate_y, rotation = transform
+        matrix = transform if transform is not None else self._calculate_default_transform(canvas_width, canvas_height)
         
         # Save canvas state and apply transform
         canvas.save()
-        
-        # First translate to the center point for rotation
-        canvas.translate(canvas_width/2, canvas_height/2)
-        # Apply rotation
-        canvas.rotate(rotation)
-        # Translate back and apply final translation
-        canvas.translate(-canvas_width/2, -canvas_height/2)
-        canvas.translate(translate_x, translate_y)
-        # Apply scale last
-        canvas.scale(scale, scale)
+        canvas.concat(matrix)
         
         # Create paint for map elements
         paint = skia.Paint(
