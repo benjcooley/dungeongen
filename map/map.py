@@ -17,7 +17,10 @@ class Map:
     def __init__(self, options: 'Options') -> None:
         self._elements: List[MapElement] = []
         self.options = options
-        self._occupancy = OccupancyGrid()
+        # Calculate grid dimensions based on canvas size and cell size
+        grid_width = int(options.canvas_width / options.cell_size)
+        grid_height = int(options.canvas_height / options.cell_size)
+        self._occupancy = OccupancyGrid(grid_width, grid_height)
     
     def add_element(self, element: MapElement) -> None:
         """Add a map element."""

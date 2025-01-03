@@ -1,6 +1,7 @@
 """Grid-based occupancy tracking for map elements."""
 
-from typing import Dict, Tuple, TYPE_CHECKING, Optional
+from typing import List, TYPE_CHECKING
+import numpy as np
 from algorithms.shapes import Rectangle
 
 if TYPE_CHECKING:
@@ -8,18 +9,24 @@ if TYPE_CHECKING:
     from map.mapelement import MapElement
 from graphics.conversions import drawing_to_grid
 
-GridPosition = Tuple[int, int]
-
 class OccupancyGrid:
-    """Tracks which grid spaces are occupied by map elements."""
+    """Tracks which grid spaces are occupied by map elements using a 2D array."""
     
-    def __init__(self) -> None:
-        # Maps grid positions to element indices (-1 means unoccupied)
-        self._occupied: Dict[GridPosition, int] = {}
+    def __init__(self, width: int, height: int) -> None:
+        """Initialize an empty occupancy grid.
+        
+        Args:
+            width: Width of the grid in cells
+            height: Height of the grid in cells
+        """
+        # Initialize grid with -1 (unoccupied)
+        self._grid = np.full((height, width), -1, dtype=np.int32)
+        self.width = width
+        self.height = height
     
     def clear(self) -> None:
         """Clear all occupied positions."""
-        self._occupied.clear()
+        self._grid.fill(-1)
     
     def mark_occupied(self, x: int, y: int, element_idx: int) -> None:
         """Mark a grid position as occupied by an element.
@@ -29,7 +36,8 @@ class OccupancyGrid:
             y: Grid y coordinate
             element_idx: Index of the occupying element in the map
         """
-        self._occupied[(x, y)] = element_idx
+        if 0 <= x < self.width and 0 <= y < self.height:
+            self._grid[y, x] = element_idx
     
     def get_occupant(self, x: int, y: int) -> int:
         """Get the index of the element occupying a grid position.
@@ -39,9 +47,11 @@ class OccupancyGrid:
             y: Grid y coordinate
             
         Returns:
-            Index of occupying element, or -1 if unoccupied
+            Index of occupying element, or -1 if unoccupied/out of bounds
         """
-        return self._occupied.get((x, y), -1)
+        if 0 <= x < self.width and 0 <= y < self.height:
+            return self._grid[y, x]
+        return -1
     
     def is_occupied(self, x: int, y: int) -> bool:
         """Check if a grid position is occupied."""
