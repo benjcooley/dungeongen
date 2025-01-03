@@ -1,6 +1,9 @@
 """Map container class definition."""
 
-from typing import List, Iterator
+from typing import List, Iterator, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from options import Options
 from algorithms.shapes import ShapeGroup
 from map.mapelement import MapElement
 from map.room import Room
@@ -10,8 +13,9 @@ from map.passage import Passage
 class Map:
     """Container for all map elements with type-specific access."""
     
-    def __init__(self) -> None:
+    def __init__(self, options: 'Options') -> None:
         self._elements: List[MapElement] = []
+        self._options = options
     
     def add_element(self, element: MapElement) -> None:
         """Add a map element."""

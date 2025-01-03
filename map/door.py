@@ -2,6 +2,11 @@
 
 from algorithms.shapes import Rectangle
 from map.mapelement import MapElement
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from map.map import Map
+    from options import Options
 
 class Door(MapElement):
     """A door connecting two map elements.
@@ -10,9 +15,9 @@ class Door(MapElement):
     The door's shape matches its bounds exactly.
     """
     
-    def __init__(self, x: float, y: float, width: float, height: float, open: bool = False) -> None:
+    def __init__(self, x: float, y: float, width: float, height: float, map_: 'Map', options: 'Options', open: bool = False) -> None:
         shape = Rectangle(x, y, width, height)
-        super().__init__(shape=shape)
+        super().__init__(shape=shape, map_=map_, options=options)
         self._open = open
         self._bounds = shape.recalculate_bounds()
     

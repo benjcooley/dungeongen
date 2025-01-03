@@ -3,7 +3,11 @@
 from map.base import MapElement
 """Base map element class definition."""
 
-from typing import List
+from typing import List, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from map.map import Map
+    from options import Options
 from algorithms.shapes import Rectangle, ShapeGroup
 from algorithms.types import Shape
 
@@ -16,10 +20,12 @@ class MapElement:
     - Connections to other map elements
     """
     
-    def __init__(self, shape: Shape) -> None:
+    def __init__(self, shape: Shape, map_: 'Map', options: 'Options') -> None:
         self._shape = shape
         self._connections: List['MapElement'] = []
         self._bounds = self._shape.recalculate_bounds()
+        self._map = map_
+        self._options = options
     
     def recalculate_bounds(self) -> Rectangle:
         """Calculate the bounding rectangle that encompasses the shape."""
