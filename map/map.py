@@ -323,16 +323,16 @@ class Map:
             region.draw(canvas, room_paint)
             
             # Draw grid if enabled
-            if self.options.grid_style == GridStyle.DOTS:
+            if self.options.grid_style not in (None, GridStyle.NONE):
                 self._draw_region_grid(canvas, region)
-            
-            # Draw element details
-            for element in self._elements:
-                if any(element.shape in region_shape.includes for region_shape in regions):
-                    element.draw(canvas)
             
             # Restore canvas state
             canvas.restore()
+            
+        # Draw element details after all regions are drawn
+        for element in self._elements:
+            if any(element.shape in region_shape.includes for region_shape in regions):
+                element.draw(canvas)
         
         # Create paint for map elements
         paint = skia.Paint(
