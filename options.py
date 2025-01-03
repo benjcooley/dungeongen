@@ -32,7 +32,7 @@ class Options:
     @property
     def crosshatch_stroke_length(self) -> float:
         """Base length of crosshatch strokes."""
-        return self.poisson_radius * 2
+        return self.crosshatch_poisson_radius * 2
     
     @property
     def min_crosshatch_stroke_length(self) -> float:
