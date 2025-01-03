@@ -9,7 +9,7 @@ if TYPE_CHECKING:
     from map.map import Map
     from options import Options
     from map.occupancy import OccupancyGrid
-from algorithms.shapes import Rectangle, ShapeGroup
+from algorithms.shapes import Rectangle, ShapeGroup, Circle
 from algorithms.types import Shape
 
 class MapElement:

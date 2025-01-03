@@ -2,7 +2,7 @@
 
 from typing import List, TYPE_CHECKING
 from array import array
-from algorithms.shapes import Rectangle
+from algorithms.shapes import Rectangle, Circle
 
 if TYPE_CHECKING:
     from options import Options
