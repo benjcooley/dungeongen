@@ -3,7 +3,9 @@
 from typing import List, Iterator, Optional, TYPE_CHECKING
 
 import skia
+import math
 from graphics.crosshatch import draw_crosshatches
+from map.grid import GridStyle
 if TYPE_CHECKING:
     from options import Options
 from map.occupancy import OccupancyGrid
@@ -282,6 +284,38 @@ class Map:
                 -self.options.room_shadow_offset_y
             )
             region.draw(canvas, room_paint)
+            
+            # Draw grid if enabled
+            if self.options.grid_style == GridStyle.DOTS:
+                # Create grid paint
+                grid_paint = skia.Paint(
+                    AntiAlias=True,
+                    Style=skia.Paint.kFill_Style,
+                    Color=self.options.grid_color
+                )
+                
+                # Calculate grid bounds in cells
+                bounds = region.recalculate_bounds()
+                start_x = math.floor(bounds.x / self.options.cell_size)
+                start_y = math.floor(bounds.y / self.options.cell_size)
+                end_x = math.ceil((bounds.x + bounds.width) / self.options.cell_size)
+                end_y = math.ceil((bounds.y + bounds.height) / self.options.cell_size)
+                
+                # Draw grid dots
+                for x in range(start_x, end_x + 1):
+                    for y in range(start_y, end_y + 1):
+                        # Convert to drawing coordinates
+                        px = x * self.options.cell_size
+                        py = y * self.options.cell_size
+                        
+                        # Check if point is within region
+                        if region.contains(px, py):
+                            # Draw dot at grid intersection
+                            canvas.drawCircle(
+                                px, py,
+                                self.options.grid_dot_size,
+                                grid_paint
+                            )
             
             # Restore canvas state
             canvas.restore()

@@ -57,3 +57,9 @@ class Options:
     room_color: int = 0xFFFFFFFF  # White for room fill
     room_shadow_offset_x: float = 2.0  # Shadow x offset in pixels
     room_shadow_offset_y: float = 2.0  # Shadow y offset in pixels
+    
+    # Grid options
+    grid_style: 'GridStyle' = None  # Grid drawing style (None for no grid)
+    grid_color: int = 0xFF808080  # Gray color for grid
+    grid_dot_size: float = 1.6  # Size of grid dots (1/20th of cell_size)
+    grid_dots_per_cell: int = 5  # Number of dots to draw per cell
