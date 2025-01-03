@@ -1,7 +1,7 @@
 """Grid-based occupancy tracking for map elements."""
 
 from typing import List, TYPE_CHECKING
-import numpy as np
+from array import array
 from algorithms.shapes import Rectangle
 
 if TYPE_CHECKING:
@@ -20,13 +20,14 @@ class OccupancyGrid:
             height: Height of the grid in cells
         """
         # Initialize grid with -1 (unoccupied)
-        self._grid = np.full((height, width), -1, dtype=np.int32)
+        self._grid = array('l', [-1] * (width * height))
         self.width = width
         self.height = height
     
     def clear(self) -> None:
         """Clear all occupied positions."""
-        self._grid.fill(-1)
+        for i in range(len(self._grid)):
+            self._grid[i] = -1
     
     def mark_occupied(self, x: int, y: int, element_idx: int) -> None:
         """Mark a grid position as occupied by an element.
@@ -37,7 +38,7 @@ class OccupancyGrid:
             element_idx: Index of the occupying element in the map
         """
         if 0 <= x < self.width and 0 <= y < self.height:
-            self._grid[y, x] = element_idx
+            self._grid[y * self.width + x] = element_idx
     
     def get_occupant(self, x: int, y: int) -> int:
         """Get the index of the element occupying a grid position.
@@ -50,7 +51,7 @@ class OccupancyGrid:
             Index of occupying element, or -1 if unoccupied/out of bounds
         """
         if 0 <= x < self.width and 0 <= y < self.height:
-            return self._grid[y, x]
+            return self._grid[y * self.width + x]
         return -1
     
     def is_occupied(self, x: int, y: int) -> bool:
