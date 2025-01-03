@@ -15,7 +15,7 @@ class Map:
     
     def __init__(self, options: 'Options') -> None:
         self._elements: List[MapElement] = []
-        self._options = options
+        self.options = options
     
     def add_element(self, element: MapElement) -> None:
         """Add a map element."""

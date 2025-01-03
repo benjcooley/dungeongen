@@ -25,7 +25,7 @@ class MapElement:
         self._connections: List['MapElement'] = []
         self._bounds = self._shape.recalculate_bounds()
         self._map = map_
-        self._options = map_._options
+        self._options = map_.options
     
     def recalculate_bounds(self) -> Rectangle:
         """Calculate the bounding rectangle that encompasses the shape."""

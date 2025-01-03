@@ -35,8 +35,8 @@ class Room(MapElement):
         Returns:
             A new rectangular Room instance
         """
-        x, y = grid_to_drawing(grid_x, grid_y, map_._options)
-        width, height = grid_to_drawing_size(grid_width, grid_height, map_._options)
+        x, y = grid_to_drawing(grid_x, grid_y, map_.options)
+        width, height = grid_to_drawing_size(grid_width, grid_height, map_.options)
         return cls(x, y, width, height, map_)
     
     @classmethod
@@ -53,8 +53,8 @@ class Room(MapElement):
         Returns:
             A new Room instance with a circular shape
         """
-        cx, cy = grid_to_drawing(grid_cx, grid_cy, map_._options)
-        radius, _ = grid_to_drawing_size(grid_radius, 0, map_._options)
+        cx, cy = grid_to_drawing(grid_cx, grid_cy, map_.options)
+        radius, _ = grid_to_drawing_size(grid_radius, 0, map_.options)
         
         # Create a Room with a Circle shape
         room = cls.__new__(cls)  # Create instance without calling __init__
