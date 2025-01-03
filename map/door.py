@@ -2,6 +2,7 @@
 
 from algorithms.shapes import Rectangle, ShapeGroup
 from map.mapelement import MapElement
+from algorithms.types import Shape
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
