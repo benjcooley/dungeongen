@@ -1,5 +1,6 @@
 """Door map element definition."""
 
+from enum import Enum, auto
 from algorithms.shapes import Rectangle, ShapeGroup
 from map.mapelement import MapElement
 from algorithms.types import Shape
@@ -10,6 +11,11 @@ if TYPE_CHECKING:
     from map.map import Map
     from options import Options
 
+class DoorOrientation(Enum):
+    """Door orientation enum."""
+    HORIZONTAL = auto()
+    VERTICAL = auto()
+
 class Door(MapElement):
     """A door connecting two map elements.
     
@@ -18,13 +24,13 @@ class Door(MapElement):
     When open, it forms an I-shaped passage connecting the sides.
     """
     
-    def __init__(self, x: float, y: float, horizontal: bool, map_: 'Map', open: bool = False) -> None:
+    def __init__(self, x: float, y: float, orientation: DoorOrientation, map_: 'Map', open: bool = False) -> None:
         """Initialize a door with position and orientation.
         
         Args:
             x: X coordinate in map units
             y: Y coordinate in map units
-            horizontal: True for horizontal door, False for vertical
+            orientation: Door orientation (HORIZONTAL or VERTICAL)
             map_: Parent map instance
             open: Initial open/closed state
         """
@@ -32,10 +38,10 @@ class Door(MapElement):
         self._y = y
         self._width = self._height = map_.options.cell_size
         self._open = open
-        self._is_horizontal = horizontal
+        self._orientation = orientation
         
         # Calculate side rectangle dimensions (1/3 of total size)
-        if self._is_horizontal:
+        if self._orientation == DoorOrientation.HORIZONTAL:
             side_width = self._width / 3
             self._left_rect = Rectangle(self._x, self._y, side_width, self._height)
             self._right_rect = Rectangle(self._x + self._width - side_width, self._y, side_width, self._height)
@@ -79,7 +85,7 @@ class Door(MapElement):
         door_cy = self._y + self._height / 2
         
         # Return appropriate side rectangle based on orientation and position
-        if self._is_horizontal:
+        if self._orientation == DoorOrientation.HORIZONTAL:
             return self._left_rect if conn_cx < door_cx else self._right_rect
         else:
             return self._top_rect if conn_cy < door_cy else self._bottom_rect
@@ -96,13 +102,13 @@ class Door(MapElement):
             self._open = value
             self._shape = self._calculate_shape()
     @classmethod
-    def from_grid(cls, grid_x: float, grid_y: float, horizontal: bool, map_: 'Map', open: bool = False) -> 'Door':
+    def from_grid(cls, grid_x: float, grid_y: float, orientation: DoorOrientation, map_: 'Map', open: bool = False) -> 'Door':
         """Create a door using grid coordinates.
         
         Args:
             grid_x: X coordinate in grid units
             grid_y: Y coordinate in grid units
-            horizontal: True for horizontal door, False for vertical
+            orientation: Door orientation (HORIZONTAL or VERTICAL)
             map_: Parent map instance
             open: Initial open/closed state
             
@@ -110,4 +116,4 @@ class Door(MapElement):
             A new Door instance
         """
         x, y = grid_to_drawing(grid_x, grid_y, map_.options)
-        return cls(x, y, horizontal, map_, open)
+        return cls(x, y, orientation, map_, open)
