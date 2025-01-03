@@ -18,11 +18,13 @@ class Map:
         self._elements: List[MapElement] = []
         self.options = options
         self._bounds: Rectangle | None = None
+        self._bounds_dirty: bool = True
         self._occupancy: OccupancyGrid | None = None
     
     def add_element(self, element: MapElement) -> None:
         """Add a map element."""
         self._elements.append(element)
+        self._bounds_dirty = True
     
     @property
     def rooms(self) -> Iterator[Room]:
@@ -57,7 +59,14 @@ class Map:
                 continue
             self._trace_connected_region(connection, visited, region)
     
-    def recalculate_bounds(self) -> Rectangle:
+    @property
+    def bounds(self) -> Rectangle:
+        """Get the current bounding rectangle, recalculating if needed."""
+        if self._bounds_dirty or self._bounds is None:
+            self._recalculate_bounds()
+        return self._bounds
+
+    def _recalculate_bounds(self) -> None:
         """Recalculate the bounding rectangle that encompasses all map elements."""
         if not self._elements:
             # Default to single cell at origin if empty
@@ -77,12 +86,12 @@ class Map:
             )
         
         self._bounds = bounds
-        return bounds
+        self._bounds_dirty = False
 
     def recalculate_occupied(self) -> None:
         """Recalculate which grid spaces are occupied by map elements."""
         # Update bounds and create new occupancy grid if needed
-        bounds = self.recalculate_bounds()
+        bounds = self.bounds
         grid_width = int(bounds.width / self.options.cell_size) + 1
         grid_height = int(bounds.height / self.options.cell_size) + 1
         
