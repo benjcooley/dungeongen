@@ -17,6 +17,26 @@ class ShapeGroup:
             any(shape.contains(px, py) for shape in self.includes) and
             not any(shape.contains(px, py) for shape in self.excludes)
         )
+    
+    def recalculate_bounds(self) -> 'Rectangle':
+        """Calculate bounds by combining all included shapes' bounds."""
+        if not self.includes:
+            raise ValueError("Shape group must have at least one included shape")
+        
+        # Start with the first shape's bounds
+        bounds = self.includes[0].recalculate_bounds()
+        
+        # Expand bounds to include all other shapes
+        for shape in self.includes[1:]:
+            other_bounds = shape.recalculate_bounds()
+            bounds = Rectangle(
+                min(bounds.x, other_bounds.x),
+                min(bounds.y, other_bounds.y),
+                max(bounds.x + bounds.width, other_bounds.x + other_bounds.width) - min(bounds.x, other_bounds.x),
+                max(bounds.y + bounds.height, other_bounds.y + other_bounds.height) - min(bounds.y, other_bounds.y)
+            )
+        
+        return bounds
 
 class Rectangle:
     """A rectangle that can be inflated to create a rounded rectangle effect.
@@ -24,6 +44,10 @@ class Rectangle:
     When inflated, the rectangle's corners become rounded with radius equal to
     the inflation amount, effectively creating a rounded rectangle shape.
     """
+    
+    def recalculate_bounds(self) -> 'Rectangle':
+        """Return this rectangle as bounds."""
+        return Rectangle(self._inflated_x, self._inflated_y, self._inflated_width, self._inflated_height)
     
     def __init__(self, x: float, y: float, width: float, height: float, inflate: float = 0) -> None:
         self.x = x  # Original x
@@ -70,3 +94,12 @@ class Circle:
 
     def contains(self, px: float, py: float) -> bool:
         return math.sqrt((px - self.cx)**2 + (py - self.cy)**2) <= self._inflated_radius
+    
+    def recalculate_bounds(self) -> Rectangle:
+        """Calculate the bounding rectangle for this circle."""
+        return Rectangle(
+            self.cx - self._inflated_radius,
+            self.cy - self._inflated_radius,
+            self._inflated_radius * 2,
+            self._inflated_radius * 2
+        )

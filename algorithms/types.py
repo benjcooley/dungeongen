@@ -11,3 +11,7 @@ class Shape(Protocol):
     def contains(self, px: float, py: float) -> bool:
         """Check if a point is contained within this shape."""
         ...
+    
+    def recalculate_bounds(self) -> 'Rectangle':
+        """Calculate the bounding rectangle that encompasses this shape."""
+        ...
