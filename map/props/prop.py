@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 import skia
 from algorithms.shapes import Rectangle
 from map.mapelement import MapElement
+from map.props.rotation import Rotation
 
 if TYPE_CHECKING:
     from map.map import Map
@@ -15,7 +16,7 @@ class Prop(MapElement):
     They have a bounding rectangle and custom drawing logic.
     """
     
-    def __init__(self, x: float, y: float, width: float, height: float, map_: 'Map') -> None:
+    def __init__(self, x: float, y: float, width: float, height: float, map_: 'Map', rotation: Rotation = Rotation.ROT_0) -> None:
         """Initialize a prop with position and size.
         
         Args:
@@ -24,6 +25,17 @@ class Prop(MapElement):
             width: Width in drawing units
             height: Height in drawing units
             map_: Parent map instance
+            rotation: Rotation angle (default: no rotation)
         """
         shape = Rectangle(x, y, width, height)
         super().__init__(shape=shape, map_=map_)
+        self.rotation = rotation
+    
+    def _apply_rotation(self, canvas: skia.Canvas) -> None:
+        """Apply rotation transform around prop center."""
+        if self.rotation != Rotation.ROT_0:
+            cx = self._bounds.x + self._bounds.width / 2
+            cy = self._bounds.y + self._bounds.height / 2
+            canvas.translate(cx, cy)
+            canvas.rotate(self.rotation.value)
+            canvas.translate(-cx, -cy)
