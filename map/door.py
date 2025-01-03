@@ -28,9 +28,9 @@ class Door(MapElement):
             map_: Parent map instance
             open: Initial open/closed state
         """
-        # Convert grid coordinates to drawing coordinates
+        # Convert grid coordinates to drawing coordinates and use cell_size for dimensions
         self._x, self._y = grid_to_drawing(grid_x, grid_y, map_.options)
-        self._width, self._height = grid_to_drawing_size(1, 1, map_.options)
+        self._width = self._height = map_.options.cell_size
         self._open = open
         self._is_horizontal = horizontal
         
