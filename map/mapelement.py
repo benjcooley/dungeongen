@@ -4,29 +4,59 @@ from map.base import MapElement
 """Base map element class definition."""
 
 from typing import List, Protocol
-from algorithms.shapes import Rectangle
+from algorithms.shapes import Rectangle, ShapeGroup
 
 class MapElement:
     """Base class for all map elements.
     
     A map element has:
-    - A rectangular bounding box
-    - A shape (which may be different from the bounds)
+    - A shape (which defines its geometry)
+    - A calculated bounding box based on the shape
     - Connections to other map elements
     """
     
-    def __init__(self, bounds: Rectangle, shape: Rectangle) -> None:
-        self._bounds = bounds
+    def __init__(self, shape: Rectangle | ShapeGroup) -> None:
         self._shape = shape
         self._connections: List['MapElement'] = []
+    
+    def recalculate_bounds(self) -> Rectangle:
+        """Calculate the bounding rectangle that encompasses the shape.
+        
+        For simple rectangles, this returns the rectangle itself.
+        For shape groups, it calculates the minimum bounding box that
+        contains all included shapes.
+        """
+        if isinstance(self._shape, Rectangle):
+            return self._shape
+        elif isinstance(self._shape, ShapeGroup):
+            # Get bounds of all included shapes
+            includes = self._shape.includes
+            if not includes:
+                raise ValueError("Shape group must have at least one included shape")
+            
+            # Start with the first shape's bounds
+            bounds = includes[0]
+            
+            # Expand bounds to include all other shapes
+            for shape in includes[1:]:
+                bounds = Rectangle(
+                    min(bounds.x, shape.x),
+                    min(bounds.y, shape.y),
+                    max(bounds.x + bounds.width, shape.x + shape.width) - min(bounds.x, shape.x),
+                    max(bounds.y + bounds.height, shape.y + shape.height) - min(bounds.y, shape.y)
+                )
+            
+            return bounds
+        else:
+            raise TypeError(f"Unsupported shape type: {type(self._shape)}")
     
     @property
     def bounds(self) -> Rectangle:
         """Get the rectangular bounding box of this element."""
-        return self._bounds
+        return self.recalculate_bounds()
     
     @property
-    def shape(self) -> Rectangle:
+    def shape(self) -> Rectangle | ShapeGroup:
         """Get the shape of this element."""
         return self._shape
     

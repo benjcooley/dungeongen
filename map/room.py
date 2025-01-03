@@ -11,5 +11,5 @@ class Room(MapElement):
     """
     
     def __init__(self, x: float, y: float, width: float, height: float) -> None:
-        bounds = Rectangle(x, y, width, height)
-        super().__init__(bounds=bounds, shape=bounds)
+        shape = Rectangle(x, y, width, height)
+        super().__init__(shape=shape)
