@@ -15,9 +15,9 @@ class Door(MapElement):
     The door's shape matches its bounds exactly.
     """
     
-    def __init__(self, x: float, y: float, width: float, height: float, map_: 'Map', options: 'Options', open: bool = False) -> None:
+    def __init__(self, x: float, y: float, width: float, height: float, map_: 'Map', open: bool = False) -> None:
         shape = Rectangle(x, y, width, height)
-        super().__init__(shape=shape, map_=map_, options=options)
+        super().__init__(shape=shape, map_=map_)
         self._open = open
         self._bounds = shape.recalculate_bounds()
     

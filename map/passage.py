@@ -15,6 +15,6 @@ class Passage(MapElement):
     The passage's shape matches its bounds exactly.
     """
     
-    def __init__(self, x: float, y: float, width: float, height: float, map_: 'Map', options: 'Options') -> None:
+    def __init__(self, x: float, y: float, width: float, height: float, map_: 'Map') -> None:
         shape = Rectangle(x, y, width, height)
-        super().__init__(shape=shape, map_=map_, options=options)
+        super().__init__(shape=shape, map_=map_)

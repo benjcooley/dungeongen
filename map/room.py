@@ -16,13 +16,13 @@ class Room(MapElement):
     The room's shape matches its bounds exactly.
     """
     
-    def __init__(self, x: float, y: float, width: float, height: float, map_: 'Map', options: 'Options') -> None:
+    def __init__(self, x: float, y: float, width: float, height: float, map_: 'Map') -> None:
         shape = Rectangle(x, y, width, height)
-        super().__init__(shape=shape, map_=map_, options=options)
+        super().__init__(shape=shape, map_=map_)
     
     @classmethod
     def rectangular_room(cls, grid_x: float, grid_y: float, grid_width: float, grid_height: float, 
-                        map_: 'Map', options: 'Options') -> 'Room':
+                        map_: 'Map') -> 'Room':
         """Create a rectangular room using grid coordinates.
         
         Args:
@@ -31,18 +31,17 @@ class Room(MapElement):
             grid_width: Width in grid units
             grid_height: Height in grid units
             map_: Parent map instance
-            options: Options instance
             
         Returns:
             A new rectangular Room instance
         """
-        x, y = grid_to_drawing(grid_x, grid_y, options)
-        width, height = grid_to_drawing_size(grid_width, grid_height, options)
-        return cls(x, y, width, height, map_, options)
+        x, y = grid_to_drawing(grid_x, grid_y, map_._options)
+        width, height = grid_to_drawing_size(grid_width, grid_height, map_._options)
+        return cls(x, y, width, height, map_)
     
     @classmethod
     def circular_room(cls, grid_cx: float, grid_cy: float, grid_radius: float,
-                     map_: 'Map', options: 'Options') -> 'Room':
+                     map_: 'Map') -> 'Room':
         """Create a circular room using grid coordinates.
         
         Args:
@@ -50,16 +49,15 @@ class Room(MapElement):
             grid_cy: Center Y coordinate in grid units
             grid_radius: Radius in grid units
             map_: Parent map instance
-            options: Options instance
             
         Returns:
             A new Room instance with a circular shape
         """
-        cx, cy = grid_to_drawing(grid_cx, grid_cy, options)
-        radius, _ = grid_to_drawing_size(grid_radius, 0, options)
+        cx, cy = grid_to_drawing(grid_cx, grid_cy, map_._options)
+        radius, _ = grid_to_drawing_size(grid_radius, 0, map_._options)
         
         # Create a Room with a Circle shape
         room = cls.__new__(cls)  # Create instance without calling __init__
         shape = Circle(cx, cy, radius)
-        MapElement.__init__(room, shape=shape, map_=map_, options=options)
+        MapElement.__init__(room, shape=shape, map_=map_)
         return room
