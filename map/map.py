@@ -17,10 +17,8 @@ class Map:
     def __init__(self, options: 'Options') -> None:
         self._elements: List[MapElement] = []
         self.options = options
-        # Calculate grid dimensions based on canvas size and cell size
-        grid_width = int(options.canvas_width / options.cell_size)
-        grid_height = int(options.canvas_height / options.cell_size)
-        self._occupancy = OccupancyGrid(grid_width, grid_height)
+        self._bounds: Rectangle | None = None
+        self._occupancy: OccupancyGrid | None = None
     
     def add_element(self, element: MapElement) -> None:
         """Add a map element."""
@@ -59,9 +57,42 @@ class Map:
                 continue
             self._trace_connected_region(connection, visited, region)
     
+    def recalculate_bounds(self) -> Rectangle:
+        """Recalculate the bounding rectangle that encompasses all map elements."""
+        if not self._elements:
+            # Default to single cell at origin if empty
+            return Rectangle(0, 0, self.options.cell_size, self.options.cell_size)
+        
+        # Start with first element's bounds
+        bounds = self._elements[0].bounds
+        
+        # Expand to include all other elements
+        for element in self._elements[1:]:
+            elem_bounds = element.bounds
+            bounds = Rectangle(
+                min(bounds.x, elem_bounds.x),
+                min(bounds.y, elem_bounds.y),
+                max(bounds.x + bounds.width, elem_bounds.x + elem_bounds.width) - min(bounds.x, elem_bounds.x),
+                max(bounds.y + bounds.height, elem_bounds.y + elem_bounds.height) - min(bounds.y, elem_bounds.y)
+            )
+        
+        self._bounds = bounds
+        return bounds
+
     def recalculate_occupied(self) -> None:
         """Recalculate which grid spaces are occupied by map elements."""
-        self._occupancy.clear()
+        # Update bounds and create new occupancy grid if needed
+        bounds = self.recalculate_bounds()
+        grid_width = int(bounds.width / self.options.cell_size) + 1
+        grid_height = int(bounds.height / self.options.cell_size) + 1
+        
+        # Create new grid or clear existing one
+        if self._occupancy is None or (self._occupancy.width != grid_width or self._occupancy.height != grid_height):
+            self._occupancy = OccupancyGrid(grid_width, grid_height)
+        else:
+            self._occupancy.clear()
+        
+        # Mark occupied spaces
         for idx, element in enumerate(self._elements):
             element.draw_occupied(self._occupancy, idx)
     
