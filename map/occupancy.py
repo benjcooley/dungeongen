@@ -77,4 +77,30 @@ class OccupancyGrid:
         # Mark all covered grid positions
         for x in range(grid_start_x, grid_end_x):
             for y in range(grid_start_y, grid_end_y):
-                self.mark_occupied(x, y)
+                self.mark_occupied(x, y, element_idx)
+    
+    def mark_circle(self, circle: 'Circle', element_idx: int, options: 'Options') -> None:
+        """Mark all grid positions covered by a circle as occupied.
+        
+        Only marks grid cells where the circle covers a significant portion of the cell.
+        """
+        # Convert circle to grid coordinates
+        center_x, center_y = drawing_to_grid(circle.cx, circle.cy, options)
+        radius = circle._inflated_radius / options.cell_size
+        
+        # Calculate grid bounds
+        grid_start_x = int(center_x - radius - 0.5)
+        grid_start_y = int(center_y - radius - 0.5)
+        grid_end_x = int(center_x + radius + 1.5)
+        grid_end_y = int(center_y + radius + 1.5)
+        
+        # Check each cell in the bounding box
+        for x in range(grid_start_x, grid_end_x):
+            for y in range(grid_start_y, grid_end_y):
+                # Check if cell center is within circle
+                cell_center_x = x + 0.5
+                cell_center_y = y + 0.5
+                dx = cell_center_x - center_x
+                dy = cell_center_y - center_y
+                if dx * dx + dy * dy <= radius * radius:
+                    self.mark_occupied(x, y, element_idx)

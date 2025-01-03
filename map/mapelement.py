@@ -75,6 +75,10 @@ class MapElement:
             grid: The occupancy grid to mark
             element_idx: Index of this element in the map
         """
-        # Use shape's bounds as conservative estimate of occupied space
-        bounds = self._shape.recalculate_bounds()
-        grid.mark_rectangle(bounds, element_idx, self._options)
+        # Handle circles differently from rectangles
+        if isinstance(self._shape, Circle):
+            grid.mark_circle(self._shape, element_idx, self._options)
+        else:
+            # For rectangles and other shapes, use bounds
+            bounds = self._shape.recalculate_bounds()
+            grid.mark_rectangle(bounds, element_idx, self._options)
