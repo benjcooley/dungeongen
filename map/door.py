@@ -36,20 +36,20 @@ class Door(MapElement):
         
         # Calculate side rectangle dimensions (1/3 of total size)
         if self._is_horizontal:
-            side_width = width / 3
-            self._left_rect = Rectangle(x, y, side_width, height)
-            self._right_rect = Rectangle(x + width - side_width, y, side_width, height)
-            self._middle_rect = Rectangle(x + side_width, y, side_width, height)
+            side_width = self._width / 3
+            self._left_rect = Rectangle(self._x, self._y, side_width, self._height)
+            self._right_rect = Rectangle(self._x + self._width - side_width, self._y, side_width, self._height)
+            self._middle_rect = Rectangle(self._x + side_width, self._y, side_width, self._height)
         else:
-            side_height = height / 3
-            self._top_rect = Rectangle(x, y, width, side_height)
-            self._bottom_rect = Rectangle(x, y + height - side_height, width, side_height)
-            self._middle_rect = Rectangle(x, y + side_height, width, side_height)
+            side_height = self._height / 3
+            self._top_rect = Rectangle(self._x, self._y, self._width, side_height)
+            self._bottom_rect = Rectangle(self._x, self._y + self._height - side_height, self._width, side_height)
+            self._middle_rect = Rectangle(self._x, self._y + side_height, self._width, side_height)
         
         # Initialize with empty shape if closed, or full I-shape if open
         shape = self._calculate_shape()
         super().__init__(shape=shape, map_=map_)
-        self._bounds = Rectangle(x, y, width, height)
+        self._bounds = Rectangle(self._x, self._y, self._width, self._height)
     
     def _calculate_shape(self) -> Shape:
         """Calculate the current shape based on open/closed state."""
