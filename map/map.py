@@ -59,12 +59,27 @@ class Map:
     def recalculate_occupied(self) -> None:
         """Recalculate which grid spaces are occupied by map elements."""
         self._occupancy.clear()
-        for element in self._elements:
-            element.draw_occupied(self._occupancy)
+        for idx, element in enumerate(self._elements):
+            element.draw_occupied(self._occupancy, idx)
     
     def is_occupied(self, x: int, y: int) -> bool:
         """Check if a grid position is occupied by any map element."""
         return self._occupancy.is_occupied(x, y)
+    
+    def get_element_at(self, x: int, y: int) -> Optional[MapElement]:
+        """Get the map element at a grid position.
+        
+        Args:
+            x: Grid x coordinate
+            y: Grid y coordinate
+            
+        Returns:
+            The MapElement at that position, or None if unoccupied
+        """
+        idx = self._occupancy.get_occupant(x, y)
+        if idx >= 0:
+            return self._elements[idx]
+        return None
     
     def get_regions(self) -> list[ShapeGroup]:
         """Get ShapeGroups for each contiguous region of the map.

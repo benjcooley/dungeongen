@@ -1,10 +1,11 @@
 """Grid-based occupancy tracking for map elements."""
 
-from typing import Set, Tuple, TYPE_CHECKING
+from typing import Dict, Tuple, TYPE_CHECKING, Optional
 from algorithms.shapes import Rectangle
 
 if TYPE_CHECKING:
     from options import Options
+    from map.mapelement import MapElement
 from graphics.conversions import drawing_to_grid
 
 GridPosition = Tuple[int, int]
@@ -13,21 +14,40 @@ class OccupancyGrid:
     """Tracks which grid spaces are occupied by map elements."""
     
     def __init__(self) -> None:
-        self._occupied: Set[GridPosition] = set()
+        # Maps grid positions to element indices (-1 means unoccupied)
+        self._occupied: Dict[GridPosition, int] = {}
     
     def clear(self) -> None:
         """Clear all occupied positions."""
         self._occupied.clear()
     
-    def mark_occupied(self, x: int, y: int) -> None:
-        """Mark a grid position as occupied."""
-        self._occupied.add((x, y))
+    def mark_occupied(self, x: int, y: int, element_idx: int) -> None:
+        """Mark a grid position as occupied by an element.
+        
+        Args:
+            x: Grid x coordinate
+            y: Grid y coordinate
+            element_idx: Index of the occupying element in the map
+        """
+        self._occupied[(x, y)] = element_idx
+    
+    def get_occupant(self, x: int, y: int) -> int:
+        """Get the index of the element occupying a grid position.
+        
+        Args:
+            x: Grid x coordinate
+            y: Grid y coordinate
+            
+        Returns:
+            Index of occupying element, or -1 if unoccupied
+        """
+        return self._occupied.get((x, y), -1)
     
     def is_occupied(self, x: int, y: int) -> bool:
         """Check if a grid position is occupied."""
-        return (x, y) in self._occupied
+        return self.get_occupant(x, y) >= 0
     
-    def mark_rectangle(self, rect: Rectangle, options: 'Options') -> None:
+    def mark_rectangle(self, rect: Rectangle, element_idx: int, options: 'Options') -> None:
         """Mark all grid positions covered by a rectangle as occupied."""
         # Convert rectangle bounds to grid coordinates
         start_x, start_y = drawing_to_grid(rect.x, rect.y, options)

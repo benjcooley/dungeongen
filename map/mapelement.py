@@ -68,8 +68,13 @@ class MapElement:
             self._connections.remove(other)
             other.disconnect_from(self)
     
-    def draw_occupied(self, grid: 'OccupancyGrid') -> None:
-        """Draw this element's shape into the occupancy grid."""
+    def draw_occupied(self, grid: 'OccupancyGrid', element_idx: int) -> None:
+        """Draw this element's shape into the occupancy grid.
+        
+        Args:
+            grid: The occupancy grid to mark
+            element_idx: Index of this element in the map
+        """
         # Use shape's bounds as conservative estimate of occupied space
         bounds = self._shape.recalculate_bounds()
-        grid.mark_rectangle(bounds, self._options)
+        grid.mark_rectangle(bounds, element_idx, self._options)
