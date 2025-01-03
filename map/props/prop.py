@@ -37,5 +37,5 @@ class Prop(MapElement):
             cx = self._bounds.x + self._bounds.width / 2
             cy = self._bounds.y + self._bounds.height / 2
             canvas.translate(cx, cy)
-            canvas.rotate(self.rotation.value)
+            canvas.rotate(self.rotation.radians * (180 / 3.14159265359))  # Convert radians to degrees for Skia
             canvas.translate(-cx, -cy)

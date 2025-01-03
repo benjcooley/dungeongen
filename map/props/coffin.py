@@ -20,9 +20,8 @@ class Coffin(Prop):
         return cls(x, y, width, height, map_, rotation)
     
     def draw(self, canvas: skia.Canvas) -> None:
-        # Save canvas state before rotation
         canvas.save()
-        self._apply_rotation(canvas)
+        self._apply_rotation(canvas)  # Apply rotation transform
         """Draw the coffin shape."""
         # Calculate points for outer coffin shape
         x, y = self._bounds.x, self._bounds.y

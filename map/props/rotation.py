@@ -1,5 +1,6 @@
 """Rotation enum for props."""
 
+import math
 from enum import Enum
 
 class Rotation(Enum):
@@ -12,4 +13,4 @@ class Rotation(Enum):
     @property
     def radians(self) -> float:
         """Get the rotation angle in radians."""
-        return self.value * (3.14159265359 / 180.0)
+        return math.radians(self.value)
