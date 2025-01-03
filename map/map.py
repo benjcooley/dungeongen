@@ -243,6 +243,49 @@ class Map:
         # Draw crosshatching pattern
         draw_crosshatches(self.options, crosshatch_shape, canvas)
         
+        # Draw room regions with shadows
+        for region in regions:
+            # Create shadow paint
+            shadow_paint = skia.Paint(
+                AntiAlias=True,
+                Style=skia.Paint.kFill_Style,
+                Color=self.options.room_shadow_color
+            )
+            
+            # Draw shadow shape
+            region.draw(canvas, shadow_paint)
+            
+            # Create room paint
+            room_paint = skia.Paint(
+                AntiAlias=True,
+                Style=skia.Paint.kFill_Style,
+                Color=self.options.room_color
+            )
+            
+            # Create mask using region shape
+            mask_paint = skia.Paint(
+                AntiAlias=True,
+                Style=skia.Paint.kFill_Style,
+                BlendMode=skia.BlendMode.kSrc
+            )
+            
+            # Save canvas state for clipping
+            canvas.save()
+            
+            # Create clipping mask using region shape
+            canvas.translate(0, 0)  # Reset translation
+            region.draw(canvas, mask_paint)
+            
+            # Draw room shape with offset, clipped by mask
+            canvas.translate(
+                -self.options.room_shadow_offset_x,
+                -self.options.room_shadow_offset_y
+            )
+            region.draw(canvas, room_paint)
+            
+            # Restore canvas state
+            canvas.restore()
+        
         # Create paint for map elements
         paint = skia.Paint(
             AntiAlias=True,
