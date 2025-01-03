@@ -49,5 +49,5 @@ class Options:
     
     # Rendering options
     crosshatch_inflation: float = 16.0  # How much to inflate shapes for crosshatching
-    crosshatch_background_color: int = 0xFFE0E0E0  # Light gray
-    crosshatch_shading_color: int = 0xFFF0F0F0  # Lighter gray for crosshatch background
+    crosshatch_background_color: int = 0xFFFFFFFF  # White
+    crosshatch_shading_color: int = 0xFFEEEEEE  # Very light gray for crosshatch background

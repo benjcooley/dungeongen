@@ -231,7 +231,7 @@ class Map:
         canvas.save()
         canvas.concat(matrix)
         
-        # Draw shaded background for crosshatch areas
+        # Draw filled gray background for crosshatch areas
         shading_paint = skia.Paint(
             AntiAlias=True,
             Style=skia.Paint.kFill_Style,
