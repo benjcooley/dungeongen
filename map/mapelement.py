@@ -19,15 +19,17 @@ class MapElement:
     def __init__(self, shape: Shape) -> None:
         self._shape = shape
         self._connections: List['MapElement'] = []
+        self._bounds = self._shape.recalculate_bounds()
     
     def recalculate_bounds(self) -> Rectangle:
         """Calculate the bounding rectangle that encompasses the shape."""
-        return self._shape.recalculate_bounds()
+        self._bounds = self._shape.recalculate_bounds()
+        return self._bounds
     
     @property
     def bounds(self) -> Rectangle:
-        """Get the rectangular bounding box of this element."""
-        return self.recalculate_bounds()
+        """Get the current rectangular bounding box of this element."""
+        return self._bounds
     
     @property
     def shape(self) -> Shape:
