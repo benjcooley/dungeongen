@@ -190,6 +190,43 @@ class Map:
         matrix.postTranslate(translate_x, translate_y)
         return matrix
 
+    def _draw_region_grid(self, canvas: skia.Canvas, region: ShapeGroup) -> None:
+        """Draw grid dots for a region.
+        
+        Args:
+            canvas: The canvas to draw on
+            region: The region to draw grid for
+        """
+        # Create grid paint
+        grid_paint = skia.Paint(
+            AntiAlias=True,
+            Style=skia.Paint.kFill_Style,
+            Color=self.options.grid_color
+        )
+        
+        # Calculate grid bounds in cells
+        bounds = region.recalculate_bounds()
+        start_x = math.floor(bounds.x / self.options.cell_size)
+        start_y = math.floor(bounds.y / self.options.cell_size)
+        end_x = math.ceil((bounds.x + bounds.width) / self.options.cell_size)
+        end_y = math.ceil((bounds.y + bounds.height) / self.options.cell_size)
+        
+        # Draw grid dots
+        for x in range(start_x, end_x + 1):
+            for y in range(start_y, end_y + 1):
+                # Convert to drawing coordinates
+                px = x * self.options.cell_size
+                py = y * self.options.cell_size
+                
+                # Check if point is within region
+                if region.contains(px, py):
+                    # Draw dot at grid intersection
+                    canvas.drawCircle(
+                        px, py,
+                        self.options.grid_dot_size,
+                        grid_paint
+                    )
+
     def render(self, canvas: skia.Canvas, transform: Optional[skia.Matrix] = None) -> None:
         """Render the map to a canvas.
         
@@ -287,35 +324,7 @@ class Map:
             
             # Draw grid if enabled
             if self.options.grid_style == GridStyle.DOTS:
-                # Create grid paint
-                grid_paint = skia.Paint(
-                    AntiAlias=True,
-                    Style=skia.Paint.kFill_Style,
-                    Color=self.options.grid_color
-                )
-                
-                # Calculate grid bounds in cells
-                bounds = region.recalculate_bounds()
-                start_x = math.floor(bounds.x / self.options.cell_size)
-                start_y = math.floor(bounds.y / self.options.cell_size)
-                end_x = math.ceil((bounds.x + bounds.width) / self.options.cell_size)
-                end_y = math.ceil((bounds.y + bounds.height) / self.options.cell_size)
-                
-                # Draw grid dots
-                for x in range(start_x, end_x + 1):
-                    for y in range(start_y, end_y + 1):
-                        # Convert to drawing coordinates
-                        px = x * self.options.cell_size
-                        py = y * self.options.cell_size
-                        
-                        # Check if point is within region
-                        if region.contains(px, py):
-                            # Draw dot at grid intersection
-                            canvas.drawCircle(
-                                px, py,
-                                self.options.grid_dot_size,
-                                grid_paint
-                            )
+                self._draw_region_grid(canvas, region)
             
             # Restore canvas state
             canvas.restore()
