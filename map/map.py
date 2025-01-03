@@ -3,6 +3,7 @@
 from typing import List, Iterator, Optional, TYPE_CHECKING
 
 import skia
+from graphics.crosshatch import draw_crosshatches
 if TYPE_CHECKING:
     from options import Options
 from map.occupancy import OccupancyGrid
@@ -240,7 +241,6 @@ class Map:
         crosshatch_shape.draw(canvas, shading_paint)
         
         # Draw crosshatching pattern
-        from graphics.crosshatch import draw_crosshatches
         draw_crosshatches(self.options, crosshatch_shape, canvas)
         
         # Create paint for map elements
