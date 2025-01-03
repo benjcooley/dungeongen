@@ -1,6 +1,6 @@
 """Map container class definition."""
 
-from typing import List, Iterator, TYPE_CHECKING
+from typing import List, Iterator, Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from options import Options
