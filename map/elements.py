@@ -1,3 +1,3 @@
-"""Map element type definitions for dungeon generation."""
+"""Base map element type definition."""
 
 from map.base import MapElement
