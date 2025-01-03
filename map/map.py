@@ -202,6 +202,18 @@ class Map:
         # Calculate or use provided transform
         matrix = transform if transform is not None else self._calculate_default_transform(canvas_width, canvas_height)
         
+        # Clear canvas with background color
+        background_paint = skia.Paint(
+            Color=self.options.crosshatch_background_color
+        )
+        canvas.drawRect(
+            skia.Rect.MakeWH(canvas_width, canvas_height),
+            background_paint
+        )
+        
+        # Get all regions
+        regions = self.get_regions()
+        
         # Save canvas state and apply transform
         canvas.save()
         canvas.concat(matrix)
