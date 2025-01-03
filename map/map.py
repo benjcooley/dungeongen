@@ -44,8 +44,9 @@ class Map:
         region.append(element)
         
         for connection in element.connections:
-            # Skip if connection is a closed door
+            # If connection is a closed door, add its side shape but don't traverse
             if isinstance(connection, Door) and not connection.open:
+                region.append(connection.get_side_shape(element))
                 continue
             self._trace_connected_region(connection, visited, region)
     
@@ -70,7 +71,13 @@ class Map:
             
             # Create ShapeGroup for this region
             if region:
-                shapes = [elem.shape for elem in region]
+                # Get shapes from elements and any door shapes
+                shapes = []
+                for item in region:
+                    if isinstance(item, MapElement):
+                        shapes.append(item.shape)
+                    else:  # Rectangle from door side
+                        shapes.append(item)
                 regions.append(ShapeGroup.combine(shapes))
         
         return regions
