@@ -97,18 +97,30 @@ class OccupancyGrid:
         # Check each cell in the bounding box
         for x in range(grid_start_x, grid_end_x):
             for y in range(grid_start_y, grid_end_y):
-                # Check if any corner of the cell is within the circle
-                corners = [
-                    (x, y),           # Top-left
-                    (x + 1, y),       # Top-right
-                    (x, y + 1),       # Bottom-left
-                    (x + 1, y + 1),   # Bottom-right
-                ]
-                
-                for corner_x, corner_y in corners:
-                    dx = corner_x - center_x
-                    dy = corner_y - center_y
-                    if dx * dx + dy * dy <= radius * radius:
-                        self.mark_occupied(x, y, element_idx)
-                        break
+                # Check each corner directly for better performance
+                # Top-left corner
+                dx = x - center_x
+                dy = y - center_y
+                if dx * dx + dy * dy <= radius * radius:
+                    self.mark_occupied(x, y, element_idx)
+                    continue
+
+                # Top-right corner
+                dx = (x + 1) - center_x
+                dy = y - center_y
+                if dx * dx + dy * dy <= radius * radius:
+                    self.mark_occupied(x, y, element_idx)
+                    continue
+
+                # Bottom-left corner
+                dx = x - center_x
+                dy = (y + 1) - center_y
+                if dx * dx + dy * dy <= radius * radius:
+                    self.mark_occupied(x, y, element_idx)
+                    continue
+
+                # Bottom-right corner
+                dx = (x + 1) - center_x
+                dy = (y + 1) - center_y
+                if dx * dx + dy * dy <= radius * radius:
                     self.mark_occupied(x, y, element_idx)
