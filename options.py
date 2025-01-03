@@ -46,3 +46,7 @@ class Options:
     def crosshatch_length_variation(self) -> float:
         """Maximum random variation in crosshatch stroke length."""
         return 0.1
+    
+    # Rendering options
+    crosshatch_inflation: float = 16.0  # How much to inflate shapes for crosshatching
+    crosshatch_background_color: int = 0xFFE0E0E0  # Light gray
