@@ -1,9 +1,13 @@
 """Type definitions for the crosshatch pattern generator."""
 
-from typing import Tuple, Union
-from algorithms.shapes import Rectangle, Circle, ShapeGroup
+from typing import Protocol, Tuple, Union
 
 # Type aliases
 Point = Tuple[float, float]
 Line = Tuple[Point, Point]
-Shape = Union[Rectangle, Circle, ShapeGroup]
+
+class Shape(Protocol):
+    """Protocol defining the interface for shapes."""
+    def contains(self, px: float, py: float) -> bool:
+        """Check if a point is contained within this shape."""
+        ...

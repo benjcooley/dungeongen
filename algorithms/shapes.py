@@ -1,14 +1,8 @@
 """Shape definitions for the crosshatch pattern generator."""
 
 import math
-from typing import List, Sequence, Protocol
-from algorithms.types import Point
-
-class Shape(Protocol):
-    """Protocol defining the interface for shapes."""
-    def contains(self, px: float, py: float) -> bool:
-        """Check if a point is contained within this shape."""
-        ...
+from typing import List, Sequence
+from algorithms.types import Point, Shape
 
 class ShapeGroup(Shape):
     """A group of shapes that can be combined to create complex shapes."""
