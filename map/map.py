@@ -359,6 +359,7 @@ class Map:
             # Apply mask as clip
             canvas.clipImage(
                 mask.makeImageSnapshot(),
+                (region.bounds.x, region.bounds.y),
                 skia.ClipOp.kIntersect,
                 True  # antialiased
             )
