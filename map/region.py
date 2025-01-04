@@ -28,3 +28,7 @@ class Region:
             shape=self.shape.inflated(amount),
             elements=self.elements
         )
+    
+    def to_path(self) -> 'skia.Path':
+        """Convert this region's shape to a Skia path."""
+        return self.shape.to_path()
