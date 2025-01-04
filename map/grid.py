@@ -25,11 +25,20 @@ def draw_region_grid(canvas: skia.Canvas, region: ShapeGroup, options: 'Options'
     max_y = math.ceil((bounds.y + bounds.height) / options.cell_size)
     
     if options.grid_debug:
-        # Save current canvas state
+        # Save current canvas state with transform
         canvas.save()
         
-        # Temporarily disable clipping/masking
+        # Get current transform matrix
+        current_matrix = canvas.getTotalMatrix()
+        
+        # Reset to identity matrix temporarily
+        canvas.resetMatrix()
+        
+        # Disable clipping/masking
         canvas.clipRect(skia.Rect.MakeXYWH(0, 0, options.canvas_width, options.canvas_height))
+        
+        # Restore the original transform
+        canvas.setMatrix(current_matrix)
         
         # Draw grid bounds rectangle for debugging
         debug_paint = skia.Paint(
