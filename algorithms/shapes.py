@@ -75,7 +75,7 @@ class ShapeGroup:
                 ))
             elif isinstance(shape, Circle):
                 shape_path.addCircle(shape.cx, shape.cy, shape._inflated_radius)
-            include_path.addPath(shape_path, skia.Path.kUnion_Op)
+            include_path.addPath(shape_path)
             
         # Subtract excluded shapes
         for shape in self.excludes:
@@ -87,7 +87,7 @@ class ShapeGroup:
                 ))
             elif isinstance(shape, Circle):
                 exclude_path.addCircle(shape.cx, shape.cy, shape._inflated_radius)
-            include_path.op(exclude_path, skia.Path.kDifference_Op)
+            include_path.op(exclude_path, skia.PathOp.kDifference_PathOp)
             
         canvas.drawPath(include_path, paint)
     
