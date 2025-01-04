@@ -333,31 +333,24 @@ class Map:
             )
             region.draw(canvas, shadow_paint)
 
-            # 2. Save state and create mask layer
+            # 2. Save state for shadow offset
             canvas.save()
-            mask = skia.Surface(int(region.bounds.width), int(region.bounds.height))
-            mask_canvas = mask.getCanvas()
             
-            # Draw region shape into mask
-            mask_paint = skia.Paint(
-                AntiAlias=True,
-                Style=skia.Paint.kFill_Style,
-                Color=skia.ColorWHITE  # White = opaque in mask
-            )
-            region.draw(mask_canvas, mask_paint)
-            
-            # 3. Draw room shape with offset (using mask)
+            # 3. Draw room shape with offset
             canvas.translate(
                 self.options.room_shadow_offset_x,
                 self.options.room_shadow_offset_y
             )
+            
+            # 4. Clip to region shape
+            canvas.clipPath(region.to_path(), skia.ClipOp.kIntersect, True)  # antialiased
+            
+            # 5. Draw the filled room
             room_paint = skia.Paint(
                 AntiAlias=True,
                 Style=skia.Paint.kFill_Style,
                 Color=self.options.room_color
             )
-            # Use region's path for clipping
-            canvas.clipPath(region.to_path(), skia.ClipOp.kIntersect, True)  # antialiased
             region.draw(canvas, room_paint)
 
             # 4. Draw grid if enabled (still clipped by mask)
