@@ -3,7 +3,7 @@
 import math
 import random
 import skia
-from algorithms.shapes import ShapeGroup
+from algorithms.shapes import ShapeGroup, Rectangle
 from options import Options
 from map.enums import GridStyle
 
