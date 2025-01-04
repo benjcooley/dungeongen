@@ -334,7 +334,8 @@ class Map:
             shadow_paint = skia.Paint(
                 AntiAlias=True,
                 Style=skia.Paint.kFill_Style,
-                Color=self.options.room_shadow_color
+                Color=self.options.room_shadow_color,
+                StrokeWidth=0  # Ensure no stroke
             )
             
             # Save canvas state for shadow
@@ -350,14 +351,16 @@ class Map:
             room_paint = skia.Paint(
                 AntiAlias=True,
                 Style=skia.Paint.kFill_Style,
-                Color=self.options.room_color
+                Color=self.options.room_color,
+                StrokeWidth=0  # Ensure no stroke
             )
             
             # Create mask using region shape
             mask_paint = skia.Paint(
                 AntiAlias=True,
                 Style=skia.Paint.kFill_Style,
-                BlendMode=skia.BlendMode.kSrc
+                BlendMode=skia.BlendMode.kSrc,
+                StrokeWidth=0  # Ensure no stroke
             )
             
             # Save canvas state for clipping
