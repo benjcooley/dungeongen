@@ -2,6 +2,7 @@
 
 from algorithms.shapes import Rectangle, Circle, Shape
 from typing import List, TYPE_CHECKING
+import skia
 
 # Constant to make rooms slightly larger to ensure proper passage connections
 ROOM_OVERLAP_OFFSET = 4.0  # pixels
