@@ -24,20 +24,29 @@ def draw_region_grid(canvas: skia.Canvas, region: ShapeGroup, options: 'Options'
     max_x = math.ceil((bounds.x + bounds.width) / options.cell_size) 
     max_y = math.ceil((bounds.y + bounds.height) / options.cell_size)
     
-    # Draw grid bounds rectangle for debugging
-    debug_paint = skia.Paint(
-        AntiAlias=True,
-        Style=skia.Paint.kStroke_Style,
-        StrokeWidth=4,
-        Color=skia.ColorGREEN
-    )
-    grid_bounds = Rectangle(
-        min_x * options.cell_size,
-        min_y * options.cell_size,
-        (max_x - min_x) * options.cell_size,
-        (max_y - min_y) * options.cell_size
-    )
-    grid_bounds.draw(canvas, debug_paint)
+    if options.grid_debug:
+        # Temporarily disable any clipping/masking
+        canvas.save()
+        canvas.resetMatrix()
+        canvas.clipRect(skia.Rect.MakeXYWH(0, 0, options.canvas_width, options.canvas_height))
+        
+        # Draw grid bounds rectangle for debugging
+        debug_paint = skia.Paint(
+            AntiAlias=True,
+            Style=skia.Paint.kStroke_Style,
+            StrokeWidth=4,
+            Color=skia.ColorGREEN
+        )
+        grid_bounds = Rectangle(
+            min_x * options.cell_size,
+            min_y * options.cell_size,
+            (max_x - min_x) * options.cell_size,
+            (max_y - min_y) * options.cell_size
+        )
+        grid_bounds.draw(canvas, debug_paint)
+        
+        # Restore previous canvas state
+        canvas.restore()
     
     # Create base paint for dots
     dot_paint = skia.Paint(

@@ -9,6 +9,7 @@ from options import Options
 
 def main():
     options = Options()
+    options.grid_debug = True  # Enable debug visualization temporarily
     
     # Initialize Skia canvas
     surface = skia.Surface(options.canvas_width, options.canvas_height)
