@@ -132,8 +132,45 @@ class Rock(Prop):
         size = map_.options.cell_size * MEDIUM_ROCK_SIZE
         return cls(x, y, size, map_, rotation)
     
-    @staticmethod
-    def get_valid_position(size: float, container: 'MapElement') -> tuple[float, float] | None:
+    @classmethod
+    def add_rocks_to(cls, container: 'MapElement', count: int, rock_type: RockType = RockType.ANY) -> None:
+        """Add a specified number of rocks to a map element.
+        
+        Args:
+            container: The MapElement to add rocks to
+            count: Number of rocks to add
+            rock_type: Type of rocks to add (defaults to ANY which randomly selects types)
+            
+        Note: Does nothing if container is a Door element.
+        """
+        from map.door import Door
+        
+        # Skip if this is a door
+        if isinstance(container, Door):
+            return
+            
+        for _ in range(count):
+            # Determine rock type
+            actual_type = rock_type if rock_type != RockType.ANY else RockType.random_type()
+            
+            # Random rotation
+            rotation = random.uniform(0, 2 * math.pi)
+            
+            # Calculate rock size and try to find valid position
+            size = (SMALL_ROCK_SIZE if actual_type == RockType.SMALL else MEDIUM_ROCK_SIZE) * container._map.options.cell_size
+            valid_pos = cls.get_valid_position(size, container)
+            
+            if valid_pos:
+                # Create rock at valid position
+                if actual_type == RockType.SMALL:
+                    rock = cls.small_rock(valid_pos[0], valid_pos[1], container._map, rotation)
+                else:  # MEDIUM
+                    rock = cls.medium_rock(valid_pos[0], valid_pos[1], container._map, rotation)
+                    
+                container.try_add_prop(rock)
+
+    @classmethod
+    def get_valid_position(cls, size: float, container: 'MapElement') -> tuple[float, float] | None:
         """Try to find a valid position for a rock within the container.
         
         Args:

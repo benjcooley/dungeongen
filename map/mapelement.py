@@ -3,8 +3,7 @@ import random
 import math
 import skia
 from map.enums import Layers
-from map.enums import Layers, RockType
-from map.props.rock import SMALL_ROCK_SIZE, MEDIUM_ROCK_SIZE, Rock
+from map.enums import Layers
 
 if TYPE_CHECKING:
     from map.map import Map
@@ -107,42 +106,6 @@ class MapElement:
         if self._map is not None:
             self._map.remove_element(self)
     
-    def add_rocks(self, count: int, rock_type: RockType = RockType.ANY) -> None:
-        """Add a specified number of rocks to this element.
-        
-        Args:
-            count: Number of rocks to add
-            rock_type: Type of rocks to add (defaults to ANY which randomly selects types)
-            
-        Note: Does nothing if called on a Door element.
-        """
-        from map.door import Door
-        from map.props.rock import Rock
-        
-        # Skip if this is a door
-        if isinstance(self, Door):
-            return
-            
-        bounds = self.bounds
-        for _ in range(count):
-            # Determine rock type
-            actual_type = rock_type if rock_type != RockType.ANY else RockType.random_type()
-            
-            # Random rotation
-            rotation = random.uniform(0, 2 * math.pi)
-            
-            # Calculate rock size and try to find valid position
-            size = (SMALL_ROCK_SIZE if actual_type == RockType.SMALL else MEDIUM_ROCK_SIZE) * self._map.options.cell_size
-            valid_pos = Rock.get_valid_position(size, self)
-            
-            if valid_pos:
-                # Create rock at valid position
-                if actual_type == RockType.SMALL:
-                    rock = Rock.small_rock(valid_pos[0], valid_pos[1], self._map, rotation)
-                else:  # MEDIUM
-                    rock = Rock.medium_rock(valid_pos[0], valid_pos[1], self._map, rotation)
-                    
-                self.try_add_prop(rock)
 
     def draw(self, canvas: 'skia.Canvas', layer: 'Layers' = Layers.PROPS) -> None:
         """Draw this element on the specified layer.
