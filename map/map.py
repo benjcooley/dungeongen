@@ -8,6 +8,7 @@ import random
 from graphics.crosshatch import draw_crosshatches
 from map.grid import GridStyle, draw_region_grid
 from map.enums import Layers
+from map.region import Region
 if TYPE_CHECKING:
     from options import Options
 from map.occupancy import OccupancyGrid
@@ -182,13 +183,12 @@ class Map:
         self.add_element(room)
         return room
     
-    def get_regions(self) -> list['Region']:
+    def get_regions(self) -> list[Region]:
         """Get Regions for each contiguous area of the map.
         
         Returns:
             List of Regions, each containing a ShapeGroup and the MapElements in that region.
         """
-        from map.region import Region
         
         visited: set[MapElement] = set()
         regions: list[Region] = []
