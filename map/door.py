@@ -67,14 +67,14 @@ class Door(MapElement):
         """Calculate the current shape based on open/closed state."""
         if not self._open:
             # When closed, the shape is empty - sides are handled by get_side_shape
-            return ShapeGroup(shapes=[])
+            return ShapeGroup(includes=[], excludes=[])
         else:
             # When open, combine all rectangles into an I-shape
             if self._orientation == DoorOrientation.HORIZONTAL:
                 shapes = [self._left_rect, self._middle_rect, self._right_rect]
             else:
                 shapes = [self._top_rect, self._middle_rect, self._bottom_rect]
-            return ShapeGroup(shapes=shapes)
+            return ShapeGroup(includes=shapes, excludes=[])
 
     def get_side_shape(self, connected: 'MapElement') -> Rectangle:
         """Get the shape for the door's side that connects to the given element."""
