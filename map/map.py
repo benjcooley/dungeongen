@@ -182,15 +182,16 @@ class Map:
         self.add_element(room)
         return room
     
-    def get_regions(self) -> list[ShapeGroup]:
-        """Get ShapeGroups for each contiguous region of the map.
+    def get_regions(self) -> list['Region']:
+        """Get Regions for each contiguous area of the map.
         
         Returns:
-            List of ShapeGroups, each representing a contiguous region not separated
-            by closed doors.
+            List of Regions, each containing a ShapeGroup and the MapElements in that region.
         """
+        from map.region import Region
+        
         visited: set[MapElement] = set()
-        regions: list[ShapeGroup] = []
+        regions: list[Region] = []
         
         # Find all connected regions
         for element in self._elements:
@@ -198,19 +199,25 @@ class Map:
                 continue
             
             # Trace this region
-            region: list[MapElement] = []
-            self._trace_connected_region(element, visited, region)
+            region_elements: list[MapElement] = []
+            self._trace_connected_region(element, visited, region_elements)
             
-            # Create ShapeGroup for this region
-            if region:
+            # Create Region for this area if we found elements
+            if region_elements:
                 # Get shapes from elements and any door shapes
                 shapes = []
-                for item in region:
+                final_elements = []
+                for item in region_elements:
                     if isinstance(item, MapElement):
                         shapes.append(item.shape)
+                        final_elements.append(item)
                     else:  # Rectangle from door side
                         shapes.append(item)
-                regions.append(ShapeGroup.combine(shapes))
+                        
+                regions.append(Region(
+                    shape=ShapeGroup.combine(shapes),
+                    elements=final_elements
+                ))
         
         return regions
 
@@ -304,7 +311,7 @@ class Map:
             canvas.save()
             
             # 2. Clip to region shape
-            canvas.clipPath(region.to_path(), skia.ClipOp.kIntersect, True)  # antialiased
+            canvas.clipPath(region.shape.to_path(), skia.ClipOp.kIntersect, True)  # antialiased
             
             # 3. Draw the filled room
             room_paint = skia.Paint(
@@ -312,7 +319,7 @@ class Map:
                 Style=skia.Paint.kFill_Style,
                 Color=self.options.room_color
             )
-            region.draw(canvas, room_paint)
+            region.shape.draw(canvas, room_paint)
             
             # 4. Draw shadows
             shadow_paint = skia.Paint(
@@ -326,14 +333,19 @@ class Map:
                 self.options.room_shadow_offset_x,
                 self.options.room_shadow_offset_y
             )
-            region.draw(canvas, shadow_paint)
+            region.shape.draw(canvas, shadow_paint)
             canvas.restore()
 
             # 5. Draw grid if enabled (still clipped by mask)
             if self.options.grid_style not in (None, GridStyle.NONE):
-                draw_region_grid(canvas, region, self.options)
+                draw_region_grid(canvas, region.shape, self.options)
 
-            # 6. Restore transform and clear clip mask
+            # 6. Draw region elements on appropriate layers
+            for element in region.elements:
+                element.draw(canvas, Layers.SHADOW)
+                element.draw(canvas, Layers.PROPS)
+
+            # 7. Restore transform and clear clip mask
             canvas.restore()
             
         # Draw shadow layer first
