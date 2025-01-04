@@ -42,14 +42,21 @@ class MapElement:
         Returns:
             True if prop was added successfully, False if position was invalid
         """
+        print(f"\nTrying to add {type(prop).__name__} to {type(self).__name__}")
+        print(f"Prop bounds: x={prop._bounds.x}, y={prop._bounds.y}, w={prop._bounds.width}, h={prop._bounds.height}")
+        print(f"Container bounds: x={self._bounds.x}, y={self._bounds.y}, w={self._bounds.width}, h={self._bounds.height}")
+        
         # Check if prop's current position is valid using class method
-        if not type(prop).get_valid_position(prop._bounds.width, self):
+        valid_pos = type(prop).get_valid_position(prop._bounds.width, self)
+        if not valid_pos:
+            print("Failed to find valid position")
             return False
             
         if prop.container is not None:
             prop.container.remove_prop(prop)
         prop.container = self
         self._props.append(prop)
+        print("Successfully added prop")
         return True
         
     def remove_prop(self, prop: 'Prop') -> None:
