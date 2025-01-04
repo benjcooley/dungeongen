@@ -298,45 +298,36 @@ class Map:
         # Draw crosshatching pattern
         draw_crosshatches(self.options, crosshatch_shape, canvas)
         
-        # Debug: Draw poisson disk sample points
-        # sampler.draw_debug_points(canvas)
-        
-        # Draw room regions with shadows
+        # Draw room regions
         for region in regions:
-            # 1. Draw shadow (no offset)
-            shadow_paint = skia.Paint(
-                AntiAlias=True,
-                Style=skia.Paint.kFill_Style,
-                Color=self.options.room_shadow_color,
-                StrokeWidth=0
-            )
-            region.draw(canvas, shadow_paint)
-
-            # 2. Save state and apply clip
+            # 1. Save state and apply clip
             canvas.save()
             
-            # 3. Clip to region shape
+            # 2. Clip to region shape
             canvas.clipPath(region.to_path(), skia.ClipOp.kIntersect, True)  # antialiased
             
-            # 4. Apply shadow offset
-            canvas.translate(
-                self.options.room_shadow_offset_x,
-                self.options.room_shadow_offset_y
-            )
-            
-            # 5. Draw the filled room
+            # 3. Draw the filled room
             room_paint = skia.Paint(
                 AntiAlias=True,
                 Style=skia.Paint.kFill_Style,
                 Color=self.options.room_color
             )
             region.draw(canvas, room_paint)
-
-            # 4. Undo shadow transform before drawing grid
-            canvas.translate(
-                -self.options.room_shadow_offset_x,
-                -self.options.room_shadow_offset_y
+            
+            # 4. Draw shadows
+            shadow_paint = skia.Paint(
+                AntiAlias=True,
+                Style=skia.Paint.kFill_Style,
+                Color=self.options.room_shadow_color,
+                StrokeWidth=0
             )
+            canvas.save()
+            canvas.translate(
+                self.options.room_shadow_offset_x,
+                self.options.room_shadow_offset_y
+            )
+            region.draw(canvas, shadow_paint)
+            canvas.restore()
 
             # 5. Draw grid if enabled (still clipped by mask)
             if self.options.grid_style not in (None, GridStyle.NONE):
