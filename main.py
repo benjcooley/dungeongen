@@ -30,7 +30,7 @@ def main():
     
     # Add 5-grid long passage
     passage = Passage(
-        *grid_to_drawing(3, -0.5, options),  # Convert grid coords to drawing coords
+        *grid_to_drawing(3, 0, options),  # Convert grid coords to drawing coords
         *grid_to_drawing_size(5, 1, options),  # Convert grid size to drawing size
         dungeon_map
     )
@@ -40,8 +40,8 @@ def main():
     second_door = Door.from_grid(8, 0, DoorOrientation.HORIZONTAL, dungeon_map, open=False)
     dungeon_map.add_element(second_door)
     
-    # Add circular room (radius 2.5 grid units, centered 2.5 units right of the door)
-    end_room = dungeon_map.add_circular_room(10.5, 0, 2.5)
+    # Add circular room (radius 3 grid units, centered 11 units right of start)
+    end_room = dungeon_map.add_circular_room(11, 0, 3)
     
     # Connect everything together
     start_room.connect_to(first_door)
