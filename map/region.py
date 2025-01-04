@@ -2,11 +2,11 @@
 
 import skia
 from typing import Sequence
-from algorithms.shapes import ShapeGroup, Rectangle, Shape
+from algorithms.shapes import ShapeGroup
 from map.mapelement import MapElement
 
 
-class Region(Shape):
+class Region:
     """A region of the map containing connected elements.
 
     A region represents a contiguous area of the map not separated by closed doors.
@@ -24,23 +24,6 @@ class Region(Shape):
         self.shape = shape
         self.elements = list(elements)
 
-    def contains(self, px: float, py: float) -> bool:
-        """Check if a point is contained within this region's shape."""
-        return self.shape.contains(px, py)
-
-    @property
-    def bounds(self) -> Rectangle:
-        """Get the bounding rectangle that encompasses this region."""
-        return self.shape.bounds
-
-    def draw(self, canvas: skia.Canvas, paint: skia.Paint) -> None:
-        """Draw this region on a canvas."""
-        self.shape.draw(canvas, paint)
-
-    def to_path(self) -> skia.Path:
-        """Convert this region's shape to a Skia path."""
-        return self.shape.to_path()
-
     def inflated(self, amount: float) -> 'Region':
         """Return a new region with its shape inflated by the given amount."""
         return Region(
@@ -48,7 +31,6 @@ class Region(Shape):
             elements=self.elements
         )
 
-    @property
-    def is_valid(self) -> bool:
-        """Check if this region is valid (has a valid shape)."""
-        return self.shape.is_valid
+    def to_path(self) -> skia.Path:
+        """Convert this region's shape to a Skia path."""
+        return self.shape.to_path()
