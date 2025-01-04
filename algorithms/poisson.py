@@ -103,6 +103,17 @@ class PoissonDiskSampler:
                         break
 
         return self.points
+        
+    def draw_debug_points(self, canvas: 'skia.Canvas') -> None:
+        """Draw debug visualization of sampled points."""
+        debug_paint = skia.Paint(
+            AntiAlias=True,
+            Style=skia.Paint.kFill_Style,
+            Color=skia.ColorBLUE
+        )
+        
+        for point in self.points:
+            canvas.drawCircle(point[0], point[1], 2, debug_paint)
 
 def test_poisson_sampling():
     """Test the Poisson disk sampling implementation."""
