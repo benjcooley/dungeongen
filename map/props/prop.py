@@ -69,16 +69,6 @@ class Prop(MapElement):
                 return (x, y)
         return None
         
-    def _is_valid_position(self, container: Shape) -> bool:
-        """Check if the prop's current position is valid within the container shape.
-        
-        Tests the prop's center point to ensure it fits.
-        Subclasses can override to add additional validation.
-        """
-        center_x = self._bounds.x + self._bounds.width/2
-        center_y = self._bounds.y + self._bounds.height/2
-        return container.contains(center_x, center_y)
-        
     @property
     def position(self) -> tuple[float, float]:
         """Get the current position of the prop."""

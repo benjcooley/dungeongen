@@ -172,23 +172,3 @@ class Rock(Prop):
                 
         return None
 
-    def _is_valid_position(self, container: Shape) -> bool:
-        """Check if the rock's position is valid within the container shape.
-        
-        Tests multiple points around the rock's perimeter to ensure it fits.
-        Overrides base class implementation to check perimeter points.
-        """
-        # Test center point first using parent implementation
-        if not super()._is_valid_position(container):
-            return False
-            
-        # Test points around the perimeter
-        num_probes = 6
-        for i in range(num_probes):
-            angle = (i * 2 * math.pi / num_probes)
-            x = self._center_x + self._radius * math.cos(angle)
-            y = self._center_y + self._radius * math.sin(angle)
-            if not container.contains(x, y):
-                return False
-                
-        return True
