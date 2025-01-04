@@ -1,5 +1,6 @@
 from typing import List, TYPE_CHECKING
 import skia
+from map.enums import Layers
 
 if TYPE_CHECKING:
     from map.map import Map

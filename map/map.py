@@ -7,6 +7,7 @@ import math
 import random
 from graphics.crosshatch import draw_crosshatches
 from map.grid import GridStyle, draw_region_grid
+from map.enums import Layers
 if TYPE_CHECKING:
     from options import Options
 from map.occupancy import OccupancyGrid

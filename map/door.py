@@ -7,6 +7,7 @@ from algorithms.shapes import Rectangle, ShapeGroup
 from map.mapelement import MapElement
 from algorithms.shapes import Shape
 from graphics.conversions import grid_to_drawing, grid_to_drawing_size
+from map.enums import Layers
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
