@@ -3,7 +3,7 @@ import random
 import math
 import skia
 from map.enums import Layers
-from map.props.rocktype import RockType
+from map.enums import Layers, RockType
 
 if TYPE_CHECKING:
     from map.map import Map
