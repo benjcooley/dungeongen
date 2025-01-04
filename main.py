@@ -44,6 +44,15 @@ def main():
     first_door.connect_to(passage)
     passage.connect_to(second_door)
     second_door.connect_to(end_room)
+    
+    # Add some test rocks
+    from map.props.rock import Rock
+    
+    # Add rocks to start room
+    rock1 = Rock.small_rock(-1, -1, dungeon_map)
+    rock2 = Rock.medium_rock(1, 1, dungeon_map, Rotation.ROT90)
+    dungeon_map.add_element(rock1)
+    dungeon_map.add_element(rock2)
 
     # Draw the map (which will draw all rooms)
     dungeon_map.render(canvas)
