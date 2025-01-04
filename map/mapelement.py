@@ -143,16 +143,17 @@ class MapElement:
     def draw(self, canvas: 'skia.Canvas', layer: 'Layers' = Layers.PROPS) -> None:
         """Draw this element on the specified layer.
         
-        The base implementation draws props on any layer.
-        Subclasses can override to add custom drawing behavior for different layers.
+        The base implementation draws props.
+        Subclasses can override to add custom drawing behavior for different layers,
+        but should call super().draw() to ensure props are drawn.
         
         Args:
             canvas: The canvas to draw on
             layer: The current drawing layer
         """
-        # Draw props on any layer
+        # Always draw props regardless of layer
         for prop in self._props:
-            prop.draw(canvas, layer)
+            prop.draw(canvas)
     
     def draw_occupied(self, grid: 'OccupancyGrid', element_idx: int) -> None:
         """Draw this element's shape into the occupancy grid.
