@@ -339,6 +339,20 @@ class Map:
             if any(element.shape in region_shape.includes for region_shape in regions):
                 element.draw(canvas)
         
+        # Debug: Draw region bounds in red
+        debug_paint = skia.Paint(
+            AntiAlias=True,
+            Style=skia.Paint.kStroke_Style,
+            StrokeWidth=2,
+            Color=skia.ColorRED
+        )
+        for region in regions:
+            bounds = region.bounds
+            canvas.drawRect(
+                skia.Rect.MakeXYWH(bounds.x, bounds.y, bounds.width, bounds.height),
+                debug_paint
+            )
+
         # Draw region borders last with rounded corners
         border_paint = skia.Paint(
             AntiAlias=True,
