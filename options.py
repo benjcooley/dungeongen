@@ -67,5 +67,5 @@ class Options:
     
     # Border options
     border_color: int = 0xFF000000  # Black color for region borders
-    border_width: float = 4.0  # Width of region borders in pixels
+    border_width: float = 6.0  # Width of region borders in pixels
     map_border_cells: float = 4.0  # Number of cells padding around the map
