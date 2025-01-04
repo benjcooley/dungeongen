@@ -2,7 +2,7 @@
 
 from typing import TYPE_CHECKING, Optional
 import skia
-from algorithms.shapes import Rectangle
+from algorithms.shapes import Rectangle, Shape
 from map.mapelement import MapElement
 from map.props.rotation import Rotation
 from map.enums import Layers
