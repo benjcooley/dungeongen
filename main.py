@@ -48,10 +48,16 @@ def main():
     # Draw the map (which will draw all rooms)
     dungeon_map.render(canvas)
 
-    # Save the result
+    # Save as PNG
     image = surface.makeImageSnapshot()
     image.save('map_output.png', skia.kPNG)
-    print("Room drawing completed and saved to 'map_output.png'")
+    
+    # Save as PDF
+    stream = skia.FILEWStream('map_output.pdf')
+    with skia.PDF.MakeDocument(stream) as document:
+        with document.page(options.canvas_width, options.canvas_height) as pdf_canvas:
+            dungeon_map.render(pdf_canvas)
+    print("Room drawing completed and saved to 'map_output.png' and 'map_output.pdf'")
 
 if __name__ == "__main__":
     main()
