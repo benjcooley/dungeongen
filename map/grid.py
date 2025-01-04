@@ -34,8 +34,8 @@ def draw_region_grid(canvas: skia.Canvas, region: ShapeGroup, options: 'Options'
         # Reset to identity matrix temporarily
         canvas.resetMatrix()
         
-        # Disable clipping/masking
-        canvas.clipRect(skia.Rect.MakeXYWH(0, 0, options.canvas_width, options.canvas_height))
+        # Remove the mask by clearing the clip, but keep the transform
+        canvas.clipRect(skia.Rect.MakeWH(canvas.getBaseLayerSize().width(), canvas.getBaseLayerSize().height()), skia.ClipOp.kIntersect, False)
         
         # Restore the original transform
         canvas.setMatrix(current_matrix)
