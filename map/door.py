@@ -183,10 +183,10 @@ class Door(MapElement):
             
             # Calculate door rectangle dimensions
             if self._orientation == DoorOrientation.HORIZONTAL:
-                # Door width is 1/5 of cell size
-                door_width = self._width / 5
-                # Door height is 60% of cell height
-                door_height = self._height * 0.6
+                # Door width is 1/6 of cell size
+                door_width = self._width / 6
+                # Door height is 55% of cell height
+                door_height = self._height * 0.55
                 # Center the door
                 door_x = self._x + (self._width - door_width) / 2
                 door_y = self._y + (self._height - door_height) / 2
@@ -203,19 +203,24 @@ class Door(MapElement):
             print(f"Door dimensions: x={door_x}, y={door_y}, w={door_width}, h={door_height}")
             print(f"Door paint color: {door_paint.getColor()}")
             
-            # Create and draw door rectangle with border
+            # Create door rectangle
             door = Rectangle(door_x, door_y, door_width, door_height, inflate=1.0)
             if not door.is_valid:
                 print("Warning: Door rectangle is invalid!")
             
-            # Draw filled door
-            door.draw(canvas, door_paint)
+            # Draw filled door with thinner stroke
+            fill_paint = skia.Paint(
+                AntiAlias=True,
+                Style=skia.Paint.kFill_Style,
+                Color=self._map.options.prop_light_color
+            )
+            door.draw(canvas, fill_paint)
             
-            # Draw border
+            # Draw border with half the normal border width
             border_paint = skia.Paint(
                 AntiAlias=True,
                 Style=skia.Paint.kStroke_Style,
-                StrokeWidth=self._map.options.border_width,
+                StrokeWidth=self._map.options.border_width / 2,
                 Color=self._map.options.border_color
             )
             door.draw(canvas, border_paint)
