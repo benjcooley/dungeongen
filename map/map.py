@@ -330,20 +330,14 @@ class Map:
         
         # Draw room regions with shadows
         for region in regions:
-            # 1. Draw shadow
+            # 1. Draw shadow (no offset)
             shadow_paint = skia.Paint(
                 AntiAlias=True,
                 Style=skia.Paint.kFill_Style,
                 Color=self.options.room_shadow_color,
                 StrokeWidth=0
             )
-            canvas.save()
-            canvas.translate(
-                self.options.room_shadow_offset_x,
-                self.options.room_shadow_offset_y
-            )
             region.draw(canvas, shadow_paint)
-            canvas.restore()
 
             # 2. Create mask layer
             canvas.save()
@@ -354,7 +348,11 @@ class Map:
             )
             region.draw(canvas, mask_paint)
 
-            # 3. Draw room shape constrained by mask
+            # 3. Draw room shape with offset (constrained by mask)
+            canvas.translate(
+                self.options.room_shadow_offset_x,
+                self.options.room_shadow_offset_y
+            )
             room_paint = skia.Paint(
                 AntiAlias=True,
                 Style=skia.Paint.kFill_Style,
@@ -362,7 +360,7 @@ class Map:
             )
             region.draw(canvas, room_paint)
 
-            # 4. Draw grid if enabled (still masked)
+            # 4. Draw grid if enabled (still masked and offset)
             if self.options.grid_style not in (None, GridStyle.NONE):
                 self._draw_region_grid(canvas, region)
 
