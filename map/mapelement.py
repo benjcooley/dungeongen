@@ -43,8 +43,12 @@ class MapElement:
             True if prop was added successfully, False if position was invalid
         """
         # Check if prop's current position is valid
-        if not prop._is_valid_position(self.shape):
+        valid_pos = prop.__class__.get_valid_position(prop._bounds.width, self)
+        if valid_pos is None:
             return False
+            
+        # Update prop position to valid position
+        prop.position = valid_pos
             
         if prop.container is not None:
             prop.container.remove_prop(prop)
