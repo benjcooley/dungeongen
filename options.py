@@ -20,7 +20,7 @@ class Options:
     
     # Crosshatch pattern configuration
     crosshatch_strokes_per_cluster: int = 3
-    crosshatch_stroke_spacing: float = 5
+    crosshatch_stroke_spacing: float = 10
     crosshatch_angle_variation: float = math.radians(10)
     
     @property
