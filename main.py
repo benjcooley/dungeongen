@@ -22,6 +22,9 @@ def main():
     
     # Add circular room one grid space away
     circle_room = dungeon_map.add_circular_room(4, -2, 2.5)
+    
+    # Connect the rooms
+    rect_room.connect_to(circle_room)
 
     # Draw the map (which will draw all rooms)
     dungeon_map.render(canvas)
