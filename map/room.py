@@ -34,8 +34,6 @@ class Room(MapElement):
     
     def draw(self, canvas: 'skia.Canvas', layer: Layers = Layers.PROPS) -> None:
         """Draw the room and its props."""
-        super().draw(canvas, layer)
-        # Draw props on the props layer
+        # Only draw props on PROPS layer
         if layer == Layers.PROPS:
-            for prop in self._props:
-                prop.draw(canvas, layer)
+            super().draw(canvas, layer)
