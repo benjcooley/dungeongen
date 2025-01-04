@@ -15,8 +15,8 @@ if TYPE_CHECKING:
     from map.map import Map
 
 # Rock sizes as fraction of grid cell
-SMALL_ROCK_SIZE = 1/8
-MEDIUM_ROCK_SIZE = 1/5
+SMALL_ROCK_SIZE = 1/12
+MEDIUM_ROCK_SIZE = 1/8
 
 class Rock(Prop):
     """A rock prop with irregular circular shape."""
@@ -53,8 +53,8 @@ class Rock(Prop):
         for i in range(8):  # Use 8 points for a smoother shape
             angle = (i * 2 * math.pi / 8) + self.rotation
             
-            # Add small random variation to radius (±10%)
-            radius_variation = random.uniform(-0.1, 0.1)
+            # Add random variation to radius (±25%)
+            radius_variation = random.uniform(-0.25, 0.25)
             perturbed_radius = self._radius * (1 + radius_variation)
             
             # Calculate point position
