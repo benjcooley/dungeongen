@@ -14,8 +14,9 @@ class Shape(Protocol):
         """Check if a point is contained within this shape."""
         ...
     
-    def recalculate_bounds(self) -> 'Rectangle':
-        """Calculate the bounding rectangle that encompasses this shape."""
+    @property
+    def bounds(self) -> 'Rectangle':
+        """Get the bounding rectangle that encompasses this shape."""
         ...
     
     def draw(self, canvas: 'skia.Canvas', paint: 'skia.Paint') -> None:
@@ -28,6 +29,9 @@ class Shape(Protocol):
 
 class ShapeGroup:
     """A group of shapes that can be combined to create complex shapes."""
+    
+        self._bounds: Rectangle | None = None
+        self._bounds_dirty = True
     
     @classmethod
     def combine(cls, shapes: Sequence[Shape]) -> 'ShapeGroup':
@@ -98,17 +102,17 @@ class ShapeGroup:
             excludes=[s.inflated(amount) for s in self.excludes]
         )
     
-    def recalculate_bounds(self) -> 'Rectangle':
+    def _recalculate_bounds(self) -> None:
         """Calculate bounds by combining all included shapes' bounds."""
         if not self.includes:
             raise ValueError("Shape group must have at least one included shape")
         
         # Start with the first shape's bounds
-        bounds = self.includes[0].recalculate_bounds()
+        bounds = self.includes[0].bounds
         
         # Expand bounds to include all other shapes
         for shape in self.includes[1:]:
-            other_bounds = shape.recalculate_bounds()
+            other_bounds = shape.bounds
             bounds = Rectangle(
                 min(bounds.x, other_bounds.x),
                 min(bounds.y, other_bounds.y),
@@ -116,7 +120,15 @@ class ShapeGroup:
                 max(bounds.y + bounds.height, other_bounds.y + other_bounds.height) - min(bounds.y, other_bounds.y)
             )
         
-        return bounds
+        self._bounds = bounds
+        self._bounds_dirty = False
+
+    @property
+    def bounds(self) -> Rectangle:
+        """Get the current bounding rectangle, recalculating if needed."""
+        if self._bounds_dirty or self._bounds is None:
+            self._recalculate_bounds()
+        return self._bounds
 
 class Rectangle:
     """A rectangle that can be inflated to create a rounded rectangle effect.
@@ -125,7 +137,8 @@ class Rectangle:
     the inflation amount, effectively creating a rounded rectangle shape.
     """
     
-    def recalculate_bounds(self) -> 'Rectangle':
+    @property
+    def bounds(self) -> 'Rectangle':
         """Return this rectangle as bounds."""
         return Rectangle(self._inflated_x, self._inflated_y, self._inflated_width, self._inflated_height)
     
@@ -208,8 +221,9 @@ class Circle:
     def contains(self, px: float, py: float) -> bool:
         return math.sqrt((px - self.cx)**2 + (py - self.cy)**2) <= self._inflated_radius
     
-    def recalculate_bounds(self) -> Rectangle:
-        """Calculate the bounding rectangle for this circle."""
+    @property
+    def bounds(self) -> Rectangle:
+        """Get the bounding rectangle for this circle."""
         return Rectangle(
             self.cx - self._inflated_radius,
             self.cy - self._inflated_radius,
