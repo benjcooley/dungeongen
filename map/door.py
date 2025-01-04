@@ -178,13 +178,13 @@ class Door(MapElement):
             door_paint = skia.Paint(
                 AntiAlias=True,
                 Style=skia.Paint.kFill_Style,
-                Color=self._map.options.border_color
+                Color=self._map.options.prop_light_color
             )
             
             # Calculate door rectangle dimensions
             if self._orientation == DoorOrientation.HORIZONTAL:
-                # Door width is 1/3 of cell size
-                door_width = self._width / 3
+                # Door width is 1/4 of cell size
+                door_width = self._width / 4
                 # Door height is 60% of cell height
                 door_height = self._height * 0.6
                 # Center the door
@@ -193,14 +193,14 @@ class Door(MapElement):
             else:
                 # Door width is 60% of cell width
                 door_width = self._width * 0.6
-                # Door height is 1/3 of cell size
-                door_height = self._height / 3
+                # Door height is 1/4 of cell size
+                door_height = self._height / 4
                 # Center the door
                 door_x = self._x + (self._width - door_width) / 2
                 door_y = self._y + (self._height - door_height) / 2
             
-            # Create and draw door rectangle with rounded corners
-            door = Rectangle(door_x, door_y, door_width, door_height, inflate=4.0)
+            # Create and draw door rectangle (no inflation)
+            door = Rectangle(door_x, door_y, door_width, door_height)
             door.draw(canvas, door_paint)
             
     @classmethod
