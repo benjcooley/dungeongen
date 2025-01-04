@@ -182,3 +182,13 @@ def draw_crosshatches(
         center_point,
         canvas,
         line_paint)
+        
+    # Draw debug points on top of crosshatching
+    debug_paint = skia.Paint(
+        AntiAlias=True,
+        Style=skia.Paint.kFill_Style,
+        Color=skia.ColorBLUE
+    )
+    
+    for point in points:
+        canvas.drawCircle(point[0], point[1], 2, debug_paint)
