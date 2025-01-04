@@ -99,6 +99,20 @@ class Rock(Prop):
         if layer != Layers.PROPS:
             return
             
+        # Debug: Print rock position and container bounds
+        if self.container:
+            container_bounds = self.container.bounds
+            print(f"\nDrawing rock at ({self._center_x}, {self._center_y}) with radius {self._radius}")
+            print(f"Container bounds: x={container_bounds.x}, y={container_bounds.y}, "
+                  f"w={container_bounds.width}, h={container_bounds.height}")
+            
+            # Check if rock is within container bounds
+            in_bounds = (self._center_x >= container_bounds.x and 
+                        self._center_x <= container_bounds.x + container_bounds.width and
+                        self._center_y >= container_bounds.y and 
+                        self._center_y <= container_bounds.y + container_bounds.height)
+            print(f"Rock center is {'inside' if in_bounds else 'OUTSIDE'} container bounds")
+            
         # Create the rock path
         path = skia.Path()
         
