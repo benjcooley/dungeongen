@@ -3,7 +3,7 @@
 import math
 import skia
 from typing import List, Protocol, Sequence
-from algorithms.types import Point, Shape
+from algorithms.aliases import Point, Shape
 
 class Shape(Protocol):
     """Protocol defining the interface for shapes."""

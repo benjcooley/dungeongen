@@ -107,6 +107,7 @@ class Door(MapElement):
         if self._open != value:
             self._open = value
             self._shape = self._calculate_shape()
+            
     @classmethod
     def from_grid(cls, grid_x: float, grid_y: float, orientation: DoorOrientation, map_: 'Map', open: bool = False) -> 'Door':
         """Create a door using grid coordinates.

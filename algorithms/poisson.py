@@ -57,7 +57,7 @@ class PoissonDiskSampler:
         """
         return self.shape.contains(x, y)
 
-    def _get_neighbors(self, x, y):
+    def get_neighbors(self, x, y):
         grid_x = int(x / self.cell_size)
         grid_y = int(y / self.cell_size)
         neighbors = []
