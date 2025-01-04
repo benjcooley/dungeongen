@@ -349,12 +349,7 @@ class Map:
         for element in self._elements:
             element.draw(canvas, Layers.PROPS)
             
-        # Draw doors layer after room outlines
-        for element in self._elements:
-            element.draw(canvas, Layers.DOORS)
-        
-
-        # Draw region borders last with rounded corners
+        # Draw region borders with rounded corners
         border_paint = skia.Paint(
             AntiAlias=True,
             Style=skia.Paint.kStroke_Style,
@@ -370,6 +365,10 @@ class Map:
             
         # Draw the unified border path
         canvas.drawPath(unified_border, border_paint)
+
+        # Draw doors layer after borders
+        for element in self._elements:
+            element.draw(canvas, Layers.DOORS)
 
         # Restore canvas state
         canvas.restore()
