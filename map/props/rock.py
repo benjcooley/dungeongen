@@ -70,6 +70,30 @@ class Rock(Prop):
             
         return points
     
+    def _is_valid_position(self, container_shape: Shape) -> bool:
+        """Check if the rock's current position is valid within the container shape.
+        
+        Args:
+            container_shape: Shape to check containment against
+            
+        Returns:
+            True if position is valid, False otherwise
+        """
+        # Check center point
+        if not container_shape.contains(self._center_x, self._center_y):
+            return False
+            
+        # Check points around the perimeter
+        num_probes = 6
+        for i in range(num_probes):
+            angle = (i * 2 * math.pi / num_probes)
+            px = self._center_x + self._radius * math.cos(angle)
+            py = self._center_y + self._radius * math.sin(angle)
+            if not container_shape.contains(px, py):
+                return False
+                
+        return True
+
     def draw(self, canvas: skia.Canvas, layer: 'Layers' = Layers.PROPS) -> None:
         """Draw the rock using a perturbed circular path on the specified layer."""
         if layer != Layers.PROPS:
