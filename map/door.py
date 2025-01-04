@@ -78,9 +78,6 @@ class Door(MapElement):
 
     def get_side_shape(self, connected: 'MapElement') -> Rectangle:
         """Get the shape for the door's side that connects to the given element."""
-        if connected not in self.connections:
-            raise ValueError("Element is not connected to this door")
-            
         # Get center point of connected element
         conn_bounds = connected.bounds
         conn_cx = conn_bounds.x + conn_bounds.width / 2
