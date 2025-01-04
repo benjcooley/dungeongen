@@ -76,19 +76,6 @@ class Prop(MapElement, ABC):
         """
         pass
 
-    @classmethod
-    @abstractmethod
-    def get_valid_position(cls, size: float, container: 'MapElement') -> tuple[float, float] | None:
-        """Try to find a valid position for a prop within the container.
-        
-        Args:
-            size: Prop size
-            container: The MapElement to place the prop in
-            
-        Returns:
-            Tuple of (x,y) coordinates if valid position found, None otherwise
-        """
-        pass
 
     def draw(self, canvas: skia.Canvas, layer: Layers = Layers.PROPS) -> None:
         """Override base MapElement draw to prevent drawing bounds rectangle."""
