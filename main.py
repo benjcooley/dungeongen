@@ -1,6 +1,7 @@
 """
 Main entry point for drawing a simple room.
 """
+import math
 import skia
 
 from graphics.conversions import grid_to_drawing, grid_to_drawing_size
