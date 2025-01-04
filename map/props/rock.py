@@ -3,12 +3,13 @@
 import random
 import math
 import skia
+from typing import List, Tuple, TYPE_CHECKING
+from map.enums import Layers
+from map.mapelement import MapElement
 
 # Rock sizes as fraction of grid cell
 SMALL_ROCK_SIZE = 1/12
 MEDIUM_ROCK_SIZE = 1/8
-from typing import List, Tuple, TYPE_CHECKING
-from map.enums import Layers
 
 from graphics.conversions import grid_to_drawing
 from map.props.prop import Prop
