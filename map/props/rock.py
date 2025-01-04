@@ -4,7 +4,7 @@ import random
 import math
 import skia
 from typing import List, Tuple, TYPE_CHECKING
-from map.enums import Layers
+from map.enums import Layers, RockType
 from map.mapelement import MapElement
 
 # Rock sizes as fraction of grid cell
