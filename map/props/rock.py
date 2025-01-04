@@ -131,6 +131,46 @@ class Rock(Prop):
         size = map_.options.cell_size * MEDIUM_ROCK_SIZE
         return cls(x, y, size, map_, rotation)
     
+    @staticmethod
+    def get_valid_position(size: float, container: 'MapElement') -> tuple[float, float] | None:
+        """Try to find a valid position for a rock within the container.
+        
+        Args:
+            size: Rock radius
+            container: The MapElement to place the rock in
+            
+        Returns:
+            Tuple of (x,y) coordinates if valid position found, None otherwise
+        """
+        bounds = container.bounds
+        margin = container._map.options.cell_size * 0.25  # 25% of cell size margin
+        
+        # Try 30 random positions
+        for _ in range(30):
+            # Generate random position within bounds
+            x = random.uniform(bounds.x + margin, bounds.x + bounds.width - margin)
+            y = random.uniform(bounds.y + margin, bounds.y + bounds.height - margin)
+            
+            # Check center point
+            if not container.shape.contains(x, y):
+                continue
+                
+            # Check points around the perimeter
+            valid = True
+            num_probes = 6
+            for i in range(num_probes):
+                angle = (i * 2 * math.pi / num_probes)
+                px = x + size * math.cos(angle)
+                py = y + size * math.sin(angle)
+                if not container.shape.contains(px, py):
+                    valid = False
+                    break
+                    
+            if valid:
+                return (x, y)
+                
+        return None
+
     def _is_valid_position(self, container: Shape) -> bool:
         """Check if the rock's position is valid within the container shape.
         

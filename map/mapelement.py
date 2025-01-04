@@ -131,7 +131,7 @@ class MapElement:
             # Random rotation
             rotation = random.uniform(0, 2 * math.pi)
             
-            # Try to find valid position for rock
+            # Calculate rock size and try to find valid position
             size = (SMALL_ROCK_SIZE if actual_type == RockType.SMALL else MEDIUM_ROCK_SIZE) * self._map.options.cell_size
             valid_pos = Rock.get_valid_position(size, self)
             
