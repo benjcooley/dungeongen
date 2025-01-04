@@ -8,7 +8,7 @@ from options import Options
 from map.enums import GridStyle
 
 
-def draw_region_grid(canvas: skia.Canvas, region: ShapeGroup, options: 'Options') -> None:
+def draw_region_grid(canvas: skia.Canvas, region: 'Region', options: 'Options') -> None:
     """Draw grid dots for a region.
     
     Args:
@@ -16,7 +16,7 @@ def draw_region_grid(canvas: skia.Canvas, region: ShapeGroup, options: 'Options'
         region: The region to draw grid for
         options: Drawing configuration options
     """
-    bounds = region.bounds
+    bounds = region.shape.bounds
     
     # Calculate grid-aligned bounds, ensuring we start before the shape bounds
     min_x = math.floor(bounds.x / options.cell_size)
@@ -46,7 +46,7 @@ def draw_region_grid(canvas: skia.Canvas, region: ShapeGroup, options: 'Options'
         # Draw for bounds width plus two dot spacings
         while x <= bounds.x + bounds.width + 2 * dot_spacing:
             x += dot_spacing
-            if region.contains(x, py):
+            if region.shape.contains(x, py):
                 # Apply length variation as a percentage of base length
                 dot_length = options.grid_dot_length * (1 + random.uniform(
                     -options.grid_dot_variation,
@@ -71,7 +71,7 @@ def draw_region_grid(canvas: skia.Canvas, region: ShapeGroup, options: 'Options'
         # Draw for bounds height plus two dot spacings
         while y <= bounds.y + bounds.height + 2 * dot_spacing:
             y += dot_spacing
-            if region.contains(px, y):
+            if region.shape.contains(px, y):
                 # Apply length variation as a percentage of base length
                 dot_length = options.grid_dot_length * (1 + random.uniform(
                     -options.grid_dot_variation,
