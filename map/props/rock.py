@@ -81,18 +81,23 @@ class Rock(Prop):
         # Move to first point
         path.moveTo(self._control_points[0][0], self._control_points[0][1])
         
-        # Add curved segments between points
-        for i in range(NUM_CONTROL_POINTS):
+        # Add curved segments between points, including back to start
+        for i in range(NUM_CONTROL_POINTS + 1):
+            curr_idx = i % NUM_CONTROL_POINTS
             next_idx = (i + 1) % NUM_CONTROL_POINTS
-            curr_point = self._control_points[i]
+            curr_point = self._control_points[curr_idx]
             next_point = self._control_points[next_idx]
             
-            # Use simple quadratic curve between points
+            # Use quadratic curve between points
             mid_x = (curr_point[0] + next_point[0]) / 2
             mid_y = (curr_point[1] + next_point[1]) / 2
-            path.quadTo(curr_point[0], curr_point[1], mid_x, mid_y)
-        
-        path.close()
+            
+            if i == 0:
+                # First point - move to midpoint
+                path.moveTo(mid_x, mid_y)
+            else:
+                # Subsequent points - curve through control point to next midpoint
+                path.quadTo(curr_point[0], curr_point[1], mid_x, mid_y)
 
         # Draw fill first
         fill_paint = skia.Paint(
