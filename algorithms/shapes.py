@@ -110,15 +110,11 @@ class ShapeGroup:
         
         # Union with remaining included shapes
         for shape in self.includes[1:]:
-            temp_path = skia.Path()
-            if skia.Op(result_path, shape.to_path(), skia.PathOp.kUnion_PathOp, temp_path):
-                result_path = temp_path
+            result_path = skia.Op(result_path, shape.to_path(), skia.PathOp.kUnion_PathOp)
             
         # Subtract excluded shapes
         for shape in self.excludes:
-            temp_path = skia.Path()
-            if skia.Op(result_path, shape.to_path(), skia.PathOp.kDifference_PathOp, temp_path):
-                result_path = temp_path
+            result_path = skia.Op(result_path, shape.to_path(), skia.PathOp.kDifference_PathOp)
             
         return result_path
 
