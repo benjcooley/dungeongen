@@ -157,20 +157,6 @@ class Rock(Prop):
         canvas.drawPath(path, stroke_paint)
     
     @classmethod
-    def small_rock(cls, grid_x: float, grid_y: float, map_: 'Map', rotation: float = 0.0) -> 'Rock':
-        """Create a small rock at the given grid position."""
-        x, y = grid_to_drawing(grid_x, grid_y, map_.options)
-        size = map_.options.cell_size * SMALL_ROCK_SIZE
-        return cls(x, y, size, map_, rotation)
-    
-    @classmethod
-    def medium_rock(cls, grid_x: float, grid_y: float, map_: 'Map', rotation: float = 0.0) -> 'Rock':
-        """Create a medium rock at the given grid position."""
-        x, y = grid_to_drawing(grid_x, grid_y, map_.options)
-        size = map_.options.cell_size * MEDIUM_ROCK_SIZE
-        return cls(x, y, size, map_, rotation)
-    
-    @classmethod
     def add_rocks_to(cls, container: 'MapElement', count: int, rock_type: RockType = RockType.ANY) -> None:
         """Add a specified number of rocks to a map element.
         
