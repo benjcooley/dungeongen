@@ -3,6 +3,7 @@
 import math
 from dataclasses import dataclass
 from map.grid import GridStyle
+from map.grid import GridStyle
 
 @dataclass
 class Options:
@@ -60,7 +61,7 @@ class Options:
     room_shadow_offset_y: float = 14.0  # Shadow y offset in pixels (positive for up)
     
     # Grid options
-    grid_style: 'GridStyle' = None  # Grid drawing style (None for no grid)
+    grid_style: 'GridStyle' = GridStyle.DOTS  # Grid drawing style using dots
     grid_color: int = 0xFF808080  # Gray color for grid
     grid_dot_size: float = 1.6  # Size of grid dots (1/20th of cell_size)
     grid_dots_per_cell: int = 5  # Number of dots to draw per cell
