@@ -1,7 +1,8 @@
 """Base class for map props."""
 
 import random
-from typing import TYPE_CHECKING, Optional
+from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING, Optional, ClassVar
 import skia
 from algorithms.shapes import Rectangle, Shape
 from map.mapelement import MapElement
@@ -11,7 +12,7 @@ from map.enums import Layers
 if TYPE_CHECKING:
     from map.map import Map
 
-class Prop(MapElement):
+class Prop(MapElement, ABC):
     """Base class for decorative map props.
     
     Props are visual elements that can be placed in rooms and passages.
@@ -84,6 +85,36 @@ class Prop(MapElement):
         self._shape = Rectangle(self._x, self._y, self._bounds.width, self._bounds.height)
         # Update the bounds
         self._bounds = self._shape.bounds
+
+    @classmethod
+    @abstractmethod
+    def is_valid_position(cls, x: float, y: float, size: float, container: 'MapElement') -> bool:
+        """Check if a position is valid for a prop within the container.
+        
+        Args:
+            x: X coordinate to check
+            y: Y coordinate to check
+            size: Prop size
+            container: The MapElement to place the prop in
+            
+        Returns:
+            True if position is valid, False otherwise
+        """
+        pass
+
+    @classmethod
+    @abstractmethod
+    def get_valid_position(cls, size: float, container: 'MapElement') -> tuple[float, float] | None:
+        """Try to find a valid position for a prop within the container.
+        
+        Args:
+            size: Prop size
+            container: The MapElement to place the prop in
+            
+        Returns:
+            Tuple of (x,y) coordinates if valid position found, None otherwise
+        """
+        pass
 
     def draw(self, canvas: skia.Canvas, layer: Layers = Layers.PROPS) -> None:
         """Override base MapElement draw to prevent drawing bounds rectangle."""
