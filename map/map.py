@@ -333,17 +333,17 @@ class Map:
             )
             region.draw(canvas, shadow_paint)
 
-            # 2. Save state for shadow offset
+            # 2. Save state and apply clip
             canvas.save()
             
-            # 3. Draw room shape with offset
+            # 3. Clip to region shape
+            canvas.clipPath(region.to_path(), skia.ClipOp.kIntersect, True)  # antialiased
+            
+            # 4. Apply shadow offset
             canvas.translate(
                 self.options.room_shadow_offset_x,
                 self.options.room_shadow_offset_y
             )
-            
-            # 4. Clip to region shape
-            canvas.clipPath(region.to_path(), skia.ClipOp.kIntersect, True)  # antialiased
             
             # 5. Draw the filled room
             room_paint = skia.Paint(
