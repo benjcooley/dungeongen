@@ -64,7 +64,7 @@ class Prop(MapElement):
             x = random.uniform(bounds.x + margin, bounds.x + bounds.width - margin)
             y = random.uniform(bounds.y + margin, bounds.y + bounds.height - margin)
             
-            test_prop = type(prop)(x, y, size, size, container._map)
+            test_prop = cls(x, y, size, size, container._map)
             if test_prop._is_valid_position(container.shape):
                 return (x, y)
         return None
