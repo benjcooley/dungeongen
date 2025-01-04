@@ -50,11 +50,11 @@ def main():
     # Add some test rocks
     from map.props.rock import Rock
     
-    # Add rocks to start room
-    rock1 = Rock.small_rock(-1, -1, dungeon_map)
-    rock2 = Rock.medium_rock(1, 1, dungeon_map, math.pi/2)  # 90 degrees in radians
-    dungeon_map.add_element(rock1)
-    dungeon_map.add_element(rock2)
+    # # Add rocks to start room
+    # rock1 = Rock.small_rock(-1, -1, dungeon_map)
+    # rock2 = Rock.medium_rock(1, 1, dungeon_map, math.pi/2)  # 90 degrees in radians
+    # dungeon_map.add_element(rock1)
+    # dungeon_map.add_element(rock2)
 
     # Draw the map (which will draw all rooms)
     dungeon_map.render(canvas)
