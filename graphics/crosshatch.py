@@ -172,6 +172,9 @@ def draw_crosshatches(
     else:
         center_point = (options.canvas_width / 2, options.canvas_height / 2)
     
+    # Draw debug points
+    sampler.draw_debug_points(canvas)
+    
     # Draw the crosshatch patterns
     _draw_crosshatch_with_clusters(
         options,

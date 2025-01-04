@@ -71,6 +71,17 @@ class PoissonDiskSampler:
                     neighbors.append(self.grid[gx][gy])
         return neighbors
 
+    def draw_debug_points(self, canvas: 'skia.Canvas') -> None:
+        """Draw debug visualization of sampled points."""
+        debug_paint = skia.Paint(
+            AntiAlias=True,
+            Style=skia.Paint.kFill_Style,
+            Color=skia.ColorBLUE
+        )
+        
+        for point in self.points:
+            canvas.drawCircle(point[0], point[1], 2, debug_paint)
+
     def sample(self):
         while self.spawn_points:
             sp_index = random.randint(0, len(self.spawn_points) - 1)
