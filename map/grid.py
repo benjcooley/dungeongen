@@ -7,6 +7,22 @@ from algorithms.shapes import ShapeGroup
 from options import Options
 from map.enums import GridStyle
 
+def _get_grid_bounds(bounds: 'Rectangle', cell_size: float) -> tuple[int, int, int, int]:
+    """Calculate the grid rectangle that fully encompasses the bounds.
+    
+    Args:
+        bounds: The bounds to encompass
+        cell_size: The size of each grid cell
+        
+    Returns:
+        Tuple of (min_x, min_y, max_x, max_y) grid coordinates
+    """
+    min_x = math.floor(bounds.x / cell_size)
+    min_y = math.floor(bounds.y / cell_size)
+    max_x = math.ceil((bounds.x + bounds.width) / cell_size)
+    max_y = math.ceil((bounds.y + bounds.height) / cell_size)
+    return min_x, min_y, max_x, max_y
+
 def draw_region_grid(canvas: skia.Canvas, region: ShapeGroup, options: 'Options') -> None:
     """Draw grid dots for a region.
     
@@ -17,6 +33,9 @@ def draw_region_grid(canvas: skia.Canvas, region: ShapeGroup, options: 'Options'
     """
     bounds = region.bounds
     
+    # Get grid bounds that encompass the region
+    min_x, min_y, max_x, max_y = _get_grid_bounds(bounds, options.cell_size)
+    
     # Create base paint for dots
     dot_paint = skia.Paint(
         AntiAlias=True,
@@ -26,8 +45,7 @@ def draw_region_grid(canvas: skia.Canvas, region: ShapeGroup, options: 'Options'
     )
 
     # Draw horizontal lines
-    for y in range(math.floor(bounds.y / options.cell_size) - 1,
-                  math.ceil((bounds.y + bounds.height) / options.cell_size) + 1):
+    for y in range(min_y, max_y + 1):
         py = y * options.cell_size
         if not any(region.contains(bounds.x + dx, py) for dx in (0, bounds.width/2, bounds.width)):
             continue
@@ -53,8 +71,7 @@ def draw_region_grid(canvas: skia.Canvas, region: ShapeGroup, options: 'Options'
                 canvas.drawLine(x, py, x + dot_length, py, dot_paint)
 
     # Draw vertical lines
-    for x in range(math.floor(bounds.x / options.cell_size) - 1,
-                  math.ceil((bounds.x + bounds.width) / options.cell_size) + 1):
+    for x in range(min_x, max_x + 1):
         px = x * options.cell_size
         if not any(region.contains(px, bounds.y + dy) for dy in (0, bounds.height/2, bounds.height)):
             continue
