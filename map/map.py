@@ -347,8 +347,14 @@ class Map:
             Color=self.options.border_color,
             StrokeJoin=skia.Paint.kRound_Join  # Round the corners
         )
+        
+        # Create a single unified path for all regions
+        unified_border = skia.Path()
         for region in regions:
-            region.draw(canvas, border_paint)
+            unified_border.addPath(region.to_path())
+            
+        # Draw the unified border path
+        canvas.drawPath(unified_border, border_paint)
 
         # Restore canvas state
         canvas.restore()
