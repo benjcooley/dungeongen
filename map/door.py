@@ -46,53 +46,83 @@ class Door(MapElement):
         self._open = open
         self._orientation = orientation
         
-        # Calculate rectangle dimensions (1/3 of size in both dimensions)
+        # Calculate dimensions for sides and middle
         if self._orientation == DoorOrientation.HORIZONTAL:
             side_width = self._width / 3
             middle_height = self._height * 0.6  # Make middle section wider (3/5 instead of 2/3)
             middle_y = self._y + (self._height - middle_height) / 2  # Center vertically
             
-            # Create inflated rectangles for rounded sides
-            # Account for both extension and inflation in width/height calculation
-            # Offset x,y by inflation amount since Rectangle will expand outward
-            self._left_rect = Rectangle(
+            # Create left side rectangle with rounded corners
+            left_side = Rectangle(
                 self._x - DOOR_SIDE_EXTENSION + DOOR_SIDE_ROUNDING,
                 self._y + DOOR_SIDE_ROUNDING,
                 side_width + DOOR_SIDE_EXTENSION - (DOOR_SIDE_ROUNDING * 2),
                 self._height - (DOOR_SIDE_ROUNDING * 2),
                 inflate=DOOR_SIDE_ROUNDING
             )
-            self._right_rect = Rectangle(
+            # Left half of middle rectangle
+            left_middle = Rectangle(
+                self._x + side_width,
+                middle_y,
+                side_width / 2,
+                middle_height
+            )
+            self._left_group = ShapeGroup(includes=[left_side, left_middle], excludes=[])
+            
+            # Create right side rectangle with rounded corners
+            right_side = Rectangle(
                 self._x + self._width - side_width + DOOR_SIDE_ROUNDING,
                 self._y + DOOR_SIDE_ROUNDING,
                 side_width + DOOR_SIDE_EXTENSION - (DOOR_SIDE_ROUNDING * 2),
                 self._height - (DOOR_SIDE_ROUNDING * 2),
                 inflate=DOOR_SIDE_ROUNDING
             )
-            self._middle_rect = Rectangle(self._x + side_width, middle_y, side_width, middle_height)
+            # Right half of middle rectangle
+            right_middle = Rectangle(
+                self._x + side_width + side_width/2,
+                middle_y,
+                side_width / 2,
+                middle_height
+            )
+            self._right_group = ShapeGroup(includes=[right_side, right_middle], excludes=[])
         else:
             side_height = self._height / 3
             middle_width = self._width * 0.6  # Make middle section wider (3/5 instead of 2/3)
             middle_x = self._x + (self._width - middle_width) / 2  # Center horizontally
             
-            # Create inflated rectangles for rounded sides
-            # Account for both extension and inflation in width/height calculation
-            # Offset x,y by inflation amount since Rectangle will expand outward
-            self._top_rect = Rectangle(
+            # Create top side rectangle with rounded corners
+            top_side = Rectangle(
                 self._x + DOOR_SIDE_ROUNDING,
                 self._y - DOOR_SIDE_EXTENSION + DOOR_SIDE_ROUNDING,
                 self._width - (DOOR_SIDE_ROUNDING * 2),
                 side_height + DOOR_SIDE_EXTENSION - (DOOR_SIDE_ROUNDING * 2),
                 inflate=DOOR_SIDE_ROUNDING
             )
-            self._bottom_rect = Rectangle(
+            # Top half of middle rectangle
+            top_middle = Rectangle(
+                middle_x,
+                self._y + side_height,
+                middle_width,
+                side_height / 2
+            )
+            self._top_group = ShapeGroup(includes=[top_side, top_middle], excludes=[])
+            
+            # Create bottom side rectangle with rounded corners
+            bottom_side = Rectangle(
                 self._x + DOOR_SIDE_ROUNDING,
                 self._y + self._height - side_height + DOOR_SIDE_ROUNDING,
                 self._width - (DOOR_SIDE_ROUNDING * 2),
                 side_height + DOOR_SIDE_EXTENSION - (DOOR_SIDE_ROUNDING * 2),
                 inflate=DOOR_SIDE_ROUNDING
             )
-            self._middle_rect = Rectangle(middle_x, self._y + side_height, middle_width, side_height)
+            # Bottom half of middle rectangle
+            bottom_middle = Rectangle(
+                middle_x,
+                self._y + side_height + side_height/2,
+                middle_width,
+                side_height / 2
+            )
+            self._bottom_group = ShapeGroup(includes=[bottom_side, bottom_middle], excludes=[])
         
         # Initialize with empty shape if closed, or full I-shape if open
         shape = self._calculate_shape()
@@ -103,16 +133,15 @@ class Door(MapElement):
         """Calculate the current shape based on open/closed state."""
         if not self._open:
             # When closed, return empty shape list
-            shapes = []
+            return ShapeGroup(includes=[], excludes=[])
         else:
-            # When open, combine all rectangles into an I-shape
-            if self._orientation == DoorOrientation.HORIZONTAL:
-                shapes = [self._left_rect, self._middle_rect, self._right_rect]
+            # When open, combine the side groups into a single shape
+            if self._orientation == DorOrientation.HORIZONTAL:
+                return ShapeGroup.combine([self._left_group, self._right_group])
             else:
-                shapes = [self._top_rect, self._middle_rect, self._bottom_rect]
-        return ShapeGroup(includes=shapes, excludes=[])
+                return ShapeGroup.combine([self._top_group, self._bottom_group])
 
-    def get_side_shape(self, connected: 'MapElement') -> Rectangle:
+    def get_side_shape(self, connected: 'MapElement') -> ShapeGroup:
         """Get the shape for the door's side that connects to the given element."""
         # Get center point of connected element
         conn_bounds = connected.bounds
@@ -123,11 +152,11 @@ class Door(MapElement):
         door_cx = self._x + self._width / 2
         door_cy = self._y + self._height / 2
         
-        # Return appropriate side rectangle based on orientation and position
+        # Return appropriate side group based on orientation and position
         if self._orientation == DoorOrientation.HORIZONTAL:
-            return self._left_rect if conn_cx < door_cx else self._right_rect
+            return self._left_group if conn_cx < door_cx else self._right_group
         else:
-            return self._top_rect if conn_cy < door_cy else self._bottom_rect
+            return self._top_group if conn_cy < door_cy else self._bottom_group
     
     @property
     def open(self) -> bool:
