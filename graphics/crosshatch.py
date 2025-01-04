@@ -10,7 +10,7 @@ import math
 import random
 import skia
 
-from algorithms.aliases import Point, Line, Shape
+from algorithms.types import Point, Line, Shape
 from algorithms.poisson import PoissonDiskSampler
 from algorithms.lines import intersect_lines
 from options import Options
