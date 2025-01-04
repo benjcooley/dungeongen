@@ -1,6 +1,6 @@
 """Base class for map props."""
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 import skia
 from algorithms.shapes import Rectangle
 from map.mapelement import MapElement
@@ -31,6 +31,7 @@ class Prop(MapElement):
         shape = Rectangle(x, y, width, height)
         super().__init__(shape=shape, map_=map_)
         self.rotation = rotation
+        self.container: Optional['MapElement'] = None
     
     def _apply_rotation(self, canvas: skia.Canvas) -> None:
         """Apply rotation transform around prop center."""

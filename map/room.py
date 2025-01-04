@@ -41,12 +41,16 @@ class Room(MapElement):
         if not self._shape.contains(prop.bounds.x + prop.bounds.width/2, 
                                   prop.bounds.y + prop.bounds.height/2):
             raise ValueError("Prop must be contained within room bounds")
+        if prop.container is not None:
+            prop.container.remove_prop(prop)
+        prop.container = self
         self._props.append(prop)
         
     def remove_prop(self, prop: 'Prop') -> None:
         """Remove a prop from this room."""
         if prop in self._props:
             self._props.remove(prop)
+            prop.container = None
             
     def draw(self, canvas: 'skia.Canvas', layer: Layers = Layers.PROPS) -> None:
         """Draw the room and its props."""
