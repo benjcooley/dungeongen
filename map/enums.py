@@ -22,5 +22,8 @@ class RockType(Enum):
     
     @classmethod
     def random_type(cls) -> 'RockType':
-        """Return a random rock type (excluding ANY)."""
-        return random.choice([cls.SMALL, cls.MEDIUM])
+        """Return a random rock type (excluding ANY).
+        
+        SMALL rocks are twice as likely to be chosen as MEDIUM rocks.
+        """
+        return random.choice([cls.SMALL, cls.SMALL, cls.MEDIUM])
