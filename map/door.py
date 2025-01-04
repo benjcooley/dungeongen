@@ -70,7 +70,7 @@ class Door(MapElement):
             return ShapeGroup(shapes=[])
         else:
             # When open, combine all rectangles into an I-shape
-            if self._is_horizontal:
+            if self._orientation == DoorOrientation.HORIZONTAL:
                 shapes = [self._left_rect, self._middle_rect, self._right_rect]
             else:
                 shapes = [self._top_rect, self._middle_rect, self._bottom_rect]
