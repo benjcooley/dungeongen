@@ -302,7 +302,7 @@ class Map:
         crosshatch_shapes = []
         for region in regions:
             # Create inflated version of the region
-            crosshatch_shapes.append(region.inflated(self.options.crosshatch_inflation))
+            crosshatch_shapes.append(region.inflated(self.options.crosshatch_border_size))
         
         # Combine all regions into single crosshatch shape
         crosshatch_shape = ShapeGroup.combine(crosshatch_shapes)

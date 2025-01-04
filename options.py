@@ -49,7 +49,7 @@ class Options:
         return 0.1
     
     # Rendering options
-    crosshatch_inflation: float = 16.0  # How much to inflate shapes for crosshatching
+    crosshatch_border_size: float = 32.0  # Size of crosshatched border around rooms
     crosshatch_background_color: int = 0xFFFFFFFF  # White
     crosshatch_shading_color: int = 0xFFCCCCCC  # Light gray for crosshatch background
     
