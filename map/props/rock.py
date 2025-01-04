@@ -22,7 +22,12 @@ MEDIUM_ROCK_SIZE = 1/5
 NUM_CONTROL_POINTS = 4
 
 # Maximum perturbation of control points as fraction of radius
-MAX_PERTURBATION = 0.2
+MAX_PERTURBATION = 0.3
+
+# Number of sub-divisions between control points for additional variation
+NUM_SUBDIVISIONS = 2
+# Maximum perturbation for subdivision points (smaller than main control points)
+MAX_SUBDIVISION_PERTURBATION = 0.15
 
 class Rock(Prop):
     """A rock prop with irregular circular shape."""
@@ -54,20 +59,56 @@ class Rock(Prop):
     def _generate_control_points(self) -> List[Tuple[float, float]]:
         """Generate perturbed control points for the rock shape."""
         points = []
+        base_points = []
         
+        # Generate main control points with radius variation
         for i in range(NUM_CONTROL_POINTS):
-            # Calculate base angle for this point
             angle = (i * 2 * math.pi / NUM_CONTROL_POINTS) + self.rotation
             
-            # Add random perturbation to radius
-            perturbed_radius = self._radius * (1 + random.uniform(-MAX_PERTURBATION, MAX_PERTURBATION))
+            # Vary the radius with a combination of sine wave and random noise
+            wave = math.sin(angle * 3) * 0.15  # 3 waves around the circle
+            noise = random.uniform(-MAX_PERTURBATION, MAX_PERTURBATION)
+            radius_factor = 1 + wave + noise
             
-            # Calculate perturbed point position
+            perturbed_radius = self._radius * radius_factor
+            
             x = self._center_x + perturbed_radius * math.cos(angle)
             y = self._center_y + perturbed_radius * math.sin(angle)
             
-            points.append((x, y))
+            base_points.append((x, y))
+        
+        # Add subdivision points between main control points
+        for i in range(NUM_CONTROL_POINTS):
+            p1 = base_points[i]
+            p2 = base_points[(i + 1) % NUM_CONTROL_POINTS]
             
+            points.append(p1)
+            
+            # Add subdivision points
+            for j in range(NUM_SUBDIVISIONS):
+                t = (j + 1) / (NUM_SUBDIVISIONS + 1)
+                
+                # Interpolate between points
+                mid_x = p1[0] * (1 - t) + p2[0] * t
+                mid_y = p1[1] * (1 - t) + p2[1] * t
+                
+                # Add random perturbation perpendicular to the line
+                dx = p2[0] - p1[0]
+                dy = p2[1] - p1[1]
+                length = math.sqrt(dx * dx + dy * dy)
+                
+                if length > 0:
+                    # Calculate perpendicular vector
+                    perp_x = -dy / length
+                    perp_y = dx / length
+                    
+                    # Add random perturbation along perpendicular
+                    perturbation = random.uniform(-MAX_SUBDIVISION_PERTURBATION, MAX_SUBDIVISION_PERTURBATION) * self._radius
+                    mid_x += perp_x * perturbation
+                    mid_y += perp_y * perturbation
+                
+                points.append((mid_x, mid_y))
+        
         return points
     
     def draw(self, canvas: skia.Canvas, layer: 'Layers' = Layers.PROPS) -> None:
