@@ -169,6 +169,38 @@ class Door(MapElement):
         if self._open != value:
             self._open = value
             self._shape = self._calculate_shape()
+    
+    def draw(self, canvas: skia.Canvas) -> None:
+        """Draw the door if it's closed."""
+        if not self._open:
+            # Create paint for door
+            door_paint = skia.Paint(
+                AntiAlias=True,
+                Style=skia.Paint.kFill_Style,
+                Color=self._map.options.border_color
+            )
+            
+            # Calculate door rectangle dimensions
+            if self._orientation == DoorOrientation.HORIZONTAL:
+                # Door width is 1/3 of cell size
+                door_width = self._width / 3
+                # Door height is 60% of cell height
+                door_height = self._height * 0.6
+                # Center the door
+                door_x = self._x + (self._width - door_width) / 2
+                door_y = self._y + (self._height - door_height) / 2
+            else:
+                # Door width is 60% of cell width
+                door_width = self._width * 0.6
+                # Door height is 1/3 of cell size
+                door_height = self._height / 3
+                # Center the door
+                door_x = self._x + (self._width - door_width) / 2
+                door_y = self._y + (self._height - door_height) / 2
+            
+            # Create and draw door rectangle with rounded corners
+            door = Rectangle(door_x, door_y, door_width, door_height, inflate=4.0)
+            door.draw(canvas, door_paint)
             
     @classmethod
     def from_grid(cls, grid_x: float, grid_y: float, orientation: DoorOrientation, map_: 'Map', open: bool = False) -> 'Door':
