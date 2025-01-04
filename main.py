@@ -16,7 +16,7 @@ def main():
     
     # Create map and add a 4x4 room centered at origin
     dungeon_map = Map(options)
-    room = dungeon_map.add_rectangular_room(-2, -2, 4, 4)
+    room = dungeon_map.add_rectangular_room(-2.5, -2.5, 5, 5)
 
     # Draw the map (which will draw all elements including our room)
     dungeon_map.render(canvas)
