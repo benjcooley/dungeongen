@@ -1,6 +1,9 @@
 from typing import List, TYPE_CHECKING
+import random
+import math
 import skia
 from map.enums import Layers
+from map.props.rocktype import RockType
 
 if TYPE_CHECKING:
     from map.map import Map
@@ -76,6 +79,48 @@ class MapElement:
         if self._map is not None:
             self._map.remove_element(self)
     
+    def add_rocks(self, count: int, rock_type: RockType = RockType.ANY) -> None:
+        """Add a specified number of rocks to this element.
+        
+        Args:
+            count: Number of rocks to add
+            rock_type: Type of rocks to add (defaults to ANY which randomly selects types)
+            
+        Note: Does nothing if called on a Door element.
+        """
+        from map.door import Door
+        from map.props.rock import Rock
+        
+        # Skip if this is a door
+        if isinstance(self, Door):
+            return
+            
+        bounds = self.bounds
+        for _ in range(count):
+            # Determine rock type
+            actual_type = rock_type if rock_type != RockType.ANY else RockType.random_type()
+            
+            # Calculate random position within bounds (with margin)
+            margin = self._map.options.cell_size * 0.25  # 25% of cell size margin
+            x = random.uniform(bounds.x + margin, bounds.x + bounds.width - margin)
+            y = random.uniform(bounds.y + margin, bounds.y + bounds.height - margin)
+            
+            # Random rotation
+            rotation = random.uniform(0, 2 * math.pi)
+            
+            # Create appropriate rock type
+            if actual_type == RockType.SMALL:
+                rock = Rock.small_rock(x, y, self._map, rotation)
+            else:  # MEDIUM
+                rock = Rock.medium_rock(x, y, self._map, rotation)
+                
+            # Try to add the rock
+            try:
+                self.add_prop(rock)
+            except ValueError:
+                # If adding fails (e.g., outside bounds), just skip this rock
+                continue
+
     def draw(self, canvas: 'skia.Canvas', layer: 'Layers' = Layers.PROPS) -> None:
         """Draw this element on the specified layer.
         
