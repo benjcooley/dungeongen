@@ -2,7 +2,7 @@
 
 import math
 import skia
-from typing import List, Sequence
+from typing import List, Protocol, Sequence
 from algorithms.types import Point, Shape
 
 class Shape(Protocol):
