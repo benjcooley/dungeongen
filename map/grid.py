@@ -35,10 +35,10 @@ def draw_region_grid(canvas: skia.Canvas, region: ShapeGroup, options: 'Options'
         # Calculate dot spacing based on cell size and dots per cell
         dot_spacing = options.cell_size / options.grid_dots_per_cell
         
-        # Start at bounds edge and add small random variation to subsequent dots
-        x = bounds.x
+        # Start before or on the left edge
+        x = bounds.x - dot_spacing * random.random()
         
-        while x < bounds.x + bounds.width:
+        while x <= bounds.x + bounds.width:
             if region.contains(x, py):
                 # Apply length variation as a percentage of base length
                 dot_length = options.grid_dot_length * (1 + random.uniform(
@@ -61,10 +61,10 @@ def draw_region_grid(canvas: skia.Canvas, region: ShapeGroup, options: 'Options'
         # Calculate dot spacing based on cell size and dots per cell
         dot_spacing = options.cell_size / options.grid_dots_per_cell
         
-        # Start at bounds edge and add small random variation to subsequent dots
-        y = bounds.y
+        # Start before or on the top edge
+        y = bounds.y - dot_spacing * random.random()
         
-        while y < bounds.y + bounds.height:
+        while y <= bounds.y + bounds.height:
             if region.contains(px, y):
                 # Apply length variation as a percentage of base length
                 dot_length = options.grid_dot_length * (1 + random.uniform(
