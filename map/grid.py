@@ -3,14 +3,9 @@
 import math
 import random
 import skia
-from enum import Enum, auto
 from algorithms.shapes import ShapeGroup
 from options import Options
-
-class GridStyle(Enum):
-    """Available grid drawing styles."""
-    NONE = auto()  # No grid
-    DOTS = auto()  # Draw grid as dots at intersections
+from map.gridstyle import GridStyle
 
 def draw_region_grid(canvas: skia.Canvas, region: ShapeGroup, options: 'Options') -> None:
     """Draw grid dots for a region.
