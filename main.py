@@ -3,6 +3,7 @@ Main entry point for drawing a simple room.
 """
 import skia
 
+from graphics.conversions import grid_to_drawing, grid_to_drawing_size
 from map.room import Room
 from map.map import Map
 from map.door import Door, DoorOrientation
