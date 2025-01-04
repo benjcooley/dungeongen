@@ -51,10 +51,10 @@ def main():
     # Add some test rocks
     from map.props.rock import Rock
     
-    # Add rocks to rooms
-    Rock.add_rocks_to(start_room, 4)  # 4 random rocks
-    Rock.add_rocks_to(end_room, 3, RockType.SMALL)  # 3 small rocks
-    Rock.add_rocks_to(passage, 2, RockType.MEDIUM)  # 2 medium rocks
+    # Add rocks to rooms and passage
+    Rock.add_rocks_to(start_room, 4, RockType.ANY)  # 4 random rocks
+    Rock.add_rocks_to(end_room, 3, RockType.ANY)  # 3 random rocks
+    Rock.add_rocks_to(passage, 3, RockType.SMALL)  # 3 small rocks in passage
 
     # Draw the map (which will draw all rooms)
     dungeon_map.render(canvas)
