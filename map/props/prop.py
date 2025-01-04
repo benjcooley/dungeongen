@@ -5,6 +5,7 @@ import skia
 from algorithms.shapes import Rectangle
 from map.mapelement import MapElement
 from map.props.rotation import Rotation
+from map.enums import Layers
 
 if TYPE_CHECKING:
     from map.map import Map
