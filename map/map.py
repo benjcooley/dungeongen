@@ -6,7 +6,7 @@ import skia
 import math
 import random
 from graphics.crosshatch import draw_crosshatches
-from map.grid import GridStyle
+from map.grid import GridStyle, draw_region_grid
 if TYPE_CHECKING:
     from options import Options
 from map.occupancy import OccupancyGrid
@@ -413,7 +413,7 @@ class Map:
 
             # 4. Draw grid if enabled (still clipped by mask)
             if self.options.grid_style not in (None, GridStyle.NONE):
-                self._draw_region_grid(canvas, region)
+                draw_region_grid(canvas, region, self.options)
 
             # 5. Restore transform and clear clip mask
             canvas.restore()
