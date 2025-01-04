@@ -2,7 +2,7 @@
 
 import math
 from dataclasses import dataclass
-from map.gridstyle import GridStyle
+from map.enums import GridStyle
 
 @dataclass
 class Options:

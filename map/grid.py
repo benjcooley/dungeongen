@@ -5,7 +5,7 @@ import random
 import skia
 from algorithms.shapes import ShapeGroup
 from options import Options
-from map.gridstyle import GridStyle
+from map.enums import GridStyle
 
 def draw_region_grid(canvas: skia.Canvas, region: ShapeGroup, options: 'Options') -> None:
     """Draw grid dots for a region.
