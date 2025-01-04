@@ -313,48 +313,43 @@ class Map:
             # 2. Clip to region shape
             canvas.clipPath(region.shape.to_path(), skia.ClipOp.kIntersect, True)  # antialiased
             
-            # 3. Draw shadows first
+            # 3. Draw shadows first (no offset)
             shadow_paint = skia.Paint(
                 AntiAlias=True,
                 Style=skia.Paint.kFill_Style,
                 Color=self.options.room_shadow_color,
                 StrokeWidth=0
             )
-            canvas.save()
-            canvas.translate(
-                self.options.room_shadow_offset_x,
-                self.options.room_shadow_offset_y
-            )
             region.shape.draw(canvas, shadow_paint)
-            canvas.restore()
             
-            # 4. Draw the filled room on top
+            # 4. Draw the filled room on top of shadow (with offset)
             room_paint = skia.Paint(
                 AntiAlias=True,
                 Style=skia.Paint.kFill_Style,
                 Color=self.options.room_color
             )
+            canvas.save()
+            canvas.translate(
+                self.options.room_shadow_offset_x,
+                self.options.room_shadow_offset_y
+            )
             region.shape.draw(canvas, room_paint)
+            canvas.restore()
+
+            # 5. Draw region element shadows
+            for element in region.elements:
+                element.draw(canvas, Layers.PROPS)
 
             # 5. Draw grid if enabled (still clipped by mask)
             if self.options.grid_style not in (None, GridStyle.NONE):
                 draw_region_grid(canvas, region, self.options)
 
-            # 6. Draw region elements on appropriate layers
+            # 6. Draw region elements props
             for element in region.elements:
-                element.draw(canvas, Layers.SHADOW)
                 element.draw(canvas, Layers.PROPS)
 
             # 7. Restore transform and clear clip mask
             canvas.restore()
-            
-        # Draw shadow layer first
-        for element in self._elements:
-            element.draw(canvas, Layers.SHADOW)
-            
-        # Draw props layer
-        for element in self._elements:
-            element.draw(canvas, Layers.PROPS)
             
         # Draw region borders with rounded corners
         border_paint = skia.Paint(
@@ -375,7 +370,7 @@ class Map:
 
         # Draw doors layer after borders
         for element in self._elements:
-            element.draw(canvas, Layers.DOORS)
+            element.draw(canvas, Layers.OVERLAY)
 
         # Restore canvas state
         canvas.restore()
