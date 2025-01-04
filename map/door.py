@@ -49,7 +49,7 @@ class Door(MapElement):
         # Calculate rectangle dimensions (1/3 of size in both dimensions)
         if self._orientation == DoorOrientation.HORIZONTAL:
             side_width = self._width / 3
-            middle_height = self._height * 2/3  # Make middle section wider (2/3 instead of 1/2)
+            middle_height = self._height * 0.6  # Make middle section wider (3/5 instead of 2/3)
             middle_y = self._y + (self._height - middle_height) / 2  # Center vertically
             
             # Create inflated rectangles for rounded sides
@@ -72,7 +72,7 @@ class Door(MapElement):
             self._middle_rect = Rectangle(self._x + side_width, middle_y, side_width, middle_height)
         else:
             side_height = self._height / 3
-            middle_width = self._width * 2/3  # Make middle section wider (2/3 instead of 1/2)
+            middle_width = self._width * 0.6  # Make middle section wider (3/5 instead of 2/3)
             middle_x = self._x + (self._width - middle_width) / 2  # Center horizontally
             
             # Create inflated rectangles for rounded sides
