@@ -18,17 +18,11 @@ def draw_region_grid(canvas: skia.Canvas, region: ShapeGroup, options: 'Options'
     """
     bounds = region.bounds
     
-    # Calculate grid-aligned bounds
+    # Calculate grid-aligned bounds, ensuring we start before the shape bounds
     min_x = math.floor(bounds.x / options.cell_size)
     min_y = math.floor(bounds.y / options.cell_size)
     max_x = math.ceil((bounds.x + bounds.width) / options.cell_size) 
     max_y = math.ceil((bounds.y + bounds.height) / options.cell_size)
-    
-    # Adjust bounds to ensure grid lines align with cell boundaries
-    if min_x * options.cell_size < bounds.x:
-        min_x += 1
-    if min_y * options.cell_size < bounds.y:
-        min_y += 1
     
     # Draw grid bounds rectangle for debugging
     debug_paint = skia.Paint(
