@@ -382,14 +382,6 @@ class Map:
             if any(element.shape in region_shape.includes for region_shape in regions):
                 element.draw(canvas)
         
-        # Create paint for map elements
-        paint = skia.Paint(
-            AntiAlias=True,
-            Style=skia.Paint.kStroke_Style,
-            StrokeWidth=1.0,
-            Color=skia.ColorBLACK
-        )
-        
         # Draw region borders last with rounded corners
         border_paint = skia.Paint(
             AntiAlias=True,
