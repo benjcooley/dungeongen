@@ -10,6 +10,7 @@ from map.map import Map
 from map.door import Door, DoorOrientation
 from map.passage import Passage
 from map.props.rotation import Rotation
+from map.enums import RockType
 from options import Options
 
 def main():
