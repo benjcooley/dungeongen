@@ -46,32 +46,6 @@ class Prop(MapElement, ABC):
             canvas.rotate(self.rotation.radians * (180 / 3.14159265359))  # Convert radians to degrees for Skia
             canvas.translate(-cx, -cy)
             
-    @classmethod
-    def get_valid_position(cls, size: float, container: 'MapElement') -> tuple[float, float] | None:
-        """Try to find a valid position for a prop within the container.
-        
-        Args:
-            size: Prop size
-            container: The MapElement to place the prop in
-            
-        Returns:
-            Tuple of (x,y) coordinates if valid position found, None otherwise
-        """
-        bounds = container.bounds
-        margin = container._map.options.cell_size * 0.25  # 25% of cell size margin
-        
-        # Try 30 random positions
-        for _ in range(30):
-            x = random.uniform(bounds.x + margin, bounds.x + bounds.width - margin)
-            y = random.uniform(bounds.y + margin, bounds.y + bounds.height - margin)
-            
-            test_prop = cls(x, y, size, size, container._map)
-            # Check if the test prop's shape is fully contained within the container
-            if container.shape.contains(test_prop._bounds.x + test_prop._bounds.width/2,
-                                     test_prop._bounds.y + test_prop._bounds.height/2):
-                return (x, y)
-        return None
-        
     @property
     def position(self) -> tuple[float, float]:
         """Get the current position of the prop."""
