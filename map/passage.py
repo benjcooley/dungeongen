@@ -1,6 +1,6 @@
 """Passage map element definition."""
 
-from algorithms.shapes import Rectangle
+from algorithms.shapes import Rectangle, Shape
 from map.mapelement import MapElement
 from typing import TYPE_CHECKING
 

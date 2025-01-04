@@ -9,7 +9,7 @@ from map.grid import GridStyle
 if TYPE_CHECKING:
     from options import Options
 from map.occupancy import OccupancyGrid
-from algorithms.shapes import ShapeGroup, Rectangle, Circle
+from algorithms.shapes import ShapeGroup, Rectangle, Circle, Shape
 from graphics.conversions import grid_to_drawing, grid_to_drawing_size
 from map.mapelement import MapElement
 from map.room import Room

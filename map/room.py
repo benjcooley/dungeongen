@@ -1,6 +1,6 @@
 """Room map element definition."""
 
-from algorithms.shapes import Rectangle, Circle
+from algorithms.shapes import Rectangle, Circle, Shape
 from map.mapelement import MapElement
 from graphics.conversions import grid_to_drawing, grid_to_drawing_size
 from typing import TYPE_CHECKING
