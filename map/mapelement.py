@@ -84,14 +84,7 @@ class MapElement:
             canvas: The canvas to draw on
             layer: The current drawing layer
         """
-        if layer == Layers.PROPS:
-            # Draw the shape with default styling
-            paint = skia.Paint(
-                AntiAlias=True,
-                Style=skia.Paint.kFill_Style,
-                Color=self._map.options.prop_light_color
-            )
-            self._shape.draw(canvas, paint)
+        ...
     
     def draw_occupied(self, grid: 'OccupancyGrid', element_idx: int) -> None:
         """Draw this element's shape into the occupancy grid.
