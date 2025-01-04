@@ -131,9 +131,10 @@ class Rock(Prop):
         """Check if the rock's position is valid within the container shape.
         
         Tests multiple points around the rock's perimeter to ensure it fits.
+        Overrides base class implementation to check perimeter points.
         """
-        # Test center point first
-        if not container.contains(self._center_x, self._center_y):
+        # Test center point first using parent implementation
+        if not super()._is_valid_position(container):
             return False
             
         # Test points around the perimeter

@@ -42,6 +42,30 @@ class Prop(MapElement):
             canvas.rotate(self.rotation.radians * (180 / 3.14159265359))  # Convert radians to degrees for Skia
             canvas.translate(-cx, -cy)
             
+    def get_valid_position(self, container: 'MapElement') -> tuple[float, float] | None:
+        """Try to find a valid position for this prop within the container.
+        
+        Args:
+            container: The MapElement to place the prop in
+            
+        Returns:
+            Tuple of (x,y) coordinates if valid position found, None otherwise
+        """
+        # Default implementation just checks current position
+        if self._is_valid_position(container.shape):
+            return (self._bounds.x, self._bounds.y)
+        return None
+        
+    def _is_valid_position(self, container: Shape) -> bool:
+        """Check if the prop's current position is valid within the container shape.
+        
+        Tests the prop's center point to ensure it fits.
+        Subclasses can override to add additional validation.
+        """
+        center_x = self._bounds.x + self._bounds.width/2
+        center_y = self._bounds.y + self._bounds.height/2
+        return container.contains(center_x, center_y)
+        
     def draw(self, canvas: skia.Canvas, layer: Layers = Layers.PROPS) -> None:
         """Override base MapElement draw to prevent drawing bounds rectangle."""
         # Props should implement their own draw logic

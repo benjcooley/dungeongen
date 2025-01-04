@@ -30,18 +30,26 @@ class MapElement:
         self._options = map_.options
         self._props: List['Prop'] = []
         
-    def add_prop(self, prop: 'Prop') -> None:
-        """Add a prop to this element.
+    def try_add_prop(self, prop: 'Prop') -> bool:
+        """Try to add a prop to this element at its current position.
         
         The prop must be contained within the element's bounds.
+        Does not modify the prop's position.
+        
+        Args:
+            prop: The prop to try adding
+            
+        Returns:
+            True if prop was added successfully, False if position was invalid
         """
-        if not self._shape.contains(prop.bounds.x + prop.bounds.width/2, 
-                                  prop.bounds.y + prop.bounds.height/2):
-            raise ValueError("Prop must be contained within element bounds")
+        if not prop._is_valid_position(self._shape):
+            return False
+            
         if prop.container is not None:
             prop.container.remove_prop(prop)
         prop.container = self
         self._props.append(prop)
+        return True
         
     def remove_prop(self, prop: 'Prop') -> None:
         """Remove a prop from this element."""
@@ -134,11 +142,11 @@ class MapElement:
                 rock = Rock.medium_rock(x, y, self._map, rotation)
                 
             # Try to add the rock
-            try:
-                self.add_prop(rock)
-            except ValueError:
-                # If adding fails (e.g., outside bounds), just skip this rock
-                continue
+            # Try to find valid position for rock
+            valid_pos = rock.get_valid_position(self)
+            if valid_pos:
+                if self.try_add_prop(rock):
+                    continue
 
     def draw(self, canvas: 'skia.Canvas', layer: 'Layers' = Layers.PROPS) -> None:
         """Draw this element on the specified layer.
