@@ -112,7 +112,7 @@ def _draw_crosshatch_with_clusters(
             base_angle = random.uniform(0, 2 * math.pi)
             for neighbor in neighbors:
                 if neighbor._base_angle is not None:
-                    base_angle += options.random_angle_variation
+                    base_angle += options.crosshatch_angle_variation
 
         cluster._base_angle = base_angle
         dx_base = math.cos(base_angle)
