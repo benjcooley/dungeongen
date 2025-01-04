@@ -62,8 +62,9 @@ class Options:
     # Grid options
     grid_style: 'GridStyle' = GridStyle.DOTS  # Grid drawing style using dots
     grid_color: int = 0xFF808080  # Gray color for grid
-    grid_dot_size: float = 3.0  # Base size for grid dots
-    grid_dot_variation: float = 0.3  # Random variation in dot size (±30%)
+    grid_dot_size: float = 3.0  # Base stroke width for grid dots
+    grid_dot_length: float = 2.0  # Base length for grid dots
+    grid_dot_variation: float = 0.3  # Random variation in dot length (±30%)
     grid_dots_per_cell: int = 5  # Number of dots to draw per cell
     
     # Border options

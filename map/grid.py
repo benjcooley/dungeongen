@@ -40,15 +40,15 @@ def draw_region_grid(canvas: skia.Canvas, region: ShapeGroup, options: 'Options'
         
         while x < bounds.x + bounds.width:
             if region.contains(x, py):
-                # Apply size variation as a percentage of base size
-                dot_size = options.grid_dot_size * (1 + random.uniform(
+                # Apply length variation as a percentage of base length
+                dot_length = options.grid_dot_length * (1 + random.uniform(
                     -options.grid_dot_variation,
                     options.grid_dot_variation
                 ))
-                dot_paint.setStrokeWidth(dot_size)
+                dot_paint.setStrokeWidth(options.grid_dot_size)
                 
-                # Draw a very short line that looks like a dot
-                canvas.drawLine(x, py, x + 0.1, py, dot_paint)
+                # Draw a short line with varied length
+                canvas.drawLine(x, py, x + dot_length, py, dot_paint)
             x += dot_spacing
 
     # Draw vertical lines
@@ -66,13 +66,13 @@ def draw_region_grid(canvas: skia.Canvas, region: ShapeGroup, options: 'Options'
         
         while y < bounds.y + bounds.height:
             if region.contains(px, y):
-                # Apply size variation as a percentage of base size
-                dot_size = options.grid_dot_size * (1 + random.uniform(
+                # Apply length variation as a percentage of base length
+                dot_length = options.grid_dot_length * (1 + random.uniform(
                     -options.grid_dot_variation,
                     options.grid_dot_variation
                 ))
-                dot_paint.setStrokeWidth(dot_size)
+                dot_paint.setStrokeWidth(options.grid_dot_size)
                 
-                # Draw a very short line that looks like a dot
-                canvas.drawLine(px, y, px, y + 0.1, dot_paint)
+                # Draw a short line with varied length
+                canvas.drawLine(px, y, px, y + dot_length, dot_paint)
             y += dot_spacing
