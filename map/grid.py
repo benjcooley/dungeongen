@@ -18,10 +18,10 @@ def draw_region_grid(canvas: skia.Canvas, region: ShapeGroup, options: 'Options'
     """
     bounds = region.bounds
     
-    # Calculate grid-aligned bounds to fully enclose the shape
-    min_x = math.floor(bounds.x / options.cell_size) - 1
-    min_y = math.floor(bounds.y / options.cell_size) - 1
-    max_x = math.ceil((bounds.x + bounds.width) / options.cell_size)
+    # Calculate grid-aligned bounds, ensuring we start before the shape bounds
+    min_x = math.floor(bounds.x / options.cell_size)
+    min_y = math.floor(bounds.y / options.cell_size)
+    max_x = math.ceil((bounds.x + bounds.width) / options.cell_size) 
     max_y = math.ceil((bounds.y + bounds.height) / options.cell_size)
     
     # Draw grid bounds rectangle for debugging
@@ -50,8 +50,7 @@ def draw_region_grid(canvas: skia.Canvas, region: ShapeGroup, options: 'Options'
     # Draw horizontal lines (include one line before min_y to ensure outer bounds)
     for y in range(min_y - 1, max_y + 1):
         py = y * options.cell_size
-        if not any(region.contains(bounds.x + dx, py) for dx in (0, bounds.width/2, bounds.width)):
-            continue
+        # Don't skip horizontal lines - we want to draw all grid lines within bounds
             
         # Calculate dot spacing based on cell size and dots per cell
         dot_spacing = options.cell_size / options.grid_dots_per_cell
@@ -76,8 +75,7 @@ def draw_region_grid(canvas: skia.Canvas, region: ShapeGroup, options: 'Options'
     # Draw vertical lines (include one line before min_x to ensure outer bounds)
     for x in range(min_x - 1, max_x + 1):
         px = x * options.cell_size
-        if not any(region.contains(px, bounds.y + dy) for dy in (0, bounds.height/2, bounds.height)):
-            continue
+        # Don't skip vertical lines - we want to draw all grid lines within bounds
             
         # Calculate dot spacing based on cell size and dots per cell
         dot_spacing = options.cell_size / options.grid_dots_per_cell
