@@ -102,11 +102,8 @@ class Door(MapElement):
     def _calculate_shape(self) -> Shape:
         """Calculate the current shape based on open/closed state."""
         if not self._open:
-            # When closed, include only the side rectangles
-            if self._orientation == DoorOrientation.HORIZONTAL:
-                shapes = [self._middle_rect]
-            else:
-                shapes = [self._middle_rect]
+            # When closed, return empty shape list
+            shapes = []
         else:
             # When open, combine all rectangles into an I-shape
             if self._orientation == DoorOrientation.HORIZONTAL:
