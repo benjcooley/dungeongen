@@ -5,6 +5,24 @@ import skia
 from typing import List, Sequence
 from algorithms.types import Point, Shape
 
+class Shape(Protocol):
+    """Protocol defining the interface for shapes."""
+    def contains(self, px: float, py: float) -> bool:
+        """Check if a point is contained within this shape."""
+        ...
+    
+    def recalculate_bounds(self) -> 'Rectangle':
+        """Calculate the bounding rectangle that encompasses this shape."""
+        ...
+    
+    def draw(self, canvas: 'skia.Canvas', paint: 'skia.Paint') -> None:
+        """Draw this shape on a canvas with the given paint."""
+        ...
+    
+    def inflated(self, amount: float) -> 'Shape':
+        """Return a new shape inflated by the given amount."""
+        ...
+
 class ShapeGroup:
     """A group of shapes that can be combined to create complex shapes."""
     
