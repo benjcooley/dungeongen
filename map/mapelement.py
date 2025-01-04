@@ -135,16 +135,17 @@ class MapElement:
             # Random rotation
             rotation = random.uniform(0, 2 * math.pi)
             
-            # Create appropriate rock type
-            if actual_type == RockType.SMALL:
-                rock = Rock.small_rock(x, y, self._map, rotation)
-            else:  # MEDIUM
-                rock = Rock.medium_rock(x, y, self._map, rotation)
-                
             # Try to find valid position for rock
-            valid_pos = rock.get_valid_position(self)
+            size = (SMALL_ROCK_SIZE if actual_type == RockType.SMALL else MEDIUM_ROCK_SIZE) * self._map.options.cell_size
+            valid_pos = Rock.get_valid_position(x, y, size, self)
+            
             if valid_pos:
-                rock.position = valid_pos
+                # Create rock at valid position
+                if actual_type == RockType.SMALL:
+                    rock = Rock.small_rock(valid_pos[0], valid_pos[1], self._map, rotation)
+                else:  # MEDIUM
+                    rock = Rock.medium_rock(valid_pos[0], valid_pos[1], self._map, rotation)
+                    
                 if self.try_add_prop(rock):
                     continue
 
