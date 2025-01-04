@@ -172,8 +172,8 @@ def draw_crosshatches(
     else:
         center_point = (options.canvas_width / 2, options.canvas_height / 2)
     
-    # Draw debug points
-    sampler.draw_debug_points(canvas)
+    # Debug: Draw sample points
+    # sampler.draw_debug_points(canvas)
     
     # Draw the crosshatch patterns
     _draw_crosshatch_with_clusters(
@@ -183,12 +183,12 @@ def draw_crosshatches(
         canvas,
         line_paint)
         
-    # Draw debug points on top of crosshatching
-    debug_paint = skia.Paint(
-        AntiAlias=True,
-        Style=skia.Paint.kFill_Style,
-        Color=skia.ColorBLUE
-    )
+    # Debug: Draw points on top of crosshatching
+    # debug_paint = skia.Paint(
+    #     AntiAlias=True,
+    #     Style=skia.Paint.kFill_Style,
+    #     Color=skia.ColorBLUE
+    # )
     
-    for point in points:
-        canvas.drawCircle(point[0], point[1], 2, debug_paint)
+    # for point in points:
+    #     canvas.drawCircle(point[0], point[1], 2, debug_paint)
