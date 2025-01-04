@@ -154,19 +154,25 @@ class Map:
         self.add_element(room)
         return room
     
-    def add_circular_room(self, grid_cx: float, grid_cy: float, grid_radius: float) -> Room:
+    def add_circular_room(self, grid_x: float, grid_y: float, grid_diameter: float) -> Room:
         """Add a circular room using grid coordinates.
         
         Args:
-            grid_cx: Center X coordinate in grid units
-            grid_cy: Center Y coordinate in grid units
-            grid_radius: Radius in grid units
+            grid_x: Top-left X coordinate in grid units
+            grid_y: Top-left Y coordinate in grid units
+            grid_diameter: Diameter in grid units
             
         Returns:
             A new Room instance with a circular shape
         """
-        cx, cy = grid_to_drawing(grid_cx, grid_cy, self.options)
-        radius, _ = grid_to_drawing_size(grid_radius, 0, self.options)
+        # Convert top-left position to drawing units
+        x, y = grid_to_drawing(grid_x, grid_y, self.options)
+        diameter, _ = grid_to_drawing_size(grid_diameter, 0, self.options)
+        radius = diameter / 2
+        
+        # Calculate center point from top-left position
+        cx = x + radius
+        cy = y + radius
         
         # Create a Room with a Circle shape
         room = Room.__new__(Room)  # Create instance without calling __init__
