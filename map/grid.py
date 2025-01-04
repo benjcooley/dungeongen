@@ -5,6 +5,7 @@ import random
 import skia
 from enum import Enum, auto
 from algorithms.shapes import ShapeGroup
+from options import Options
 
 class GridStyle(Enum):
     """Available grid drawing styles."""
