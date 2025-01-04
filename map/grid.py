@@ -35,17 +35,12 @@ def draw_region_grid(canvas: skia.Canvas, region: ShapeGroup, options: 'Options'
         # Calculate dot spacing based on cell size and dots per cell
         dot_spacing = options.cell_size / options.grid_dots_per_cell
         
-        # Ensure first dot is before/on left edge
+        # Start at random position up to one dot spacing before edge
         x = bounds.x - dot_spacing * random.random()
-        first_x = True
         
-        while x <= bounds.x + bounds.width:
-            if first_x:
-                # Ensure first dot is before/on edge
-                first_x = False
-            else:
-                # Randomize subsequent dot positions more
-                x += dot_spacing * random.uniform(0.5, 1.5)
+        # Draw for bounds width plus two dot spacings
+        while x <= bounds.x + bounds.width + 2 * dot_spacing:
+            x += dot_spacing
             if region.contains(x, py):
                 # Apply length variation as a percentage of base length
                 dot_length = options.grid_dot_length * (1 + random.uniform(
@@ -67,17 +62,12 @@ def draw_region_grid(canvas: skia.Canvas, region: ShapeGroup, options: 'Options'
         # Calculate dot spacing based on cell size and dots per cell
         dot_spacing = options.cell_size / options.grid_dots_per_cell
         
-        # Ensure first dot is before/on top edge
+        # Start at random position up to one dot spacing before edge
         y = bounds.y - dot_spacing * random.random()
-        first_y = True
         
-        while y <= bounds.y + bounds.height:
-            if first_y:
-                # Ensure first dot is before/on edge
-                first_y = False
-            else:
-                # Randomize subsequent dot positions more
-                y += dot_spacing * random.uniform(0.5, 1.5)
+        # Draw for bounds height plus two dot spacings
+        while y <= bounds.y + bounds.height + 2 * dot_spacing:
+            y += dot_spacing
             if region.contains(px, y):
                 # Apply length variation as a percentage of base length
                 dot_length = options.grid_dot_length * (1 + random.uniform(
