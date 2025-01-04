@@ -65,7 +65,9 @@ class Prop(MapElement):
             y = random.uniform(bounds.y + margin, bounds.y + bounds.height - margin)
             
             test_prop = cls(x, y, size, size, container._map)
-            if test_prop._is_valid_position(container.shape):
+            # Check if the test prop's shape is fully contained within the container
+            if container.shape.contains(test_prop._bounds.x + test_prop._bounds.width/2,
+                                     test_prop._bounds.y + test_prop._bounds.height/2):
                 return (x, y)
         return None
         
