@@ -25,10 +25,13 @@ def draw_region_grid(canvas: skia.Canvas, region: ShapeGroup, options: 'Options'
     max_y = math.ceil((bounds.y + bounds.height) / options.cell_size)
     
     if options.grid_debug:
-        # Temporarily disable any clipping/masking
+        # Save current canvas state
         canvas.save()
+        
+        # Reset all transformations and masking
         canvas.resetMatrix()
-        canvas.clipRect(skia.Rect.MakeXYWH(0, 0, options.canvas_width, options.canvas_height))
+        canvas.restore()  # Remove any active masks
+        canvas.save()     # Start fresh state
         
         # Draw grid bounds rectangle for debugging
         debug_paint = skia.Paint(
@@ -45,7 +48,7 @@ def draw_region_grid(canvas: skia.Canvas, region: ShapeGroup, options: 'Options'
         )
         grid_bounds.draw(canvas, debug_paint)
         
-        # Restore previous canvas state
+        # Restore to original state with masks
         canvas.restore()
     
     # Create base paint for dots
