@@ -186,11 +186,11 @@ class Rock(Prop):
             
             if valid_pos:
                 # Create rock at valid position
-                if actual_type == RockType.SMALL:
-                    rock = cls.small_rock(valid_pos[0], valid_pos[1], container._map, rotation)
-                else:  # MEDIUM
-                    rock = cls.medium_rock(valid_pos[0], valid_pos[1], container._map, rotation)
-                    
+                # Calculate rock size based on type
+                size = (SMALL_ROCK_SIZE if actual_type == RockType.SMALL else MEDIUM_ROCK_SIZE) * container._map.options.cell_size
+            
+                # Create rock with calculated size
+                rock = cls(valid_pos[0], valid_pos[1], size, container._map, rotation)
                 container.try_add_prop(rock)
 
     @classmethod
