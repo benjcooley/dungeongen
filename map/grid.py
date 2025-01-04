@@ -43,8 +43,6 @@ def draw_region_grid(canvas: skia.Canvas, region: ShapeGroup, options: 'Options'
         StrokeWidth=2,
         Color=skia.ColorGREEN
     )
-    # Get grid-aligned bounds using the calculated grid coordinates
-    min_x, min_y, max_x, max_y = _get_grid_bounds(bounds, options.cell_size)
     grid_bounds = Rectangle(
         min_x * options.cell_size,
         min_y * options.cell_size,
