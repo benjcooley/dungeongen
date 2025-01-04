@@ -2,11 +2,11 @@
 
 import math
 import skia
-from typing import List, Protocol, Sequence, TYPE_CHECKING
+from typing import List, Protocol, Sequence, TypeAlias
 from algorithms.types import Point
 
-if TYPE_CHECKING:
-    from algorithms.shapes import Rectangle
+# Forward declaration of Rectangle type
+Rectangle: TypeAlias = 'Rectangle'
 
 class Shape(Protocol):
     """Protocol defining the interface for shapes."""
