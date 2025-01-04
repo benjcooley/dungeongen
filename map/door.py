@@ -183,8 +183,8 @@ class Door(MapElement):
             
             # Calculate door rectangle dimensions
             if self._orientation == DoorOrientation.HORIZONTAL:
-                # Door width is 1/3 of cell size
-                door_width = self._width / 3
+                # Door width is 1/5 of cell size
+                door_width = self._width / 5
                 # Door height is 60% of cell height
                 door_height = self._height * 0.6
                 # Center the door
@@ -193,8 +193,8 @@ class Door(MapElement):
             else:
                 # Door width is 60% of cell width
                 door_width = self._width * 0.6
-                # Door height is 1/3 of cell size
-                door_height = self._height / 3
+                # Door height is 1/5 of cell size
+                door_height = self._height / 5
                 # Center the door
                 door_x = self._x + (self._width - door_width) / 2
                 door_y = self._y + (self._height - door_height) / 2
@@ -203,11 +203,22 @@ class Door(MapElement):
             print(f"Door dimensions: x={door_x}, y={door_y}, w={door_width}, h={door_height}")
             print(f"Door paint color: {door_paint.getColor()}")
             
-            # Create door rectangle with small inflation to ensure visibility
+            # Create and draw door rectangle with border
             door = Rectangle(door_x, door_y, door_width, door_height, inflate=1.0)
             if not door.is_valid:
                 print("Warning: Door rectangle is invalid!")
+            
+            # Draw filled door
             door.draw(canvas, door_paint)
+            
+            # Draw border
+            border_paint = skia.Paint(
+                AntiAlias=True,
+                Style=skia.Paint.kStroke_Style,
+                StrokeWidth=self._map.options.border_width,
+                Color=self._map.options.border_color
+            )
+            door.draw(canvas, border_paint)
             
     @classmethod
     def from_grid(cls, grid_x: float, grid_y: float, orientation: DoorOrientation, map_: 'Map', open: bool = False) -> 'Door':
