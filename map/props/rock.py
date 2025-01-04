@@ -4,6 +4,7 @@ import random
 import math
 import skia
 from typing import List, Tuple, TYPE_CHECKING
+from map.enums import Layers
 
 from graphics.conversions import grid_to_drawing
 from map.props.prop import Prop
@@ -69,7 +70,7 @@ class Rock(Prop):
             
         return points
     
-    def draw(self, canvas: skia.Canvas) -> None:
+    def draw(self, canvas: skia.Canvas, layer: 'Layers' = Layers.PROPS) -> None:
         """Draw the rock using a perturbed circular path."""
         # Create the rock path
         path = skia.Path()
