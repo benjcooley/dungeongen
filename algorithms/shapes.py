@@ -105,17 +105,22 @@ class ShapeGroup:
         if not self.includes:
             return skia.Path()
             
-        # Create path for included shapes
-        include_path = skia.Path()
-        for shape in self.includes:
-            include_path.addPath(shape.to_path())
+        # Start with the first included shape
+        result_path = self.includes[0].to_path()
+        
+        # Union with remaining included shapes
+        for shape in self.includes[1:]:
+            temp_path = skia.Path()
+            if skia.Op(result_path, shape.to_path(), skia.PathOp.kUnion_PathOp, temp_path):
+                result_path = temp_path
             
         # Subtract excluded shapes
         for shape in self.excludes:
-            exclude_path = shape.to_path()
-            include_path.op(exclude_path, skia.PathOp.kDifference_PathOp)
+            temp_path = skia.Path()
+            if skia.Op(result_path, shape.to_path(), skia.PathOp.kDifference_PathOp, temp_path):
+                result_path = temp_path
             
-        return include_path
+        return result_path
 
     def draw(self, canvas: skia.Canvas, paint: skia.Paint) -> None:
         """Draw this shape group using Skia's path operations."""
