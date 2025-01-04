@@ -3,7 +3,7 @@
 import math
 import skia
 from typing import List, Sequence
-from algorithms.base import Point, Shape
+from algorithms.types import Point, Shape
 
 class ShapeGroup:
     """A group of shapes that can be combined to create complex shapes."""
