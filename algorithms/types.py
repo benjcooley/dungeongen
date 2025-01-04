@@ -1,6 +1,10 @@
 """Type definitions for the crosshatch pattern generator."""
 
-from typing import Protocol, Tuple
+from typing import Protocol, Tuple, TYPE_CHECKING
+import skia
+
+if TYPE_CHECKING:
+    from algorithms.shapes import Rectangle
 
 # Type aliases
 Point = Tuple[float, float]
