@@ -51,7 +51,7 @@ class Options:
     # Rendering options
     crosshatch_border_size: float = 24.0  # Size of crosshatched border around rooms
     crosshatch_background_color: int = 0xFFFFFFFF  # White
-    crosshatch_shading_color: int = 0xFFD5D5D5  # Darker gray for crosshatch background
+    crosshatch_shading_color: int = 0xFFD0D2D5  # Darker gray with subtle blue tint for crosshatch background
     
     # Room rendering options
     room_shadow_color: int = 0xFFD8D8D8  # Very light gray for room shadows
