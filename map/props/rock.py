@@ -94,22 +94,15 @@ class Rock(Prop):
         
         path.close()
 
-        # Draw filled rock
-        fill_paint = skia.Paint(
+        # Draw rock with fill and stroke in one pass
+        paint = skia.Paint(
             AntiAlias=True,
-            Style=skia.Paint.kFill_Style,
-            Color=self._map.options.room_color  # Use room fill color
-        )
-        canvas.drawPath(path, fill_paint)
-        
-        # Draw border
-        border_paint = skia.Paint(
-            AntiAlias=True,
-            Style=skia.Paint.kStroke_Style,
+            Style=skia.Paint.kStrokeAndFill_Style,
             StrokeWidth=self._map.options.door_stroke_width / 2,  # Thinner border for rocks
-            Color=self._map.options.border_color  # Use black outline
+            Color=self._map.options.room_color,  # Fill color
+            StrokeJoin=skia.Paint.kRound_Join  # Round corners
         )
-        canvas.drawPath(path, border_paint)
+        canvas.drawPath(path, paint)
     
     @classmethod
     def small_rock(cls, grid_x: float, grid_y: float, map_: 'Map', rotation: float = 0.0) -> 'Rock':
