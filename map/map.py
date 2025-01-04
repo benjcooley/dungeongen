@@ -321,11 +321,17 @@ class Map:
             )
             region.draw(canvas, room_paint)
 
-            # 4. Draw grid if enabled (still clipped by mask)
+            # 4. Undo shadow transform before drawing grid
+            canvas.translate(
+                -self.options.room_shadow_offset_x,
+                -self.options.room_shadow_offset_y
+            )
+
+            # 5. Draw grid if enabled (still clipped by mask)
             if self.options.grid_style not in (None, GridStyle.NONE):
                 draw_region_grid(canvas, region, self.options)
 
-            # 5. Restore transform and clear clip mask
+            # 6. Restore transform and clear clip mask
             canvas.restore()
             
         # Draw element details after all regions are drawn
