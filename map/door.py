@@ -213,7 +213,7 @@ class Door(MapElement):
             fill_paint = skia.Paint(
                 AntiAlias=True,
                 Style=skia.Paint.kFill_Style,
-                Color=self._map.options.prop_light_color
+                Color=self._map.options.room_color
             )
             door.draw(canvas, fill_paint)
             
