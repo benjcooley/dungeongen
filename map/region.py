@@ -1,5 +1,6 @@
 """Region class for grouping map elements."""
 
+import skia
 from typing import List, Sequence
 from algorithms.shapes import ShapeGroup, Shape
 from map.mapelement import MapElement
