@@ -1,10 +1,10 @@
 """
-Main entry point for the crosshatch pattern generator.
+Main entry point for drawing a simple room.
 """
 import skia
 
-from graphics.crosshatch import draw_crosshatches
-from algorithms.shapes import Rectangle, ShapeGroup
+from map.room import Room
+from map.map import Map
 from options import Options
 
 def main():
@@ -18,23 +18,21 @@ def main():
     background_paint = skia.Paint(AntiAlias=True, Color=skia.ColorWHITE)
     canvas.drawRect(skia.Rect.MakeWH(options.canvas_width, options.canvas_height), background_paint)
 
-    # Create shape group for crosshatching with outer rectangle and inset exclusion
-    outer_rect = Rectangle(100, 100, options.canvas_width - 200, options.canvas_height - 200, inflate=40)
-    inner_rect = Rectangle(
-        options.canvas_width // 3,
-        options.canvas_height // 3,
-        options.canvas_width // 3,
-        options.canvas_height // 3
-    )
-    shape = ShapeGroup(includes=[outer_rect], excludes=[inner_rect])
+    # Create map and add a 5x5 room
+    dungeon_map = Map(options)
+    room = Room(10, 10, 5, 5, dungeon_map)
 
-    # Draw crosshatch patterns
-    draw_crosshatches(options, shape, canvas)
+    # Set up the canvas transform to see the room properly
+    transform = dungeon_map._calculate_default_transform(options.canvas_width, options.canvas_height)
+    canvas.setMatrix(transform)
+
+    # Draw the room
+    room.draw(canvas)
 
     # Save the result
     image = surface.makeImageSnapshot()
-    image.save('crosshatch_output.png', skia.kPNG)
-    print("Crosshatch drawing completed and saved to 'crosshatch_output.png'")
+    image.save('room_output.png', skia.kPNG)
+    print("Room drawing completed and saved to 'room_output.png'")
 
 if __name__ == "__main__":
     main()
