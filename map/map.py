@@ -4,6 +4,7 @@ from typing import List, Iterator, Optional, TYPE_CHECKING
 
 import skia
 import math
+import random
 from graphics.crosshatch import draw_crosshatches
 from map.grid import GridStyle
 if TYPE_CHECKING:
