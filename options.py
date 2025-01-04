@@ -12,8 +12,8 @@ class Options:
     cell_size: float = 64.0  # Size of one grid square in pixels
     
     # Canvas dimensions
-    canvas_width: int = 800
-    canvas_height: int = 800
+    canvas_width: int = 2000
+    canvas_height: int = 2000
     
     # Crosshatch stroke appearance
     crosshatch_stroke_width: float = 1.5
