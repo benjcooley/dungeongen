@@ -9,7 +9,8 @@ from map.grid import GridStyle
 if TYPE_CHECKING:
     from options import Options
 from map.occupancy import OccupancyGrid
-from algorithms.shapes import ShapeGroup, Rectangle
+from algorithms.shapes import ShapeGroup, Rectangle, Circle
+from graphics.conversions import grid_to_drawing, grid_to_drawing_size
 from map.mapelement import MapElement
 from map.room import Room
 from map.door import Door
@@ -133,6 +134,45 @@ class Map:
         if idx >= 0:
             return self._elements[idx]
         return None
+
+    def create_rectangular_room(self, grid_x: float, grid_y: float, grid_width: float, grid_height: float) -> Room:
+        """Create a rectangular room using grid coordinates.
+        
+        Args:
+            grid_x: X coordinate in grid units
+            grid_y: Y coordinate in grid units
+            grid_width: Width in grid units
+            grid_height: Height in grid units
+            
+        Returns:
+            A new rectangular Room instance
+        """
+        x, y = grid_to_drawing(grid_x, grid_y, self.options)
+        width, height = grid_to_drawing_size(grid_width, grid_height, self.options)
+        room = Room(x, y, width, height, self)
+        self.add_element(room)
+        return room
+    
+    def create_circular_room(self, grid_cx: float, grid_cy: float, grid_radius: float) -> Room:
+        """Create a circular room using grid coordinates.
+        
+        Args:
+            grid_cx: Center X coordinate in grid units
+            grid_cy: Center Y coordinate in grid units
+            grid_radius: Radius in grid units
+            
+        Returns:
+            A new Room instance with a circular shape
+        """
+        cx, cy = grid_to_drawing(grid_cx, grid_cy, self.options)
+        radius, _ = grid_to_drawing_size(grid_radius, 0, self.options)
+        
+        # Create a Room with a Circle shape
+        room = Room.__new__(Room)  # Create instance without calling __init__
+        shape = Circle(cx, cy, radius)
+        MapElement.__init__(room, shape=shape, map_=self)
+        self.add_element(room)
+        return room
     
     def get_regions(self) -> list[ShapeGroup]:
         """Get ShapeGroups for each contiguous region of the map.
