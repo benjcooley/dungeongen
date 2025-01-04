@@ -174,7 +174,7 @@ class Door(MapElement):
     
     def draw(self, canvas: skia.Canvas, layer: 'Layers' = Layers.PROPS) -> None:
         """Draw the door if it's closed."""
-        if not self._open and layer == Layers.DOORS:
+        if not self._open and layer == Layers.OVERLAY:
             # Create paint for door
             door_paint = skia.Paint(
                 AntiAlias=True,
