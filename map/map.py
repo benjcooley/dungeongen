@@ -251,7 +251,7 @@ class Map:
         )
         
         # Calculate grid bounds in cells
-        bounds = region.recalculate_bounds()
+        bounds = region.bounds
         start_x = math.floor(bounds.x / self.options.cell_size)
         start_y = math.floor(bounds.y / self.options.cell_size)
         end_x = math.ceil((bounds.x + bounds.width) / self.options.cell_size)
@@ -301,14 +301,8 @@ class Map:
         regions = self.get_regions()
         crosshatch_shapes = []
         for region in regions:
-            # Create inflated version of included shapes
-            inflated_includes = [shape.inflated(self.options.crosshatch_inflation) 
-                               for shape in region.includes]
-            # Excluded shapes are not inflated
-            crosshatch_shapes.append(ShapeGroup(
-                includes=inflated_includes,
-                excludes=region.excludes
-            ))
+            # Create inflated version of the region
+            crosshatch_shapes.append(region.inflated(self.options.crosshatch_inflation))
         
         # Combine all regions into single crosshatch shape
         crosshatch_shape = ShapeGroup.combine(crosshatch_shapes)
