@@ -104,9 +104,9 @@ class Door(MapElement):
         if not self._open:
             # When closed, include only the side rectangles
             if self._orientation == DoorOrientation.HORIZONTAL:
-                shapes = [self._left_rect, self._right_rect]
+                shapes = [self._middle_rect]
             else:
-                shapes = [self._top_rect, self._bottom_rect]
+                shapes = [self._middle_rect]
         else:
             # When open, combine all rectangles into an I-shape
             if self._orientation == DoorOrientation.HORIZONTAL:
