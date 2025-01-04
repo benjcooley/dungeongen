@@ -322,6 +322,9 @@ class Map:
         # Draw crosshatching pattern
         draw_crosshatches(self.options, crosshatch_shape, canvas)
         
+        # Debug: Draw poisson disk sample points
+        # sampler.draw_debug_points(canvas)
+        
         # Draw room regions with shadows
         for region in regions:
             # 1. Draw shadow (no offset)
