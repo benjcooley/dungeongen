@@ -142,8 +142,7 @@ class MapElement:
                 else:  # MEDIUM
                     rock = Rock.medium_rock(valid_pos[0], valid_pos[1], self._map, rotation)
                     
-                if self.try_add_prop(rock):
-                    continue
+                self.try_add_prop(rock)
 
     def draw(self, canvas: 'skia.Canvas', layer: 'Layers' = Layers.PROPS) -> None:
         """Draw this element on the specified layer.
