@@ -20,7 +20,7 @@ def main():
 
     # Create map and add a 4x4 room centered at origin
     dungeon_map = Map(options)
-    room = Room(-2, -2, 4, 4, dungeon_map)
+    room = Room.rectangular_room(-2, -2, 4, 4, dungeon_map)
 
     # Set up the canvas transform to see the room properly
     transform = dungeon_map._calculate_default_transform(options.canvas_width, options.canvas_height)
