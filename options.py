@@ -9,7 +9,7 @@ class Options:
     """Configuration options for the crosshatch pattern generator."""
     
     # Map grid configuration
-    cell_size: float = 32.0  # Size of one grid square in pixels
+    cell_size: float = 64.0  # Size of one grid square in pixels
     
     # Canvas dimensions
     canvas_width: int = 400
