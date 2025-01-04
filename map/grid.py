@@ -44,23 +44,15 @@ def draw_region_grid(canvas: skia.Canvas, region: ShapeGroup, options: 'Options'
         
         while x < bounds.x + bounds.width:
             if region.contains(x, py):
-                dot_size = options.grid_dot_size + random.uniform(
-                    -options.grid_dot_variation, 
+                # Apply size variation as a percentage of base size
+                dot_size = options.grid_dot_size * (1 + random.uniform(
+                    -options.grid_dot_variation,
                     options.grid_dot_variation
-                )
+                ))
                 dot_paint.setStrokeWidth(dot_size)
                 
-                # Calculate dot length relative to dot size
-                dot_length = dot_size * random.uniform(
-                    options.grid_min_dot_length,
-                    options.grid_max_dot_length
-                )
-                
-                canvas.drawLine(
-                    x - dot_length/2, py,
-                    x + dot_length/2, py,
-                    dot_paint
-                )
+                # Draw a very short line that looks like a dot
+                canvas.drawLine(x, py, x + 0.1, py, dot_paint)
             x += dot_spacing
 
     # Draw vertical lines
@@ -78,21 +70,13 @@ def draw_region_grid(canvas: skia.Canvas, region: ShapeGroup, options: 'Options'
         
         while y < bounds.y + bounds.height:
             if region.contains(px, y):
-                dot_size = options.grid_dot_size + random.uniform(
-                    -options.grid_dot_variation, 
+                # Apply size variation as a percentage of base size
+                dot_size = options.grid_dot_size * (1 + random.uniform(
+                    -options.grid_dot_variation,
                     options.grid_dot_variation
-                )
+                ))
                 dot_paint.setStrokeWidth(dot_size)
                 
-                # Calculate dot length relative to dot size
-                dot_length = dot_size * random.uniform(
-                    options.grid_min_dot_length,
-                    options.grid_max_dot_length
-                )
-                
-                canvas.drawLine(
-                    px, y - dot_length/2,
-                    px, y + dot_length/2,
-                    dot_paint
-                )
+                # Draw a very short line that looks like a dot
+                canvas.drawLine(px, y, px, y + 0.1, dot_paint)
             y += dot_spacing
