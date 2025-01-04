@@ -39,3 +39,8 @@ class Prop(MapElement):
             canvas.translate(cx, cy)
             canvas.rotate(self.rotation.radians * (180 / 3.14159265359))  # Convert radians to degrees for Skia
             canvas.translate(-cx, -cy)
+            
+    def draw(self, canvas: skia.Canvas, layer: Layers = Layers.PROPS) -> None:
+        """Override base MapElement draw to prevent drawing bounds rectangle."""
+        # Props should implement their own draw logic
+        pass
