@@ -4,6 +4,7 @@ import math
 import skia
 from map.enums import Layers
 from map.enums import Layers, RockType
+from map.props.rock import SMALL_ROCK_SIZE, MEDIUM_ROCK_SIZE, Rock
 
 if TYPE_CHECKING:
     from map.map import Map
