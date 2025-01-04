@@ -219,13 +219,23 @@ class Rock(Prop):
             Tuple of (x,y) coordinates if valid position found, None otherwise
         """
         bounds = container.bounds
-        margin = container._map.options.cell_size * 0.25  # 25% of cell size margin
+        margin = size + (container._map.options.cell_size * 0.25)  # Add rock size to margin
         
+        # Calculate valid range for random positions
+        min_x = bounds.x + margin
+        max_x = bounds.x + bounds.width - margin
+        min_y = bounds.y + margin 
+        max_y = bounds.y + bounds.height - margin
+        
+        # Verify the container is large enough
+        if min_x >= max_x or min_y >= max_y:
+            return None
+            
         # Try 30 random positions
         for _ in range(30):
             # Generate random position within bounds
-            x = random.uniform(bounds.x + margin, bounds.x + bounds.width - margin)
-            y = random.uniform(bounds.y + margin, bounds.y + bounds.height - margin)
+            x = random.uniform(min_x, max_x)
+            y = random.uniform(min_y, max_y)
             
             # Check center point
             if not container.shape.contains(x, y):
@@ -233,7 +243,7 @@ class Rock(Prop):
                 
             # Check points around the perimeter
             valid = True
-            num_probes = 6
+            num_probes = 8  # Increased from 6 for better coverage
             for i in range(num_probes):
                 angle = (i * 2 * math.pi / num_probes)
                 px = x + size * math.cos(angle)
