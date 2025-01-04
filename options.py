@@ -51,13 +51,13 @@ class Options:
     # Rendering options
     crosshatch_border_size: float = 24.0  # Size of crosshatched border around rooms
     crosshatch_background_color: int = 0xFFFFFFFF  # White
-    crosshatch_shading_color: int = 0xFFDDDDDD  # Slightly darker gray for crosshatch background
+    crosshatch_shading_color: int = 0xFFD5D5D5  # Darker gray for crosshatch background
     
     # Room rendering options
     room_shadow_color: int = 0xFFD8D8D8  # Very light gray for room shadows
     room_color: int = 0xFFFFFFFF  # White for room fill
-    room_shadow_offset_x: float = -12.0  # Shadow x offset in pixels (negative for right)
-    room_shadow_offset_y: float = -12.0  # Shadow y offset in pixels (negative for down)
+    room_shadow_offset_x: float = -16.0  # Shadow x offset in pixels (negative for right)
+    room_shadow_offset_y: float = -16.0  # Shadow y offset in pixels (negative for down)
     
     # Grid options
     grid_style: 'GridStyle' = None  # Grid drawing style (None for no grid)
