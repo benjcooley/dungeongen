@@ -30,6 +30,9 @@ class Shape(Protocol):
 class ShapeGroup:
     """A group of shapes that can be combined to create complex shapes."""
     
+    def __init__(self, includes: Sequence[Shape], excludes: Sequence[Shape]) -> None:
+        self.includes = list(includes)
+        self.excludes = list(excludes)
         self._bounds: Rectangle | None = None
         self._bounds_dirty = True
     
