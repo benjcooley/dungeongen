@@ -14,10 +14,6 @@ def main():
     surface = skia.Surface(options.canvas_width, options.canvas_height)
     canvas = surface.getCanvas()
     
-    # Initialize canvas and background
-    background_paint = skia.Paint(AntiAlias=True, Color=skia.ColorWHITE)
-    canvas.drawRect(skia.Rect.MakeWH(options.canvas_width, options.canvas_height), background_paint)
-
     # Create map and add a 4x4 room centered at origin
     dungeon_map = Map(options)
     room = dungeon_map.add_rectangular_room(-2, -2, 4, 4)
