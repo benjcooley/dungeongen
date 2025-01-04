@@ -324,17 +324,23 @@ class Map:
         
         # Draw room regions with shadows
         for region in regions:
-            # Create shadow paint
+            # Draw shadow first
             shadow_paint = skia.Paint(
                 AntiAlias=True,
                 Style=skia.Paint.kFill_Style,
                 Color=self.options.room_shadow_color
             )
             
-            # Draw shadow shape
+            # Save canvas state for shadow
+            canvas.save()
+            canvas.translate(
+                self.options.room_shadow_offset_x,
+                self.options.room_shadow_offset_y
+            )
             region.draw(canvas, shadow_paint)
+            canvas.restore()
             
-            # Create room paint
+            # Draw room on top
             room_paint = skia.Paint(
                 AntiAlias=True,
                 Style=skia.Paint.kFill_Style,
