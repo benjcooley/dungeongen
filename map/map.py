@@ -214,8 +214,10 @@ class Map:
         """
         bounds = self.bounds
         
-        # Calculate scale to fit in canvas with padding
-        padding = 20  # pixels of padding around the map
+        # Calculate padding in pixels based on cell size
+        padding = self.options.map_border_cells * self.options.cell_size
+        
+        # Calculate scale to fit in canvas with cell-based padding
         scale_x = (canvas_width - 2 * padding) / bounds.width
         scale_y = (canvas_height - 2 * padding) / bounds.height
         scale = min(scale_x, scale_y)
