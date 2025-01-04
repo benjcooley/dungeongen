@@ -405,8 +405,8 @@ class Map:
             Color=self.options.border_color,
             StrokeJoin=skia.Paint.kRound_Join  # Round the corners
         )
-        for region in regions:
-            region.draw(canvas, border_paint)
+        #for region in regions:
+        #    region.draw(canvas, border_paint)
 
         # Restore canvas state
         canvas.restore()
