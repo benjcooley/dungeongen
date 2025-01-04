@@ -136,7 +136,7 @@ class Door(MapElement):
             return ShapeGroup(includes=[], excludes=[])
         else:
             # When open, combine the side groups into a single shape
-            if self._orientation == DorOrientation.HORIZONTAL:
+            if self._orientation == DoorOrientation.HORIZONTAL:
                 return ShapeGroup.combine([self._left_group, self._right_group])
             else:
                 return ShapeGroup.combine([self._top_group, self._bottom_group])
