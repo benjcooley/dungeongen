@@ -71,7 +71,7 @@ class Rock(Prop):
         return points
     
     def draw(self, canvas: skia.Canvas, layer: 'Layers' = Layers.PROPS) -> None:
-        """Draw the rock using a perturbed circular path."""
+        """Draw the rock using a perturbed circular path on the specified layer."""
         # Create the rock path
         path = skia.Path()
         
@@ -81,35 +81,47 @@ class Rock(Prop):
         # Add curved segments between points
         for i in range(NUM_CONTROL_POINTS):
             next_idx = (i + 1) % NUM_CONTROL_POINTS
-            
-            # Calculate control points for curve
             curr_point = self._control_points[i]
             next_point = self._control_points[next_idx]
             
             # Use simple quadratic curve between points
             mid_x = (curr_point[0] + next_point[0]) / 2
             mid_y = (curr_point[1] + next_point[1]) / 2
-            
             path.quadTo(curr_point[0], curr_point[1], mid_x, mid_y)
         
-        # Close the path
         path.close()
         
-        # Draw filled rock with border
-        fill_paint = skia.Paint(
-            AntiAlias=True,
-            Style=skia.Paint.kFill_Style,
-            Color=self._map.options.prop_light_color
-        )
-        canvas.drawPath(path, fill_paint)
-        
-        border_paint = skia.Paint(
-            AntiAlias=True,
-            Style=skia.Paint.kStroke_Style,
-            StrokeWidth=self._map.options.door_stroke_width / 2,  # Thinner border for rocks
-            Color=self._map.options.border_color
-        )
-        canvas.drawPath(path, border_paint)
+        if layer == Layers.SHADOW:
+            # Draw shadow offset from the rock
+            shadow_paint = skia.Paint(
+                AntiAlias=True,
+                Style=skia.Paint.kFill_Style,
+                Color=self._map.options.room_shadow_color
+            )
+            canvas.save()
+            canvas.translate(
+                self._map.options.room_shadow_offset_x,
+                self._map.options.room_shadow_offset_y
+            )
+            canvas.drawPath(path, shadow_paint)
+            canvas.restore()
+            
+        elif layer == Layers.PROPS:
+            # Draw filled rock with border
+            fill_paint = skia.Paint(
+                AntiAlias=True,
+                Style=skia.Paint.kFill_Style,
+                Color=self._map.options.prop_light_color
+            )
+            canvas.drawPath(path, fill_paint)
+            
+            border_paint = skia.Paint(
+                AntiAlias=True,
+                Style=skia.Paint.kStroke_Style,
+                StrokeWidth=self._map.options.door_stroke_width / 2,  # Thinner border for rocks
+                Color=self._map.options.border_color
+            )
+            canvas.drawPath(path, border_paint)
     
     @classmethod
     def small_rock(cls, grid_x: float, grid_y: float, map_: 'Map', rotation: float = 0.0) -> 'Rock':

@@ -345,6 +345,10 @@ class Map:
             # 6. Restore transform and clear clip mask
             canvas.restore()
             
+        # Draw shadow layer first
+        for element in self._elements:
+            element.draw(canvas, Layers.SHADOW)
+            
         # Draw props layer
         for element in self._elements:
             element.draw(canvas, Layers.PROPS)

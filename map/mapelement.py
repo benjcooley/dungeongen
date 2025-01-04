@@ -75,16 +75,23 @@ class MapElement:
             self._map.remove_element(self)
     
     def draw(self, canvas: 'skia.Canvas', layer: 'Layers' = Layers.PROPS) -> None:
-        """Draw any additional details for this element.
+        """Draw this element on the specified layer.
         
-        This method is called after the main shape is drawn, allowing elements
-        to draw additional details like props, decorations, etc.
+        The base implementation draws the shape on the PROPS layer.
+        Subclasses can override to add custom drawing behavior for different layers.
         
         Args:
             canvas: The canvas to draw on
             layer: The current drawing layer
         """
-        pass  # Base implementation does nothing
+        if layer == Layers.PROPS:
+            # Draw the shape with default styling
+            paint = skia.Paint(
+                AntiAlias=True,
+                Style=skia.Paint.kFill_Style,
+                Color=self._map.options.prop_light_color
+            )
+            self._shape.draw(canvas, paint)
     
     def draw_occupied(self, grid: 'OccupancyGrid', element_idx: int) -> None:
         """Draw this element's shape into the occupancy grid.

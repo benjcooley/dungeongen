@@ -9,5 +9,6 @@ class GridStyle(Enum):
 
 class Layers(Enum):
     """Drawing layers for map elements."""
+    SHADOW = auto()  # Shadow layer drawn first
     PROPS = auto()   # Base layer for props and general elements
     DOORS = auto()   # Door layer that draws over room outlines
