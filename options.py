@@ -66,8 +66,6 @@ class Options:
     grid_dot_length: float = 1.0  # Base length for grid dots
     grid_dot_variation: float = 0.15  # Random variation in dot length (±15%)
     grid_dots_per_cell: int = 5  # Number of dots to draw per cell
-    grid_debug: bool = False  # Show grid debug rectangles
-    
     # Border options
     border_color: int = 0xFF000000  # Black color for region borders
     border_width: float = 6.0  # Width of region borders in pixels
