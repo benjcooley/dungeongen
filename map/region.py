@@ -21,3 +21,10 @@ class Region:
         """
         self.shape = shape
         self.elements = list(elements)
+    
+    def inflated(self, amount: float) -> 'Region':
+        """Return a new region with its shape inflated by the given amount."""
+        return Region(
+            shape=self.shape.inflated(amount),
+            elements=self.elements
+        )
