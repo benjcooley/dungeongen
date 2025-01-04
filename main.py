@@ -60,8 +60,10 @@ def main():
             
     # Save as SVG
     stream = skia.FILEWStream('map_output.svg')
-    with skia.SVGCanvas.Make((options.canvas_width, options.canvas_height), stream) as svg_canvas:
+    svg_canvas = skia.SVGCanvas.Make((options.canvas_width, options.canvas_height), stream)
+    if svg_canvas:
         dungeon_map.render(svg_canvas)
+        del svg_canvas  # Ensure canvas is destroyed before stream
     
     print("Room drawing completed and saved to 'map_output.png', 'map_output.pdf', and 'map_output.svg'")
 
