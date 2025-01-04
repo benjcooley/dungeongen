@@ -244,63 +244,61 @@ class Map:
             canvas: The canvas to draw on
             region: The region to draw grid for
         """
-        # Create grid paint
-        grid_paint = skia.Paint(
+        bounds = region.bounds
+        
+        # Create base paint for dots
+        dot_paint = skia.Paint(
             AntiAlias=True,
-            Style=skia.Paint.kFill_Style,
+            Style=skia.Paint.kStroke_Style,
+            StrokeCap=skia.Paint.kRound_Cap,
             Color=self.options.grid_color
         )
-        
-        # Calculate grid bounds in cells
-        bounds = region.bounds
-        start_x = math.floor(bounds.x / self.options.cell_size)
-        start_y = math.floor(bounds.y / self.options.cell_size)
-        end_x = math.ceil((bounds.x + bounds.width) / self.options.cell_size)
-        end_y = math.ceil((bounds.y + bounds.height) / self.options.cell_size)
-        
-        # Draw grid dots
-        for x in range(start_x, end_x + 1):
-            for y in range(start_y, end_y + 1):
-                # Convert to drawing coordinates
-                px = x * self.options.cell_size
-                py = y * self.options.cell_size
+
+        # Draw horizontal lines
+        for y in range(math.floor(bounds.y / self.options.cell_size),
+                      math.ceil((bounds.y + bounds.height) / self.options.cell_size) + 1):
+            py = y * self.options.cell_size
+            if not any(region.contains(bounds.x + dx, py) for dx in (0, bounds.width/2, bounds.width)):
+                continue
                 
-                # Check if point is within region
-                if region.contains(px, py):
-                    # Draw elongated dots with slight variation
-                    dot_paint = skia.Paint(
-                        AntiAlias=True,
-                        Style=skia.Paint.kStroke_Style,
-                        StrokeCap=skia.Paint.kRound_Cap,
-                        Color=self.options.grid_color,
-                        StrokeWidth=self.options.grid_dot_size + random.uniform(
-                            -self.options.grid_dot_variation,
-                            self.options.grid_dot_variation
-                        )
+            # Random offset for this line's dots
+            offset = random.uniform(0, self.options.cell_size)
+            
+            # Draw dots across width
+            x = bounds.x + offset
+            while x < bounds.x + bounds.width:
+                if region.contains(x, py):
+                    dot_paint.setStrokeWidth(self.options.grid_dot_size + 
+                        random.uniform(-self.options.grid_dot_variation, self.options.grid_dot_variation))
+                    canvas.drawLine(
+                        x - self.options.grid_dot_length/2, py,
+                        x + self.options.grid_dot_length/2, py,
+                        dot_paint
                     )
-                    
-                    # Draw horizontal and vertical dots
-                    for i in range(self.options.grid_dots_per_cell):
-                        # Calculate position within cell
-                        cell_pos = (i + 1) / (self.options.grid_dots_per_cell + 1)
-                        
-                        # Draw horizontal dot
-                        h_x = px + cell_pos * self.options.cell_size
-                        if region.contains(h_x, py):
-                            canvas.drawLine(
-                                h_x - self.options.grid_dot_length/2, py,
-                                h_x + self.options.grid_dot_length/2, py,
-                                dot_paint
-                            )
-                        
-                        # Draw vertical dot
-                        v_y = py + cell_pos * self.options.cell_size
-                        if region.contains(px, v_y):
-                            canvas.drawLine(
-                                px, v_y - self.options.grid_dot_length/2,
-                                px, v_y + self.options.grid_dot_length/2,
-                                dot_paint
-                            )
+                x += self.options.cell_size
+
+        # Draw vertical lines
+        for x in range(math.floor(bounds.x / self.options.cell_size),
+                      math.ceil((bounds.x + bounds.width) / self.options.cell_size) + 1):
+            px = x * self.options.cell_size
+            if not any(region.contains(px, bounds.y + dy) for dy in (0, bounds.height/2, bounds.height)):
+                continue
+                
+            # Random offset for this line's dots
+            offset = random.uniform(0, self.options.cell_size)
+            
+            # Draw dots across height
+            y = bounds.y + offset
+            while y < bounds.y + bounds.height:
+                if region.contains(px, y):
+                    dot_paint.setStrokeWidth(self.options.grid_dot_size + 
+                        random.uniform(-self.options.grid_dot_variation, self.options.grid_dot_variation))
+                    canvas.drawLine(
+                        px, y - self.options.grid_dot_length/2,
+                        px, y + self.options.grid_dot_length/2,
+                        dot_paint
+                    )
+                y += self.options.cell_size
 
     def render(self, canvas: skia.Canvas, transform: Optional[skia.Matrix] = None) -> None:
         """Render the map to a canvas.
