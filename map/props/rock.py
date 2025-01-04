@@ -26,7 +26,7 @@ MAX_PERTURBATION = 0.2
 class Rock(Prop):
     """A rock prop with irregular circular shape."""
     
-    def __init__(self, x: float, y: float, size: float, map_: 'Map', rotation: Rotation = Rotation.ROT0) -> None:
+    def __init__(self, x: float, y: float, size: float, map_: 'Map', rotation: float = 0.0) -> None:
         """Initialize a rock with position and size.
         
         Args:
@@ -56,7 +56,7 @@ class Rock(Prop):
         
         for i in range(NUM_CONTROL_POINTS):
             # Calculate base angle for this point
-            angle = (i * 2 * math.pi / NUM_CONTROL_POINTS) + self._rotation.radians
+            angle = (i * 2 * math.pi / NUM_CONTROL_POINTS) + self._rotation
             
             # Add random perturbation to radius
             perturbed_radius = self._radius * (1 + random.uniform(-MAX_PERTURBATION, MAX_PERTURBATION))
@@ -111,14 +111,14 @@ class Rock(Prop):
         canvas.drawPath(path, border_paint)
     
     @classmethod
-    def small_rock(cls, grid_x: float, grid_y: float, map_: 'Map', rotation: Rotation = Rotation.ROT0) -> 'Rock':
+    def small_rock(cls, grid_x: float, grid_y: float, map_: 'Map', rotation: float = 0.0) -> 'Rock':
         """Create a small rock at the given grid position."""
         x, y = grid_to_drawing(grid_x, grid_y, map_.options)
         size = map_.options.cell_size * SMALL_ROCK_SIZE
         return cls(x, y, size, map_, rotation)
     
     @classmethod
-    def medium_rock(cls, grid_x: float, grid_y: float, map_: 'Map', rotation: Rotation = Rotation.ROT0) -> 'Rock':
+    def medium_rock(cls, grid_x: float, grid_y: float, map_: 'Map', rotation: float = 0.0) -> 'Rock':
         """Create a medium rock at the given grid position."""
         x, y = grid_to_drawing(grid_x, grid_y, map_.options)
         size = map_.options.cell_size * MEDIUM_ROCK_SIZE

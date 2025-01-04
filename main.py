@@ -51,7 +51,7 @@ def main():
     
     # Add rocks to start room
     rock1 = Rock.small_rock(-1, -1, dungeon_map)
-    rock2 = Rock.medium_rock(1, 1, dungeon_map, Rotation.ROT90)
+    rock2 = Rock.medium_rock(1, 1, dungeon_map, math.pi/2)  # 90 degrees in radians
     dungeon_map.add_element(rock1)
     dungeon_map.add_element(rock2)
 
