@@ -284,8 +284,8 @@ class Map:
         regions = self.get_regions()
         crosshatch_shapes = []
         for region in regions:
-            # Create inflated version of the region
-            crosshatch_shapes.append(region.inflated(self.options.crosshatch_border_size))
+            # Create inflated version of the region's shape
+            crosshatch_shapes.append(region.shape.inflated(self.options.crosshatch_border_size))
         
         # Combine all regions into single crosshatch shape
         crosshatch_shape = ShapeGroup.combine(crosshatch_shapes)
@@ -368,7 +368,7 @@ class Map:
         # Create a single unified path for all regions
         unified_border = skia.Path()
         for region in regions:
-            unified_border.addPath(region.to_path())
+            unified_border.addPath(region.shape.to_path())
             
         # Draw the unified border path
         canvas.drawPath(unified_border, border_paint)
