@@ -313,15 +313,7 @@ class Map:
             # 2. Clip to region shape
             canvas.clipPath(region.shape.to_path(), skia.ClipOp.kIntersect, True)  # antialiased
             
-            # 3. Draw the filled room
-            room_paint = skia.Paint(
-                AntiAlias=True,
-                Style=skia.Paint.kFill_Style,
-                Color=self.options.room_color
-            )
-            region.shape.draw(canvas, room_paint)
-            
-            # 4. Draw shadows
+            # 3. Draw shadows first
             shadow_paint = skia.Paint(
                 AntiAlias=True,
                 Style=skia.Paint.kFill_Style,
@@ -335,6 +327,14 @@ class Map:
             )
             region.shape.draw(canvas, shadow_paint)
             canvas.restore()
+            
+            # 4. Draw the filled room on top
+            room_paint = skia.Paint(
+                AntiAlias=True,
+                Style=skia.Paint.kFill_Style,
+                Color=self.options.room_color
+            )
+            region.shape.draw(canvas, room_paint)
 
             # 5. Draw grid if enabled (still clipped by mask)
             if self.options.grid_style not in (None, GridStyle.NONE):
