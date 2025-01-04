@@ -31,27 +31,7 @@ class Room(MapElement):
             height + ROOM_OVERLAP_OFFSET
         )
         super().__init__(shape=shape, map_=map_)
-        self._props: List['Prop'] = []
     
-    def add_prop(self, prop: 'Prop') -> None:
-        """Add a prop to this room.
-        
-        The prop must be contained within the room's bounds.
-        """
-        if not self._shape.contains(prop.bounds.x + prop.bounds.width/2, 
-                                  prop.bounds.y + prop.bounds.height/2):
-            raise ValueError("Prop must be contained within room bounds")
-        if prop.container is not None:
-            prop.container.remove_prop(prop)
-        prop.container = self
-        self._props.append(prop)
-        
-    def remove_prop(self, prop: 'Prop') -> None:
-        """Remove a prop from this room."""
-        if prop in self._props:
-            self._props.remove(prop)
-            prop.container = None
-            
     def draw(self, canvas: 'skia.Canvas', layer: Layers = Layers.PROPS) -> None:
         """Draw the room and its props."""
         super().draw(canvas, layer)

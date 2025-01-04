@@ -29,6 +29,25 @@ class MapElement:
         self._map = map_
         self._options = map_.options
         self._props: List['Prop'] = []
+        
+    def add_prop(self, prop: 'Prop') -> None:
+        """Add a prop to this element.
+        
+        The prop must be contained within the element's bounds.
+        """
+        if not self._shape.contains(prop.bounds.x + prop.bounds.width/2, 
+                                  prop.bounds.y + prop.bounds.height/2):
+            raise ValueError("Prop must be contained within element bounds")
+        if prop.container is not None:
+            prop.container.remove_prop(prop)
+        prop.container = self
+        self._props.append(prop)
+        
+    def remove_prop(self, prop: 'Prop') -> None:
+        """Remove a prop from this element."""
+        if prop in self._props:
+            self._props.remove(prop)
+            prop.container = None
     
     def recalculate_bounds(self) -> Rectangle:
         """Calculate the bounding rectangle that encompasses the shape."""
