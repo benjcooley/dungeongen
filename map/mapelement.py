@@ -24,6 +24,7 @@ class MapElement:
         self._bounds = self._shape.bounds
         self._map = map_
         self._options = map_.options
+        self._props: List['Prop'] = []
     
     def recalculate_bounds(self) -> Rectangle:
         """Calculate the bounding rectangle that encompasses the shape."""
@@ -77,17 +78,16 @@ class MapElement:
     def draw(self, canvas: 'skia.Canvas', layer: 'Layers' = Layers.PROPS) -> None:
         """Draw this element on the specified layer.
         
-        The base implementation draws the shape on the PROPS layer.
+        The base implementation draws props on any layer.
         Subclasses can override to add custom drawing behavior for different layers.
         
         Args:
             canvas: The canvas to draw on
             layer: The current drawing layer
         """
-        # Draw props on the PROPS layer
-        if layer == Layers.PROPS:
-            for prop in self._props:
-                prop.draw(canvas, layer)
+        # Draw props on any layer
+        for prop in self._props:
+            prop.draw(canvas, layer)
     
     def draw_occupied(self, grid: 'OccupancyGrid', element_idx: int) -> None:
         """Draw this element's shape into the occupancy grid.
