@@ -264,18 +264,32 @@ class Map:
             # Random offset for this line's dots
             offset = random.uniform(0, self.options.cell_size)
             
-            # Draw dots across width
-            x = bounds.x + offset
+            # Calculate dot spacing based on cell size and dots per cell
+            dot_spacing = self.options.cell_size / self.options.grid_dots_per_cell
+            
+            # Start at a random position within one spacing interval
+            x = bounds.x + random.uniform(0, dot_spacing)
+            
             while x < bounds.x + bounds.width:
                 if region.contains(x, py):
-                    dot_paint.setStrokeWidth(self.options.grid_dot_size + 
-                        random.uniform(-self.options.grid_dot_variation, self.options.grid_dot_variation))
+                    dot_size = self.options.grid_dot_size + random.uniform(
+                        -self.options.grid_dot_variation, 
+                        self.options.grid_dot_variation
+                    )
+                    dot_paint.setStrokeWidth(dot_size)
+                    
+                    # Calculate dot length relative to dot size
+                    dot_length = dot_size * random.uniform(
+                        self.options.grid_min_dot_length,
+                        self.options.grid_max_dot_length
+                    )
+                    
                     canvas.drawLine(
-                        x - self.options.grid_dot_length/2, py,
-                        x + self.options.grid_dot_length/2, py,
+                        x - dot_length/2, py,
+                        x + dot_length/2, py,
                         dot_paint
                     )
-                x += self.options.cell_size
+                x += dot_spacing
 
         # Draw vertical lines
         for x in range(math.floor(bounds.x / self.options.cell_size),
@@ -287,18 +301,32 @@ class Map:
             # Random offset for this line's dots
             offset = random.uniform(0, self.options.cell_size)
             
-            # Draw dots across height
-            y = bounds.y + offset
+            # Calculate dot spacing based on cell size and dots per cell
+            dot_spacing = self.options.cell_size / self.options.grid_dots_per_cell
+            
+            # Start at a random position within one spacing interval
+            y = bounds.y + random.uniform(0, dot_spacing)
+            
             while y < bounds.y + bounds.height:
                 if region.contains(px, y):
-                    dot_paint.setStrokeWidth(self.options.grid_dot_size + 
-                        random.uniform(-self.options.grid_dot_variation, self.options.grid_dot_variation))
+                    dot_size = self.options.grid_dot_size + random.uniform(
+                        -self.options.grid_dot_variation, 
+                        self.options.grid_dot_variation
+                    )
+                    dot_paint.setStrokeWidth(dot_size)
+                    
+                    # Calculate dot length relative to dot size
+                    dot_length = dot_size * random.uniform(
+                        self.options.grid_min_dot_length,
+                        self.options.grid_max_dot_length
+                    )
+                    
                     canvas.drawLine(
-                        px, y - self.options.grid_dot_length/2,
-                        px, y + self.options.grid_dot_length/2,
+                        px, y - dot_length/2,
+                        px, y + dot_length/2,
                         dot_paint
                     )
-                y += self.options.cell_size
+                y += dot_spacing
 
     def render(self, canvas: skia.Canvas, transform: Optional[skia.Matrix] = None) -> None:
         """Render the map to a canvas.
