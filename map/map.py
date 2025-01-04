@@ -338,7 +338,7 @@ class Map:
 
             # 5. Draw grid if enabled (still clipped by mask)
             if self.options.grid_style not in (None, GridStyle.NONE):
-                draw_region_grid(canvas, region.shape, self.options)
+                draw_region_grid(canvas, region, self.options)
 
             # 6. Draw region elements on appropriate layers
             for element in region.elements:
