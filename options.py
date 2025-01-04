@@ -16,7 +16,7 @@ class Options:
     canvas_height: int = 400
     
     # Crosshatch stroke appearance
-    crosshatch_stroke_width: float = 1.2
+    crosshatch_stroke_width: float = 1.5
     
     # Crosshatch pattern configuration
     crosshatch_strokes_per_cluster: int = 3
