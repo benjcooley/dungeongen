@@ -56,7 +56,7 @@ class Rock(Prop):
         
         for i in range(NUM_CONTROL_POINTS):
             # Calculate base angle for this point
-            angle = (i * 2 * math.pi / NUM_CONTROL_POINTS) + self._rotation
+            angle = (i * 2 * math.pi / NUM_CONTROL_POINTS) + self.rotation
             
             # Add random perturbation to radius
             perturbed_radius = self._radius * (1 + random.uniform(-MAX_PERTURBATION, MAX_PERTURBATION))
