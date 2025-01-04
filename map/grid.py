@@ -47,8 +47,8 @@ def draw_region_grid(canvas: skia.Canvas, region: ShapeGroup, options: 'Options'
         Color=options.grid_color
     )
 
-    # Draw horizontal lines
-    for y in range(min_y, max_y + 1):
+    # Draw horizontal lines (include one line before min_y to ensure outer bounds)
+    for y in range(min_y - 1, max_y + 1):
         py = y * options.cell_size
         if not any(region.contains(bounds.x + dx, py) for dx in (0, bounds.width/2, bounds.width)):
             continue
@@ -73,8 +73,8 @@ def draw_region_grid(canvas: skia.Canvas, region: ShapeGroup, options: 'Options'
                 # Draw a short line with varied length
                 canvas.drawLine(x, py, x + dot_length, py, dot_paint)
 
-    # Draw vertical lines
-    for x in range(min_x, max_x + 1):
+    # Draw vertical lines (include one line before min_x to ensure outer bounds)
+    for x in range(min_x - 1, max_x + 1):
         px = x * options.cell_size
         if not any(region.contains(px, bounds.y + dy) for dy in (0, bounds.height/2, bounds.height)):
             continue
