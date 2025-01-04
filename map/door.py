@@ -200,10 +200,6 @@ class Door(MapElement):
                 door_x = self._x + (self._width - door_width) / 2
                 door_y = self._y + (self._height - door_height) / 2
             
-            # Debug prints
-            print(f"Door dimensions: x={door_x}, y={door_y}, w={door_width}, h={door_height}")
-            print(f"Door paint color: {door_paint.getColor()}")
-            
             # Create door rectangle
             door = Rectangle(door_x, door_y, door_width, door_height, inflate=1.0)
             if not door.is_valid:

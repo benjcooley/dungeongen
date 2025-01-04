@@ -99,20 +99,6 @@ class Rock(Prop):
         if layer != Layers.PROPS:
             return
             
-        # Debug: Print rock position and container bounds
-        if self.container:
-            container_bounds = self.container.bounds
-            print(f"\nDrawing rock at ({self._center_x}, {self._center_y}) with radius {self._radius}")
-            print(f"Container bounds: x={container_bounds.x}, y={container_bounds.y}, "
-                  f"w={container_bounds.width}, h={container_bounds.height}")
-            
-            # Check if rock is within container bounds
-            in_bounds = (self._center_x >= container_bounds.x and 
-                        self._center_x <= container_bounds.x + container_bounds.width and
-                        self._center_y >= container_bounds.y and 
-                        self._center_y <= container_bounds.y + container_bounds.height)
-            print(f"Rock center is {'inside' if in_bounds else 'OUTSIDE'} container bounds")
-            
         # Create the rock path
         path = skia.Path()
         
@@ -213,10 +199,6 @@ class Rock(Prop):
         min_y = bounds.y + margin 
         max_y = bounds.y + bounds.height - margin
         
-        print(f"\nTrying to place rock of size {size}")
-        print(f"Container bounds: x={bounds.x}, y={bounds.y}, w={bounds.width}, h={bounds.height}")
-        print(f"Valid position range: x={min_x} to {max_x}, y={min_y} to {max_y}")
-        
         # Verify the container is large enough
         if min_x >= max_x or min_y >= max_y:
             print("Container too small for rock!")
@@ -228,11 +210,8 @@ class Rock(Prop):
             x = random.uniform(min_x, max_x)
             y = random.uniform(min_y, max_y)
             
-            print(f"Attempt {attempt + 1}: Generated position ({x}, {y})")
-            
             # Check center point
             if not container.shape.contains(x, y):
-                print("  Center point outside container")
                 continue
                 
             # Check points around the perimeter
@@ -243,15 +222,11 @@ class Rock(Prop):
                 px = x + size * math.cos(angle)
                 py = y + size * math.sin(angle)
                 if not container.shape.contains(px, py):
-                    print(f"  Perimeter point {i} ({px}, {py}) outside container")
                     valid = False
                     break
                     
             if valid:
-                print(f"Found valid position: ({x}, {y})")
                 return (x, y)
-                
-        print("Failed to find valid position after 30 attempts")
                 
         return None
 
