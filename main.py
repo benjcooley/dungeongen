@@ -22,12 +22,10 @@ def main():
     dungeon_map = Map(options)
     room = Room.rectangular_room(-2, -2, 4, 4, dungeon_map)
 
-    # Set up the canvas transform to see the room properly
+    # Draw the map (which will draw all elements including our room)
     transform = dungeon_map._calculate_default_transform(options.canvas_width, options.canvas_height)
     canvas.setMatrix(transform)
-
-    # Draw the room
-    room.draw(canvas)
+    dungeon_map.draw(canvas)
 
     # Save the result
     image = surface.makeImageSnapshot()
