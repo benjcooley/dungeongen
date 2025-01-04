@@ -56,8 +56,8 @@ class Options:
     # Room rendering options
     room_shadow_color: int = 0xFFD8D8D8  # Very light gray for room shadows
     room_color: int = 0xFFFFFFFF  # White for room fill
-    room_shadow_offset_x: float = 16.0  # Shadow x offset in pixels (positive for left)
-    room_shadow_offset_y: float = 16.0  # Shadow y offset in pixels (positive for up)
+    room_shadow_offset_x: float = 8.0   # Shadow x offset in pixels (positive for left)
+    room_shadow_offset_y: float = 12.0  # Shadow y offset in pixels (positive for up)
     
     # Grid options
     grid_style: 'GridStyle' = None  # Grid drawing style (None for no grid)
