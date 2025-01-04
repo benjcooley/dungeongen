@@ -18,9 +18,9 @@ def main():
     background_paint = skia.Paint(AntiAlias=True, Color=skia.ColorWHITE)
     canvas.drawRect(skia.Rect.MakeWH(options.canvas_width, options.canvas_height), background_paint)
 
-    # Create map and add a 5x5 room centered at origin
+    # Create map and add a 4x4 room centered at origin
     dungeon_map = Map(options)
-    room = Room(-2.5, -2.5, 5, 5, dungeon_map)
+    room = Room(-2, -2, 4, 4, dungeon_map)
 
     # Set up the canvas transform to see the room properly
     transform = dungeon_map._calculate_default_transform(options.canvas_width, options.canvas_height)
