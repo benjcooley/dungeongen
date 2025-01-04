@@ -100,9 +100,9 @@ class Rock(Prop):
             Style=skia.Paint.kStrokeAndFill_Style,
             StrokeWidth=self._map.options.prop_stroke_width,
             Color=self._map.options.prop_fill_color,  # Use prop fill color
-            StrokeColor=self._map.options.prop_outline_color,  # Use prop outline color
             StrokeJoin=skia.Paint.kRound_Join  # Round corners
         )
+        paint.setStrokeColor(self._map.options.prop_outline_color)  # Set stroke color separately
         canvas.drawPath(path, paint)
     
     @classmethod
