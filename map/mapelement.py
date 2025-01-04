@@ -141,10 +141,10 @@ class MapElement:
             else:  # MEDIUM
                 rock = Rock.medium_rock(x, y, self._map, rotation)
                 
-            # Try to add the rock
             # Try to find valid position for rock
             valid_pos = rock.get_valid_position(self)
             if valid_pos:
+                rock.position = valid_pos
                 if self.try_add_prop(rock):
                     continue
 

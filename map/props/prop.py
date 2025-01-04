@@ -28,6 +28,8 @@ class Prop(MapElement):
             map_: Parent map instance
             rotation: Rotation angle (default: no rotation)
         """
+        self._x = x
+        self._y = y
         shape = Rectangle(x, y, width, height)
         super().__init__(shape=shape, map_=map_)
         self.rotation = rotation
@@ -66,6 +68,20 @@ class Prop(MapElement):
         center_y = self._bounds.y + self._bounds.height/2
         return container.contains(center_x, center_y)
         
+    @property
+    def position(self) -> tuple[float, float]:
+        """Get the current position of the prop."""
+        return (self._x, self._y)
+        
+    @position.setter 
+    def position(self, pos: tuple[float, float]) -> None:
+        """Set the position of the prop and update its shape."""
+        self._x, self._y = pos
+        # Update the shape's position
+        self._shape = Rectangle(self._x, self._y, self._bounds.width, self._bounds.height)
+        # Update the bounds
+        self._bounds = self._shape.bounds
+
     def draw(self, canvas: skia.Canvas, layer: Layers = Layers.PROPS) -> None:
         """Override base MapElement draw to prevent drawing bounds rectangle."""
         # Props should implement their own draw logic
