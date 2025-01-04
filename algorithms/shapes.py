@@ -195,9 +195,27 @@ class Rectangle:
         )
 
     def contains(self, px: float, py: float) -> bool:
-        dx = max(0, abs(px - (self._inflated_x + self._inflated_width / 2)) - self._inflated_width / 2)
-        dy = max(0, abs(py - (self._inflated_y + self._inflated_height / 2)) - self._inflated_height / 2)
-        return math.sqrt(dx ** 2 + dy ** 2) <= self._inflate
+        """Check if a point is contained within this rectangle.
+        
+        For inflated rectangles, this creates rounded corners with radius equal to
+        the inflation amount. Points must be within the rectangle and not in the
+        corner regions beyond the rounded corners.
+        """
+        # First check if point is within the basic rectangle bounds
+        if not (self._inflated_x <= px <= self._inflated_x + self._inflated_width and
+                self._inflated_y <= py <= self._inflated_y + self._inflated_height):
+            return False
+            
+        # If not inflated, we're done
+        if self._inflate <= 0:
+            return True
+            
+        # For inflated rectangles, check corner regions
+        dx = max(0, abs(px - (self._inflated_x + self._inflated_width / 2)) - (self._inflated_width / 2 - self._inflate))
+        dy = max(0, abs(py - (self._inflated_y + self._inflated_height / 2)) - (self._inflated_height / 2 - self._inflate))
+        
+        # Point must be within the rounded corner radius
+        return math.sqrt(dx * dx + dy * dy) <= self._inflate
     
     def to_path(self) -> skia.Path:
         """Convert this rectangle to a Skia path."""
