@@ -32,7 +32,7 @@ class Rock(Prop):
             rotation: Rotation angle (affects perturbation but not overall shape)
         """
         # Calculate bounds (square that contains the perturbed circle)
-        bounds_size = size * 2 * (1 + MAX_PERTURBATION)  # Add perturbation margin
+        bounds_size = size * 2 * 1.2  # Add 20% margin for variations
         bounds_x = x - bounds_size/2
         bounds_y = y - bounds_size/2
         
@@ -77,9 +77,10 @@ class Rock(Prop):
         path.moveTo(self._control_points[0][0], self._control_points[0][1])
         
         # Add curved segments between points, including back to start
-        for i in range(NUM_CONTROL_POINTS + 1):
-            curr_idx = i % NUM_CONTROL_POINTS
-            next_idx = (i + 1) % NUM_CONTROL_POINTS
+        num_points = len(self._control_points)
+        for i in range(num_points + 1):
+            curr_idx = i % num_points
+            next_idx = (i + 1) % num_points
             curr_point = self._control_points[curr_idx]
             next_point = self._control_points[next_idx]
             
