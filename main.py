@@ -29,11 +29,7 @@ def main():
     dungeon_map.add_element(first_door)
     
     # Add 5-grid long passage
-    passage = Passage(
-        *grid_to_drawing(3, 0, options),  # Convert grid coords to drawing coords
-        *grid_to_drawing_size(5, 1, options),  # Convert grid size to drawing size
-        dungeon_map
-    )
+    passage = Passage.from_grid(3, 0, 5, 1, dungeon_map)
     dungeon_map.add_element(passage)
     
     # Add closed door at the end of the passage
