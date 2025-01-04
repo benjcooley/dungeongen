@@ -73,7 +73,7 @@ class MapElement:
         if self._map is not None:
             self._map.remove_element(self)
     
-    def draw(self, canvas: 'skia.Canvas') -> None:
+    def draw(self, canvas: 'skia.Canvas', layer: 'Layers' = Layers.PROPS) -> None:
         """Draw any additional details for this element.
         
         This method is called after the main shape is drawn, allowing elements
@@ -81,6 +81,7 @@ class MapElement:
         
         Args:
             canvas: The canvas to draw on
+            layer: The current drawing layer
         """
         pass  # Base implementation does nothing
     

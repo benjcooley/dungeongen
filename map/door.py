@@ -171,9 +171,9 @@ class Door(MapElement):
             self._open = value
             self._shape = self._calculate_shape()
     
-    def draw(self, canvas: skia.Canvas) -> None:
+    def draw(self, canvas: skia.Canvas, layer: 'Layers' = Layers.PROPS) -> None:
         """Draw the door if it's closed."""
-        if not self._open:
+        if not self._open and layer == Layers.DOORS:
             # Create paint for door
             door_paint = skia.Paint(
                 AntiAlias=True,

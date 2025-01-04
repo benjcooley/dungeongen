@@ -344,9 +344,13 @@ class Map:
             # 6. Restore transform and clear clip mask
             canvas.restore()
             
-        # Draw element details after all regions are drawn
+        # Draw props layer
         for element in self._elements:
-            element.draw(canvas)
+            element.draw(canvas, Layers.PROPS)
+            
+        # Draw doors layer after room outlines
+        for element in self._elements:
+            element.draw(canvas, Layers.DOORS)
         
 
         # Draw region borders last with rounded corners

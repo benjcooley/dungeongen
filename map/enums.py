@@ -6,3 +6,8 @@ class GridStyle(Enum):
     """Available grid drawing styles."""
     NONE = auto()  # No grid
     DOTS = auto()  # Draw grid as dots at intersections
+
+class Layers(Enum):
+    """Drawing layers for map elements."""
+    PROPS = auto()   # Base layer for props and general elements
+    DOORS = auto()   # Door layer that draws over room outlines
