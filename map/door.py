@@ -54,18 +54,19 @@ class Door(MapElement):
             
             # Create inflated rectangles for rounded sides
             # Account for both extension and inflation in width/height calculation
+            # Offset x,y by inflation amount since Rectangle will expand outward
             self._left_rect = Rectangle(
-                self._x - DOOR_SIDE_EXTENSION,
-                self._y,  # Don't offset Y since inflation will expand it
+                self._x - DOOR_SIDE_EXTENSION + DOOR_SIDE_ROUNDING,
+                self._y + DOOR_SIDE_ROUNDING,
                 side_width + DOOR_SIDE_EXTENSION - (DOOR_SIDE_ROUNDING * 2),
-                self._height - (DOOR_SIDE_ROUNDING * 2),  # Account for inflation in height
+                self._height - (DOOR_SIDE_ROUNDING * 2),
                 inflate=DOOR_SIDE_ROUNDING
             )
             self._right_rect = Rectangle(
-                self._x + self._width - side_width,
-                self._y,  # Don't offset Y since inflation will expand it
+                self._x + self._width - side_width + DOOR_SIDE_ROUNDING,
+                self._y + DOOR_SIDE_ROUNDING,
                 side_width + DOOR_SIDE_EXTENSION - (DOOR_SIDE_ROUNDING * 2),
-                self._height - (DOOR_SIDE_ROUNDING * 2),  # Account for inflation in height
+                self._height - (DOOR_SIDE_ROUNDING * 2),
                 inflate=DOOR_SIDE_ROUNDING
             )
             self._middle_rect = Rectangle(self._x + side_width, middle_y, side_width, middle_height)
@@ -76,17 +77,18 @@ class Door(MapElement):
             
             # Create inflated rectangles for rounded sides
             # Account for both extension and inflation in width/height calculation
+            # Offset x,y by inflation amount since Rectangle will expand outward
             self._top_rect = Rectangle(
-                self._x,  # Don't offset X since inflation will expand it
-                self._y - DOOR_SIDE_EXTENSION,
-                self._width - (DOOR_SIDE_ROUNDING * 2),  # Account for inflation in width
+                self._x + DOOR_SIDE_ROUNDING,
+                self._y - DOOR_SIDE_EXTENSION + DOOR_SIDE_ROUNDING,
+                self._width - (DOOR_SIDE_ROUNDING * 2),
                 side_height + DOOR_SIDE_EXTENSION - (DOOR_SIDE_ROUNDING * 2),
                 inflate=DOOR_SIDE_ROUNDING
             )
             self._bottom_rect = Rectangle(
-                self._x,  # Don't offset X since inflation will expand it
-                self._y + self._height - side_height,
-                self._width - (DOOR_SIDE_ROUNDING * 2),  # Account for inflation in width
+                self._x + DOOR_SIDE_ROUNDING,
+                self._y + self._height - side_height + DOOR_SIDE_ROUNDING,
+                self._width - (DOOR_SIDE_ROUNDING * 2),
                 side_height + DOOR_SIDE_EXTENSION - (DOOR_SIDE_ROUNDING * 2),
                 inflate=DOOR_SIDE_ROUNDING
             )
