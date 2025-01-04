@@ -52,20 +52,20 @@ def main():
     image = surface.makeImageSnapshot()
     image.save('map_output.png', skia.kPNG)
     
-    # Save as PDF
-    stream = skia.FILEWStream('map_output.pdf')
-    with skia.PDF.MakeDocument(stream) as document:
-        with document.page(options.canvas_width, options.canvas_height) as pdf_canvas:
-            dungeon_map.render(pdf_canvas)
+    # # Save as PDF
+    # stream = skia.FILEWStream('map_output.pdf')
+    # with skia.PDF.MakeDocument(stream) as document:
+    #     with document.page(options.canvas_width, options.canvas_height) as pdf_canvas:
+    #         dungeon_map.render(pdf_canvas)
             
-    # Save as SVG
-    stream = skia.FILEWStream('map_output.svg')
-    svg_canvas = skia.SVGCanvas.Make((options.canvas_width, options.canvas_height), stream)
-    if svg_canvas:
-        dungeon_map.render(svg_canvas)
-        del svg_canvas  # Ensure canvas is destroyed before stream
+    # # Save as SVG
+    # stream = skia.FILEWStream('map_output.svg')
+    # svg_canvas = skia.SVGCanvas.Make((options.canvas_width, options.canvas_height), stream)
+    # if svg_canvas:
+    #     dungeon_map.render(svg_canvas)
+    #     del svg_canvas  # Ensure canvas is destroyed before stream
     
-    print("Room drawing completed and saved to 'map_output.png', 'map_output.pdf', and 'map_output.svg'")
+    print("Room drawing completed and saved to 'map_output.png'")
 
 if __name__ == "__main__":
     main()
