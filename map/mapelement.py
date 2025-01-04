@@ -84,7 +84,10 @@ class MapElement:
             canvas: The canvas to draw on
             layer: The current drawing layer
         """
-        ...
+        # Draw props on the PROPS layer
+        if layer == Layers.PROPS:
+            for prop in self._props:
+                prop.draw(canvas, layer)
     
     def draw_occupied(self, grid: 'OccupancyGrid', element_idx: int) -> None:
         """Draw this element's shape into the occupancy grid.
