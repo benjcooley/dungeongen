@@ -330,15 +330,13 @@ class Map:
         
         # Draw room regions with shadows
         for region in regions:
-            # Draw shadow first
+            # 1. Draw shadow
             shadow_paint = skia.Paint(
                 AntiAlias=True,
                 Style=skia.Paint.kFill_Style,
                 Color=self.options.room_shadow_color,
-                StrokeWidth=0  # Ensure no stroke
+                StrokeWidth=0
             )
-            
-            # Save canvas state for shadow
             canvas.save()
             canvas.translate(
                 self.options.room_shadow_offset_x,
@@ -346,42 +344,29 @@ class Map:
             )
             region.draw(canvas, shadow_paint)
             canvas.restore()
-            
-            # Draw room on top
-            room_paint = skia.Paint(
-                AntiAlias=True,
-                Style=skia.Paint.kFill_Style,
-                Color=self.options.room_color,
-                StrokeWidth=0  # Ensure no stroke
-            )
-            
-            # Create mask using region shape
+
+            # 2. Create mask layer
+            canvas.save()
             mask_paint = skia.Paint(
                 AntiAlias=True,
                 Style=skia.Paint.kFill_Style,
-                BlendMode=skia.BlendMode.kSrc,
-                StrokeWidth=0  # Ensure no stroke
+                BlendMode=skia.BlendMode.kSrc
             )
-            
-            # Save canvas state for clipping
-            canvas.save()
-            
-            # Create clipping mask using region shape
-            canvas.translate(0, 0)  # Reset translation
             region.draw(canvas, mask_paint)
-            
-            # Draw room shape with offset, clipped by mask
-            canvas.translate(
-                -self.options.room_shadow_offset_x,
-                -self.options.room_shadow_offset_y
+
+            # 3. Draw room shape constrained by mask
+            room_paint = skia.Paint(
+                AntiAlias=True,
+                Style=skia.Paint.kFill_Style,
+                Color=self.options.room_color
             )
             region.draw(canvas, room_paint)
-            
-            # Draw grid if enabled
+
+            # 4. Draw grid if enabled (still masked)
             if self.options.grid_style not in (None, GridStyle.NONE):
                 self._draw_region_grid(canvas, region)
-            
-            # Restore canvas state
+
+            # 5. Clear mask and restore transform
             canvas.restore()
             
         # Draw element details after all regions are drawn
