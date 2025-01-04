@@ -98,8 +98,9 @@ class Rock(Prop):
         paint = skia.Paint(
             AntiAlias=True,
             Style=skia.Paint.kStrokeAndFill_Style,
-            StrokeWidth=self._map.options.door_stroke_width / 2,  # Thinner border for rocks
-            Color=self._map.options.room_color,  # Fill color
+            StrokeWidth=self._map.options.prop_stroke_width,
+            Color=self._map.options.prop_fill_color,  # Use prop fill color
+            StrokeColor=self._map.options.prop_outline_color,  # Use prop outline color
             StrokeJoin=skia.Paint.kRound_Join  # Round corners
         )
         canvas.drawPath(path, paint)
