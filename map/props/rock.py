@@ -94,23 +94,23 @@ class Rock(Prop):
         
         path.close()
 
-        # # Draw fill first
-        # fill_paint = skia.Paint(
-        #     AntiAlias=True,
-        #     Style=skia.Paint.kFill_Style,
-        #     Color=self._map.options.prop_fill_color
-        # )
-        # canvas.drawPath(path, fill_paint)
+        # Draw fill first
+        fill_paint = skia.Paint(
+            AntiAlias=True,
+            Style=skia.Paint.kFill_Style,
+            Color=self._map.options.prop_fill_color
+        )
+        canvas.drawPath(path, fill_paint)
         
-        # # Draw stroke on top
-        # stroke_paint = skia.Paint(
-        #     AntiAlias=True,
-        #     Style=skia.Paint.kStroke_Style,
-        #     StrokeWidth=self._map.options.prop_stroke_width,
-        #     Color=self._map.options.prop_outline_color,
-        #     StrokeJoin=skia.Paint.kRound_Join
-        # )
-        # canvas.drawPath(path, stroke_paint)
+        # Draw stroke on top
+        stroke_paint = skia.Paint(
+            AntiAlias=True,
+            Style=skia.Paint.kStroke_Style,
+            StrokeWidth=self._map.options.prop_stroke_width,
+            Color=self._map.options.prop_outline_color,
+            StrokeJoin=skia.Paint.kRound_Join
+        )
+        canvas.drawPath(path, stroke_paint)
     
     @classmethod
     def small_rock(cls, grid_x: float, grid_y: float, map_: 'Map', rotation: float = 0.0) -> 'Rock':
