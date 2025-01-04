@@ -30,6 +30,11 @@ class Shape(Protocol):
     def inflated(self, amount: float) -> 'Shape':
         """Return a new shape inflated by the given amount."""
         ...
+    
+    @property
+    def is_valid(self) -> bool:
+        """Check if this shape is valid and can be rendered."""
+        ...
 
 class ShapeGroup:
     """A group of shapes that can be combined to create complex shapes."""
@@ -131,8 +136,8 @@ class ShapeGroup:
     
     def _recalculate_bounds(self) -> None:
         """Calculate bounds by combining all included shapes' bounds."""
-        if not self.includes:
-            raise ValueError("Shape group must have at least one included shape")
+        if not self.is_valid:
+            return
         
         # Start with the first shape's bounds
         bounds = self.includes[0].bounds
@@ -151,8 +156,15 @@ class ShapeGroup:
         self._bounds_dirty = False
 
     @property
+    def is_valid(self) -> bool:
+        """Check if this shape group is valid (has at least one included shape)."""
+        return len(self.includes) > 0
+    
+    @property
     def bounds(self) -> Rectangle:
         """Get the current bounding rectangle, recalculating if needed."""
+        if not self.is_valid:
+            return Rectangle(0, 0, 0, 0)
         if self._bounds_dirty or self._bounds is None:
             self._recalculate_bounds()
         return self._bounds
@@ -165,8 +177,15 @@ class Rectangle:
     """
     
     @property
+    def is_valid(self) -> bool:
+        """Check if this rectangle is valid (has positive width and height)."""
+        return self.width > 0 and self.height > 0
+    
+    @property
     def bounds(self) -> 'Rectangle':
         """Return this rectangle as bounds."""
+        if not self.is_valid:
+            return Rectangle(0, 0, 0, 0)
         return Rectangle(self._inflated_x, self._inflated_y, self._inflated_width, self._inflated_height)
     
     def __init__(self, x: float, y: float, width: float, height: float, inflate: float = 0) -> None:
@@ -270,8 +289,15 @@ class Circle:
         return math.sqrt((px - self.cx)**2 + (py - self.cy)**2) <= self._inflated_radius
     
     @property
+    def is_valid(self) -> bool:
+        """Check if this circle is valid (has positive radius)."""
+        return self.radius > 0
+    
+    @property
     def bounds(self) -> Rectangle:
         """Get the bounding rectangle for this circle."""
+        if not self.is_valid:
+            return Rectangle(0, 0, 0, 0)
         return Rectangle(
             self.cx - self._inflated_radius,
             self.cy - self._inflated_radius,
