@@ -56,7 +56,7 @@ class Options:
     # Room rendering options
     room_shadow_color: int = 0xFFD0D0D0  # Lighter gray for room shadows
     room_color: int = 0xFFFFFFFF  # White for room fill
-    prop_light_color: int = 0xFFFFFFFF  # Light color for props (same as room fill for now)
+    prop_light_color: int = 0xFF808080  # Medium gray for props
     room_shadow_offset_x: float = 10.0   # Shadow x offset in pixels (positive for left)
     room_shadow_offset_y: float = 14.0  # Shadow y offset in pixels (positive for up)
     
