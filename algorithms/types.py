@@ -6,5 +6,3 @@ from algorithms.shapes import Shape
 # Type aliases
 Point = Tuple[float, float]
 Line = Tuple[Point, Point]
-
-__all__ = ['Point', 'Line', 'Shape']
