@@ -20,13 +20,13 @@ class MapElement:
     def __init__(self, shape: Shape, map_: 'Map') -> None:
         self._shape = shape
         self._connections: List['MapElement'] = []
-        self._bounds = self._shape.recalculate_bounds()
+        self._bounds = self._shape.bounds
         self._map = map_
         self._options = map_.options
     
     def recalculate_bounds(self) -> Rectangle:
         """Calculate the bounding rectangle that encompasses the shape."""
-        self._bounds = self._shape.recalculate_bounds()
+        self._bounds = self._shape.bounds
         return self._bounds
     
     @property
