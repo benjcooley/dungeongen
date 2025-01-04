@@ -257,6 +257,7 @@ class Circle:
         self.cx = cx
         self.cy = cy
         self.radius = radius  # Original radius
+        self._inflate = inflate
         self._inflated_radius = radius + inflate
 
     @property
