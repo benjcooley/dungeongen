@@ -46,14 +46,10 @@ class MapElement:
         print(f"Prop bounds: x={prop._bounds.x}, y={prop._bounds.y}, w={prop._bounds.width}, h={prop._bounds.height}")
         print(f"Container bounds: x={self._bounds.x}, y={self._bounds.y}, w={self._bounds.width}, h={self._bounds.height}")
         
-        # Get valid position for prop
-        valid_pos = type(prop).get_valid_position(prop._bounds.width, self)
-        if not valid_pos:
-            print("Failed to find valid position")
+        # Check if prop's current position is valid
+        if not prop._is_valid_position(self.shape):
+            print("Invalid position")
             return False
-            
-        # Update prop position with valid coordinates
-        prop.position = valid_pos
             
         if prop.container is not None:
             prop.container.remove_prop(prop)
