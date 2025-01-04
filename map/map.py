@@ -266,12 +266,40 @@ class Map:
                 
                 # Check if point is within region
                 if region.contains(px, py):
-                    # Draw dot at grid intersection
-                    canvas.drawCircle(
-                        px, py,
-                        self.options.grid_dot_size,
-                        grid_paint
+                    # Draw elongated dots with slight variation
+                    dot_paint = skia.Paint(
+                        AntiAlias=True,
+                        Style=skia.Paint.kStroke_Style,
+                        StrokeCap=skia.Paint.kRound_Cap,
+                        Color=self.options.grid_color,
+                        StrokeWidth=self.options.grid_dot_size + random.uniform(
+                            -self.options.grid_dot_variation,
+                            self.options.grid_dot_variation
+                        )
                     )
+                    
+                    # Draw horizontal and vertical dots
+                    for i in range(self.options.grid_dots_per_cell):
+                        # Calculate position within cell
+                        cell_pos = (i + 1) / (self.options.grid_dots_per_cell + 1)
+                        
+                        # Draw horizontal dot
+                        h_x = px + cell_pos * self.options.cell_size
+                        if region.contains(h_x, py):
+                            canvas.drawLine(
+                                h_x - self.options.grid_dot_length/2, py,
+                                h_x + self.options.grid_dot_length/2, py,
+                                dot_paint
+                            )
+                        
+                        # Draw vertical dot
+                        v_y = py + cell_pos * self.options.cell_size
+                        if region.contains(px, v_y):
+                            canvas.drawLine(
+                                px, v_y - self.options.grid_dot_length/2,
+                                px, v_y + self.options.grid_dot_length/2,
+                                dot_paint
+                            )
 
     def render(self, canvas: skia.Canvas, transform: Optional[skia.Matrix] = None) -> None:
         """Render the map to a canvas.
