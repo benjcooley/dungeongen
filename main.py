@@ -57,7 +57,13 @@ def main():
     with skia.PDF.MakeDocument(stream) as document:
         with document.page(options.canvas_width, options.canvas_height) as pdf_canvas:
             dungeon_map.render(pdf_canvas)
-    print("Room drawing completed and saved to 'map_output.png' and 'map_output.pdf'")
+            
+    # Save as SVG
+    stream = skia.FILEWStream('map_output.svg')
+    with skia.SVGCanvas.Make((options.canvas_width, options.canvas_height), stream) as svg_canvas:
+        dungeon_map.render(svg_canvas)
+    
+    print("Room drawing completed and saved to 'map_output.png', 'map_output.pdf', and 'map_output.svg'")
 
 if __name__ == "__main__":
     main()
