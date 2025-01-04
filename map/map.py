@@ -135,8 +135,8 @@ class Map:
             return self._elements[idx]
         return None
 
-    def create_rectangular_room(self, grid_x: float, grid_y: float, grid_width: float, grid_height: float) -> Room:
-        """Create a rectangular room using grid coordinates.
+    def add_rectangular_room(self, grid_x: float, grid_y: float, grid_width: float, grid_height: float) -> Room:
+        """Add a rectangular room using grid coordinates.
         
         Args:
             grid_x: X coordinate in grid units
@@ -153,8 +153,8 @@ class Map:
         self.add_element(room)
         return room
     
-    def create_circular_room(self, grid_cx: float, grid_cy: float, grid_radius: float) -> Room:
-        """Create a circular room using grid coordinates.
+    def add_circular_room(self, grid_cx: float, grid_cy: float, grid_radius: float) -> Room:
+        """Add a circular room using grid coordinates.
         
         Args:
             grid_cx: Center X coordinate in grid units
