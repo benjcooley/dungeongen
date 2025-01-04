@@ -339,16 +339,20 @@ class Map:
             )
             region.draw(canvas, shadow_paint)
 
-            # 2. Create mask layer
+            # 2. Save state and create mask layer
             canvas.save()
+            mask = skia.Surface(int(region.bounds.width), int(region.bounds.height))
+            mask_canvas = mask.getCanvas()
+            
+            # Draw region shape into mask
             mask_paint = skia.Paint(
                 AntiAlias=True,
                 Style=skia.Paint.kFill_Style,
-                BlendMode=skia.BlendMode.kSrc
+                Color=skia.ColorWHITE  # White = opaque in mask
             )
-            region.draw(canvas, mask_paint)
-
-            # 3. Draw room shape with offset (constrained by mask)
+            region.draw(mask_canvas, mask_paint)
+            
+            # 3. Draw room shape with offset (using mask)
             canvas.translate(
                 self.options.room_shadow_offset_x,
                 self.options.room_shadow_offset_y
@@ -358,13 +362,19 @@ class Map:
                 Style=skia.Paint.kFill_Style,
                 Color=self.options.room_color
             )
+            # Apply mask as clip
+            canvas.clipImage(
+                mask.makeImageSnapshot(),
+                skia.ClipOp.kIntersect,
+                True  # antialiased
+            )
             region.draw(canvas, room_paint)
 
-            # 4. Draw grid if enabled (still masked and offset)
+            # 4. Draw grid if enabled (still clipped by mask)
             if self.options.grid_style not in (None, GridStyle.NONE):
                 self._draw_region_grid(canvas, region)
 
-            # 5. Clear mask and restore transform
+            # 5. Restore transform and clear clip mask
             canvas.restore()
             
         # Draw element details after all regions are drawn
