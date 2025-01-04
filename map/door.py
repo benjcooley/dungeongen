@@ -1,6 +1,7 @@
 """Door map element definition."""
 
 from enum import Enum, auto
+import math
 from algorithms.shapes import Rectangle, ShapeGroup
 from map.mapelement import MapElement
 from algorithms.shapes import Shape
@@ -15,6 +16,11 @@ class DoorOrientation(Enum):
     """Door orientation enum."""
     HORIZONTAL = auto()
     VERTICAL = auto()
+
+# Amount to round the door side corners by
+DOOR_SIDE_ROUNDING = 12.0
+# Amount to extend the door sides to ensure proper connection with rooms
+DOOR_SIDE_EXTENSION = DOOR_SIDE_ROUNDING
 
 class Door(MapElement):
     """A door connecting two map elements.
@@ -46,16 +52,42 @@ class Door(MapElement):
             middle_height = self._height / 3
             middle_y = self._y + (self._height - middle_height) / 2  # Center vertically
             
-            self._left_rect = Rectangle(self._x, self._y, side_width, self._height)
-            self._right_rect = Rectangle(self._x + self._width - side_width, self._y, side_width, self._height)
+            # Create inflated rectangles for rounded sides, extending out by DOOR_SIDE_EXTENSION
+            self._left_rect = Rectangle(
+                self._x - DOOR_SIDE_EXTENSION,
+                self._y,
+                side_width + DOOR_SIDE_EXTENSION,
+                self._height,
+                inflate=DOOR_SIDE_ROUNDING
+            )
+            self._right_rect = Rectangle(
+                self._x + self._width - side_width,
+                self._y,
+                side_width + DOOR_SIDE_EXTENSION,
+                self._height,
+                inflate=DOOR_SIDE_ROUNDING
+            )
             self._middle_rect = Rectangle(self._x + side_width, middle_y, side_width, middle_height)
         else:
             side_height = self._height / 3
             middle_width = self._width / 3
             middle_x = self._x + (self._width - middle_width) / 2  # Center horizontally
             
-            self._top_rect = Rectangle(self._x, self._y, self._width, side_height)
-            self._bottom_rect = Rectangle(self._x, self._y + self._height - side_height, self._width, side_height)
+            # Create inflated rectangles for rounded sides, extending out by DOOR_SIDE_EXTENSION
+            self._top_rect = Rectangle(
+                self._x,
+                self._y - DOOR_SIDE_EXTENSION,
+                self._width,
+                side_height + DOOR_SIDE_EXTENSION,
+                inflate=DOOR_SIDE_ROUNDING
+            )
+            self._bottom_rect = Rectangle(
+                self._x,
+                self._y + self._height - side_height,
+                self._width,
+                side_height + DOOR_SIDE_EXTENSION,
+                inflate=DOOR_SIDE_ROUNDING
+            )
             self._middle_rect = Rectangle(middle_x, self._y + side_height, middle_width, side_height)
         
         # Initialize with empty shape if closed, or full I-shape if open
