@@ -89,10 +89,6 @@ class ShapeGroup:
         
         return cls(includes=includes, excludes=excludes)
     
-    def __init__(self, includes: Sequence[Shape], excludes: Sequence[Shape]) -> None:
-        self.includes = list(includes)
-        self.excludes = list(excludes)
-    
     def contains(self, px: float, py: float) -> bool:
         """Check if a point is contained within this shape group."""
         return (
