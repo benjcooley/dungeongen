@@ -14,11 +14,16 @@ def main():
     surface = skia.Surface(options.canvas_width, options.canvas_height)
     canvas = surface.getCanvas()
     
-    # Create map and add a 5x5 room aligned to grid
+    # Create map and add rooms
     dungeon_map = Map(options)
-    room = dungeon_map.add_rectangular_room(-2, -2, 5, 5)
+    
+    # Add rectangular room
+    rect_room = dungeon_map.add_rectangular_room(-2, -2, 5, 5)
+    
+    # Add circular room one grid space away
+    circle_room = dungeon_map.add_circular_room(4, -2, 2.5)
 
-    # Draw the map (which will draw all elements including our room)
+    # Draw the map (which will draw all rooms)
     dungeon_map.render(canvas)
 
     # Save the result
