@@ -5,6 +5,7 @@ from map.enums import Layers
 if TYPE_CHECKING:
     from map.map import Map
     from options import Options
+    from map.props.prop import Prop
     from map.occupancy import OccupancyGrid
 from algorithms.shapes import Rectangle, Circle
 from algorithms.shapes import Shape
