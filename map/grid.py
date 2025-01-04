@@ -6,6 +6,7 @@ import skia
 from algorithms.shapes import ShapeGroup, Rectangle
 from options import Options
 from map.enums import GridStyle
+from map.region import Region
 
 
 def draw_region_grid(canvas: skia.Canvas, region: 'Region', options: 'Options') -> None:
