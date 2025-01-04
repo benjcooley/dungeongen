@@ -221,7 +221,7 @@ class Door(MapElement):
             border_paint = skia.Paint(
                 AntiAlias=True,
                 Style=skia.Paint.kStroke_Style,
-                StrokeWidth=self._map.options.border_width / 2,
+                StrokeWidth=self._map.options.door_stroke_width,
                 Color=self._map.options.border_color
             )
             door.draw(canvas, border_paint)
