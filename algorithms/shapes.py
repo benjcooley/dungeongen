@@ -35,6 +35,28 @@ class ShapeGroup:
         self.excludes = list(excludes)
         self._bounds: Rectangle | None = None
         self._bounds_dirty = True
+
+    def add_include(self, shape: Shape) -> None:
+        """Add a shape to the includes list."""
+        self.includes.append(shape)
+        self._bounds_dirty = True
+
+    def remove_include(self, shape: Shape) -> None:
+        """Remove a shape from the includes list."""
+        if shape in self.includes:
+            self.includes.remove(shape)
+            self._bounds_dirty = True
+
+    def add_exclude(self, shape: Shape) -> None:
+        """Add a shape to the excludes list."""
+        self.excludes.append(shape)
+        self._bounds_dirty = True
+
+    def remove_exclude(self, shape: Shape) -> None:
+        """Remove a shape from the excludes list."""
+        if shape in self.excludes:
+            self.excludes.remove(shape)
+            self._bounds_dirty = True
     
     @classmethod
     def combine(cls, shapes: Sequence[Shape]) -> 'ShapeGroup':
