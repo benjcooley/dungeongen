@@ -36,6 +36,21 @@ def draw_region_grid(canvas: skia.Canvas, region: ShapeGroup, options: 'Options'
     # Get grid bounds that encompass the region
     min_x, min_y, max_x, max_y = _get_grid_bounds(bounds, options.cell_size)
     
+    # Draw grid bounds rectangle for debugging
+    debug_paint = skia.Paint(
+        AntiAlias=True,
+        Style=skia.Paint.kStroke_Style,
+        StrokeWidth=2,
+        Color=skia.ColorGREEN
+    )
+    grid_bounds = Rectangle(
+        min_x * options.cell_size,
+        min_y * options.cell_size,
+        (max_x - min_x) * options.cell_size,
+        (max_y - min_y) * options.cell_size
+    )
+    grid_bounds.draw(canvas, debug_paint)
+    
     # Create base paint for dots
     dot_paint = skia.Paint(
         AntiAlias=True,
