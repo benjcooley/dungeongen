@@ -36,8 +36,8 @@ def main():
     second_door = Door.from_grid(8, 0, DoorOrientation.HORIZONTAL, dungeon_map, open=False)
     dungeon_map.add_element(second_door)
     
-    # Add circular room (radius 2.5 grid units for 5x5, centered to align with door)
-    end_room = dungeon_map.add_circular_room(11, 0, 2.5)
+    # Add circular room (5x5 grid units, aligned with first room)
+    end_room = dungeon_map.add_circular_room(11, -2, 2.5)
     
     # Connect everything together
     start_room.connect_to(first_door)
