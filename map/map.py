@@ -214,12 +214,16 @@ class Map:
         """
         bounds = self.bounds
         
-        # Calculate padding in pixels based on cell size
-        padding = self.options.map_border_cells * self.options.cell_size
+        # Calculate padding in grid units and convert to pixels
+        padding_x, padding_y = grid_to_drawing_size(
+            self.options.map_border_cells,
+            self.options.map_border_cells,
+            self.options
+        )
         
         # Calculate scale to fit in canvas with cell-based padding
-        scale_x = (canvas_width - 2 * padding) / bounds.width
-        scale_y = (canvas_height - 2 * padding) / bounds.height
+        scale_x = (canvas_width - 2 * padding_x) / bounds.width
+        scale_y = (canvas_height - 2 * padding_y) / bounds.height
         scale = min(scale_x, scale_y)
         
         # Calculate translation to center the map
