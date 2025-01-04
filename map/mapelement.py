@@ -6,7 +6,7 @@ if TYPE_CHECKING:
     from options import Options
     from map.occupancy import OccupancyGrid
 from algorithms.shapes import Rectangle, Circle
-from algorithms.aliases import Shape
+from algorithms.shapes import Shape
 
 class MapElement:
     """Base class for all map elements.
