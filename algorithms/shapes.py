@@ -23,6 +23,10 @@ class Shape(Protocol):
         """Draw this shape on a canvas with the given paint."""
         ...
     
+    def to_path(self) -> 'skia.Path':
+        """Convert this shape to a Skia path."""
+        ...
+    
     def inflated(self, amount: float) -> 'Shape':
         """Return a new shape inflated by the given amount."""
         ...
@@ -96,37 +100,26 @@ class ShapeGroup:
             not any(shape.contains(px, py) for shape in self.excludes)
         )
     
-    def draw(self, canvas: skia.Canvas, paint: skia.Paint) -> None:
-        """Draw this shape group using Skia's path operations."""
+    def to_path(self) -> skia.Path:
+        """Convert this shape group to a Skia path."""
         if not self.includes:
-            return
+            return skia.Path()
             
         # Create path for included shapes
         include_path = skia.Path()
         for shape in self.includes:
-            shape_path = skia.Path()
-            if isinstance(shape, Rectangle):
-                shape_path.addRect(skia.Rect.MakeXYWH(
-                    shape._inflated_x, shape._inflated_y,
-                    shape._inflated_width, shape._inflated_height
-                ))
-            elif isinstance(shape, Circle):
-                shape_path.addCircle(shape.cx, shape.cy, shape._inflated_radius)
-            include_path.addPath(shape_path)
+            include_path.addPath(shape.to_path())
             
         # Subtract excluded shapes
         for shape in self.excludes:
-            exclude_path = skia.Path()
-            if isinstance(shape, Rectangle):
-                exclude_path.addRect(skia.Rect.MakeXYWH(
-                    shape._inflated_x, shape._inflated_y,
-                    shape._inflated_width, shape._inflated_height
-                ))
-            elif isinstance(shape, Circle):
-                exclude_path.addCircle(shape.cx, shape.cy, shape._inflated_radius)
+            exclude_path = shape.to_path()
             include_path.op(exclude_path, skia.PathOp.kDifference_PathOp)
             
-        canvas.drawPath(include_path, paint)
+        return include_path
+
+    def draw(self, canvas: skia.Canvas, paint: skia.Paint) -> None:
+        """Draw this shape group using Skia's path operations."""
+        canvas.drawPath(self.to_path(), paint)
     
     def inflated(self, amount: float) -> 'ShapeGroup':
         """Return a new shape group with all shapes inflated."""
@@ -206,11 +199,11 @@ class Rectangle:
         dy = max(0, abs(py - (self._inflated_y + self._inflated_height / 2)) - self._inflated_height / 2)
         return math.sqrt(dx ** 2 + dy ** 2) <= self._inflate
     
-    def draw(self, canvas: skia.Canvas, paint: skia.Paint) -> None:
-        """Draw this rectangle on a canvas."""
+    def to_path(self) -> skia.Path:
+        """Convert this rectangle to a Skia path."""
+        path = skia.Path()
         if self._inflate > 0:
-            # Draw with rounded corners when inflated
-            canvas.drawRRect(
+            path.addRRect(
                 skia.RRect.MakeRectXY(
                     skia.Rect.MakeXYWH(
                         self._inflated_x,
@@ -220,20 +213,22 @@ class Rectangle:
                     ),
                     self._inflate,  # x radius
                     self._inflate   # y radius
-                ),
-                paint
+                )
             )
         else:
-            # Draw regular rectangle when not inflated
-            canvas.drawRect(
+            path.addRect(
                 skia.Rect.MakeXYWH(
                     self._inflated_x,
                     self._inflated_y,
                     self._inflated_width,
                     self._inflated_height
-                ),
-                paint
+                )
             )
+        return path
+
+    def draw(self, canvas: skia.Canvas, paint: skia.Paint) -> None:
+        """Draw this rectangle on a canvas."""
+        canvas.drawPath(self.to_path(), paint)
     
     def inflated(self, amount: float) -> 'Rectangle':
         """Return a new rectangle inflated by the given amount."""
@@ -264,9 +259,15 @@ class Circle:
             self._inflated_radius * 2
         )
     
+    def to_path(self) -> skia.Path:
+        """Convert this circle to a Skia path."""
+        path = skia.Path()
+        path.addCircle(self.cx, self.cy, self._inflated_radius)
+        return path
+
     def draw(self, canvas: skia.Canvas, paint: skia.Paint) -> None:
         """Draw this circle on a canvas."""
-        canvas.drawCircle(self.cx, self.cy, self._inflated_radius, paint)
+        canvas.drawPath(self.to_path(), paint)
     
     def inflated(self, amount: float) -> 'Circle':
         """Return a new circle inflated by the given amount."""

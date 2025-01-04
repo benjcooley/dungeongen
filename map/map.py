@@ -356,10 +356,8 @@ class Map:
                 Style=skia.Paint.kFill_Style,
                 Color=self.options.room_color
             )
-            # Create path for clipping
-            clip_path = skia.Path()
-            region.shape.draw(clip_path)
-            canvas.clipPath(clip_path, skia.ClipOp.kIntersect, True)  # antialiased
+            # Use shape's path for clipping
+            canvas.clipPath(region.shape.to_path(), skia.ClipOp.kIntersect, True)  # antialiased
             region.draw(canvas, room_paint)
 
             # 4. Draw grid if enabled (still clipped by mask)
