@@ -35,8 +35,8 @@ def draw_region_grid(canvas: skia.Canvas, region: ShapeGroup, options: 'Options'
         # Calculate dot spacing based on cell size and dots per cell
         dot_spacing = options.cell_size / options.grid_dots_per_cell
         
-        # Start at a random position within one spacing interval
-        x = bounds.x + random.uniform(0, dot_spacing)
+        # Start at bounds edge and add small random variation to subsequent dots
+        x = bounds.x
         
         while x < bounds.x + bounds.width:
             if region.contains(x, py):
@@ -49,7 +49,7 @@ def draw_region_grid(canvas: skia.Canvas, region: ShapeGroup, options: 'Options'
                 
                 # Draw a short line with varied length
                 canvas.drawLine(x, py, x + dot_length, py, dot_paint)
-            x += dot_spacing
+            x += dot_spacing + random.uniform(-dot_spacing * 0.1, dot_spacing * 0.1)
 
     # Draw vertical lines
     for x in range(math.floor(bounds.x / options.cell_size),
@@ -61,8 +61,8 @@ def draw_region_grid(canvas: skia.Canvas, region: ShapeGroup, options: 'Options'
         # Calculate dot spacing based on cell size and dots per cell
         dot_spacing = options.cell_size / options.grid_dots_per_cell
         
-        # Start at a random position within one spacing interval
-        y = bounds.y + random.uniform(0, dot_spacing)
+        # Start at bounds edge and add small random variation to subsequent dots
+        y = bounds.y
         
         while y < bounds.y + bounds.height:
             if region.contains(px, y):
@@ -75,4 +75,4 @@ def draw_region_grid(canvas: skia.Canvas, region: ShapeGroup, options: 'Options'
                 
                 # Draw a short line with varied length
                 canvas.drawLine(px, y, px, y + dot_length, dot_paint)
-            y += dot_spacing
+            y += dot_spacing + random.uniform(-dot_spacing * 0.1, dot_spacing * 0.1)
