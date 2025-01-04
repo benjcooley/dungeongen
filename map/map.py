@@ -346,8 +346,7 @@ class Map:
             
         # Draw element details after all regions are drawn
         for element in self._elements:
-            if any(element.shape in region_shape.includes for region_shape in regions):
-                element.draw(canvas)
+            element.draw(canvas)
         
 
         # Draw region borders last with rounded corners
