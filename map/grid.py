@@ -9,7 +9,7 @@ from map.enums import GridStyle
 from map.region import Region
 
 
-def draw_region_grid(canvas: skia.Canvas, region: 'Region', options: 'Options') -> None:
+def draw_region_grid(canvas: skia.Canvas, region: Region, options: 'Options') -> None:
     """Draw grid dots for a region.
     
     Args:
