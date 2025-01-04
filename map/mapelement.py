@@ -128,17 +128,12 @@ class MapElement:
             # Determine rock type
             actual_type = rock_type if rock_type != RockType.ANY else RockType.random_type()
             
-            # Calculate random position within bounds (with margin)
-            margin = self._map.options.cell_size * 0.25  # 25% of cell size margin
-            x = random.uniform(bounds.x + margin, bounds.x + bounds.width - margin)
-            y = random.uniform(bounds.y + margin, bounds.y + bounds.height - margin)
-            
             # Random rotation
             rotation = random.uniform(0, 2 * math.pi)
             
             # Try to find valid position for rock
             size = (SMALL_ROCK_SIZE if actual_type == RockType.SMALL else MEDIUM_ROCK_SIZE) * self._map.options.cell_size
-            valid_pos = Rock.get_valid_position(x, y, size, self)
+            valid_pos = Rock.get_valid_position(size, self)
             
             if valid_pos:
                 # Create rock at valid position

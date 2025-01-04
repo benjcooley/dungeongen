@@ -1,5 +1,6 @@
 """Base class for map props."""
 
+import random
 from typing import TYPE_CHECKING, Optional
 import skia
 from algorithms.shapes import Rectangle, Shape
@@ -45,22 +46,27 @@ class Prop(MapElement):
             canvas.translate(-cx, -cy)
             
     @classmethod
-    def get_valid_position(cls, x: float, y: float, size: float, container: 'MapElement') -> tuple[float, float] | None:
-        """Try to find a valid position for a rock within the container.
+    def get_valid_position(cls, size: float, container: 'MapElement') -> tuple[float, float] | None:
+        """Try to find a valid position for a prop within the container.
         
         Args:
-            x: Initial X coordinate
-            y: Initial Y coordinate
-            size: Rock radius
-            container: The MapElement to place the rock in
+            size: Prop size
+            container: The MapElement to place the prop in
             
         Returns:
             Tuple of (x,y) coordinates if valid position found, None otherwise
         """
-        # Create temporary rock to test position
-        test_rock = cls(x, y, size, container._map)
-        if test_rock._is_valid_position(container.shape):
-            return (x, y)
+        bounds = container.bounds
+        margin = container._map.options.cell_size * 0.25  # 25% of cell size margin
+        
+        # Try 30 random positions
+        for _ in range(30):
+            x = random.uniform(bounds.x + margin, bounds.x + bounds.width - margin)
+            y = random.uniform(bounds.y + margin, bounds.y + bounds.height - margin)
+            
+            test_prop = cls(x, y, size, size, container._map)
+            if test_prop._is_valid_position(container.shape):
+                return (x, y)
         return None
         
     def _is_valid_position(self, container: Shape) -> bool:
