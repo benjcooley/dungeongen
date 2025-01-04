@@ -18,7 +18,7 @@ class DoorOrientation(Enum):
     VERTICAL = auto()
 
 # Amount to round the door side corners by
-DOOR_SIDE_ROUNDING = 12.0
+DOOR_SIDE_ROUNDING = 8.0
 # Amount to extend the door sides to ensure proper connection with rooms
 DOOR_SIDE_EXTENSION = DOOR_SIDE_ROUNDING
 
@@ -53,18 +53,19 @@ class Door(MapElement):
             middle_y = self._y + (self._height - middle_height) / 2  # Center vertically
             
             # Create inflated rectangles for rounded sides, extending out by DOOR_SIDE_EXTENSION
+            # Compensate for inflation by increasing size
             self._left_rect = Rectangle(
                 self._x - DOOR_SIDE_EXTENSION,
-                self._y,
+                self._y - DOOR_SIDE_ROUNDING,
                 side_width + DOOR_SIDE_EXTENSION,
-                self._height,
+                self._height + 2 * DOOR_SIDE_ROUNDING,
                 inflate=DOOR_SIDE_ROUNDING
             )
             self._right_rect = Rectangle(
                 self._x + self._width - side_width,
-                self._y,
+                self._y - DOOR_SIDE_ROUNDING,
                 side_width + DOOR_SIDE_EXTENSION,
-                self._height,
+                self._height + 2 * DOOR_SIDE_ROUNDING,
                 inflate=DOOR_SIDE_ROUNDING
             )
             self._middle_rect = Rectangle(self._x + side_width, middle_y, side_width, middle_height)
@@ -74,17 +75,18 @@ class Door(MapElement):
             middle_x = self._x + (self._width - middle_width) / 2  # Center horizontally
             
             # Create inflated rectangles for rounded sides, extending out by DOOR_SIDE_EXTENSION
+            # Compensate for inflation by increasing size
             self._top_rect = Rectangle(
-                self._x,
+                self._x - DOOR_SIDE_ROUNDING,
                 self._y - DOOR_SIDE_EXTENSION,
-                self._width,
+                self._width + 2 * DOOR_SIDE_ROUNDING,
                 side_height + DOOR_SIDE_EXTENSION,
                 inflate=DOOR_SIDE_ROUNDING
             )
             self._bottom_rect = Rectangle(
-                self._x,
+                self._x - DOOR_SIDE_ROUNDING,
                 self._y + self._height - side_height,
-                self._width,
+                self._width + 2 * DOOR_SIDE_ROUNDING,
                 side_height + DOOR_SIDE_EXTENSION,
                 inflate=DOOR_SIDE_ROUNDING
             )
