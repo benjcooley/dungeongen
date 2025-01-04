@@ -1,8 +1,3 @@
-"""Base map element type definition."""
-
-from map.base import MapElement
-"""Base map element class definition."""
-
 from typing import List, TYPE_CHECKING
 import skia
 
@@ -10,8 +5,8 @@ if TYPE_CHECKING:
     from map.map import Map
     from options import Options
     from map.occupancy import OccupancyGrid
-from algorithms.shapes import Rectangle, ShapeGroup, Circle
-from algorithms.types import Shape
+from algorithms.shapes import Rectangle, Circle
+from algorithms.aliases import Shape
 
 class MapElement:
     """Base class for all map elements.
