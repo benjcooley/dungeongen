@@ -9,8 +9,6 @@ from algorithms.shapes import Shape
 class PoissonDiskSampler:
     def __init__(
         self,
-        width: float,
-        height: float,
         min_distance: float,
         shape: Shape,
         max_attempts: int = 30
@@ -18,21 +16,24 @@ class PoissonDiskSampler:
         """Initialize the Poisson disk sampler.
         
         Args:
-            width: Width of the sampling area
-            height: Height of the sampling area
             min_distance: Minimum distance between points
-            shape_group: Shape group defining valid sampling areas
+            shape: Shape defining valid sampling area
             max_attempts: Maximum sampling attempts per point
         """
-        self.width = width
-        self.height = height
         self.min_distance = min_distance
         self.cell_size = min_distance / math.sqrt(2)
         self.max_attempts = max_attempts
         self.shape = shape
+        
+        # Get bounds from shape
+        bounds = shape.bounds
+        self.offset_x = bounds.x
+        self.offset_y = bounds.y
+        self.width = bounds.width
+        self.height = bounds.height
 
-        self.grid_width = int(width / self.cell_size) + 1
-        self.grid_height = int(height / self.cell_size) + 1
+        self.grid_width = int(self.width / self.cell_size) + 1
+        self.grid_height = int(self.height / self.cell_size) + 1
         self.grid: List[List[Optional[Point]]] = [
             [None for _ in range(self.grid_height)] 
             for _ in range(self.grid_width)
@@ -40,9 +41,11 @@ class PoissonDiskSampler:
         self.points: List[Point] = []
         self.spawn_points: List[Point] = []
 
-        # Initialize spawn points within the shape
-        for x in range(0, int(self.width), int(self.min_distance)):
-            for y in range(0, int(self.height), int(self.min_distance)):
+        # Initialize spawn points within the shape, accounting for offset
+        for i in range(0, int(self.width), int(self.min_distance)):
+            for j in range(0, int(self.height), int(self.min_distance)):
+                x = i + self.offset_x
+                y = j + self.offset_y
                 if shape.contains(x, y):
                     self.spawn_points.append((x, y))
 
@@ -79,9 +82,13 @@ class PoissonDiskSampler:
                 candidate_x = spawn_point[0] + math.cos(angle) * radius
                 candidate_y = spawn_point[1] + math.sin(angle) * radius
 
-                if 0 <= candidate_x < self.width and 0 <= candidate_y < self.height and self._is_point_valid(candidate_x, candidate_y):
-                    grid_x = int(candidate_x / self.cell_size)
-                    grid_y = int(candidate_y / self.cell_size)
+                # Check if point is within shape bounds
+                if (self.offset_x <= candidate_x < self.offset_x + self.width and 
+                    self.offset_y <= candidate_y < self.offset_y + self.height and 
+                    self._is_point_valid(candidate_x, candidate_y)):
+                    # Convert to grid coordinates by subtracting offset
+                    grid_x = int((candidate_x - self.offset_x) / self.cell_size)
+                    grid_y = int((candidate_y - self.offset_y) / self.cell_size)
 
                     if all(
                         self.grid[gx][gy] is None or
