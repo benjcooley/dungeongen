@@ -24,20 +24,20 @@ def main():
     # Since we want grid alignment and center at 0,0, we'll offset by -2,-2
     start_room = dungeon_map.add_rectangular_room(-2, -2, 5, 5)
     
-    # Add door to the right of the room (at x=2, centered vertically)
-    first_door = Door.from_grid(2, 0, DoorOrientation.HORIZONTAL, dungeon_map, open=True)
+    # Add door to the right of the room (at x=3, centered vertically)
+    first_door = Door.from_grid(3, 0, DoorOrientation.HORIZONTAL, dungeon_map, open=True)
     dungeon_map.add_element(first_door)
     
     # Add 5-grid long passage
-    passage = Passage.from_grid(3, 0, 5, 1, dungeon_map)
+    passage = Passage.from_grid(4, 0, 5, 1, dungeon_map)
     dungeon_map.add_element(passage)
     
     # Add closed door at the end of the passage
-    second_door = Door.from_grid(8, 0, DoorOrientation.HORIZONTAL, dungeon_map, open=False)
+    second_door = Door.from_grid(9, 0, DoorOrientation.HORIZONTAL, dungeon_map, open=False)
     dungeon_map.add_element(second_door)
     
     # Add circular room (5x5 grid units, 11 units right of start room)
-    end_room = dungeon_map.add_circular_room(9, -2, 5)
+    end_room = dungeon_map.add_circular_room(10, -2, 5)
     
     # Connect everything together
     start_room.connect_to(first_door)
