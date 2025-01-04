@@ -23,8 +23,8 @@ def main():
 
     # Save the result
     image = surface.makeImageSnapshot()
-    image.save('room_output.png', skia.kPNG)
-    print("Room drawing completed and saved to 'room_output.png'")
+    image.save('map_output.png', skia.kPNG)
+    print("Room drawing completed and saved to 'map_output.png'")
 
 if __name__ == "__main__":
     main()
