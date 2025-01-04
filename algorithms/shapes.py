@@ -46,6 +46,12 @@ class ShapeGroup:
         if shape in self.includes:
             self.includes.remove(shape)
             self._bounds_dirty = True
+            
+    def remove_include_at(self, index: int) -> None:
+        """Remove a shape from the includes list at the specified index."""
+        if 0 <= index < len(self.includes):
+            self.includes.pop(index)
+            self._bounds_dirty = True
 
     def add_exclude(self, shape: Shape) -> None:
         """Add a shape to the excludes list."""
@@ -56,6 +62,12 @@ class ShapeGroup:
         """Remove a shape from the excludes list."""
         if shape in self.excludes:
             self.excludes.remove(shape)
+            self._bounds_dirty = True
+            
+    def remove_exclude_at(self, index: int) -> None:
+        """Remove a shape from the excludes list at the specified index."""
+        if 0 <= index < len(self.excludes):
+            self.excludes.pop(index)
             self._bounds_dirty = True
     
     @classmethod
