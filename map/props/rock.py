@@ -72,7 +72,7 @@ class Rock(Prop):
     
     def draw(self, canvas: skia.Canvas, layer: 'Layers' = Layers.PROPS) -> None:
         """Draw the rock using a perturbed circular path on the specified layer."""
-        if layer not in (Layers.SHADOW, Layers.PROPS):
+        if layer != Layers.PROPS:
             return
             
         # Create the rock path
