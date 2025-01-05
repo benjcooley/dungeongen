@@ -39,11 +39,19 @@ class Shape(Protocol):
         """Return a new shape inflated by the given amount."""
         ...
     
-    def translated(self, dx: float, dy: float) -> 'Shape':
+    def translate(self, dx: float, dy: float) -> None:
+        """Translate this shape by the given amounts in-place."""
+        ...
+    
+    def rotate(self, rotation: 'Rotation') -> None:
+        """Rotate this shape by the given 90-degree increment in-place."""
+        ...
+
+    def make_translated(self, dx: float, dy: float) -> 'Shape':
         """Return a new shape translated by the given amounts."""
         ...
     
-    def rotated(self, rotation: 'Rotation') -> 'Shape':
+    def make_rotated(self, rotation: 'Rotation') -> 'Shape':
         """Return a new shape rotated by the given 90-degree increment."""
         ...
     
@@ -198,11 +206,34 @@ class ShapeGroup:
             excludes=[s.inflated(amount) for s in self.excludes]
         )
         
-    def rotated(self, rotation: 'Rotation') -> 'ShapeGroup':
+    def rotate(self, rotation: 'Rotation') -> None:
+        """Rotate all shapes in this group by 90-degree increment in-place."""
+        for shape in self.includes:
+            shape.rotate(rotation)
+        for shape in self.excludes:
+            shape.rotate(rotation)
+        self._bounds_dirty = True
+    
+    def translate(self, dx: float, dy: float) -> None:
+        """Translate all shapes in this group by the given amounts in-place."""
+        for shape in self.includes:
+            shape.translate(dx, dy)
+        for shape in self.excludes:
+            shape.translate(dx, dy)
+        self._bounds_dirty = True
+    
+    def make_rotated(self, rotation: 'Rotation') -> 'ShapeGroup':
         """Return a new shape group with all shapes rotated by 90-degree increment."""
         return ShapeGroup(
-            includes=[s.rotated(rotation) for s in self.includes],
-            excludes=[s.rotated(rotation) for s in self.excludes]
+            includes=[s.make_rotated(rotation) for s in self.includes],
+            excludes=[s.make_rotated(rotation) for s in self.excludes]
+        )
+        
+    def make_translated(self, dx: float, dy: float) -> 'ShapeGroup':
+        """Return a new shape group with all shapes translated by the given amounts."""
+        return ShapeGroup(
+            includes=[s.make_translated(dx, dy) for s in self.includes],
+            excludes=[s.make_translated(dx, dy) for s in self.excludes]
         )
     
     def _recalculate_bounds(self) -> None:
@@ -355,11 +386,45 @@ class Rectangle:
         """Return a new rectangle inflated by the given amount."""
         return Rectangle(self.x, self.y, self.width, self.height, self._inflate + amount)
     
-    def translated(self, dx: float, dy: float) -> 'Rectangle':
+    def translate(self, dx: float, dy: float) -> None:
+        """Translate this rectangle by the given amounts in-place."""
+        self.x += dx
+        self.y += dy
+        self._inflated_x += dx
+        self._inflated_y += dy
+    
+    def make_translated(self, dx: float, dy: float) -> 'Rectangle':
         """Return a new rectangle translated by the given amounts."""
         return Rectangle(self.x + dx, self.y + dy, self.width, self.height, self._inflate)
     
-    def rotated(self, rotation: 'Rotation') -> 'Rectangle':
+    def rotate(self, rotation: 'Rotation') -> None:
+        """Rotate this rectangle by the given 90-degree increment in-place."""
+        # Calculate center point
+        center_x = self.x + self.width / 2
+        center_y = self.y + self.height / 2
+        
+        # Get rotation angle in radians
+        angle = rotation.radians
+            
+        # Rotate center point around origin
+        new_center_x = center_x * math.cos(angle) - center_y * math.sin(angle)
+        new_center_y = center_x * math.sin(angle) + center_y * math.cos(angle)
+        
+        # Calculate new top-left position relative to rotated center
+        self.x = new_center_x - self.width / 2
+        self.y = new_center_y - self.height / 2
+        
+        # For 90/270 degree rotations, swap width and height
+        if rotation in (Rotation.ROT_90, Rotation.ROT_270):
+            self.width, self.height = self.height, self.width
+        
+        # Update inflated values
+        self._inflated_x = self.x - self._inflate
+        self._inflated_y = self.y - self._inflate
+        self._inflated_width = self.width + 2 * self._inflate
+        self._inflated_height = self.height + 2 * self._inflate
+    
+    def make_rotated(self, rotation: 'Rotation') -> 'Rectangle':
         """Return a new rectangle rotated by the given 90-degree increment."""
         # Calculate center point
         center_x = self.x + self.width / 2
@@ -515,11 +580,32 @@ class Circle:
         """Return a new circle inflated by the given amount."""
         return Circle(self.cx, self.cy, self.radius, self._inflate + amount)
         
-    def translated(self, dx: float, dy: float) -> 'Circle':
+    def translate(self, dx: float, dy: float) -> None:
+        """Translate this circle by the given amounts in-place."""
+        self.cx += dx
+        self.cy += dy
+    
+    def make_translated(self, dx: float, dy: float) -> 'Circle':
         """Return a new circle translated by the given amounts."""
         return Circle(self.cx + dx, self.cy + dy, self.radius, self._inflate)
     
-    def rotated(self, rotation: 'Rotation') -> 'Circle':
+    def rotate(self, rotation: 'Rotation') -> None:
+        """Rotate this circle by the given 90-degree increment in-place."""
+        # Skip rotation if center is at origin
+        if abs(self.cx) < 1e-6 and abs(self.cy) < 1e-6:
+            return
+            
+        # Get rotation angle in radians
+        angle = rotation.radians
+            
+        # Rotate center point around origin
+        new_cx = self.cx * math.cos(angle) - self.cy * math.sin(angle)
+        new_cy = self.cx * math.sin(angle) + self.cy * math.cos(angle)
+        
+        self.cx = new_cx
+        self.cy = new_cy
+    
+    def make_rotated(self, rotation: 'Rotation') -> 'Circle':
         """Return a new circle rotated by the given 90-degree increment."""
         # Skip rotation if center is at origin
         if abs(self.cx) < 1e-6 and abs(self.cy) < 1e-6:

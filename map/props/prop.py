@@ -89,8 +89,8 @@ class Prop(ABC):
         dx = pos[0] - self._x
         dy = pos[1] - self._y
         self._x, self._y = pos
-        # Translate the boundary shape to new position
-        self._boundary_shape = self._boundary_shape.translated(dx, dy)
+        # Translate the boundary shape to new position in-place
+        self._boundary_shape.translate(dx, dy)
         # Update the bounds
         self._bounds = self._boundary_shape.bounds
 
