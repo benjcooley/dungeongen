@@ -47,16 +47,13 @@ class Altar(Prop):
         )
         
     def _draw_content(self, canvas: skia.Canvas, bounds: Rectangle) -> None:
-        # Draw the altar rectangle
-        altar_rect = Rectangle(-ALTAR_WIDTH/2, -ALTAR_HEIGHT/2, ALTAR_WIDTH, ALTAR_HEIGHT)
-        
         # Draw fill
         fill_paint = skia.Paint(
             AntiAlias=True,
             Style=skia.Paint.kFill_Style,
             Color=self._map.options.prop_fill_color
         )
-        altar_rect.draw(canvas, fill_paint)
+        self.get_prop_boundary_shape().draw(canvas, fill_paint)
         
         # Draw outline
         outline_paint = skia.Paint(
@@ -65,7 +62,7 @@ class Altar(Prop):
             StrokeWidth=self._map.options.prop_stroke_width,
             Color=self._map.options.prop_outline_color
         )
-        altar_rect.draw(canvas, outline_paint)
+        self.get_prop_boundary_shape().draw(canvas, outline_paint)
         
         # Draw decorative dots
         dot_paint = skia.Paint(
