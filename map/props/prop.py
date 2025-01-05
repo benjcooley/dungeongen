@@ -249,8 +249,18 @@ class Prop(MapElement, ABC):
         Returns:
             A Rectangle representing the prop's bounds in map coordinates
         """
-        # Get base boundary shape (centered at origin)
-        base_shape = cls.get_prop_boundary_shape()
+        if cls.is_grid_aligned():
+            # For grid-aligned props, use grid size to create rectangle
+            grid_size = cls.prop_grid_size()
+            if grid_size is None:
+                raise ValueError(f"Grid-aligned prop {cls.__name__} must specify prop_grid_size")
+            size = grid_size * CELL_SIZE
+            # Create centered rectangle
+            base_shape = Rectangle(-size/2, -size/2, size, size)
+        else:
+            # For non-grid props, use standard prop boundary
+            base_shape = cls.get_prop_boundary_shape()
+            
         bounds = base_shape.bounds
         
         # Calculate translation to move shape to center point
