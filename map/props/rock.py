@@ -34,6 +34,11 @@ class Rock(Prop):
         return False
         
     @classmethod
+    def is_wall_aligned(cls) -> bool:
+        """Whether this prop should be aligned to room walls."""
+        return False
+        
+    @classmethod
     def prop_size(cls) -> 'Point':
         """Get the nominal size of this rock in drawing units."""
         size = MEDIUM_ROCK_SIZE * 2 * CELL_SIZE  # Use medium rock size as standard

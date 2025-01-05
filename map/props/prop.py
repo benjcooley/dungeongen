@@ -97,6 +97,81 @@ class Prop(ABC):
         # Update the bounds
         self._bounds = self._boundary_shape.bounds
 
+    def snap_valid_position(self, x: float, y: float) -> tuple[float, float] | None:
+        """Snap a position to the nearest valid position for this prop.
+        
+        For grid-aligned props, snaps to grid intersections.
+        For wall-aligned props, snaps to nearest wall in rectangular rooms.
+        For other props, returns the original position if valid.
+        
+        Args:
+            x: X coordinate to snap
+            y: Y coordinate to snap
+            
+        Returns:
+            Tuple of (snapped_x, snapped_y) if valid position found, None otherwise
+        """
+        if not self.container:
+            return None
+            
+        # Handle grid-aligned props
+        if self.is_grid_aligned():
+            # Snap to nearest grid intersection
+            grid_x = round(x / CELL_SIZE) * CELL_SIZE
+            grid_y = round(y / CELL_SIZE) * CELL_SIZE
+            
+            # Check if valid
+            if self.is_valid_position(grid_x, grid_y, self.rotation, self.container):
+                return (grid_x, grid_y)
+            return None
+            
+        # Handle wall-aligned props
+        elif self.is_wall_aligned() and isinstance(self.container._shape, Rectangle):
+            room_bounds = self.container._shape.bounds
+            prop_bounds = self.shape.bounds
+            prop_width = prop_bounds.width
+            prop_height = prop_bounds.height
+            
+            # Find closest wall
+            left_dist = abs(x - room_bounds.x)
+            right_dist = abs(x - (room_bounds.x + room_bounds.width))
+            top_dist = abs(y - room_bounds.y)
+            bottom_dist = abs(y - (room_bounds.y + room_bounds.height))
+            
+            # Try walls in order of closest to furthest
+            walls = [(left_dist, 'left'), (right_dist, 'right'), 
+                    (top_dist, 'top'), (bottom_dist, 'bottom')]
+            walls.sort(key=lambda x: x[0])
+            
+            for _, wall in walls:
+                if wall == 'left':
+                    test_x = room_bounds.x
+                    test_y = min(max(y, room_bounds.y + prop_height/2), 
+                               room_bounds.y + room_bounds.height - prop_height/2)
+                elif wall == 'right':
+                    test_x = room_bounds.x + room_bounds.width - prop_width
+                    test_y = min(max(y, room_bounds.y + prop_height/2),
+                               room_bounds.y + room_bounds.height - prop_height/2)
+                elif wall == 'top':
+                    test_x = min(max(x, room_bounds.x + prop_width/2),
+                               room_bounds.x + room_bounds.width - prop_width/2)
+                    test_y = room_bounds.y
+                else:  # bottom
+                    test_x = min(max(x, room_bounds.x + prop_width/2),
+                               room_bounds.x + room_bounds.width - prop_width/2)
+                    test_y = room_bounds.y + room_bounds.height - prop_height
+                
+                if self.is_valid_position(test_x, test_y, self.rotation, self.container):
+                    return (test_x, test_y)
+            
+            return None
+            
+        # For other props, just check if the original position is valid
+        elif self.is_valid_position(x, y, self.rotation, self.container):
+            return (x, y)
+            
+        return None
+
     def place_random_position(self, max_attempts: int = MAX_PLACEMENT_ATTEMPTS) -> bool:
         """Try to place this prop at a valid random position within its container.
         
@@ -120,11 +195,10 @@ class Prop(ABC):
             x = random.uniform(bounds.x, bounds.x + bounds.width)
             y = random.uniform(bounds.y, bounds.y + bounds.height)
             
-            # Update position
-            self.position = (x, y)
-            
-            # Check if valid
-            if self.is_valid_position(x, y, self.rotation, self.container):
+            # Try to snap to valid position
+            snapped = self.snap_valid_position(x, y)
+            if snapped:
+                self.position = snapped
                 return True
                 
         return False
