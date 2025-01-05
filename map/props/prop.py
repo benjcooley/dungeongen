@@ -58,28 +58,7 @@ class Prop(MapElement, ABC):
         pass
 
     def draw(self, canvas: skia.Canvas, layer: Layers = Layers.PROPS) -> None:
-        """Draw the prop with proper coordinate transformation."""
-        if layer == Layers.PROPS:
-            with canvas.save():
-                # Move to prop center
-                cx = self._x + self._width / 2
-                cy = self._y + self._height / 2
-                canvas.translate(cx, cy)
-                
-                # Apply rotation
-                canvas.rotate(self.rotation.radians * (180 / math.pi))
-                
-                # Create bounds rect centered at origin
-                bounds = Rectangle(
-                    -self._width/2, -self._height/2,
-                    self._width, self._height
-                )
-                
-                # Draw in local coordinates
-                self._draw_content(canvas, bounds)
-            
-    def draw(self, canvas: skia.Canvas, layer: Layers = Layers.PROPS) -> None:
-        """Draw the prop with proper rotation handling."""
+        """Draw the prop with proper coordinate transformation and styling."""
         if layer == Layers.PROPS:
             with canvas.save():
                 # Move to prop center
