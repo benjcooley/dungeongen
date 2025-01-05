@@ -23,8 +23,29 @@ class Altar(Prop):
 
     @classmethod
     def is_valid_position(cls, x: float, y: float, size: float, container: 'MapElement') -> bool:
-        """Check if position is valid for altar placement."""
-        return container.shape.contains(x, y)
+        """Check if position is valid for altar placement.
+        
+        Args:
+            x: X coordinate to check
+            y: Y coordinate to check
+            size: Size of the altar
+            container: MapElement to check placement within
+            
+        Returns:
+            True if position is valid for altar placement
+        """
+        # Check if altar's full bounds are within container
+        margin = size * 0.1  # Add 10% margin from walls
+        for check_x in (x + margin, x + size - margin):
+            for check_y in (y + margin, y + size - margin):
+                if not container.shape.contains(check_x, check_y):
+                    return False
+                    
+        # Check if position is already occupied by another prop
+        if container.map.is_occupied(x + size/2, y + size/2):
+            return False
+            
+        return True
 
     def draw(self, canvas: skia.Canvas) -> None:
         """Draw the altar."""
