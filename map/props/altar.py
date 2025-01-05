@@ -4,7 +4,7 @@ import skia
 from map.props.prop import Prop
 from map.props.rotation import Rotation
 from map.enums import Layers
-from algorithms.shapes import Rectangle
+from algorithms.shapes import Rectangle, Shape
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -125,7 +125,7 @@ class Altar(Prop):
         
         # Top dot - centered in rectangle width, inset from top
         canvas.drawCircle(
-            rect_x + rect_width/2,  # Center of rectangle
+            -0.375,  # Center of rectangle (-0.5 + 0.25/2)
             -bounds.height/2 + dot_inset,  # Inset from top
             dot_radius,
             dot_paint
@@ -133,7 +133,7 @@ class Altar(Prop):
         
         # Bottom dot - centered in rectangle width, inset from bottom
         canvas.drawCircle(
-            rect_x + rect_width/2,  # Center of rectangle
+            -0.375,  # Center of rectangle (-0.5 + 0.25/2)
             bounds.height/2 - dot_inset,  # Inset from bottom
             dot_radius,
             dot_paint
