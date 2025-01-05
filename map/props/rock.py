@@ -56,13 +56,16 @@ class Rock(Prop):
         bounds_x = x - bounds_size/2
         bounds_y = y - bounds_size/2
         
-        super().__init__(bounds_x, bounds_y, bounds_size, bounds_size, map_, rotation)
+        # Create circular boundary shape
+        boundary = Circle(x, y, size)
+        super().__init__(boundary, map_, rotation)
         
+        # Store additional rock-specific properties
         self._radius = size
         self._center_x = x
         self._center_y = y
         
-        # Generate perturbed control points
+        # Generate perturbed control points for visual rendering
         self._control_points = self._generate_control_points()
     
     def _generate_control_points(self) -> List[Tuple[float, float]]:

@@ -22,32 +22,25 @@ class Prop(ABC):
     They have a bounding rectangle and custom drawing logic.
     """
     
-    def __init__(self, x: float, y: float, width: float, height: float, map_: 'Map', rotation: Rotation = Rotation.ROT_0) -> None:
-        """Initialize a prop with position and size.
+    def __init__(self, boundary_shape: Shape, map_: 'Map', rotation: Rotation = Rotation.ROT_0) -> None:
+        """Initialize a prop with a boundary shape.
         
         Props are drawn relative to their center point. The default orientation (0° rotation)
         has the prop facing right. Rotation happens counterclockwise in 90° increments.
         
         Args:
-            x: Left edge X coordinate in drawing units
-            y: Top edge Y coordinate in drawing units 
-            width: Width in drawing units
-            height: Height in drawing units
+            boundary_shape: Shape defining the prop's boundary
             map_: Parent map instance
             rotation: Rotation angle in 90° increments (default: facing right)
         """
-        self._x = x
-        self._y = y
-        self._width = width
-        self._height = height
+        self._boundary_shape = boundary_shape
+        self._bounds = boundary_shape.bounds
+        self._x = self._bounds.x
+        self._y = self._bounds.y
+        self._width = self._bounds.width
+        self._height = self._bounds.height
         self._map = map_
         self.rotation = rotation
-        center = (x + width/2, y + height/2)
-        self._boundary_shape = self.get_map_aligned_boundary_shape(center, rotation)
-        if self._boundary_shape is None:
-            # Use default rectangular boundary if none provided
-            self._boundary_shape = Rectangle(x, y, width, height)
-        self._bounds = self._boundary_shape.bounds
         self.container: Optional['MapElement'] = None
     
     def _draw_content(self, canvas: skia.Canvas, bounds: Rectangle) -> None:

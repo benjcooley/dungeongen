@@ -47,7 +47,9 @@ class Altar(Prop):
             map_: Parent map instance
             rotation: Rotation angle in 90° increments (default: facing right)
         """
-        super().__init__(x, y, ALTAR_WIDTH, ALTAR_HEIGHT, map_, rotation)
+        # Create boundary shape
+        boundary = Rectangle(x, y, ALTAR_WIDTH, ALTAR_HEIGHT)
+        super().__init__(boundary, map_, rotation)
     
     @classmethod
     def is_decoration(cls) -> bool:
