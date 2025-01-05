@@ -15,11 +15,13 @@ from map.mapelement import MapElement
 # Constant to make rooms slightly larger to ensure proper passage connections
 ROOM_OVERLAP_OFFSET = 4.0  # pixels
 # Base corner size as fraction of cell size
-CORNER_SIZE = 0.35  # Increased from 0.25
+CORNER_SIZE = 0.35
 # How far corners are inset from room edges
-CORNER_INSET = 0.12  # Decreased from 0.15
-# How much to vary the line lengths by (as fraction of base size)
-CORNER_LENGTH_VARIATION = 1.2  # Increased from 1.0
+CORNER_INSET = 0.12
+# Minimum corner length as percentage of base size
+MIN_CORNER_LENGTH = 0.5
+# Maximum corner length as percentage of base size 
+MAX_CORNER_LENGTH = 2.0
 # Control point scale for curve (relative to corner size)
 CURVE_CONTROL_SCALE = 0.8  # Increased from 0.5 for more concavity
 
@@ -61,9 +63,11 @@ class Room(MapElement):
         # Calculate base corner size
         base_size = self._map.options.cell_size * CORNER_SIZE
         
-        # Calculate end points with random variations
-        p1 = corner + left * (base_size * (1.0 + random.random() * CORNER_LENGTH_VARIATION))
-        p2 = corner + right * (base_size * (1.0 + random.random() * CORNER_LENGTH_VARIATION))
+        # Calculate end points with constrained random lengths
+        length1 = base_size * (MIN_CORNER_LENGTH + random.random() * (MAX_CORNER_LENGTH - MIN_CORNER_LENGTH))
+        length2 = base_size * (MIN_CORNER_LENGTH + random.random() * (MAX_CORNER_LENGTH - MIN_CORNER_LENGTH))
+        p1 = corner + left * length1
+        p2 = corner + right * length2
         
         # Create and draw the corner path
         path = skia.Path()
