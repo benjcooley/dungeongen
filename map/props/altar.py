@@ -16,6 +16,17 @@ ALTAR_INSET = (CELL_SIZE - ALTAR_HEIGHT) / 2  # Calculated inset from cell edges
 class Altar(Prop):
     """An altar prop that appears as a small rectangular table with decorative dots."""
     
+    def __init__(self, x: float, y: float, map_: 'Map', rotation: Rotation = Rotation.ROT_0) -> None:
+        """Initialize an altar prop.
+        
+        Args:
+            x: X coordinate in drawing units
+            y: Y coordinate in drawing units
+            map_: Parent map instance
+            rotation: Rotation angle in 90° increments (default: facing right)
+        """
+        super().__init__(x, y, ALTAR_WIDTH, ALTAR_HEIGHT, map_, rotation)
+    
     @classmethod
     def is_decoration(cls) -> bool:
         """Altars are not decorative - they're major props."""
