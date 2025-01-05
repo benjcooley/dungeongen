@@ -61,27 +61,19 @@ class Room(MapElement):
         # Calculate base corner size
         base_size = self._map.options.cell_size * CORNER_SIZE
         
-        # Calculate random variations for line lengths
-        variation_left = 1.0 + (random.random() * CORNER_LENGTH_VARIATION)
-        variation_right = 1.0 + (random.random() * CORNER_LENGTH_VARIATION)
+        # Calculate end points with random variations
+        p1 = corner + left * (base_size * (1.0 + random.random() * CORNER_LENGTH_VARIATION))
+        p2 = corner + right * (base_size * (1.0 + random.random() * CORNER_LENGTH_VARIATION))
         
-        # Create corner path
+        # Create and draw the corner path
         path = skia.Path()
         path.moveTo(corner.x, corner.y)
+        path.lineTo(p1.x, p1.y)
         
-        # Scale and apply the vectors
-        left_scaled = left * (base_size * variation_left)
-        right_scaled = right * (base_size * variation_right)
-        
-        # Draw first straight line along left wall
-        end1 = corner + left_scaled
-        path.lineTo(end1.x, end1.y)
-        
-        # Draw curved line to point along right wall
-        end2 = corner + right_scaled
-        cp1 = end1 + right_scaled * CURVE_CONTROL_SCALE
-        cp2 = end2 + left_scaled * CURVE_CONTROL_SCALE
-        path.cubicTo(cp1.x, cp1.y, cp2.x, cp2.y, end2.x, end2.y)
+        # Draw curved line between points
+        cp1 = p1 + (p2 - corner) * CURVE_CONTROL_SCALE
+        cp2 = p2 + (p1 - corner) * CURVE_CONTROL_SCALE
+        path.cubicTo(cp1.x, cp1.y, cp2.x, cp2.y, p2.x, p2.y)
         
         # Close the path
         path.lineTo(corner.x, corner.y)
