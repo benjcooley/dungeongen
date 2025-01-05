@@ -200,7 +200,6 @@ class Prop(MapElement, ABC):
         ...
         
     @classmethod
-    @abstractmethod
     def get_prop_boundary_shape(cls) -> Shape:
         """Get the boundary shape of this prop type in local coordinates.
         
@@ -208,7 +207,9 @@ class Prop(MapElement, ABC):
         This shape is used for collision detection and placement validation.
         The actual visual appearance may differ from this boundary shape.
         """
-        ...
+        # Create a centered rectangle based on prop size
+        size = cls.prop_size()
+        return Rectangle(-size/2, -size/2, size, size)
 
     @classmethod
     def get_map_aligned_boundary_shape(cls, center_x: float, center_y: float, rotation: Rotation) -> Shape:
