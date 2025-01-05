@@ -1,5 +1,8 @@
 import skia
-from typing import ClassVar
+from typing import ClassVar, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from map.map import Map
 
 from algorithms.shapes import Rectangle, Shape
 from constants import CELL_SIZE
