@@ -37,9 +37,14 @@ class Rock(Prop):
         return (size, size)  # Rocks are circular, so width = height
         
     @classmethod
-    def prop_grid_size(cls) -> tuple[float, float] | None:
-        """Rocks don't have a standard grid size."""
-        return None
+    def prop_grid_size(cls) -> tuple[float, float]:
+        """Get the standard grid size for rocks.
+        
+        Since rocks are not grid-aligned, this returns their typical size in grid units.
+        """
+        # Use medium rock size as standard (2x larger than small)
+        size = MEDIUM_ROCK_SIZE * 2
+        return (size, size)  # Rocks are circular, so width = height
     
     def __init__(self, x: float, y: float, size: float, map_: 'Map', rotation: float = 0.0) -> None:
         """Initialize a rock with position and size.
