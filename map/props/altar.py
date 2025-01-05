@@ -20,6 +20,10 @@ ALTAR_WIDTH = CELL_SIZE * 0.3   # Width of altar surface
 ALTAR_HEIGHT = CELL_SIZE * 0.7  # Height of altar
 ALTAR_INSET = (CELL_SIZE - ALTAR_HEIGHT) / 2  # Calculated inset from cell edges
 
+# Grid offset from cell corner to altar center
+ALTAR_GRID_OFFSET_X = 0.5  # Center horizontally in cell
+ALTAR_GRID_OFFSET_Y = 0.5  # Center vertically in cell
+
 class Altar(Prop):
     """An altar prop that appears as a small rectangular table with decorative dots."""
     
@@ -61,6 +65,11 @@ class Altar(Prop):
     def prop_grid_size(cls) -> Point:
         """Altars occupy 1x1 grid cells."""
         return (1.0, 1.0)  # Square grid cell
+    
+    @classmethod
+    def grid_offset(cls) -> Point:
+        """Get the offset from grid position to altar center."""
+        return (ALTAR_GRID_OFFSET_X, ALTAR_GRID_OFFSET_Y)
         
     def _draw_content(self, canvas: skia.Canvas, bounds: Rectangle) -> None:
         # Get prop shape once and cast to Rectangle since we know it's always a rectangle
