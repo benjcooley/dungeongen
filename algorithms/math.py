@@ -102,21 +102,26 @@ class Point2:
     x: float
     y: float
     
-    def __add__(self, other: Point) -> Point:
-        return Point(self.x + other.x, self.y + other.y)
+    @classmethod
+    def from_point(cls, point: 'Point') -> 'Point2':
+        """Create a Point2 from a Point tuple."""
+        return cls(point[0], point[1])
+    
+    def __add__(self, other: Point) -> 'Point2':
+        return Point2(self.x + other.x, self.y + other.y)
         
-    def __sub__(self, other: Point) -> Point:
-        return Point(self.x - other.x, self.y - other.y)
+    def __sub__(self, other: Point) -> 'Point2':
+        return Point2(self.x - other.x, self.y - other.y)
         
-    def __mul__(self, scalar: float) -> Point:
-        return Point(self.x * scalar, self.y * scalar)
+    def __mul__(self, scalar: float) -> 'Point2':
+        return Point2(self.x * scalar, self.y * scalar)
         
-    def __truediv__(self, scalar: float) -> Point:
-        return Point(self.x / scalar, self.y / scalar)
+    def __truediv__(self, scalar: float) -> 'Point2':
+        return Point2(self.x / scalar, self.y / scalar)
         
-    def __neg__(self) -> Point:
+    def __neg__(self) -> 'Point2':
         """Return negated vector (-x, -y)."""
-        return Point(-self.x, -self.y)
+        return Point2(-self.x, -self.y)
         
     def dot(self, other: Point) -> float:
         """Compute dot product with another vector."""
@@ -126,25 +131,25 @@ class Point2:
         """Get vector length."""
         return math.sqrt(self.x * self.x + self.y * self.y)
         
-    def normalized(self) -> Point:
+    def normalized(self) -> 'Point2':
         """Get normalized vector (length 1)."""
         length = self.length()
         if length == 0:
-            return Point(0, 0)
+            return Point2(0, 0)
         return self / length
         
-    def rotated(self, angle: float) -> Point:
+    def rotated(self, angle: float) -> 'Point2':
         """Return vector rotated by angle (in radians)."""
         cos_a = math.cos(angle)
         sin_a = math.sin(angle)
-        return Point(
+        return Point2(
             self.x * cos_a - self.y * sin_a,
             self.x * sin_a + self.y * cos_a
         )
         
-    def perpendicular(self) -> Point:
+    def perpendicular(self) -> 'Point2':
         """Get perpendicular vector (rotated 90 degrees counterclockwise)."""
-        return Point(-self.y, self.x)
+        return Point2(-self.y, self.x)
         
     def to_tuple(self) -> Tuple[float, float]:
         """Convert to (x,y) tuple."""
