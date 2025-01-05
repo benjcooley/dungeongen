@@ -40,8 +40,8 @@ class Prop(MapElement, ABC):
         self._y = y
         self._width = width
         self._height = height
-        shape = Rectangle(x, y, width, height)
-        super().__init__(shape=shape, map_=map_)
+        boundary_shape = Rectangle(x, y, width, height)
+        super().__init__(shape=boundary_shape, map_=map_)
         self.rotation = rotation
         self.container: Optional['MapElement'] = None
     
@@ -105,7 +105,7 @@ class Prop(MapElement, ABC):
         """Set the position of the prop and update its shape."""
         self._x, self._y = pos
         # Update the shape's position
-        self._shape = Rectangle(self._x, self._y, self._bounds.width, self._bounds.height)
+        self._boundary_shape = Rectangle(self._x, self._y, self._bounds.width, self._bounds.height)
         # Update the bounds
         self._bounds = self._shape.bounds
 
@@ -125,7 +125,7 @@ class Prop(MapElement, ABC):
         self._x = pos[0] - self._width/2
         self._y = pos[1] - self._height/2
         # Update the shape's position
-        self._shape = Rectangle(self._x, self._y, self._bounds.width, self._bounds.height)
+        self._boundary_shape = Rectangle(self._x, self._y, self._bounds.width, self._bounds.height)
         # Update the bounds
         self._bounds = self._shape.bounds
 
