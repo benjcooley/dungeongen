@@ -216,7 +216,7 @@ class Rock(Prop):
             rotation = random.uniform(0, 2 * math.pi)
             
             # Calculate base rock size
-            base_size = (SMALL_ROCK_SIZE if actual_type == RockType.SMALL else MEDIUM_ROCK_SIZE) * container._map.CELL_SIZE
+            base_size = (SMALL_ROCK_SIZE if actual_type == RockType.SMALL else MEDIUM_ROCK_SIZE) * CELL_SIZE
             
             # Add overall size variation (±30%)
             size_variation = random.uniform(0.7, 1.3)
