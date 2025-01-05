@@ -311,14 +311,19 @@ class Rectangle:
             new_width = self.width
             new_height = self.height
             
-        # Rotate center point around origin
-        angle = rotation.radians
-        new_center_x = center_x * math.cos(angle) - center_y * math.sin(angle)
-        new_center_y = center_x * math.sin(angle) + center_y * math.cos(angle)
+        # Skip rotation if center is at origin
+        if abs(center_x) < 1e-6 and abs(center_y) < 1e-6:
+            new_x = -new_width / 2
+            new_y = -new_height / 2
+        else:
+            # Rotate center point around origin
+            angle = rotation.radians
+            new_center_x = center_x * math.cos(angle) - center_y * math.sin(angle)
+            new_center_y = center_x * math.sin(angle) + center_y * math.cos(angle)
             
-        # Calculate new top-left position relative to rotated center
-        new_x = new_center_x - new_width / 2
-        new_y = new_center_y - new_height / 2
+            # Calculate new top-left position relative to rotated center
+            new_x = new_center_x - new_width / 2
+            new_y = new_center_y - new_height / 2
         
         return Rectangle(new_x, new_y, new_width, new_height, self._inflate)
         
@@ -411,6 +416,10 @@ class Circle:
     
     def rotate(self, rotation: 'Rotation') -> 'Circle':
         """Return a new circle rotated by the given rotation (90-degree increments only)."""
+        # Skip rotation if center is at origin
+        if abs(self.cx) < 1e-6 and abs(self.cy) < 1e-6:
+            return Circle(0, 0, self.radius, self._inflate)
+            
         # Rotate center point around origin
         angle = rotation.radians
         new_cx = self.cx * math.cos(angle) - self.cy * math.sin(angle)
