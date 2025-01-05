@@ -55,9 +55,10 @@ class Room(MapElement):
         # Calculate base corner size
         base_size = self._map.options.cell_size * CORNER_SIZE
         
-        # Calculate varied line lengths using corner position for consistency
-        variation_left = 1.0 + (CORNER_LENGTH_VARIATION * math.sin(corner.x * 0.1))
-        variation_right = 1.0 + (CORNER_LENGTH_VARIATION * math.cos(corner.y * 0.1))
+        # Calculate random variations for line lengths
+        import random
+        variation_left = 1.0 + (CORNER_LENGTH_VARIATION * (random.random() * 2 - 1))
+        variation_right = 1.0 + (CORNER_LENGTH_VARIATION * (random.random() * 2 - 1))
         
         # Scale the normalized vectors by the varied sizes
         left_norm = left * (base_size * variation_left)
