@@ -35,6 +35,17 @@ class Altar(Prop):
         """Altars occupy 1x1 grid cells."""
         return (1.0, 1.0)  # Square grid cell
         
+    @classmethod
+    def get_prop_boundary_shape(cls) -> Shape:
+        """Get a slightly inset rectangle for better collision detection."""
+        size = cls.prop_size()
+        return Rectangle(
+            -size[0]/2 + ALTAR_INSET,
+            -size[1]/2 + ALTAR_INSET,
+            size[0] - 2*ALTAR_INSET,
+            size[1] - 2*ALTAR_INSET
+        )
+        
     def _draw_content(self, canvas: skia.Canvas, bounds: Rectangle) -> None:
         dot_paint = skia.Paint(AntiAlias=True, Style=skia.Paint.kFill_Style, Color=self._map.options.prop_outline_color)
         dot_radius = bounds.width * 0.05
