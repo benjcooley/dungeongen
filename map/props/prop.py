@@ -28,7 +28,10 @@ class Prop(ABC):
     They have a bounding rectangle and custom drawing logic.
     """
     
-    def __init__(self, rect: Rectangle, boundary_shape: Shape, map_: 'Map', rotation: Rotation = Rotation.ROT_0) -> None:
+    def __init__(self, rect: Rectangle, boundary_shape: Shape, map_: 'Map', 
+                 rotation: Rotation = Rotation.ROT_0, 
+                 grid_offset: tuple[float, float] | None = None,
+                 grid_bounds: tuple[float, float] | None = None) -> None:
         """Initialize a prop with a grid-aligned rectangle and boundary shape.
         
         Props are drawn relative to their center point. The default orientation (0° rotation)
@@ -39,6 +42,8 @@ class Prop(ABC):
             boundary_shape: Shape defining the prop's collision boundary
             map_: Parent map instance
             rotation: Rotation angle in 90° increments (default: facing right)
+            grid_offset: Optional tuple of (x,y) grid offset from cell corner to prop center
+            grid_bounds: Optional tuple of (width,height) in grid units
         """
         self._rect = rect
         self._boundary_shape = boundary_shape
@@ -50,6 +55,8 @@ class Prop(ABC):
         self._map = map_
         self.rotation = rotation
         self.container: Optional['MapElement'] = None
+        self._grid_offset = grid_offset
+        self._grid_bounds = grid_bounds
     
     def _draw_content(self, canvas: skia.Canvas, bounds: Rectangle) -> None:
         """Draw the prop's content in local coordinates.

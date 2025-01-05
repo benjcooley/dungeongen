@@ -42,7 +42,9 @@ class Altar(Prop):
             ALTAR_HEIGHT,
             rotation
         )
-        super().__init__(rect, rect, map_, rotation)
+        super().__init__(rect, rect, map_, rotation,
+                        grid_offset=(ALTAR_GRID_OFFSET_X, ALTAR_GRID_OFFSET_Y),
+                        grid_bounds=(1.0, 1.0))
     
     @classmethod
     def is_decoration(cls) -> bool:
@@ -65,11 +67,6 @@ class Altar(Prop):
         return (1.0, 1.0)  # Square grid cell
     
     @classmethod
-    def grid_offset(cls) -> Point:
-        """Get the offset from grid position to altar center."""
-        return (ALTAR_GRID_OFFSET_X, ALTAR_GRID_OFFSET_Y)
-    
-    @classmethod
     def from_grid(cls, grid_x: float, grid_y: float, map_: 'Map', rotation: Rotation = Rotation.ROT_0) -> 'Altar':
         """Create an altar at a grid position.
         
@@ -82,8 +79,9 @@ class Altar(Prop):
         Returns:
             A new Altar instance positioned at the grid coordinates
         """
-        # Convert grid position to center point
-        center_x, center_y = cls.map_position_to_center((grid_x * CELL_SIZE, grid_y * CELL_SIZE), rotation)
+        # Calculate center point from grid position and offset
+        center_x = (grid_x + ALTAR_GRID_OFFSET_X) * CELL_SIZE
+        center_y = (grid_y + ALTAR_GRID_OFFSET_Y) * CELL_SIZE
         return cls(center_x, center_y, map_, rotation)
         
     def _draw_content(self, canvas: skia.Canvas, bounds: Rectangle) -> None:
