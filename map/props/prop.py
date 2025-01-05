@@ -42,7 +42,11 @@ class Prop(ABC):
         self._height = height
         self._map = map_
         self.rotation = rotation
-        self._boundary_shape = self.get_map_aligned_boundary_shape((x + width/2, y + height/2), rotation)
+        center = (x + width/2, y + height/2)
+        self._boundary_shape = self.get_map_aligned_boundary_shape(center, rotation)
+        if self._boundary_shape is None:
+            # Use default rectangular boundary if none provided
+            self._boundary_shape = Rectangle(x, y, width, height)
         self._bounds = self._boundary_shape.bounds
         self.container: Optional['MapElement'] = None
     
@@ -207,19 +211,18 @@ class Prop(ABC):
         return None
         
     @classmethod
-    def get_prop_boundary_shape(cls) -> Shape:
+    def get_prop_boundary_shape(cls) -> Shape | None:
         """Get the boundary shape of this prop type in local coordinates.
         
-        Returns a shape centered at (0,0) and oriented to the right (0 degrees).
+        Returns a shape centered at (0,0) and oriented to the right (0 degrees),
+        or None to use default rectangular boundary.
         This shape is used for collision detection and placement validation.
         The actual visual appearance may differ from this boundary shape.
         """
-        # Create a centered rectangle based on prop size
-        size = cls.prop_size()
-        return Rectangle(-size/2, -size/2, size, size)
+        return None  # Use default rectangular boundary
 
     @classmethod
-    def get_map_aligned_boundary_shape(cls, center: Point, rotation: Rotation) -> Shape:
+    def get_map_aligned_boundary_shape(cls, center: Point, rotation: Rotation) -> Shape | None:
         """Get the boundary shape aligned to a specific map position and rotation.
         
         Args:
@@ -227,11 +230,14 @@ class Prop(ABC):
             rotation: Rotation angle
             
         Returns:
-            The boundary shape translated and rotated to the specified position
+            The boundary shape translated and rotated to the specified position,
+            or None to use default rectangular boundary
         """
         # Get base boundary shape (already centered at 0,0)
         base_shape = cls.get_prop_boundary_shape()
-        
+        if base_shape is None:
+            return None
+            
         # Create transformed shape - rotate first, then translate to center point
         return base_shape.rotated(rotation).translated(center[0], center[1])
 
