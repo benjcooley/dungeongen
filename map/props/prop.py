@@ -37,14 +37,32 @@ class Prop(MapElement, ABC):
         self.rotation = rotation
         self.container: Optional['MapElement'] = None
     
+    def _draw_content(self, canvas: skia.Canvas) -> None:
+        """Draw the prop's content without rotation.
+        
+        This method should be implemented by subclasses to draw their specific content.
+        The canvas will already be properly transformed for rotation.
+        """
+        pass
+
     def _apply_rotation(self, canvas: skia.Canvas) -> None:
         """Apply rotation transform around prop center."""
-        if self.rotation != Rotation.ROT_0:
-            cx = self._bounds.x + self._bounds.width / 2
-            cy = self._bounds.y + self._bounds.height / 2
-            canvas.translate(cx, cy)
-            canvas.rotate(self.rotation.radians * (180 / 3.14159265359))  # Convert radians to degrees for Skia
-            canvas.translate(-cx, -cy)
+        cx = self._bounds.x + self._bounds.width / 2
+        cy = self._bounds.y + self._bounds.height / 2
+        canvas.translate(cx, cy)
+        canvas.rotate(self.rotation.radians * (180 / 3.14159265359))  # Convert radians to degrees for Skia
+        canvas.translate(-cx, -cy)
+            
+    def draw(self, canvas: skia.Canvas, layer: Layers = Layers.PROPS) -> None:
+        """Draw the prop with proper rotation handling.
+        
+        The base implementation handles rotation and canvas state management.
+        Subclasses should implement _draw_content() instead of overriding this method.
+        """
+        if layer == Layers.PROPS:
+            with canvas.save():
+                self._apply_rotation(canvas)
+                self._draw_content(canvas)
             
     @property
     def position(self) -> tuple[float, float]:

@@ -72,47 +72,44 @@ class Altar(Prop):
         return (container.contains_rectangle(rect) and 
                 not container.prop_intersects(cls(x, y, size, size, container._map)))
 
-    def draw(self, canvas: skia.Canvas) -> None:
-        """Draw the altar."""
-        with canvas.save():
-            self._apply_rotation(canvas)
-            
-            # Draw main rectangle
-            rect_paint = skia.Paint(
-                AntiAlias=True,
-                Style=skia.Paint.kFill_Style,
-                Color=self._map.options.prop_dark_color
-            )
-            
-            # Main rectangle is 80% of prop size
-            rect_size = self.width * 0.8
-            x = self.x + (self.width - rect_size) / 2
-            y = self.y + (self.height - rect_size) / 2
-            
-            canvas.drawRect(skia.Rect.MakeXYWH(x, y, rect_size, rect_size), rect_paint)
-            
-            # Draw two dots
-            dot_paint = skia.Paint(
-                AntiAlias=True,
-                Style=skia.Paint.kFill_Style,
-                Color=self._map.options.prop_light_color
-            )
-            
-            dot_radius = self.width * 0.1
-            dot_offset = self.width * 0.2
-            
-            # Left dot
-            canvas.drawCircle(
-                self.x + self.width/2 - dot_offset,
-                self.y + self.height/2,
-                dot_radius,
-                dot_paint
-            )
-            
-            # Right dot
-            canvas.drawCircle(
-                self.x + self.width/2 + dot_offset,
-                self.y + self.height/2,
-                dot_radius,
-                dot_paint
-            )
+    def _draw_content(self, canvas: skia.Canvas) -> None:
+        """Draw the altar's content."""
+        # Draw main rectangle
+        rect_paint = skia.Paint(
+            AntiAlias=True,
+            Style=skia.Paint.kFill_Style,
+            Color=self._map.options.prop_dark_color
+        )
+        
+        # Main rectangle is 80% of prop size
+        rect_size = self.width * 0.8
+        x = self.x + (self.width - rect_size) / 2
+        y = self.y + (self.height - rect_size) / 2
+        
+        canvas.drawRect(skia.Rect.MakeXYWH(x, y, rect_size, rect_size), rect_paint)
+        
+        # Draw two dots
+        dot_paint = skia.Paint(
+            AntiAlias=True,
+            Style=skia.Paint.kFill_Style,
+            Color=self._map.options.prop_light_color
+        )
+        
+        dot_radius = self.width * 0.1
+        dot_offset = self.width * 0.2
+        
+        # Left dot
+        canvas.drawCircle(
+            self.x + self.width/2 - dot_offset,
+            self.y + self.height/2,
+            dot_radius,
+            dot_paint
+        )
+        
+        # Right dot
+        canvas.drawCircle(
+            self.x + self.width/2 + dot_offset,
+            self.y + self.height/2,
+            dot_radius,
+            dot_paint
+        )
