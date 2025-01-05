@@ -1,0 +1,10 @@
+.aider*
+.env
+.pyc
+__pycache__
+.DS_Store
+.vscode
+/*.png
+/*.svg
+/*.pdf
+
