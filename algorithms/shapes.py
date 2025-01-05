@@ -570,12 +570,12 @@ class Rectangle:
         return cls(-width/2, -height/2, width, height)
 
     @classmethod
-    def rotated_rect(cls, x: float, y: float, width: float, height: float, rotation: 'Rotation', inflate: float = 0) -> 'Rectangle':
+    def rotated_rect(cls, center_x: float, center_y: float, width: float, height: float, rotation: 'Rotation', inflate: float = 0) -> 'Rectangle':
         """Create a rectangle with dimensions swapped based on rotation.
         
         Args:
-            x: X coordinate
-            y: Y coordinate
+            center_x: X center of rectangle
+            center_y: Y center of rectangle
             width: Width in drawing units
             height: Height in drawing units
             rotation: Rotation angle in 90° increments
@@ -585,8 +585,8 @@ class Rectangle:
             A new Rectangle with width/height swapped if rotation is 90° or 270°
         """
         if rotation in (Rotation.ROT_90, Rotation.ROT_270):
-            return cls(x, y, height, width, inflate)
-        return cls(x, y, width, height, inflate)
+            return cls(center_x - height / 2, center_y - width / 2, height, width, inflate)
+        return cls(center_x - width / 2, center_y - height / 2, width, height, inflate)
 
 class Circle:
     def __init__(self, cx: float, cy: float, radius: float, inflate: float = 0) -> None:
