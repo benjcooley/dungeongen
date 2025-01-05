@@ -138,7 +138,7 @@ class Rock(Prop):
         return None
 
     @classmethod
-    def get_prop_shape(cls) -> Shape:
+    def get_prop_boundary_shape(cls) -> Shape:
         """Get the rock's shape in local coordinates."""
         # Return a circle sized between small and medium rocks
         nominal_size = (SMALL_ROCK_SIZE + MEDIUM_ROCK_SIZE) / 2

@@ -43,7 +43,7 @@ class Altar(Prop):
     _shape_instance: ClassVar[Shape] = None
     
     @classmethod
-    def get_prop_shape(cls) -> Shape:
+    def get_prop_boundary_shape(cls) -> Shape:
         """Get the cached shape instance for this prop type."""
         if cls._shape_instance is None:
             # Start with a 1x1 centered grid rectangle

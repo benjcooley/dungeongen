@@ -101,7 +101,7 @@ class Prop(MapElement, ABC):
                     Style=skia.Paint.kFill_Style,
                     Color=self._map.options.prop_light_color
                 )
-                self.get_prop_shape().draw(canvas, fill_paint)
+                self.get_prop_boundary_shape().draw(canvas, fill_paint)
                 
                 # Draw shape outline
                 outline_paint = skia.Paint(
@@ -110,7 +110,7 @@ class Prop(MapElement, ABC):
                     StrokeWidth=self._map.options.prop_stroke_width,
                     Color=self._map.options.prop_outline_color
                 )
-                self.get_prop_shape().draw(canvas, outline_paint)
+                self.get_prop_boundary_shape().draw(canvas, outline_paint)
                 
                 # Draw additional content
                 self._draw_content(canvas, bounds)
@@ -201,11 +201,12 @@ class Prop(MapElement, ABC):
         
     @classmethod
     @abstractmethod
-    def get_prop_shape(cls) -> Shape:
-        """Get the shape of this prop type in local coordinates.
+    def get_prop_boundary_shape(cls) -> Shape:
+        """Get the boundary shape of this prop type in local coordinates.
         
         Returns a shape centered at (0,0) and oriented to the right (0 degrees).
-        This shape will be transformed based on the prop's position and rotation.
+        This shape is used for collision detection and placement validation.
+        The actual visual appearance may differ from this boundary shape.
         """
         ...
 
