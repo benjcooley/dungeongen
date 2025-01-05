@@ -13,6 +13,11 @@ Rectangle: TypeAlias = 'Rectangle'
 
 class Shape(Protocol):
     """Protocol defining the interface for shapes."""
+    @property
+    def inflate(self) -> float:
+        """Get the inflation amount for this shape."""
+        ...
+
     def contains(self, px: float, py: float) -> bool:
         """Check if a point is contained within this shape."""
         ...
@@ -331,6 +336,11 @@ class Rectangle:
         self._inflated_height = height + 2 * inflate
 
     @property
+    def inflate(self) -> float:
+        """Get the inflation amount for this rectangle."""
+        return self._inflate
+
+    @property
     def inflated(self) -> 'Rectangle':
         """Return a new Rectangle instance with the inflated dimensions.
         
@@ -577,6 +587,11 @@ class Circle:
         self.radius = radius  # Original radius
         self._inflate = inflate
         self._inflated_radius = radius + inflate
+
+    @property
+    def inflate(self) -> float:
+        """Get the inflation amount for this circle."""
+        return self._inflate
 
     @property
     def inflated(self) -> 'Circle':
