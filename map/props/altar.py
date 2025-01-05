@@ -23,46 +23,27 @@ ALTAR_INSET = (CELL_SIZE - ALTAR_HEIGHT) / 2  # Calculated inset from cell edges
 class Altar(Prop):
     """An altar prop that appears as a small rectangular table with decorative dots."""
     
-    @classmethod
-    def from_grid(cls, grid_x: float, grid_y: float, map_: 'Map', rotation: Rotation = Rotation.ROT_0) -> 'Altar':
-        """Create an altar at grid coordinates.
-        
-        Args:
-            grid_x: Grid X coordinate
-            grid_y: Grid Y coordinate
-            map_: Parent map instance
-            rotation: Rotation angle in 90° increments (default: facing right)
-            
-        Returns:
-            New Altar instance
-        """
-        x, y = grid_to_drawing(grid_x, grid_y, map_.options)
-        center_x = x + CELL_SIZE / 2
-        center_y = y + CELL_SIZE / 2
-        return cls(center_x, center_y, map_, rotation)
-        
-    def __init__(self, center_x: float, center_y: float, map_: 'Map', rotation: Rotation = Rotation.ROT_0) -> None:
+    def __init__(self, x: float, y: float, map_: 'Map', rotation: Rotation = Rotation.ROT_0) -> None:
         """Initialize an altar prop.
         
-        Note: Use from_grid() to create altars at grid coordinates.
-        
         Args:
-            center_x: Center X coordinate in drawing units
-            center_y: Center Y coordinate in drawing units
+            x: Center X coordinate in drawing units
+            y: Center Y coordinate in drawing units
             map_: Parent map instance
             rotation: Rotation angle in 90° increments (default: facing right)
         """
-        # Calculate top-left coordinates
-        x = center_x - CELL_SIZE / 2
-        y = center_y - CELL_SIZE / 2
-        
         # Create grid-aligned rectangle for full cell
-        rect = Rectangle(x, y, CELL_SIZE, CELL_SIZE)
+        rect = Rectangle(
+            x - CELL_SIZE/2,
+            y - CELL_SIZE/2,
+            CELL_SIZE,
+            CELL_SIZE
+        )
         
         # Create boundary shape as rotated rectangle centered on point
         boundary = Rectangle.rotated_rect(
-            center_x - ALTAR_WIDTH / 2,
-            center_y - ALTAR_HEIGHT / 2,
+            x - ALTAR_WIDTH/2,
+            y - ALTAR_HEIGHT/2,
             ALTAR_WIDTH,
             ALTAR_HEIGHT,
             rotation
