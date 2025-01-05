@@ -71,7 +71,7 @@ class Rock(Prop):
         # Generate perturbed control points for visual rendering
         self._control_points = self._generate_control_points()
     
-    def _generate_control_points(self) -> List[Tuple[float, float]]:
+    def _generate_control_points(self) -> List[Point]:
         """Generate slightly perturbed control points for the rock shape."""
         points = []
         
