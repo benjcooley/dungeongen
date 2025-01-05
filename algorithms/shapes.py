@@ -148,8 +148,15 @@ class ShapeGroup:
             excludes=[s.inflated(amount) for s in self.excludes]
         )
         
+    def rotated(self, angle: float) -> 'ShapeGroup':
+        """Return a new shape group with all shapes rotated by angle in radians."""
+        return ShapeGroup(
+            includes=[s.rotated(angle) for s in self.includes],
+            excludes=[s.rotated(angle) for s in self.excludes]
+        )
+    
     def rotate(self, rotation: 'Rotation') -> 'ShapeGroup':
-        """Return a new shape group with all shapes rotated."""
+        """Return a new shape group with all shapes rotated by 90-degree increment."""
         return ShapeGroup(
             includes=[s.rotate(rotation) for s in self.includes],
             excludes=[s.rotate(rotation) for s in self.excludes]
