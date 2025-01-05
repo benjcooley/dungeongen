@@ -1,4 +1,5 @@
 from typing import ClassVar
+from constants import CELL_SIZE
 import skia
 from map.props.prop import Prop
 from map.props.rotation import Rotation
@@ -39,7 +40,11 @@ class Altar(Prop):
     def get_prop_shape(cls) -> Shape:
         """Get the cached shape instance for this prop type."""
         if cls._shape_instance is None:
-            cls._shape_instance = Rectangle(-0.5, -0.5, 0.25, 1.0)
+            # Create a rectangle 1 cell wide by 2 cells high
+            width = CELL_SIZE
+            height = CELL_SIZE * 2
+            # Center it at origin
+            cls._shape_instance = Rectangle(-width/2, -height/2, width, height)
         return cls._shape_instance
         
     def _draw_content(self, canvas: skia.Canvas, bounds: Rectangle) -> None:
