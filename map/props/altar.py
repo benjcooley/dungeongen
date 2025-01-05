@@ -82,11 +82,11 @@ class Altar(Prop):
             Color=self._map.options.prop_light_color
         )
         
-        # Rectangle is 1/4 width of cell, inset from left
+        # Rectangle takes up left 1/4 of cell, full height
         rect_width = bounds.width * 0.25
-        rect_height = bounds.height * 0.7  # 70% of height
-        rect_x = -bounds.width/2 + bounds.width * 0.15  # 15% inset from left
-        rect_y = -rect_height/2  # Center vertically
+        rect_height = bounds.height  # Full height
+        rect_x = -bounds.width/2  # Align to left edge
+        rect_y = -bounds.height/2  # Align to top edge
         
         canvas.drawRect(skia.Rect.MakeXYWH(rect_x, rect_y, rect_width, rect_height), rect_paint)
         
@@ -106,21 +106,22 @@ class Altar(Prop):
             Color=self._map.options.prop_outline_color
         )
         
+        # Dots are centered horizontally in the rectangle and inset from top/bottom
         dot_radius = bounds.width * 0.05
-        dot_y_offset = rect_height/2 * 0.8  # Place dots near top/bottom edges
+        dot_inset = bounds.width * 0.1  # 10% inset from edges
         
-        # Top dot
+        # Top dot - centered in rectangle width, inset from top
         canvas.drawCircle(
             rect_x + rect_width/2,  # Center of rectangle
-            rect_y - dot_y_offset,  # Above rectangle
+            -bounds.height/2 + dot_inset,  # Inset from top
             dot_radius,
             dot_paint
         )
         
-        # Bottom dot
+        # Bottom dot - centered in rectangle width, inset from bottom
         canvas.drawCircle(
             rect_x + rect_width/2,  # Center of rectangle
-            rect_y + rect_height + dot_y_offset,  # Below rectangle
+            bounds.height/2 - dot_inset,  # Inset from bottom
             dot_radius,
             dot_paint
         )
