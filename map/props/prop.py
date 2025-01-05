@@ -130,39 +130,37 @@ class Prop(MapElement, ABC):
         self._bounds = self._shape.bounds
 
     @classmethod
-    def is_valid_position(cls, x: float, y: float, size: float, container: 'MapElement') -> bool:
+    def is_valid_position(cls, x: float, y: float, rotation: Rotation, container: 'MapElement') -> bool:
         """Check if a position is valid for a prop within the container.
-        
-        Uses the prop's shape and grid requirements to determine validity.
         
         Args:
             x: X coordinate to check
             y: Y coordinate to check
-            size: Prop size
+            rotation: Prop rotation
             container: The MapElement to place the prop in
             
         Returns:
             True if position is valid, False otherwise
         """
-        # Get prop's grid size if it has one
-        grid_size = cls.prop_grid_size()
-        if grid_size is not None:
-            # For grid-aligned props, ensure position is on grid intersection
-            if cls.is_grid_aligned():
-                cell_size = CELL_SIZE
-                if (x % cell_size != 0) or (y % cell_size != 0):
-                    return False
-            
-            # Create shape based on grid size
-            width = grid_size * container._map.CELL_SIZE
-            height = width if isinstance(grid_size, (int, float)) else grid_size[1] * container._map.CELL_SIZE
-            rect = Rectangle(x - width/2, y - height/2, width, height)
-        else:
-            # Use standard prop size if no grid size
-            rect = Rectangle(x - size/2, y - size/2, size, size)
-            
+        # For grid-aligned props, ensure position is on grid intersection
+        if cls.is_grid_aligned():
+            if (x % CELL_SIZE != 0) or (y % CELL_SIZE != 0):
+                return False
+
+        # Get prop's boundary shape transformed to test position
+        shape = cls.get_map_aligned_boundary_shape(x, y, rotation)
+        
         # Check if shape is contained within container
-        return container.contains_rectangle(rect)
+        if not container.shape.contains_shape(shape):
+            return False
+            
+        # For non-decorative props, check intersection with other props
+        if not cls.is_decoration():
+            for prop in container._props:
+                if not prop.is_decoration() and prop.shape.intersects(shape):
+                    return False
+                    
+        return True
 
 
     @classmethod
