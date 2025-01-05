@@ -30,8 +30,8 @@ class Prop(ABC):
     
     def __init__(self, rect: Rectangle, boundary_shape: Shape, map_: 'Map', 
                  rotation: Rotation = Rotation.ROT_0, 
-                 grid_offset: tuple[float, float] | None = None,
-                 grid_bounds: tuple[float, float] | None = None) -> None:
+                 grid_offset: Point | None = None,
+                 grid_bounds: Rectangle | None = None) -> None:
         """Initialize a prop with a grid-aligned rectangle and boundary shape.
         
         Props are drawn relative to their center point. The default orientation (0° rotation)

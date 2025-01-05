@@ -42,9 +42,12 @@ class Altar(Prop):
             ALTAR_HEIGHT,
             rotation
         )
+        # Create grid offset point and bounds rectangle
+        grid_offset = (ALTAR_GRID_OFFSET_X, ALTAR_GRID_OFFSET_Y)
+        grid_bounds = Rectangle(0, 0, 1.0, 1.0)
         super().__init__(rect, rect, map_, rotation,
-                        grid_offset=(ALTAR_GRID_OFFSET_X, ALTAR_GRID_OFFSET_Y),
-                        grid_bounds=(1.0, 1.0))
+                        grid_offset=grid_offset,
+                        grid_bounds=grid_bounds)
     
     @classmethod
     def is_decoration(cls) -> bool:
