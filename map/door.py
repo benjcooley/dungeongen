@@ -8,6 +8,7 @@ from map.mapelement import MapElement
 from algorithms.shapes import Shape
 from graphics.conversions import grid_to_drawing, grid_to_drawing_size
 from map.enums import Layers
+from constants import CELL_SIZE
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -44,7 +45,7 @@ class Door(MapElement):
         """
         self._x = x
         self._y = y
-        self._width = self._height = map_.options.cell_size
+        self._width = self._height = CELL_SIZE
         self._open = open
         self._orientation = orientation
         

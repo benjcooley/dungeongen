@@ -7,7 +7,7 @@ from algorithms.shapes import ShapeGroup, Rectangle
 from options import Options
 from map.enums import GridStyle
 from map.region import Region
-
+from constants import CELL_SIZE
 
 def draw_region_grid(canvas: skia.Canvas, region: Region, options: 'Options') -> None:
     """Draw grid dots for a region.
@@ -20,10 +20,10 @@ def draw_region_grid(canvas: skia.Canvas, region: Region, options: 'Options') ->
     bounds = region.shape.bounds
     
     # Calculate grid-aligned bounds, ensuring we start before the shape bounds
-    min_x = math.floor(bounds.x / options.cell_size)
-    min_y = math.floor(bounds.y / options.cell_size)
-    max_x = math.ceil((bounds.x + bounds.width) / options.cell_size) 
-    max_y = math.ceil((bounds.y + bounds.height) / options.cell_size)
+    min_x = math.floor(bounds.x / CELL_SIZE)
+    min_y = math.floor(bounds.y / CELL_SIZE)
+    max_x = math.ceil((bounds.x + bounds.width) / CELL_SIZE) 
+    max_y = math.ceil((bounds.y + bounds.height) / CELL_SIZE)
     
     # Create base paint for dots
     dot_paint = skia.Paint(
@@ -35,11 +35,11 @@ def draw_region_grid(canvas: skia.Canvas, region: Region, options: 'Options') ->
 
     # Draw horizontal lines (include one line before min_y to ensure outer bounds)
     for y in range(min_y - 1, max_y + 1):
-        py = y * options.cell_size
+        py = y * CELL_SIZE
         # Don't skip horizontal lines - we want to draw all grid lines within bounds
             
         # Calculate dot spacing based on cell size and dots per cell
-        dot_spacing = options.cell_size / options.grid_dots_per_cell
+        dot_spacing = CELL_SIZE / options.grid_dots_per_cell
         
         # Start at random position up to one dot spacing before edge
         x = bounds.x - dot_spacing * random.random()
@@ -60,11 +60,11 @@ def draw_region_grid(canvas: skia.Canvas, region: Region, options: 'Options') ->
 
     # Draw vertical lines (include one line before min_x to ensure outer bounds)
     for x in range(min_x - 1, max_x + 1):
-        px = x * options.cell_size
+        px = x * CELL_SIZE
         # Don't skip vertical lines - we want to draw all grid lines within bounds
             
         # Calculate dot spacing based on cell size and dots per cell
-        dot_spacing = options.cell_size / options.grid_dots_per_cell
+        dot_spacing = CELL_SIZE / options.grid_dots_per_cell
         
         # Start at random position up to one dot spacing before edge
         y = bounds.y - dot_spacing * random.random()

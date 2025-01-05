@@ -3,6 +3,7 @@
 from typing import List, TYPE_CHECKING
 from array import array
 from algorithms.shapes import Rectangle, Circle
+from constants import CELL_SIZE
 
 if TYPE_CHECKING:
     from options import Options
@@ -86,7 +87,7 @@ class OccupancyGrid:
         """
         # Convert circle to grid coordinates
         center_x, center_y = drawing_to_grid(circle.cx, circle.cy, options)
-        radius = circle._inflated_radius / options.cell_size
+        radius = circle._inflated_radius / CELL_SIZE
         
         # Calculate grid bounds
         grid_start_x = int(center_x - radius - 0.5)

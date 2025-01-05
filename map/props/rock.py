@@ -8,6 +8,7 @@ from graphics.conversions import grid_to_drawing
 from map.props.prop import Prop
 from map.props.rotation import Rotation
 from algorithms.shapes import Circle, Point, Shape
+from constants import CELL_SIZE
 
 if TYPE_CHECKING:
     from map.map import Map
@@ -112,7 +113,7 @@ class Rock(Prop):
             Tuple of (x,y) coordinates if valid position found, None otherwise
         """
         bounds = container.bounds
-        margin = max(size, container._map.options.cell_size * 0.25)  # Use larger of rock size or 25% cell size
+        margin = max(size, container._map.CELL_SIZE * 0.25)  # Use larger of rock size or 25% cell size
         
         # Calculate valid range for random positions
         min_x = bounds.x + margin
@@ -215,7 +216,7 @@ class Rock(Prop):
             rotation = random.uniform(0, 2 * math.pi)
             
             # Calculate base rock size
-            base_size = (SMALL_ROCK_SIZE if actual_type == RockType.SMALL else MEDIUM_ROCK_SIZE) * container._map.options.cell_size
+            base_size = (SMALL_ROCK_SIZE if actual_type == RockType.SMALL else MEDIUM_ROCK_SIZE) * container._map.CELL_SIZE
             
             # Add overall size variation (±30%)
             size_variation = random.uniform(0.7, 1.3)

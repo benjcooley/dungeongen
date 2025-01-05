@@ -18,6 +18,8 @@ from map.mapelement import MapElement
 from map.room import Room
 from map.door import Door
 from map.passage import Passage
+from constants import CELL_SIZE
+
 
 class Map:
     """Container for all map elements with type-specific access."""
@@ -86,7 +88,7 @@ class Map:
         """Recalculate the bounding rectangle that encompasses all map elements."""
         if not self._elements:
             # Default to single cell at origin if empty
-            return Rectangle(0, 0, self.options.cell_size, self.options.cell_size)
+            return Rectangle(0, 0, CELL_SIZE, CELL_SIZE)
         
         # Start with first element's bounds
         bounds = self._elements[0].bounds
@@ -108,8 +110,8 @@ class Map:
         """Recalculate which grid spaces are occupied by map elements."""
         # Update bounds and create new occupancy grid if needed
         bounds = self.bounds
-        grid_width = int(bounds.width / self.options.cell_size) + 1
-        grid_height = int(bounds.height / self.options.cell_size) + 1
+        grid_width = int(bounds.width / CELL_SIZE) + 1
+        grid_height = int(bounds.height / CELL_SIZE) + 1
         
         # Create new grid or clear existing one
         if self._occupancy is None or (self._occupancy.width != grid_width or self._occupancy.height != grid_height):

@@ -11,6 +11,7 @@ from algorithms.shapes import Rectangle, Circle, Shape
 from graphics.conversions import grid_to_drawing, grid_to_drawing_size
 from map.enums import Layers
 from map.mapelement import MapElement
+from constants import CELL_SIZE
 
 # Constant to make rooms slightly larger to ensure proper passage connections
 ROOM_OVERLAP_OFFSET = 4.0  # pixels
@@ -61,7 +62,7 @@ class Room(MapElement):
             right: Direction vector parallel to right wall (from corner's perspective)
         """
         # Calculate base corner size
-        base_size = self._map.options.cell_size * CORNER_SIZE
+        base_size = self._map.CELL_SIZE * CORNER_SIZE
         
         # Calculate end points with constrained random lengths
         length1 = base_size * (MIN_CORNER_LENGTH + random.random() * (MAX_CORNER_LENGTH - MIN_CORNER_LENGTH))
@@ -97,7 +98,7 @@ class Room(MapElement):
             return
             
         # Calculate corner positions with inset
-        inset = self._map.options.cell_size * CORNER_INSET
+        inset = self._map.CELL_SIZE * CORNER_INSET
         left = self._bounds.x + inset
         right = self._bounds.x + self._bounds.width - inset
         top = self._bounds.y + inset

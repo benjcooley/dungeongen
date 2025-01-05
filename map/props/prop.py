@@ -9,6 +9,7 @@ from algorithms.shapes import Rectangle, Shape
 from map.mapelement import MapElement
 from map.props.rotation import Rotation
 from map.enums import Layers
+from constants import CELL_SIZE
 
 if TYPE_CHECKING:
     from map.map import Map
@@ -148,13 +149,13 @@ class Prop(MapElement, ABC):
         if grid_size is not None:
             # For grid-aligned props, ensure position is on grid intersection
             if cls.is_grid_aligned():
-                cell_size = container._map.options.cell_size
+                cell_size = container._map.CELL_SIZE
                 if (x % cell_size != 0) or (y % cell_size != 0):
                     return False
             
             # Create shape based on grid size
-            width = grid_size * container._map.options.cell_size
-            height = width if isinstance(grid_size, (int, float)) else grid_size[1] * container._map.options.cell_size
+            width = grid_size * container._map.CELL_SIZE
+            height = width if isinstance(grid_size, (int, float)) else grid_size[1] * container._map.CELL_SIZE
             rect = Rectangle(x - width/2, y - height/2, width, height)
         else:
             # Use standard prop size if no grid size

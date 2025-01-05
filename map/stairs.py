@@ -5,6 +5,7 @@ from algorithms.shapes import Rectangle, Shape
 from map.mapelement import MapElement
 from graphics.conversions import grid_to_drawing
 from map.enums import Layers
+from constants import CELL_SIZE
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -29,7 +30,7 @@ class Stairs(MapElement):
         self._x = x
         self._y = y
         self._rotation = rotation
-        size = map_.options.cell_size
+        size = map_.CELL_SIZE
         
         # Create shape as simple 1x1 rectangle
         shape = Rectangle(x, y, size, size)
@@ -56,8 +57,8 @@ class Stairs(MapElement):
         if layer == Layers.PROPS:
             with canvas.save():
                 # Apply rotation around center
-                cx = self._x + self._map.options.cell_size / 2
-                cy = self._y + self._map.options.cell_size / 2
+                cx = self._x + self._map.CELL_SIZE / 2
+                cy = self._y + self._map.CELL_SIZE / 2
                 canvas.translate(cx, cy)
                 canvas.rotate(self._rotation * 180 / 3.14159)  # Convert radians to degrees
                 canvas.translate(-cx, -cy)
@@ -72,15 +73,15 @@ class Stairs(MapElement):
                 
                 # Number of steps
                 num_steps = 5
-                step_spacing = self._map.options.cell_size / (num_steps + 1)
+                step_spacing = self._map.CELL_SIZE / (num_steps + 1)
                 
                 # Draw each step line
                 for i in range(num_steps):
                     y = self._y + step_spacing * (i + 1)
                     canvas.drawLine(
-                        self._x + self._map.options.cell_size * 0.2,  # Start 20% in
+                        self._x + self._map.CELL_SIZE * 0.2,  # Start 20% in
                         y,
-                        self._x + self._map.options.cell_size * 0.8,  # End 80% across
+                        self._x + self._map.CELL_SIZE * 0.8,  # End 80% across
                         y,
                         step_paint
                     )
