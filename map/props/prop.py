@@ -205,6 +205,73 @@ class Prop(ABC):
         return False
 
     @property
+    def grid_position(self) -> Point:
+        """Get the prop's position in grid coordinates.
+        
+        For grid-aligned props, returns the grid cell position accounting for rotation.
+        For non-grid props, returns the position modulo grid size.
+        
+        Returns:
+            Tuple of (grid_x, grid_y) coordinates
+        """
+        if not self.is_grid_aligned():
+            return (self._x / CELL_SIZE, self._y / CELL_SIZE)
+            
+        # For grid-aligned props, calculate based on center and rotation
+        center_x = self._x + self._width/2
+        center_y = self._y + self._height/2
+        
+        # Get grid size and offset
+        grid_size = self.prop_grid_size()
+        if grid_size is None:
+            raise ValueError(f"Grid-aligned prop {self.__class__.__name__} must specify prop_grid_size")
+            
+        # Calculate grid position based on rotation
+        if self.rotation in (Rotation.ROT_0, Rotation.ROT_90):
+            return (
+                (center_x / CELL_SIZE) - grid_size[0]/2,
+                (center_y / CELL_SIZE) - grid_size[1]/2
+            )
+        else:  # ROT_180, ROT_270
+            return (
+                (center_x / CELL_SIZE) - (1 - grid_size[0]/2),
+                (center_y / CELL_SIZE) - (1 - grid_size[1]/2)
+            )
+    
+    @grid_position.setter
+    def grid_position(self, pos: tuple[float, float]) -> None:
+        """Set the prop's position using grid coordinates.
+        
+        For grid-aligned props, positions the prop centered on the grid cell
+        accounting for rotation. For non-grid props, simply multiplies by cell size.
+        
+        Args:
+            pos: Tuple of (grid_x, grid_y) coordinates
+        """
+        if not self.is_grid_aligned():
+            self.position = (pos[0] * CELL_SIZE, pos[1] * CELL_SIZE)
+            return
+            
+        # For grid-aligned props, calculate center position
+        grid_size = self.prop_grid_size()
+        if grid_size is None:
+            raise ValueError(f"Grid-aligned prop {self.__class__.__name__} must specify prop_grid_size")
+            
+        # Calculate center offset based on rotation
+        if self.rotation in (Rotation.ROT_0, Rotation.ROT_90):
+            center_x = (pos[0] + grid_size[0]/2) * CELL_SIZE
+            center_y = (pos[1] + grid_size[1]/2) * CELL_SIZE
+        else:  # ROT_180, ROT_270
+            center_x = (pos[0] + (1 - grid_size[0]/2)) * CELL_SIZE
+            center_y = (pos[1] + (1 - grid_size[1]/2)) * CELL_SIZE
+            
+        # Set position based on calculated center
+        self.position = (
+            center_x - self._width/2,
+            center_y - self._height/2
+        )
+    
+    @property
     def center(self) -> Point:
         """Get the center position of the prop."""
         return (self._x + self._width/2, self._y + self._height/2)
