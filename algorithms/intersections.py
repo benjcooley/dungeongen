@@ -40,9 +40,9 @@ def shape_group_intersect(group: 'ShapeGroup', other: 'Shape') -> bool:
     # Check if any included shape intersects
     for shape in group.includes:
         if shape.intersects(other):
-            # Check if any excluded shape contains the intersection
+            # Check if any excluded shape fully contains the other shape
             for exclude in group.excludes:
-                if exclude.intersects(other):
+                if exclude.contains(other):
                     return False
             return True
             
