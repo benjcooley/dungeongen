@@ -4,6 +4,7 @@ import math
 import skia
 from typing import List, Protocol, Sequence, TypeAlias
 from algorithms.types import Point
+from algorithms.math import Matrix2D
 
 # Forward declaration of Rectangle type
 Rectangle: TypeAlias = 'Rectangle'
@@ -37,6 +38,10 @@ class Shape(Protocol):
     
     def rotated(self, angle: float) -> 'Shape':
         """Return a new shape rotated by the given angle in radians."""
+        ...
+    
+    def transform(self, matrix: 'Matrix2D') -> 'Shape':
+        """Return a new shape transformed by the given matrix."""
         ...
     
     @property
@@ -140,6 +145,13 @@ class ShapeGroup:
         return ShapeGroup(
             includes=[s.inflated(amount) for s in self.includes],
             excludes=[s.inflated(amount) for s in self.excludes]
+        )
+        
+    def transform(self, matrix: 'Matrix2D') -> 'ShapeGroup':
+        """Return a new shape group with all shapes transformed."""
+        return ShapeGroup(
+            includes=[s.transform(matrix) for s in self.includes],
+            excludes=[s.transform(matrix) for s in self.excludes]
         )
     
     def _recalculate_bounds(self) -> None:
@@ -286,38 +298,26 @@ class Rectangle:
     
     def rotated(self, angle: float) -> 'Rectangle':
         """Return a new rectangle rotated by the given angle in radians."""
-        # For rectangles, rotation creates a new rectangle that bounds the rotated shape
-        # Calculate the new bounds after rotation
-        cos_a = math.cos(angle)
-        sin_a = math.sin(angle)
+        return self.transform(Matrix2D.rotation(angle))
         
+    def transform(self, matrix: 'Matrix2D') -> 'Rectangle':
+        """Return a new rectangle transformed by the given matrix."""
         # Get corner points
         corners = [
-            (self.x, self.y),
-            (self.x + self.width, self.y),
-            (self.x, self.y + self.height),
-            (self.x + self.width, self.y + self.height)
+            Point(self.x, self.y),
+            Point(self.x + self.width, self.y),
+            Point(self.x, self.y + self.height),
+            Point(self.x + self.width, self.y + self.height)
         ]
         
-        # Rotate each corner around center point
-        cx = self.x + self.width/2
-        cy = self.y + self.height/2
-        rotated_corners = []
-        for x, y in corners:
-            # Translate to origin
-            dx = x - cx
-            dy = y - cy
-            # Rotate
-            rx = dx * cos_a - dy * sin_a
-            ry = dx * sin_a + dy * cos_a
-            # Translate back
-            rotated_corners.append((rx + cx, ry + cy))
+        # Transform all corners
+        transformed_corners = matrix.transform_points(corners)
         
         # Calculate new bounds
-        min_x = min(x for x, y in rotated_corners)
-        max_x = max(x for x, y in rotated_corners)
-        min_y = min(y for x, y in rotated_corners)
-        max_y = max(y for x, y in rotated_corners)
+        min_x = min(p.x for p in transformed_corners)
+        max_x = max(p.x for p in transformed_corners)
+        min_y = min(p.y for p in transformed_corners)
+        max_y = max(p.y for p in transformed_corners)
         
         return Rectangle(min_x, min_y, max_x - min_x, max_y - min_y, self._inflate)
         
@@ -410,5 +410,18 @@ class Circle:
     
     def rotated(self, angle: float) -> 'Circle':
         """Return a new circle rotated by the given angle in radians."""
-        # Circles don't change shape when rotated
-        return Circle(self.cx, self.cy, self.radius, self._inflate)
+        return self.transform(Matrix2D.rotation(angle))
+        
+    def transform(self, matrix: 'Matrix2D') -> 'Circle':
+        """Return a new circle transformed by the given matrix."""
+        # Transform center point
+        center = Point(self.cx, self.cy)
+        new_center = matrix.transform_point(center)
+        
+        # Calculate scale factor from matrix determinant
+        scale = math.sqrt(abs(matrix.determinant()))
+        
+        # Scale radius by average scale factor
+        new_radius = self.radius * scale
+        
+        return Circle(new_center.x, new_center.y, new_radius, self._inflate)
