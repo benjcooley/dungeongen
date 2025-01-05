@@ -58,27 +58,23 @@ class Room(MapElement):
         dx = 1 if flip_x else -1
         dy = 1 if flip_y else -1
         
-        # Start at inner corner
-        path.moveTo(x, y)
+        # Start at outer corner
+        path.moveTo(x + (size * dx), y + (size * dy))
         
-        # Calculate points for the L shape
-        outer_x = x + (size * 1.5 * dx)  # Make outer line 1.5x longer
-        outer_y = y + (size * 1.5 * dy)
+        # Draw the L shape going inward
+        path.lineTo(x + (size * dx), y)  # Vertical line to top
+        path.lineTo(x + (size * 0.3 * dx), y)  # Short horizontal to inner
+        path.lineTo(x, y + (size * 0.3 * dy))  # Short vertical to inner
+        path.lineTo(x, y + (size * dy))  # Horizontal line to side
         
-        # Draw the L shape
-        path.lineTo(outer_x, y)  # Horizontal line
-        path.lineTo(outer_x, y + (size * 0.3 * dy))  # Small vertical segment
-        path.lineTo(x + (size * 0.3 * dx), outer_y)  # Small horizontal segment
-        path.lineTo(x, outer_y)  # Vertical line
-        
-        # Calculate control points for the curved inner section
-        cp1x = x + (size * 0.8 * dx)
-        cp1y = y + (size * 0.2 * dy)
-        cp2x = x + (size * 0.2 * dx)
-        cp2y = y + (size * 0.8 * dy)
+        # Calculate control points for the curved outer section
+        cp1x = x + (size * 0.3 * dx)
+        cp1y = y + (size * dy)
+        cp2x = x + (size * dx)
+        cp2y = y + (size * 0.3 * dy)
         
         # Add curved section back to start
-        path.cubicTo(cp1x, cp1y, cp2x, cp2y, x, y)
+        path.cubicTo(cp1x, cp1y, cp2x, cp2y, x + (size * dx), y + (size * dy))
         
         # Fill the corner with black
         corner_paint = skia.Paint(
