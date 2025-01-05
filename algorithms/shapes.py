@@ -411,6 +411,17 @@ class Rectangle:
             self._inflate
         )
         
+    def center(self) -> tuple[float, float]:
+        """Get the center point of this rectangle.
+        
+        Returns:
+            Tuple of (center_x, center_y) coordinates
+        """
+        return (
+            self.x + self.width / 2,
+            self.y + self.height / 2
+        )
+        
     def intersects(self, other: 'Shape') -> bool:
         """Check if this rectangle intersects with another shape."""
         return shape_intersects(self, other)
