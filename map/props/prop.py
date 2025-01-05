@@ -59,41 +59,22 @@ class Prop(ABC):
 
     def draw(self, canvas: skia.Canvas, layer: Layers = Layers.PROPS) -> None:
         """Draw the prop with proper coordinate transformation and styling."""
-        if layer == Layers.PROPS:
-            with canvas.save():
-                # Move to prop center
-                cx = self._x + self._width / 2
-                cy = self._y + self._height / 2
-                canvas.translate(cx, cy)
-                
-                # Apply rotation
-                canvas.rotate(self.rotation.radians * (180 / math.pi))
-                
-                # Create bounds rect centered at origin
-                bounds = Rectangle(
-                    -self._width/2, -self._height/2,
-                    self._width, self._height
-                )
-                
-                # Draw shape fill
-                fill_paint = skia.Paint(
-                    AntiAlias=True,
-                    Style=skia.Paint.kFill_Style,
-                    Color=self._map.options.prop_light_color
-                )
-                self.get_prop_boundary_shape().draw(canvas, fill_paint)
-                
-                # Draw shape outline
-                outline_paint = skia.Paint(
-                    AntiAlias=True,
-                    Style=skia.Paint.kStroke_Style,
-                    StrokeWidth=self._map.options.prop_stroke_width,
-                    Color=self._map.options.prop_outline_color
-                )
-                self.get_prop_boundary_shape().draw(canvas, outline_paint)
-                
-                # Draw additional content
-                self._draw_content(canvas, bounds)
+        with canvas.save():
+            # Move to prop center
+            center = self._bounds.center()
+            canvas.translate(center[0], center[1])
+            
+            # Apply rotation
+            canvas.rotate(self.rotation.radians * (180 / math.pi))
+            
+            # Create bounds rect centered at origin
+            bounds = Rectangle(
+                -self._width/2, -self._height/2,
+                self._width, self._height
+            )
+            
+            # Draw additional content
+            self._draw_content(canvas, bounds)
             
     @property
     def position(self) -> tuple[float, float]:
