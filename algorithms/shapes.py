@@ -383,18 +383,14 @@ class Rectangle:
         
     def intersects(self, other: 'Shape') -> bool:
         """Check if this rectangle intersects with another shape."""
-        # Quick rejection using bounds for non-Rectangle shapes
-        if not isinstance(other, Rectangle):
-            if not self._bounds_intersect(other.bounds):
-                return False
-            # Delegate to other shape's intersection test
-            return other.intersects(self)
-            
-        # For Rectangle-Rectangle, use actual dimensions
-        return (self.x < other.x + other.width and
-                self.x + self.width > other.x and
-                self.y < other.y + other.height and
-                self.y + self.height > other.y)
+        from algorithms.intersections import rect_rect_intersect, rect_circle_intersect
+        
+        if isinstance(other, Rectangle):
+            return rect_rect_intersect(self, other)
+        elif isinstance(other, Circle):
+            return rect_circle_intersect(self, other)
+        else:
+            raise TypeError(f"Intersection not implemented between Rectangle and {type(other)}")
         
     def _bounds_intersect(self, other: 'Rectangle') -> bool:
         """Test if this rectangle's bounds intersect another rectangle."""
@@ -486,29 +482,14 @@ class Circle:
         
     def intersects(self, other: 'Shape') -> bool:
         """Check if this circle intersects with another shape."""
-        # Quick rejection using bounds
-        if not self._bounds_intersect(other.bounds):
-            return False
-            
+        from algorithms.intersections import circle_circle_intersect, circle_rect_intersect
+        
         if isinstance(other, Circle):
-            # Circle-Circle: Compare centers distance to sum of radii
-            dx = self.cx - other.cx
-            dy = self.cy - other.cy
-            radii_sum = self.radius + other.radius
-            return (dx * dx + dy * dy) <= (radii_sum * radii_sum)
-            
-        if isinstance(other, Rectangle):
-            # Circle-Rectangle: Find closest point on rectangle to circle center
-            closest_x = max(other.x, min(self.cx, other.x + other.width))
-            closest_y = max(other.y, min(self.cy, other.y + other.height))
-            
-            # Compare distance from closest point to circle center
-            dx = self.cx - closest_x
-            dy = self.cy - closest_y
-            return (dx * dx + dy * dy) <= (self.radius * self.radius)
-            
-        # For other shapes, delegate to their implementation
-        return other.intersects(self)
+            return circle_circle_intersect(self, other)
+        elif isinstance(other, Rectangle):
+            return circle_rect_intersect(self, other)
+        else:
+            raise TypeError(f"Intersection not implemented between Circle and {type(other)}")
         
     def _bounds_intersect(self, other: Rectangle) -> bool:
         """Test if this circle's bounds intersect a rectangle."""
