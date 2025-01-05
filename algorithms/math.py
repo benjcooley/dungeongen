@@ -96,11 +96,18 @@ class Matrix2D:
             ty=-(self.a * self.ty - self.c * self.tx) * inv_det
         )
 
-@dataclass
 class Point2:
     """A 2D point/vector with basic vector operations."""
-    x: float
-    y: float
+    
+    def __init__(self, x: float = 0.0, y: float = 0.0) -> None:
+        """Initialize a Point2 with optional coordinates.
+        
+        Args:
+            x: X coordinate (default: 0.0)
+            y: Y coordinate (default: 0.0)
+        """
+        self.x = x
+        self.y = y
     
     @classmethod
     def from_point(cls, point: 'Point') -> 'Point2':
