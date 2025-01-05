@@ -150,6 +150,16 @@ class Prop(MapElement, ABC):
         Returns None if the prop type doesn't have a standard grid size.
         """
         ...
+        
+    @classmethod
+    @abstractmethod
+    def get_prop_shape(cls) -> Shape:
+        """Get the shape of this prop type in local coordinates.
+        
+        Returns a shape centered at (0,0) and oriented to the right (0 degrees).
+        This shape will be transformed based on the prop's position and rotation.
+        """
+        ...
 
     def draw(self, canvas: skia.Canvas, layer: Layers = Layers.PROPS) -> None:
         """Override base MapElement draw to prevent drawing bounds rectangle."""

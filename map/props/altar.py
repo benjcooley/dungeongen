@@ -84,22 +84,24 @@ class Altar(Prop):
         return (container.contains_rectangle(rect) and 
                 not container.prop_intersects(cls(x, y, size, size, container._map)))
 
+    @classmethod
+    def get_prop_shape(cls) -> Shape:
+        """Get the altar's shape in local coordinates."""
+        # Create rectangle that's 1/4 width and full height
+        return Rectangle(-0.5, -0.5, 0.25, 1.0)
+        
     def _draw_content(self, canvas: skia.Canvas, bounds: Rectangle) -> None:
         """Draw the altar's content in local coordinates."""
+        # Get the altar's base shape
+        altar_shape = self.get_prop_shape()
+        
         # Draw main rectangle with light fill
         rect_paint = skia.Paint(
             AntiAlias=True,
             Style=skia.Paint.kFill_Style,
             Color=self._map.options.prop_light_color
         )
-        
-        # Rectangle takes up left 1/4 of cell, full height
-        rect_width = bounds.width * 0.25
-        rect_height = bounds.height  # Full height
-        rect_x = -bounds.width/2  # Align to left edge
-        rect_y = -bounds.height/2  # Align to top edge
-        
-        canvas.drawRect(skia.Rect.MakeXYWH(rect_x, rect_y, rect_width, rect_height), rect_paint)
+        altar_shape.draw(canvas, rect_paint)
         
         # Draw outline
         outline_paint = skia.Paint(
@@ -108,7 +110,7 @@ class Altar(Prop):
             StrokeWidth=self._map.options.prop_stroke_width,
             Color=self._map.options.prop_outline_color
         )
-        canvas.drawRect(skia.Rect.MakeXYWH(rect_x, rect_y, rect_width, rect_height), outline_paint)
+        altar_shape.draw(canvas, outline_paint)
         
         # Draw two dots (candles)
         dot_paint = skia.Paint(
