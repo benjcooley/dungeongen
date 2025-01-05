@@ -449,6 +449,25 @@ class Rectangle:
         height = grid_height * CELL_SIZE
         return cls(-width/2, -height/2, width, height)
 
+    @classmethod
+    def rotated_rect(cls, x: float, y: float, width: float, height: float, rotation: 'Rotation', inflate: float = 0) -> 'Rectangle':
+        """Create a rectangle with dimensions swapped based on rotation.
+        
+        Args:
+            x: X coordinate
+            y: Y coordinate
+            width: Width in drawing units
+            height: Height in drawing units
+            rotation: Rotation angle in 90° increments
+            inflate: Optional inflation amount
+            
+        Returns:
+            A new Rectangle with width/height swapped if rotation is 90° or 270°
+        """
+        if rotation in (Rotation.ROT_90, Rotation.ROT_270):
+            return cls(x, y, height, width, inflate)
+        return cls(x, y, width, height, inflate)
+
 class Circle:
     def __init__(self, cx: float, cy: float, radius: float, inflate: float = 0) -> None:
         self.cx = cx
