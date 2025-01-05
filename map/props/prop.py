@@ -43,34 +43,38 @@ class Prop(MapElement, ABC):
         self.rotation = rotation
         self.container: Optional['MapElement'] = None
     
-    def _draw_content(self, canvas: skia.Canvas) -> None:
-        """Draw the prop's content without rotation.
+    def _draw_content(self, canvas: skia.Canvas, bounds: Rectangle) -> None:
+        """Draw the prop's content in local coordinates.
         
         This method should be implemented by subclasses to draw their specific content.
-        The canvas will already be properly transformed for rotation.
+        The coordinate system is set up so that:
+        - Origin (0,0) is at the center of the prop
+        - Prop is facing right (rotation 0)
+        - bounds.width and bounds.height define the prop size
+        - bounds.x and bounds.y are -width/2 and -height/2 respectively
         """
         pass
 
-    @property
-    def width(self) -> float:
-        """Get prop width."""
-        return self._width
-        
-    @property 
-    def height(self) -> float:
-        """Get prop height."""
-        return self._height
-
-    def _apply_rotation(self, canvas: skia.Canvas) -> None:
-        """Apply rotation transform around prop center."""
-        # Calculate center point
-        cx = self._x + self._width / 2
-        cy = self._y + self._height / 2
-        
-        # Translate to center, rotate, translate back
-        canvas.translate(cx, cy)
-        canvas.rotate(self.rotation.radians * (180 / math.pi))  # Convert radians to degrees
-        canvas.translate(-cx, -cy)
+    def draw(self, canvas: skia.Canvas, layer: Layers = Layers.PROPS) -> None:
+        """Draw the prop with proper coordinate transformation."""
+        if layer == Layers.PROPS:
+            with canvas.save():
+                # Move to prop center
+                cx = self._x + self._width / 2
+                cy = self._y + self._height / 2
+                canvas.translate(cx, cy)
+                
+                # Apply rotation
+                canvas.rotate(self.rotation.radians * (180 / math.pi))
+                
+                # Create bounds rect centered at origin
+                bounds = Rectangle(
+                    -self._width/2, -self._height/2,
+                    self._width, self._height
+                )
+                
+                # Draw in local coordinates
+                self._draw_content(canvas, bounds)
             
     def draw(self, canvas: skia.Canvas, layer: Layers = Layers.PROPS) -> None:
         """Draw the prop with proper rotation handling.
