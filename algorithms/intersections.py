@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 import math
 
 if TYPE_CHECKING:
-    from algorithms.shapes import Rectangle, Circle, Shape
+    from algorithms.shapes import Rectangle, Circle, Shape, ShapeGroup
 
 def rect_rect_intersect(rect1: 'Rectangle', rect2: 'Rectangle') -> bool:
     """Test intersection between two rectangles."""
@@ -30,3 +30,20 @@ def rect_circle_intersect(rect: 'Rectangle', circle: 'Circle') -> bool:
     dx = circle.cx - closest_x
     dy = circle.cy - closest_y
     return (dx * dx + dy * dy) <= (circle.radius * circle.radius)
+
+def shape_group_intersect(group: 'ShapeGroup', other: 'Shape') -> bool:
+    """Test intersection between a shape group and another shape."""
+    # Quick rejection using bounds
+    if not group._bounds_intersect(other.bounds):
+        return False
+        
+    # Check if any included shape intersects
+    for shape in group.includes:
+        if shape.intersects(other):
+            # Check if any excluded shape contains the intersection
+            for exclude in group.excludes:
+                if exclude.intersects(other):
+                    return False
+            return True
+            
+    return False

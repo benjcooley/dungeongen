@@ -190,20 +190,8 @@ class ShapeGroup:
         
     def intersects(self, other: 'Shape') -> bool:
         """Check if this shape group intersects with another shape."""
-        # Quick rejection using bounds
-        if not self._bounds_intersect(other.bounds):
-            return False
-            
-        # Check if any included shape intersects
-        for shape in self.includes:
-            if shape.intersects(other):
-                # Check if any excluded shape contains the intersection
-                for exclude in self.excludes:
-                    if exclude.intersects(other):
-                        return False
-                return True
-                
-        return False
+        from algorithms.intersections import shape_group_intersect
+        return shape_group_intersect(self, other)
         
     def _bounds_intersect(self, other: Rectangle) -> bool:
         """Test if this shape group's bounds intersect a rectangle."""
