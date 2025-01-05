@@ -16,6 +16,11 @@ class Shape(Protocol):
     def contains(self, px: float, py: float) -> bool:
         """Check if a point is contained within this shape."""
         ...
+        
+    def contains_shape(self, other: 'Shape') -> bool:
+        """Check if another shape is fully contained within this shape."""
+        from algorithms.intersections import shape_contains
+        return shape_contains(self, other)
     
     @property
     def bounds(self) -> 'Rectangle':
