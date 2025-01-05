@@ -482,7 +482,7 @@ class Circle:
         
     def intersects(self, other: 'Shape') -> bool:
         """Check if this circle intersects with another shape."""
-        from algorithms.intersections import circle_circle_intersect, circle_rect_intersect
+        from algorithms.intersections import circle_circle_intersect, rect_circle_intersect
         
         if isinstance(other, Circle):
             return circle_circle_intersect(self, other)
