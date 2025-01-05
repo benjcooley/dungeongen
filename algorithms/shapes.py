@@ -5,6 +5,7 @@ import skia
 from typing import List, Protocol, Sequence, TypeAlias
 from algorithms.types import Point
 from algorithms.math import Matrix2D
+from map.props.rotation import Rotation
 
 # Forward declaration of Rectangle type
 Rectangle: TypeAlias = 'Rectangle'
