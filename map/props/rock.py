@@ -140,8 +140,9 @@ class Rock(Prop):
     @classmethod
     def get_prop_shape(cls) -> Shape:
         """Get the rock's shape in local coordinates."""
-        # Return a unit circle centered at origin
-        return Circle(0, 0, 0.5)
+        # Return a circle sized between small and medium rocks
+        nominal_size = (SMALL_ROCK_SIZE + MEDIUM_ROCK_SIZE) / 2
+        return Circle(0, 0, nominal_size * CELL_SIZE)
         
     def draw(self, canvas: skia.Canvas, layer: Layers = Layers.PROPS) -> None:
         """Draw the rock using a perturbed circular path on the specified layer."""
