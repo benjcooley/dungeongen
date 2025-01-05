@@ -138,16 +138,17 @@ class Rock(Prop):
             # Random rotation
             rotation = random.uniform(0, 2 * math.pi)
             
-            # Calculate rock size and try to find valid position
-            size = (SMALL_ROCK_SIZE if actual_type == RockType.SMALL else MEDIUM_ROCK_SIZE) * container._map.options.cell_size
+            # Calculate base rock size
+            base_size = (SMALL_ROCK_SIZE if actual_type == RockType.SMALL else MEDIUM_ROCK_SIZE) * container._map.options.cell_size
+            
+            # Add overall size variation (±30%)
+            size_variation = random.uniform(0.7, 1.3)
+            size = base_size * size_variation
+            
             valid_pos = cls.get_valid_position(size, container)
             
             if valid_pos:
                 # Create rock at valid position
-                # Calculate rock size based on type
-                size = (SMALL_ROCK_SIZE if actual_type == RockType.SMALL else MEDIUM_ROCK_SIZE) * container._map.options.cell_size
-            
-                # Create rock with calculated size
                 rock = cls(valid_pos[0], valid_pos[1], size, container._map, rotation)
                 container.try_add_prop(rock)
 
@@ -182,22 +183,7 @@ class Rock(Prop):
             x = random.uniform(min_x, max_x)
             y = random.uniform(min_y, max_y)
             
-            # Check center point
-            if not container.shape.contains(x, y):
-                continue
-                
-            # Check points around the perimeter
-            valid = True
-            num_probes = 8  # Increased from 6 for better coverage
-            for i in range(num_probes):
-                angle = (i * 2 * math.pi / num_probes)
-                px = x + size * math.cos(angle)
-                py = y + size * math.sin(angle)
-                if not container.shape.contains(px, py):
-                    valid = False
-                    break
-                    
-            if valid:
+            if cls.is_valid_position(x, y, size, container):
                 return (x, y)
                 
         return None
@@ -419,3 +405,30 @@ class Rock(Prop):
                 # Create rock at valid position
                 rock = cls(valid_pos[0], valid_pos[1], size, container._map, rotation)
                 container.try_add_prop(rock)
+    @classmethod
+    def is_valid_position(cls, x: float, y: float, size: float, container: 'MapElement') -> bool:
+        """Check if a position is valid for a rock within the container.
+        
+        Args:
+            x: X coordinate to check
+            y: Y coordinate to check
+            size: Rock radius
+            container: The MapElement to place the rock in
+            
+        Returns:
+            True if position is valid, False otherwise
+        """
+        # Check center point
+        if not container.shape.contains(x, y):
+            return False
+            
+        # Check points around the perimeter
+        num_probes = 8
+        for i in range(num_probes):
+            angle = (i * 2 * math.pi / num_probes)
+            px = x + size * math.cos(angle)
+            py = y + size * math.sin(angle)
+            if not container.shape.contains(px, py):
+                return False
+                
+        return True
