@@ -7,7 +7,7 @@ from map.mapelement import MapElement
 from graphics.conversions import grid_to_drawing
 from map.props.prop import Prop
 from map.props.rotation import Rotation
-from algorithms.shapes import Circle, Point, Shape
+from algorithms.shapes import Circle, Point, Shape, Rectangle
 from constants import CELL_SIZE
 
 if TYPE_CHECKING:
