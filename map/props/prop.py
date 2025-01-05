@@ -210,6 +210,30 @@ class Prop(MapElement, ABC):
         """
         ...
 
+    @classmethod
+    def get_map_aligned_boundary_shape(cls, center_x: float, center_y: float, rotation: Rotation) -> Shape:
+        """Get the boundary shape aligned to a specific map position and rotation.
+        
+        Args:
+            center_x: Center X coordinate in map space
+            center_y: Center Y coordinate in map space
+            rotation: Rotation angle
+            
+        Returns:
+            The boundary shape translated and rotated to the specified position
+        """
+        # Get base boundary shape (centered at origin)
+        base_shape = cls.get_prop_boundary_shape()
+        bounds = base_shape.bounds
+        
+        # Calculate translation to move shape to center point
+        dx = center_x - bounds.x - bounds.width/2
+        dy = center_y - bounds.y - bounds.height/2
+        
+        # Create transformed shape
+        # Note: This assumes the Shape classes implement proper translation and rotation
+        return base_shape.translated(dx, dy).rotated(rotation.radians)
+
     def draw(self, canvas: skia.Canvas, layer: Layers = Layers.PROPS) -> None:
         """Override base MapElement draw to prevent drawing bounds rectangle."""
         # Props should implement their own draw logic

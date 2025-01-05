@@ -31,6 +31,14 @@ class Shape(Protocol):
         """Return a new shape inflated by the given amount."""
         ...
     
+    def translated(self, dx: float, dy: float) -> 'Shape':
+        """Return a new shape translated by the given amounts."""
+        ...
+    
+    def rotated(self, angle: float) -> 'Shape':
+        """Return a new shape rotated by the given angle in radians."""
+        ...
+    
     @property
     def is_valid(self) -> bool:
         """Check if this shape is valid and can be rendered."""
@@ -271,6 +279,47 @@ class Rectangle:
     def inflated(self, amount: float) -> 'Rectangle':
         """Return a new rectangle inflated by the given amount."""
         return Rectangle(self.x, self.y, self.width, self.height, self._inflate + amount)
+    
+    def translated(self, dx: float, dy: float) -> 'Rectangle':
+        """Return a new rectangle translated by the given amounts."""
+        return Rectangle(self.x + dx, self.y + dy, self.width, self.height, self._inflate)
+    
+    def rotated(self, angle: float) -> 'Rectangle':
+        """Return a new rectangle rotated by the given angle in radians."""
+        # For rectangles, rotation creates a new rectangle that bounds the rotated shape
+        # Calculate the new bounds after rotation
+        cos_a = math.cos(angle)
+        sin_a = math.sin(angle)
+        
+        # Get corner points
+        corners = [
+            (self.x, self.y),
+            (self.x + self.width, self.y),
+            (self.x, self.y + self.height),
+            (self.x + self.width, self.y + self.height)
+        ]
+        
+        # Rotate each corner around center point
+        cx = self.x + self.width/2
+        cy = self.y + self.height/2
+        rotated_corners = []
+        for x, y in corners:
+            # Translate to origin
+            dx = x - cx
+            dy = y - cy
+            # Rotate
+            rx = dx * cos_a - dy * sin_a
+            ry = dx * sin_a + dy * cos_a
+            # Translate back
+            rotated_corners.append((rx + cx, ry + cy))
+        
+        # Calculate new bounds
+        min_x = min(x for x, y in rotated_corners)
+        max_x = max(x for x, y in rotated_corners)
+        min_y = min(y for x, y in rotated_corners)
+        max_y = max(y for x, y in rotated_corners)
+        
+        return Rectangle(min_x, min_y, max_x - min_x, max_y - min_y, self._inflate)
         
     def adjust(self, left: float, top: float, right: float, bottom: float) -> 'Rectangle':
         """Return a new rectangle with edges adjusted by the given amounts.
@@ -354,3 +403,12 @@ class Circle:
     def inflated(self, amount: float) -> 'Circle':
         """Return a new circle inflated by the given amount."""
         return Circle(self.cx, self.cy, self.radius, self._inflate + amount)
+        
+    def translated(self, dx: float, dy: float) -> 'Circle':
+        """Return a new circle translated by the given amounts."""
+        return Circle(self.cx + dx, self.cy + dy, self.radius, self._inflate)
+    
+    def rotated(self, angle: float) -> 'Circle':
+        """Return a new circle rotated by the given angle in radians."""
+        # Circles don't change shape when rotated
+        return Circle(self.cx, self.cy, self.radius, self._inflate)
