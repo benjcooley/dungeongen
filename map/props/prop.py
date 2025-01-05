@@ -86,9 +86,11 @@ class Prop(ABC):
     @position.setter 
     def position(self, pos: tuple[float, float]) -> None:
         """Set the position of the prop and update its shape."""
+        dx = pos[0] - self._x
+        dy = pos[1] - self._y
         self._x, self._y = pos
-        # Update the shape's position
-        self._boundary_shape = Rectangle(self._x, self._y, self._bounds.width, self._bounds.height)
+        # Translate the boundary shape to new position
+        self._boundary_shape = self._boundary_shape.translated(dx, dy)
         # Update the bounds
         self._bounds = self._boundary_shape.bounds
 
