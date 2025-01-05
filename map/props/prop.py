@@ -156,8 +156,8 @@ class Prop(ABC):
             
             return None
             
-    # Handle grid-aligned props
-    if self.is_grid_aligned():
+        # Handle grid-aligned props
+        if self.is_grid_aligned():
             # Snap to nearest grid intersection
             grid_x = round(x / CELL_SIZE) * CELL_SIZE
             grid_y = round(y / CELL_SIZE) * CELL_SIZE
@@ -167,7 +167,7 @@ class Prop(ABC):
                 return (grid_x, grid_y)
             return None
             
-    # For other props, just check if the original position is valid
+        # For other props, just check if the original position is valid
         if self.is_valid_position(x, y, self.rotation, self.container):
             return (x, y)
             
