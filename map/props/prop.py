@@ -115,18 +115,7 @@ class Prop(ABC):
         if not self.container:
             return None
             
-        # Handle grid-aligned props
-        if self.is_grid_aligned():
-            # Snap to nearest grid intersection
-            grid_x = round(x / CELL_SIZE) * CELL_SIZE
-            grid_y = round(y / CELL_SIZE) * CELL_SIZE
-            
-            # Check if valid
-            if self.is_valid_position(grid_x, grid_y, self.rotation, self.container):
-                return (grid_x, grid_y)
-            return None
-            
-        # Handle wall-aligned props
+        # Handle wall-aligned props first
         elif self.is_wall_aligned() and isinstance(self.container._shape, Rectangle):
             room_bounds = self.container._shape.bounds
             prop_bounds = self.shape.bounds
@@ -165,6 +154,17 @@ class Prop(ABC):
                 if self.is_valid_position(test_x, test_y, self.rotation, self.container):
                     return (test_x, test_y)
             
+            return None
+            
+        # Handle grid-aligned props
+        if self.is_grid_aligned():
+            # Snap to nearest grid intersection
+            grid_x = round(x / CELL_SIZE) * CELL_SIZE
+            grid_y = round(y / CELL_SIZE) * CELL_SIZE
+            
+            # Check if valid
+            if self.is_valid_position(grid_x, grid_y, self.rotation, self.container):
+                return (grid_x, grid_y)
             return None
             
         # For other props, just check if the original position is valid
