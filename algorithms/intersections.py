@@ -30,7 +30,3 @@ def rect_circle_intersect(rect: 'Rectangle', circle: 'Circle') -> bool:
     dx = circle.cx - closest_x
     dy = circle.cy - closest_y
     return (dx * dx + dy * dy) <= (circle.radius * circle.radius)
-
-def circle_rect_intersect(circle: 'Circle', rect: 'Rectangle') -> bool:
-    """Test intersection between a circle and rectangle."""
-    return rect_circle_intersect(rect, circle)

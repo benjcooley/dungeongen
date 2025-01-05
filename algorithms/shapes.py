@@ -487,7 +487,7 @@ class Circle:
         if isinstance(other, Circle):
             return circle_circle_intersect(self, other)
         elif isinstance(other, Rectangle):
-            return circle_rect_intersect(self, other)
+            return rect_circle_intersect(other, self)
         else:
             raise TypeError(f"Intersection not implemented between Circle and {type(other)}")
         
