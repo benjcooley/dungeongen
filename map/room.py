@@ -1,10 +1,16 @@
 """Room map element definition."""
 
-from algorithms.shapes import Rectangle, Circle, Shape
-from algorithms.math import Point
-from typing import List, TYPE_CHECKING, Tuple
-import skia
 import math
+import random
+from typing import List, TYPE_CHECKING, Tuple
+
+import skia
+
+from algorithms.math import Point
+from algorithms.shapes import Rectangle, Circle, Shape
+from graphics.conversions import grid_to_drawing, grid_to_drawing_size
+from map.enums import Layers
+from map.mapelement import MapElement
 
 # Constant to make rooms slightly larger to ensure proper passage connections
 ROOM_OVERLAP_OFFSET = 4.0  # pixels
