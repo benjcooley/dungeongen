@@ -123,28 +123,29 @@ class Prop(MapElement, ABC):
         """
         return False
 
-    @property
-    def grid_aligned(self) -> bool:
+    @classmethod
+    @abstractmethod
+    def grid_aligned(cls) -> bool:
         """Whether this prop should be aligned to the grid.
         
         Props that return True should be positioned at grid intersections.
-        By default, props are not grid-aligned.
         """
-        return False
+        ...
 
-    @property
-    def prop_size(self) -> float:
-        """Get the size of this prop in drawing units."""
-        return max(self._width, self._height)
+    @classmethod
+    @abstractmethod
+    def prop_size(cls) -> float:
+        """Get the standard size of this prop type in drawing units."""
+        ...
 
-    @property
-    def prop_grid_size(self) -> float | None:
-        """Get the size of this prop in grid units.
+    @classmethod
+    @abstractmethod
+    def prop_grid_size(cls) -> float | None:
+        """Get the standard size of this prop type in grid units.
         
-        Returns None if the prop doesn't have a standard grid size.
-        By default, props don't have a standard grid size.
+        Returns None if the prop type doesn't have a standard grid size.
         """
-        return None
+        ...
 
     def draw(self, canvas: skia.Canvas, layer: Layers = Layers.PROPS) -> None:
         """Override base MapElement draw to prevent drawing bounds rectangle."""
