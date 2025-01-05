@@ -41,9 +41,9 @@ class Prop(ABC):
         self._width = width
         self._height = height
         self._map = map_
-        self._boundary_shape = Rectangle(x, y, width, height)
-        self._bounds = self._boundary_shape.bounds
         self.rotation = rotation
+        self._boundary_shape = self.get_map_aligned_boundary_shape((x + width/2, y + height/2), rotation)
+        self._bounds = self._boundary_shape.bounds
         self.container: Optional['MapElement'] = None
     
     def _draw_content(self, canvas: skia.Canvas, bounds: Rectangle) -> None:
