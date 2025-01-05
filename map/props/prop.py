@@ -2,6 +2,9 @@
 
 import math
 import random
+
+# Maximum attempts to find valid random position
+MAX_PLACEMENT_ATTEMPTS = 30
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Optional, ClassVar
 
@@ -94,7 +97,7 @@ class Prop(ABC):
         # Update the bounds
         self._bounds = self._boundary_shape.bounds
 
-    def place_random_position(self, max_attempts: int = 30) -> bool:
+    def place_random_position(self, max_attempts: int = MAX_PLACEMENT_ATTEMPTS) -> bool:
         """Try to place this prop at a valid random position within its container.
         
         Args:
