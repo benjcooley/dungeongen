@@ -70,9 +70,9 @@ class Room(MapElement):
         path.moveTo(corner.x, corner.y)
         path.lineTo(p1.x, p1.y)
         
-        # Draw curved line between points
-        cp1 = p1 + (p2 - corner) * CURVE_CONTROL_SCALE
-        cp2 = p2 + (p1 - corner) * CURVE_CONTROL_SCALE
+        # Draw curved line between points with inward curve
+        cp1 = p1 - (p2 - corner) * CURVE_CONTROL_SCALE  # Changed + to -
+        cp2 = p2 - (p1 - corner) * CURVE_CONTROL_SCALE  # Changed + to -
         path.cubicTo(cp1.x, cp1.y, cp2.x, cp2.y, p2.x, p2.y)
         
         # Close the path
