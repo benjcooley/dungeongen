@@ -2,6 +2,11 @@ from typing import ClassVar
 from constants import CELL_SIZE
 import skia
 from map.props.prop import Prop
+from map.enums import Layers
+
+# Constants for altar dimensions
+ALTAR_INSET = CELL_SIZE * 0.15  # Inset from cell edges
+ALTAR_WIDTH = CELL_SIZE * 0.6   # Width of altar surface
 from map.props.rotation import Rotation
 from algorithms.shapes import Rectangle, Shape
 from map.mapelement import MapElement
@@ -40,8 +45,16 @@ class Altar(Prop):
     def get_prop_shape(cls) -> Shape:
         """Get the cached shape instance for this prop type."""
         if cls._shape_instance is None:
-            # Create a 1x2 grid rectangle centered at origin
-            cls._shape_instance = Rectangle.centered_grid(1, 2)
+            # Start with a 1x1 centered grid rectangle
+            base = Rectangle.centered_grid(1, 1)
+            # Adjust edges with insets
+            right_inset = CELL_SIZE - ALTAR_INSET - ALTAR_WIDTH
+            cls._shape_instance = base.adjust(
+                left=ALTAR_INSET,
+                top=ALTAR_INSET,
+                right=-right_inset,
+                bottom=ALTAR_INSET
+            )
         return cls._shape_instance
         
     def _draw_content(self, canvas: skia.Canvas, bounds: Rectangle) -> None:
