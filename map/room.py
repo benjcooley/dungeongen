@@ -38,46 +38,41 @@ class Room(MapElement):
         )
         super().__init__(shape=shape, map_=map_)
     
-    def _draw_corner(self, canvas: skia.Canvas, x: float, y: float, flip_x: bool, flip_y: bool) -> None:
+    def _draw_corner(self, canvas: skia.Canvas, corner: Point, wall1: Point, wall2: Point) -> None:
         """Draw a single corner decoration.
         
         Args:
             canvas: The canvas to draw on
-            x: Corner x position
-            y: Corner y position
-            flip_x: Whether to flip horizontally
-            flip_y: Whether to flip vertically
+            corner: Corner position
+            wall1: First wall direction vector
+            wall2: Second wall direction vector
         """
-        # Calculate corner size based on cell size
-        size = self._map.options.cell_size * CORNER_SIZE
+        # Calculate corner size based on cell size with variation
+        base_size = self._map.options.cell_size * CORNER_SIZE
+        var_size = base_size * (1 + (0.1 * (math.sin(corner.x * corner.y) * 0.5 + 0.5)))
+        
+        # Normalize wall vectors and scale to size
+        wall1_norm = wall1.normalized() * var_size
+        wall2_norm = wall2.normalized() * var_size
         
         # Create corner path
         path = skia.Path()
+        path.moveTo(corner.x, corner.y)
         
-        # Calculate direction multipliers
-        dx = 1 if flip_x else -1
-        dy = 1 if flip_y else -1
+        # Draw straight edges along walls
+        p1 = corner + wall1_norm
+        p2 = p1 + wall2_norm
         
-        # Add slight variation to size
-        var_size = size * (1 + (0.1 * (math.sin(x * y) * 0.5 + 0.5)))
-        
-        # Start at wall edge
-        path.moveTo(x, y)
-        
-        # Draw straight edge parallel to wall
-        path.lineTo(x + (var_size * dx), y)  # Horizontal line
-        path.lineTo(x + (var_size * dx), y + (var_size * dy))  # Vertical line
-        path.lineTo(x, y + (var_size * dy))  # Back to wall
+        path.lineTo(p1.x, p1.y)
+        path.lineTo(p2.x, p2.y)
+        path.lineTo(corner.x + wall2_norm.x, corner.y + wall2_norm.y)
         
         # Calculate control points for curved inset
-        # Control points are positioned to create a natural curve facing room interior
-        cp1x = x + (var_size * 0.8 * dx)
-        cp1y = y + (var_size * 0.2 * dy)
-        cp2x = x + (var_size * 0.2 * dx)
-        cp2y = y + (var_size * 0.8 * dy)
+        cp1 = corner + wall1_norm * 0.8 + wall2_norm * 0.2
+        cp2 = corner + wall1_norm * 0.2 + wall2_norm * 0.8
         
         # Add curved section back to start
-        path.cubicTo(cp1x, cp1y, cp2x, cp2y, x, y)
+        path.cubicTo(cp1.x, cp1.y, cp2.x, cp2.y, corner.x, corner.y)
         
         # Fill the corner with black
         corner_paint = skia.Paint(
@@ -99,11 +94,24 @@ class Room(MapElement):
         top = self._bounds.y + inset
         bottom = self._bounds.y + self._bounds.height - inset
         
-        # Draw all four corners
-        self._draw_corner(canvas, left, top, False, False)      # Top-left
-        self._draw_corner(canvas, right, top, True, False)      # Top-right
-        self._draw_corner(canvas, left, bottom, False, True)    # Bottom-left
-        self._draw_corner(canvas, right, bottom, True, True)    # Bottom-right
+        # Create corner points and wall vectors
+        from algorithms.math import Point
+        
+        # Corner positions
+        tl = Point(left, top)
+        tr = Point(right, top)
+        bl = Point(left, bottom)
+        br = Point(right, bottom)
+        
+        # Wall direction vectors
+        right_vec = Point(1, 0)
+        down_vec = Point(0, 1)
+        
+        # Draw all four corners with appropriate wall vectors
+        self._draw_corner(canvas, tl, right_vec, down_vec)      # Top-left
+        self._draw_corner(canvas, tr, -right_vec, down_vec)     # Top-right  
+        self._draw_corner(canvas, bl, right_vec, -down_vec)     # Bottom-left
+        self._draw_corner(canvas, br, -right_vec, -down_vec)    # Bottom-right
 
     def draw(self, canvas: 'skia.Canvas', layer: Layers = Layers.PROPS) -> None:
         """Draw the room and its props."""
