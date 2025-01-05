@@ -149,7 +149,7 @@ class Prop(MapElement, ABC):
         if grid_size is not None:
             # For grid-aligned props, ensure position is on grid intersection
             if cls.is_grid_aligned():
-                cell_size = container._map.CELL_SIZE
+                cell_size = CELL_SIZE
                 if (x % cell_size != 0) or (y % cell_size != 0):
                     return False
             

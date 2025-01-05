@@ -5,6 +5,7 @@ from typing import List, Iterator, Optional, TYPE_CHECKING
 import skia
 import math
 import random
+from constants import CELL_SIZE
 from graphics.crosshatch import draw_crosshatches
 from map.grid import GridStyle, draw_region_grid
 from map.enums import Layers
