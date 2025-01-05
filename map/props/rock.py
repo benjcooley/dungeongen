@@ -58,8 +58,8 @@ class Rock(Prop):
         for i in range(8):  # Use 8 points for a smoother shape
             angle = (i * 2 * math.pi / 8) + self.rotation
             
-            # Add random variation to radius (±25%)
-            radius_variation = random.uniform(-0.25, 0.25)
+            # Add random variation to radius (±35%)
+            radius_variation = random.uniform(-0.35, 0.35)
             perturbed_radius = self._radius * (1 + radius_variation)
             
             # Calculate point position
@@ -411,8 +411,13 @@ class Rock(Prop):
             # Random rotation
             rotation = random.uniform(0, 2 * math.pi)
             
-            # Calculate rock size and try to find valid position
-            size = (SMALL_ROCK_SIZE if actual_type == RockType.SMALL else MEDIUM_ROCK_SIZE) * container._map.options.cell_size
+            # Calculate base rock size
+            base_size = (SMALL_ROCK_SIZE if actual_type == RockType.SMALL else MEDIUM_ROCK_SIZE) * container._map.options.cell_size
+            
+            # Add overall size variation (±30%)
+            size_variation = random.uniform(0.7, 1.3)
+            size = base_size * size_variation
+            
             valid_pos = cls.get_valid_position(size, container)
             
             if valid_pos:
