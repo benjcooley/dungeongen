@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from map.map import Map
+    from map.mapelement import MapElement
 
 class Altar(Prop):
     """An altar prop with a rectangular base and two dots."""

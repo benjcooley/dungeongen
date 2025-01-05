@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING, List
 
 if TYPE_CHECKING:
     from map.map import Map
+    from map.mapelement import MapElement
 
 class Stairs(Prop):
     """A staircase prop with parallel lines indicating steps."""
