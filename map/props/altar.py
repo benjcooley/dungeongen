@@ -52,13 +52,16 @@ class Altar(Prop):
         return cls._boundary_shape
         
     def _draw_content(self, canvas: skia.Canvas, bounds: Rectangle) -> None:
+        # Get prop shape once
+        prop_shape = self.get_prop_boundary_shape()
+        
         # Draw fill
         fill_paint = skia.Paint(
             AntiAlias=True,
             Style=skia.Paint.kFill_Style,
             Color=self._map.options.prop_fill_color
         )
-        self.get_prop_boundary_shape().draw(canvas, fill_paint)
+        prop_shape.draw(canvas, fill_paint)
         
         # Draw outline
         outline_paint = skia.Paint(
@@ -67,7 +70,7 @@ class Altar(Prop):
             StrokeWidth=self._map.options.prop_stroke_width,
             Color=self._map.options.prop_outline_color
         )
-        self.get_prop_boundary_shape().draw(canvas, outline_paint)
+        prop_shape.draw(canvas, outline_paint)
         
         # Draw decorative dots
         dot_paint = skia.Paint(
@@ -77,6 +80,6 @@ class Altar(Prop):
         )
         dot_radius = CELL_SIZE * 0.05
         dot_offset = ALTAR_HEIGHT * 0.3  # Offset from center
-        center_x = self.get_prop_boundary_shape().center()[0]
+        center_x = prop_shape.center()[0]
         canvas.drawCircle(center_x, -dot_offset, dot_radius, dot_paint)
         canvas.drawCircle(center_x, dot_offset, dot_radius, dot_paint)
