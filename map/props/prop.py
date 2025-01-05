@@ -97,7 +97,7 @@ class Prop(ABC):
         # Update the bounds
         self._bounds = self._boundary_shape.bounds
 
-    def snap_valid_position(self, x: float, y: float) -> tuple[float, float] | None:
+    def snap_valid_position(self, x: float, y: float) -> tuple[tuple[float, float], bool]:
         """Snap a position to the nearest valid position for this prop.
         
         For grid-aligned props, snaps to grid intersections.
@@ -109,10 +109,11 @@ class Prop(ABC):
             y: Y coordinate to snap
             
         Returns:
-            Tuple of (snapped_x, snapped_y) if valid position found, None otherwise
+            Tuple of ((snapped_x, snapped_y), success) where success is True if
+            a valid position was found, False otherwise
         """
         if not self.container:
-            return None
+            return ((x, y), False)
             
         # Handle grid-aligned props
         if self.is_grid_aligned():
@@ -122,8 +123,8 @@ class Prop(ABC):
             
             # Check if valid
             if self.is_valid_position(grid_x, grid_y, self.rotation, self.container):
-                return (grid_x, grid_y)
-            return None
+                return ((grid_x, grid_y), True)
+            return ((x, y), False)
             
         # Handle wall-aligned props
         elif self.is_wall_aligned() and isinstance(self.container._shape, Rectangle):
@@ -162,15 +163,15 @@ class Prop(ABC):
                     test_y = room_bounds.y + room_bounds.height - prop_height
                 
                 if self.is_valid_position(test_x, test_y, self.rotation, self.container):
-                    return (test_x, test_y)
+                    return ((test_x, test_y), True)
             
-            return None
+            return ((x, y), False)
             
         # For other props, just check if the original position is valid
         elif self.is_valid_position(x, y, self.rotation, self.container):
-            return (x, y)
+            return ((x, y), True)
             
-        return None
+        return ((x, y), False)
 
     def place_random_position(self, max_attempts: int = MAX_PLACEMENT_ATTEMPTS) -> bool:
         """Try to place this prop at a valid random position within its container.
@@ -196,8 +197,8 @@ class Prop(ABC):
             y = random.uniform(bounds.y, bounds.y + bounds.height)
             
             # Try to snap to valid position
-            snapped = self.snap_valid_position(x, y)
-            if snapped:
+            snapped, valid = self.snap_valid_position(x, y)
+            if valid:
                 self.position = snapped
                 return True
                 
