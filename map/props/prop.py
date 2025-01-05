@@ -174,7 +174,7 @@ class Prop(ABC):
             
         return ((x, y), False)
 
-    def place_random_position(self, max_attempts: int = MAX_PLACEMENT_ATTEMPTS) -> tuple[float, float] | None:
+    def place_random_position(self, max_attempts: int = MAX_PLACEMENT_ATTEMPTS) -> Point | None:
         """Try to place this prop at a valid random position within its container.
         
         Args:
@@ -197,11 +197,11 @@ class Prop(ABC):
             x = random.uniform(bounds.x, bounds.x + bounds.width)
             y = random.uniform(bounds.y, bounds.y + bounds.height)
             
-            # Try to snap to valid position
-            snapped, valid = self.snap_valid_position(x, y)
+            # Try to snap to valid position 
+            snapped_pos, valid = self.snap_valid_position(x, y)
             if valid:
-                self.position = snapped
-                return snapped
+                self.position = snapped_pos
+                return snapped_pos
                 
         return None
 
