@@ -1,9 +1,9 @@
 """Room map element definition."""
 
 import math
-import random
 from typing import List, TYPE_CHECKING, Tuple
 
+import random
 import skia
 
 from algorithms.math import Point
@@ -62,7 +62,6 @@ class Room(MapElement):
         base_size = self._map.options.cell_size * CORNER_SIZE
         
         # Calculate random variations for line lengths
-        import random
         variation_left = 1.0 + (random.random() * CORNER_LENGTH_VARIATION)
         variation_right = 1.0 + (random.random() * CORNER_LENGTH_VARIATION)
         
