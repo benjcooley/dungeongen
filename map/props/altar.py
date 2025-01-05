@@ -4,6 +4,7 @@ import skia
 from map.props.prop import Prop
 from map.props.rotation import Rotation
 from map.enums import Layers
+from algorithms.shapes import Rectangle
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
