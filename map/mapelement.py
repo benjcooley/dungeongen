@@ -128,15 +128,25 @@ class MapElement:
             canvas: The canvas to draw on
             layer: The current drawing layer
         """
-        # Draw decoration props first
-        for prop in self._props:
-            if prop.is_decoration:
-                prop.draw(canvas)
-                
-        # Then draw non-decoration props
-        for prop in self._props:
-            if not prop.is_decoration:
-                prop.draw(canvas)
+        if layer == Layers.PROPS:
+            # Draw decoration props first
+            for prop in self._props:
+                if prop.is_decoration:
+                    prop.draw(canvas)
+                    
+            # Then draw non-decoration props
+            for prop in self._props:
+                if not prop.is_decoration:
+                    prop.draw(canvas)
+        elif layer == Layers.SHADOWS:
+            # Only draw shadows for non-decoration props
+            for prop in self._props:
+                if not prop.is_decoration:
+                    prop.draw(canvas, layer)
+        else:
+            # For other layers, draw all props
+            for prop in self._props:
+                prop.draw(canvas, layer)
     
     def draw_occupied(self, grid: 'OccupancyGrid', element_idx: int) -> None:
         """Draw this element's shape into the occupancy grid.
