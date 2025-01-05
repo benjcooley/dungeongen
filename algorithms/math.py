@@ -151,6 +151,6 @@ class Point2:
         """Get perpendicular vector (rotated 90 degrees counterclockwise)."""
         return Point2(-self.y, self.x)
         
-    def to_tuple(self) -> Tuple[float, float]:
-        """Convert to (x,y) tuple."""
+    def to_point(self) -> Tuple[float, float]:
+        """Convert to Point tuple."""
         return (self.x, self.y)
