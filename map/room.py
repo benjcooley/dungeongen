@@ -1,6 +1,7 @@
 """Room map element definition."""
 
 from algorithms.shapes import Rectangle, Circle, Shape
+from algorithms.math import Point
 from typing import List, TYPE_CHECKING, Tuple
 import skia
 import math
