@@ -109,6 +109,26 @@ class Prop(MapElement, ABC):
         # Update the bounds
         self._bounds = self._shape.bounds
 
+    @property
+    def center(self) -> tuple[float, float]:
+        """Get the center position of the prop."""
+        return (self._x + self._width/2, self._y + self._height/2)
+        
+    @center.setter
+    def center(self, pos: tuple[float, float]) -> None:
+        """Set the center position of the prop.
+        
+        Args:
+            pos: Tuple of (x,y) coordinates for the new center position
+        """
+        # Calculate new top-left position from center
+        self._x = pos[0] - self._width/2
+        self._y = pos[1] - self._height/2
+        # Update the shape's position
+        self._shape = Rectangle(self._x, self._y, self._bounds.width, self._bounds.height)
+        # Update the bounds
+        self._bounds = self._shape.bounds
+
     @classmethod
     def is_valid_position(cls, x: float, y: float, rotation: Rotation, container: 'MapElement') -> bool:
         """Check if a position is valid for a prop within the container.
