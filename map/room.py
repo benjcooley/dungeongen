@@ -8,10 +8,14 @@ import math
 
 # Constant to make rooms slightly larger to ensure proper passage connections
 ROOM_OVERLAP_OFFSET = 4.0  # pixels
-# Corner size as fraction of cell size
-CORNER_SIZE = 0.25  # Increased size for more prominent corners
+# Base corner size as fraction of cell size
+CORNER_SIZE = 0.25
 # How far corners are inset from room edges
-CORNER_INSET = 0.20  # Increased inset to match example
+CORNER_INSET = 0.20
+# How much to vary the line lengths by (as fraction of base size)
+CORNER_LENGTH_VARIATION = 0.3
+# Control point scale for curve (relative to corner size)
+CURVE_CONTROL_SCALE = 0.5
 
 from map.mapelement import MapElement
 from graphics.conversions import grid_to_drawing, grid_to_drawing_size
@@ -48,13 +52,16 @@ class Room(MapElement):
             left: Direction vector parallel to left wall (from corner's perspective)
             right: Direction vector parallel to right wall (from corner's perspective)
         """
-        # Calculate corner size based on cell size with variation
+        # Calculate base corner size
         base_size = self._map.options.cell_size * CORNER_SIZE
-        var_size = base_size * (1 + (0.1 * (math.sin(corner.x * corner.y) * 0.5 + 0.5)))
         
-        # Normalize wall vectors and scale to size
-        left_norm = left.normalized() * var_size
-        right_norm = right.normalized() * var_size
+        # Calculate varied line lengths using corner position for consistency
+        variation_left = 1.0 + (CORNER_LENGTH_VARIATION * math.sin(corner.x * 0.1))
+        variation_right = 1.0 + (CORNER_LENGTH_VARIATION * math.cos(corner.y * 0.1))
+        
+        # Normalize wall vectors and scale with individual variations
+        left_norm = left.normalized() * (base_size * variation_left)
+        right_norm = right.normalized() * (base_size * variation_right)
         
         # Create corner path
         path = skia.Path()
@@ -66,8 +73,8 @@ class Room(MapElement):
         
         # Draw curved line to point along right wall
         p2 = corner + right_norm
-        cp1 = p1 + right_norm * 0.5  # Control point near p1
-        cp2 = p2 + left_norm * 0.5  # Control point near p2
+        cp1 = p1 + right_norm * CURVE_CONTROL_SCALE
+        cp2 = p2 + left_norm * CURVE_CONTROL_SCALE
         path.cubicTo(cp1.x, cp1.y, cp2.x, cp2.y, p2.x, p2.y)
         
         # Draw straight line back to corner
