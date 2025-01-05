@@ -343,8 +343,8 @@ class Prop(ABC):
         """
         return (0.0, 0.0)
 
-    @classmethod
-    def grid_size(cls) -> Point:
+    @property
+    def grid_size(self) -> Point:
         """Get the grid space occupied by this prop.
         
         For grid-aligned props, returns how many grid cells this prop occupies.
@@ -353,7 +353,9 @@ class Prop(ABC):
         Returns:
             Tuple of (width, height) in grid units
         """
-        return (0.0, 0.0)
+        if self._grid_bounds is None:
+            return (0.0, 0.0)
+        return self._grid_bounds
 
     @classmethod
     @abstractmethod
