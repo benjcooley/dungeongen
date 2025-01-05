@@ -60,20 +60,18 @@ class Room(MapElement):
         path = skia.Path()
         path.moveTo(corner.x, corner.y)
         
-        # Draw straight edges along walls
+        # Draw first straight line along wall1
         p1 = corner + wall1_norm
-        p2 = p1 + wall2_norm
-        
         path.lineTo(p1.x, p1.y)
-        path.lineTo(p2.x, p2.y)
-        path.lineTo(corner.x + wall2_norm.x, corner.y + wall2_norm.y)
         
-        # Calculate control points for curved inset
-        cp1 = corner + wall1_norm * 0.8 + wall2_norm * 0.2
-        cp2 = corner + wall1_norm * 0.2 + wall2_norm * 0.8
+        # Draw curved line to point along wall2
+        p2 = corner + wall2_norm
+        cp1 = p1 + wall2_norm * 0.5  # Control point near p1
+        cp2 = p2 + wall1_norm * 0.5  # Control point near p2
+        path.cubicTo(cp1.x, cp1.y, cp2.x, cp2.y, p2.x, p2.y)
         
-        # Add curved section back to start
-        path.cubicTo(cp1.x, cp1.y, cp2.x, cp2.y, corner.x, corner.y)
+        # Draw straight line back to corner
+        path.lineTo(corner.x, corner.y)
         
         # Fill the corner with black
         corner_paint = skia.Paint(
