@@ -61,7 +61,7 @@ class Altar(Prop):
             Style=skia.Paint.kFill_Style,
             Color=self._map.options.prop_fill_color
         )
-        prop_shape.draw(canvas, fill_paint)
+        rect_shape.draw(canvas, fill_paint)
         
         # Draw outline
         outline_paint = skia.Paint(
@@ -70,7 +70,7 @@ class Altar(Prop):
             StrokeWidth=self._map.options.prop_stroke_width,
             Color=self._map.options.prop_outline_color
         )
-        prop_shape.draw(canvas, outline_paint)
+        rect_shape.draw(canvas, outline_paint)
         
         # Draw decorative dots
         dot_paint = skia.Paint(
