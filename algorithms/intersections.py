@@ -2,6 +2,7 @@
 
 from typing import TYPE_CHECKING
 import math
+import skia
 
 if TYPE_CHECKING:
     from algorithms.shapes import Rectangle, Circle, Shape, ShapeGroup
