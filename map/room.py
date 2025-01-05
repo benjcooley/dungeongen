@@ -17,11 +17,11 @@ ROOM_OVERLAP_OFFSET = 4.0  # pixels
 # Base corner size as fraction of cell size
 CORNER_SIZE = 0.25
 # How far corners are inset from room edges
-CORNER_INSET = 0.20
+CORNER_INSET = 0.15  # Decreased from 0.20
 # How much to vary the line lengths by (as fraction of base size)
-CORNER_LENGTH_VARIATION = 0.3
+CORNER_LENGTH_VARIATION = 0.5  # Increased from 0.3
 # Control point scale for curve (relative to corner size)
-CURVE_CONTROL_SCALE = 0.5
+CURVE_CONTROL_SCALE = 0.8  # Increased from 0.5 for more concavity
 
 from map.mapelement import MapElement
 from graphics.conversions import grid_to_drawing, grid_to_drawing_size
