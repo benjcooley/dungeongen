@@ -94,6 +94,38 @@ class Prop(ABC):
         # Update the bounds
         self._bounds = self._boundary_shape.bounds
 
+    def place_random_position(self, max_attempts: int = 30) -> bool:
+        """Try to place this prop at a valid random position within its container.
+        
+        Args:
+            max_attempts: Maximum number of random positions to try
+            
+        Returns:
+            True if a valid position was found, False if all attempts failed
+            
+        Note: The prop must already be added to a container element.
+        """
+        if not self.container:
+            return False
+            
+        # Get container bounds
+        bounds = self.container.bounds
+        
+        # Try random positions
+        for _ in range(max_attempts):
+            # Generate random position within bounds
+            x = random.uniform(bounds.x, bounds.x + bounds.width)
+            y = random.uniform(bounds.y, bounds.y + bounds.height)
+            
+            # Update position
+            self.position = (x, y)
+            
+            # Check if valid
+            if self.is_valid_position(x, y, self.rotation, self.container):
+                return True
+                
+        return False
+
     @property
     def center(self) -> Point:
         """Get the center position of the prop."""
