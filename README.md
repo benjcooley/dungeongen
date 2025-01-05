@@ -104,8 +104,13 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
-[Add your chosen license here]
+Apache License 2.0
 
 ## Credits
 
-[Add credits/acknowledgments here]
+This project is a reimplementation of Watabou's One Page Dungeon Generator:
+- Original creator: [Watabou](https://watabou.itch.io)
+- AI Development Advisor: Claude 3.5 Sonnet
+- Additional AI Development: OpenAI ChatGPT 4.0
+
+Please consider supporting the original creator through [Patreon](https://www.patreon.com/watawatabou)!
