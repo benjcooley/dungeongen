@@ -1,5 +1,6 @@
 import skia
 from typing import ClassVar, TYPE_CHECKING
+from algorithms.types import Point
 
 if TYPE_CHECKING:
     from map.map import Map
@@ -68,12 +69,12 @@ class Altar(Prop):
         return True
         
     @classmethod
-    def prop_size(cls) -> tuple[float, float]:
+    def prop_size(cls) -> 'Point':
         """Get the size of this prop type in drawing units."""
         return (ALTAR_WIDTH, ALTAR_HEIGHT)  # Use altar-specific dimensions
         
     @classmethod
-    def prop_grid_size(cls) -> tuple[float, float]:
+    def prop_grid_size(cls) -> 'Point':
         """Altars occupy 1x1 grid cells."""
         return (1.0, 1.0)  # Square grid cell
         

@@ -5,6 +5,7 @@ import math
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Optional, ClassVar
 from algorithms.types import Point
+from algorithms.types import Point
 import skia
 from algorithms.shapes import Rectangle, Shape
 from map.mapelement import MapElement
@@ -77,7 +78,7 @@ class Prop(ABC):
             self._draw_content(canvas, bounds)
             
     @property
-    def position(self) -> tuple[float, float]:
+    def position(self) -> 'Point':
         """Get the current position of the prop."""
         return (self._x, self._y)
         
@@ -91,7 +92,7 @@ class Prop(ABC):
         self._bounds = self._boundary_shape.bounds
 
     @property
-    def center(self) -> tuple[float, float]:
+    def center(self) -> 'Point':
         """Get the center position of the prop."""
         return (self._x + self._width/2, self._y + self._height/2)
         
@@ -157,7 +158,7 @@ class Prop(ABC):
         ...
 
     @classmethod
-    def grid_offset(cls) -> tuple[float, float]:
+    def grid_offset(cls) -> 'Point':
         """Get the offset from grid position to prop position.
         
         For grid-aligned props, this returns the offset needed to properly
@@ -170,7 +171,7 @@ class Prop(ABC):
         return (0.0, 0.0)
 
     @classmethod
-    def grid_size(cls) -> tuple[float, float]:
+    def grid_size(cls) -> 'Point':
         """Get the grid space occupied by this prop.
         
         For grid-aligned props, returns how many grid cells this prop occupies.
@@ -183,7 +184,7 @@ class Prop(ABC):
 
     @classmethod
     @abstractmethod
-    def prop_size(cls) -> tuple[float, float]:
+    def prop_size(cls) -> 'Point':
         """Get the actual size of this prop in drawing units.
         
         This defines the prop's tight bounding rectangle size.
