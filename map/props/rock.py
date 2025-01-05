@@ -19,6 +19,11 @@ MEDIUM_ROCK_SIZE = 1/8
 class Rock(Prop):
     """A rock prop with irregular circular shape."""
     
+    @property
+    def is_decoration(self) -> bool:
+        """Rocks are decorative floor items."""
+        return True
+    
     def __init__(self, x: float, y: float, size: float, map_: 'Map', rotation: float = 0.0) -> None:
         """Initialize a rock with position and size.
         

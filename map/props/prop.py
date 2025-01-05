@@ -77,6 +77,15 @@ class Prop(MapElement, ABC):
         pass
 
 
+    @property
+    def is_decoration(self) -> bool:
+        """Whether this prop is a decoration that should be drawn before other props.
+        
+        Decoration props are small floor items like rocks and cracks that don't
+        need to check intersection with other props.
+        """
+        return False
+
     def draw(self, canvas: skia.Canvas, layer: Layers = Layers.PROPS) -> None:
         """Override base MapElement draw to prevent drawing bounds rectangle."""
         # Props should implement their own draw logic

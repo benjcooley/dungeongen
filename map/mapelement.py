@@ -112,6 +112,11 @@ class MapElement:
             self._map.remove_element(self)
     
 
+    @property
+    def is_decoration(self) -> bool:
+        """Whether this element is a decoration that should be drawn before other props."""
+        return False
+
     def draw(self, canvas: 'skia.Canvas', layer: 'Layers' = Layers.PROPS) -> None:
         """Draw this element on the specified layer.
         
@@ -123,9 +128,15 @@ class MapElement:
             canvas: The canvas to draw on
             layer: The current drawing layer
         """
-        # Always draw props regardless of layer
+        # Draw decoration props first
         for prop in self._props:
-            prop.draw(canvas)
+            if prop.is_decoration:
+                prop.draw(canvas)
+                
+        # Then draw non-decoration props
+        for prop in self._props:
+            if not prop.is_decoration:
+                prop.draw(canvas)
     
     def draw_occupied(self, grid: 'OccupancyGrid', element_idx: int) -> None:
         """Draw this element's shape into the occupancy grid.
