@@ -8,11 +8,9 @@ import math
 # Constant to make rooms slightly larger to ensure proper passage connections
 ROOM_OVERLAP_OFFSET = 4.0  # pixels
 # Corner size as fraction of cell size
-CORNER_SIZE = 0.1
+CORNER_SIZE = 0.15  # Increased size for more prominent corners
 # How far corners are inset from room edges
-CORNER_INSET = 0.1
-# Control point scale factor for bezier curve (higher = more curved)
-CORNER_CURVE_FACTOR = 0.6
+CORNER_INSET = 0.15  # Increased inset to match example
 
 from map.mapelement import MapElement
 from graphics.conversions import grid_to_drawing, grid_to_drawing_size
@@ -56,28 +54,31 @@ class Room(MapElement):
         # Create corner path
         path = skia.Path()
         
+        # Calculate direction multipliers
+        dx = 1 if flip_x else -1
+        dy = 1 if flip_y else -1
+        
         # Start at inner corner
         path.moveTo(x, y)
         
-        # Calculate end points of the two straight lines
-        dx = size * (1 if flip_x else -1)
-        dy = size * (1 if flip_y else -1)
+        # Calculate points for the L shape
+        outer_x = x + (size * 1.5 * dx)  # Make outer line 1.5x longer
+        outer_y = y + (size * 1.5 * dy)
         
-        # Add first line
-        x1 = x + dx
-        path.lineTo(x1, y)
+        # Draw the L shape
+        path.lineTo(outer_x, y)  # Horizontal line
+        path.lineTo(outer_x, y + (size * 0.3 * dy))  # Small vertical segment
+        path.lineTo(x + (size * 0.3 * dx), outer_y)  # Small horizontal segment
+        path.lineTo(x, outer_y)  # Vertical line
         
-        # Add second line
-        y1 = y + dy
-        path.lineTo(x, y1)
-        
-        # Calculate control point for bezier curve
-        # Move control point inward by scaling both coordinates
-        control_x = x + (dx * CORNER_CURVE_FACTOR)
-        control_y = y + (dy * CORNER_CURVE_FACTOR)
+        # Calculate control points for the curved inner section
+        cp1x = x + (size * 0.8 * dx)
+        cp1y = y + (size * 0.2 * dy)
+        cp2x = x + (size * 0.2 * dx)
+        cp2y = y + (size * 0.8 * dy)
         
         # Add curved section back to start
-        path.quadTo(control_x, control_y, x, y)
+        path.cubicTo(cp1x, cp1y, cp2x, cp2y, x, y)
         
         # Fill the corner with black
         corner_paint = skia.Paint(
