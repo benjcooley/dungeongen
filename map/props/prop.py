@@ -1,6 +1,7 @@
 """Base class for map props."""
 
 import random
+import math
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Optional, ClassVar
 import skia
