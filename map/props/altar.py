@@ -9,8 +9,9 @@ from map.props.prop import Prop
 from map.props.rotation import Rotation
 
 # Constants for altar dimensions
-ALTAR_INSET = CELL_SIZE * 0.15  # Inset from cell edges
 ALTAR_WIDTH = CELL_SIZE * 0.3   # Width of altar surface
+ALTAR_HEIGHT = CELL_SIZE * 0.7  # Height of altar
+ALTAR_INSET = (CELL_SIZE - ALTAR_HEIGHT) / 2  # Calculated inset from cell edges
 
 class Altar(Prop):
     """An altar prop that appears as a small rectangular table with decorative dots."""
