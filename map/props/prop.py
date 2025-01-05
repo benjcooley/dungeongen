@@ -222,22 +222,14 @@ class Prop(ABC):
         center_x = self._x + self._width/2
         center_y = self._y + self._height/2
         
-        # Get grid size and offset
-        grid_size = self.prop_grid_size()
-        if grid_size is None:
-            raise ValueError(f"Grid-aligned prop {self.__class__.__name__} must specify prop_grid_size")
-            
-        # Calculate grid position based on rotation, rounding down to integers
-        if self.rotation in (Rotation.ROT_0, Rotation.ROT_90):
-            return (
-                math.floor((center_x / CELL_SIZE) - grid_size[0]/2),
-                math.floor((center_y / CELL_SIZE) - grid_size[1]/2)
-            )
-        else:  # ROT_180, ROT_270
-            return (
-                math.floor((center_x / CELL_SIZE) - (1 - grid_size[0]/2)),
-                math.floor((center_y / CELL_SIZE) - (1 - grid_size[1]/2))
-            )
+        # Get offset from grid point to center
+        offset = self._get_grid_center_offset(self.rotation)
+        
+        # Subtract offset from center to get grid position, rounding down to integers
+        return (
+            math.floor(center_x / CELL_SIZE - offset[0]),
+            math.floor(center_y / CELL_SIZE - offset[1])
+        )
     
     @grid_position.setter
     def grid_position(self, pos: tuple[float, float]) -> None:
@@ -253,19 +245,13 @@ class Prop(ABC):
             self.position = (pos[0] * CELL_SIZE, pos[1] * CELL_SIZE)
             return
             
-        # For grid-aligned props, calculate center position
-        grid_size = self.prop_grid_size()
-        if grid_size is None:
-            raise ValueError(f"Grid-aligned prop {self.__class__.__name__} must specify prop_grid_size")
-            
-        # Calculate center offset based on rotation
-        if self.rotation in (Rotation.ROT_0, Rotation.ROT_90):
-            center_x = (pos[0] + grid_size[0]/2) * CELL_SIZE
-            center_y = (pos[1] + grid_size[1]/2) * CELL_SIZE
-        else:  # ROT_180, ROT_270
-            center_x = (pos[0] + (1 - grid_size[0]/2)) * CELL_SIZE
-            center_y = (pos[1] + (1 - grid_size[1]/2)) * CELL_SIZE
-            
+        # Get offset from grid point to center
+        offset = self._get_grid_center_offset(self.rotation)
+        
+        # Calculate center position by adding offset to grid position
+        center_x = (pos[0] + offset[0]) * CELL_SIZE
+        center_y = (pos[1] + offset[1]) * CELL_SIZE
+        
         # Set position based on calculated center
         self.position = (
             center_x - self._width/2,
@@ -405,6 +391,42 @@ class Prop(ABC):
             
         # Create transformed shape - rotate first, then translate to center point
         return base_shape.rotated(rotation).translated(center[0], center[1])
+
+    @classmethod
+    def _get_grid_center_offset(cls, rotation: Rotation) -> Point:
+        """Calculate offset from grid point to center based on rotation.
+        
+        For grid-aligned props, calculates the offset from the upper-left grid point
+        to the prop's center point, accounting for rotation.
+        
+        Args:
+            rotation: Prop rotation
+            
+        Returns:
+            Tuple of (offset_x, offset_y) in grid units
+            
+        Raises:
+            ValueError: If prop_grid_size is not defined for grid-aligned props
+        """
+        grid_size = cls.prop_grid_size()
+        if grid_size is None:
+            raise ValueError(f"Grid-aligned prop {cls.__name__} must specify prop_grid_size")
+            
+        width, height = grid_size
+        
+        # For 90° and 270° rotations, swap width and height
+        if rotation in (Rotation.ROT_90, Rotation.ROT_270):
+            width, height = height, width
+            
+        # Calculate center offset based on rotation
+        if rotation == Rotation.ROT_0:
+            return (width/2, height/2)
+        elif rotation == Rotation.ROT_90:
+            return (width/2, height/2)
+        elif rotation == Rotation.ROT_180:
+            return (1 - width/2, 1 - height/2)
+        else:  # ROT_270
+            return (1 - width/2, 1 - height/2)
 
     @classmethod
     def center_to_map_position(cls, center: Point, rotation: Rotation) -> Point:
