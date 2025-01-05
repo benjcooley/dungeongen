@@ -371,14 +371,8 @@ class Rectangle:
         
     def intersects(self, other: 'Shape') -> bool:
         """Check if this rectangle intersects with another shape."""
-        from algorithms.intersections import rect_rect_intersect, rect_circle_intersect
-        
-        if isinstance(other, Rectangle):
-            return rect_rect_intersect(self, other)
-        elif isinstance(other, Circle):
-            return rect_circle_intersect(self, other)
-        else:
-            raise TypeError(f"Intersection not implemented between Rectangle and {type(other)}")
+        from algorithms.intersections import shape_intersects
+        return shape_intersects(self, other)
         
     def _bounds_intersect(self, other: 'Rectangle') -> bool:
         """Test if this rectangle's bounds intersect another rectangle."""
@@ -470,14 +464,8 @@ class Circle:
         
     def intersects(self, other: 'Shape') -> bool:
         """Check if this circle intersects with another shape."""
-        from algorithms.intersections import circle_circle_intersect, rect_circle_intersect
-        
-        if isinstance(other, Circle):
-            return circle_circle_intersect(self, other)
-        elif isinstance(other, Rectangle):
-            return rect_circle_intersect(other, self)
-        else:
-            raise TypeError(f"Intersection not implemented between Circle and {type(other)}")
+        from algorithms.intersections import shape_intersects
+        return shape_intersects(self, other)
         
     def _bounds_intersect(self, other: Rectangle) -> bool:
         """Test if this circle's bounds intersect a rectangle."""

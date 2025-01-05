@@ -6,6 +6,41 @@ import math
 if TYPE_CHECKING:
     from algorithms.shapes import Rectangle, Circle, Shape, ShapeGroup
 
+def shape_intersects(shape1: 'Shape', shape2: 'Shape') -> bool:
+    """Generic shape intersection test.
+    
+    Args:
+        shape1: First shape to test
+        shape2: Second shape to test
+        
+    Returns:
+        True if shapes intersect, False otherwise
+        
+    Raises:
+        TypeError: If shape combination is not supported
+    """
+    # Handle ShapeGroup specially
+    if isinstance(shape1, ShapeGroup):
+        return shape_group_intersect(shape1, shape2)
+    elif isinstance(shape2, ShapeGroup):
+        return shape_group_intersect(shape2, shape1)
+        
+    # Test rectangle combinations
+    if isinstance(shape1, Rectangle):
+        if isinstance(shape2, Rectangle):
+            return rect_rect_intersect(shape1, shape2)
+        elif isinstance(shape2, Circle):
+            return rect_circle_intersect(shape1, shape2)
+            
+    # Test circle combinations        
+    elif isinstance(shape1, Circle):
+        if isinstance(shape2, Circle):
+            return circle_circle_intersect(shape1, shape2)
+        elif isinstance(shape2, Rectangle):
+            return rect_circle_intersect(shape2, shape1)
+            
+    raise TypeError(f"Intersection not implemented between {type(shape1)} and {type(shape2)}")
+
 def rect_rect_intersect(rect1: 'Rectangle', rect2: 'Rectangle') -> bool:
     """Test intersection between two rectangles."""
     return (rect1.x < rect2.x + rect2.width and
