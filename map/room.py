@@ -57,8 +57,8 @@ class Room(MapElement):
         
         # Calculate random variations for line lengths
         import random
-        variation_left = 1.0 + (CORNER_LENGTH_VARIATION * (random.random() * 2 - 1))
-        variation_right = 1.0 + (CORNER_LENGTH_VARIATION * (random.random() * 2 - 1))
+        variation_left = 1.0 + (random.random() * CORNER_LENGTH_VARIATION)
+        variation_right = 1.0 + (random.random() * CORNER_LENGTH_VARIATION)
         
         # Scale the normalized vectors by the varied sizes
         left_norm = left * (base_size * variation_left)
