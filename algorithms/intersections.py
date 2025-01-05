@@ -8,7 +8,10 @@ if TYPE_CHECKING:
     from algorithms.shapes import Rectangle, Circle, Shape, ShapeGroup
 
 def shape_intersects(shape1: 'Shape', shape2: 'Shape') -> bool:
-    """Test if two shapes intersect using Skia path operations.
+    """Test if two shapes intersect.
+    
+    Uses Skia path operations for complex shapes (ShapeGroups or inflated shapes),
+    and simpler geometric tests for basic shapes.
     
     Args:
         shape1: First shape to test
@@ -21,7 +24,25 @@ def shape_intersects(shape1: 'Shape', shape2: 'Shape') -> bool:
     if not shape1._bounds_intersect(shape2.bounds):
         return False
         
-    # Use Skia path intersection
+    # Use Skia for ShapeGroups or inflated shapes
+    if (isinstance(shape1, ShapeGroup) or isinstance(shape2, ShapeGroup) or
+        getattr(shape1, '_inflate', 0) != 0 or getattr(shape2, '_inflate', 0) != 0):
+        result = skia.Op(shape1.path, shape2.path, skia.PathOp.kIntersect_PathOp)
+        return not result.isEmpty()
+        
+    # Use geometric tests for basic shapes
+    if isinstance(shape1, Rectangle):
+        if isinstance(shape2, Rectangle):
+            return rect_rect_intersect(shape1, shape2)
+        elif isinstance(shape2, Circle):
+            return rect_circle_intersect(shape1, shape2)
+    elif isinstance(shape1, Circle):
+        if isinstance(shape2, Circle):
+            return circle_circle_intersect(shape1, shape2)
+        elif isinstance(shape2, Rectangle):
+            return rect_circle_intersect(shape2, shape1)
+            
+    # Fall back to Skia for unknown shape combinations
     result = skia.Op(shape1.path, shape2.path, skia.PathOp.kIntersect_PathOp)
     return not result.isEmpty()
 
