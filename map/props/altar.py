@@ -1,10 +1,12 @@
-from typing import ClassVar, TYPE_CHECKING
+"""Altar prop implementation."""
 
+from typing import ClassVar, TYPE_CHECKING
 import skia
 
 from algorithms.shapes import Rectangle, Shape
 from algorithms.types import Point
 from constants import CELL_SIZE
+from graphics.conversions import grid_to_drawing
 from map.enums import Layers
 from map.mapelement import MapElement
 from map.props.prop import Prop
@@ -26,34 +28,39 @@ class Altar(Prop):
         """Create an altar at grid coordinates.
         
         Args:
-            grid_x: Grid X coordinate (top-left)
-            grid_y: Grid Y coordinate (top-left)
+            grid_x: Grid X coordinate
+            grid_y: Grid Y coordinate
             map_: Parent map instance
             rotation: Rotation angle in 90° increments (default: facing right)
             
         Returns:
             New Altar instance
         """
-        from graphics.conversions import grid_to_drawing
         x, y = grid_to_drawing(grid_x, grid_y, map_.options)
-        return cls(x, y, map_, rotation)
+        center_x = x + CELL_SIZE / 2
+        center_y = y + CELL_SIZE / 2
+        return cls(center_x, center_y, map_, rotation)
         
-    def __init__(self, x: float, y: float, map_: 'Map', rotation: Rotation = Rotation.ROT_0) -> None:
+    def __init__(self, center_x: float, center_y: float, map_: 'Map', rotation: Rotation = Rotation.ROT_0) -> None:
         """Initialize an altar prop.
         
         Note: Use from_grid() to create altars at grid coordinates.
         
         Args:
-            x: X coordinate in drawing units
-            y: Y coordinate in drawing units
+            center_x: Center X coordinate in drawing units
+            center_y: Center Y coordinate in drawing units
             map_: Parent map instance
             rotation: Rotation angle in 90° increments (default: facing right)
         """
+        # Calculate top-left coordinates
+        x = center_x - CELL_SIZE / 2
+        y = center_y - CELL_SIZE / 2
+        
         # Create grid-aligned rectangle and boundary shape
         rect = Rectangle(x, y, CELL_SIZE, CELL_SIZE)  # Full grid cell
         boundary = Rectangle(
-            x + (CELL_SIZE - ALTAR_WIDTH) / 2,  # Center in cell
-            y + (CELL_SIZE - ALTAR_HEIGHT) / 2,
+            center_x - ALTAR_WIDTH / 2,  # Center on given point
+            center_y - ALTAR_HEIGHT / 2,
             ALTAR_WIDTH,
             ALTAR_HEIGHT
         )
