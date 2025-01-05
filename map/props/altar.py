@@ -2,6 +2,7 @@ import skia
 from map.props.prop import Prop
 from map.props.rotation import Rotation
 from algorithms.shapes import Rectangle, Shape
+from map.mapelement import MapElement
 
 class Altar(Prop):
     """An altar prop that appears as a small rectangular table with decorative dots."""
