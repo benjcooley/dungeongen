@@ -1,15 +1,17 @@
-import random
 import math
-import skia
+import random
 from typing import List, TYPE_CHECKING
+
+import skia
+
+from algorithms.shapes import Circle, Rectangle, Shape
 from algorithms.types import Point
+from constants import CELL_SIZE
+from graphics.conversions import grid_to_drawing
 from map.enums import Layers, RockType
 from map.mapelement import MapElement
-from graphics.conversions import grid_to_drawing
 from map.props.prop import Prop
 from map.props.rotation import Rotation
-from algorithms.shapes import Circle, Point, Shape, Rectangle
-from constants import CELL_SIZE
 
 if TYPE_CHECKING:
     from map.map import Map
