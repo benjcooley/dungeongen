@@ -65,14 +65,14 @@ class Matrix2D:
             ty=self.c * other.tx + self.d * other.ty + self.ty
         )
     
-    def transform_point(self, point: 'Point2') -> 'Point2':
+    def transform_point(self, point: 'Point2D') -> 'Point2D':
         """Transform a point using this matrix."""
-        return Point(
+        return Point2D(
             self.a * point.x + self.b * point.y + self.tx,
             self.c * point.x + self.d * point.y + self.ty
         )
     
-    def transform_points(self, points: List['Point2']) -> List['Point2']:
+    def transform_points(self, points: List['Point2D']) -> List['Point2D']:
         """Transform multiple points using this matrix."""
         return [self.transform_point(p) for p in points]
     
@@ -96,7 +96,7 @@ class Matrix2D:
             ty=-(self.a * self.ty - self.c * self.tx) * inv_det
         )
 
-class Point2:
+class Point2D:
     """A 2D point/vector with basic vector operations."""
     
     def __init__(self, x: float = 0.0, y: float = 0.0) -> None:
@@ -114,21 +114,21 @@ class Point2:
         """Create a Point2 from a Point tuple."""
         return cls(point[0], point[1])
     
-    def __add__(self, other: Point) -> 'Point2':
-        return Point2(self.x + other.x, self.y + other.y)
+    def __add__(self, other: Point) -> 'Point2D':
+        return Point2D(self.x + other.x, self.y + other.y)
         
-    def __sub__(self, other: Point) -> 'Point2':
-        return Point2(self.x - other.x, self.y - other.y)
+    def __sub__(self, other: Point) -> 'Point2D':
+        return Point2D(self.x - other.x, self.y - other.y)
         
-    def __mul__(self, scalar: float) -> 'Point2':
-        return Point2(self.x * scalar, self.y * scalar)
+    def __mul__(self, scalar: float) -> 'Point2D':
+        return Point2D(self.x * scalar, self.y * scalar)
         
-    def __truediv__(self, scalar: float) -> 'Point2':
-        return Point2(self.x / scalar, self.y / scalar)
+    def __truediv__(self, scalar: float) -> 'Point2D':
+        return Point2D(self.x / scalar, self.y / scalar)
         
-    def __neg__(self) -> 'Point2':
+    def __neg__(self) -> 'Point2D':
         """Return negated vector (-x, -y)."""
-        return Point2(-self.x, -self.y)
+        return Point2D(-self.x, -self.y)
         
     def dot(self, other: Point) -> float:
         """Compute dot product with another vector."""
@@ -138,25 +138,25 @@ class Point2:
         """Get vector length."""
         return math.sqrt(self.x * self.x + self.y * self.y)
         
-    def normalized(self) -> 'Point2':
+    def normalized(self) -> 'Point2D':
         """Get normalized vector (length 1)."""
         length = self.length()
         if length == 0:
-            return Point2(0, 0)
+            return Point2D(0, 0)
         return self / length
         
-    def rotated(self, angle: float) -> 'Point2':
+    def rotated(self, angle: float) -> 'Point2D':
         """Return vector rotated by angle (in radians)."""
         cos_a = math.cos(angle)
         sin_a = math.sin(angle)
-        return Point2(
+        return Point2D(
             self.x * cos_a - self.y * sin_a,
             self.x * sin_a + self.y * cos_a
         )
         
-    def perpendicular(self) -> 'Point2':
+    def perpendicular(self) -> 'Point2D':
         """Get perpendicular vector (rotated 90 degrees counterclockwise)."""
-        return Point2(-self.y, self.x)
+        return Point2D(-self.y, self.x)
         
     def to_point(self) -> Tuple[float, float]:
         """Convert to Point tuple."""

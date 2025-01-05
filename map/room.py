@@ -6,7 +6,7 @@ from typing import List, TYPE_CHECKING, Tuple
 import random
 import skia
 
-from algorithms.math import Point2
+from algorithms.math import Point2D
 from algorithms.shapes import Rectangle, Circle, Shape
 from graphics.conversions import grid_to_drawing, grid_to_drawing_size
 from map.enums import Layers
@@ -52,7 +52,7 @@ class Room(MapElement):
         )
         super().__init__(shape=shape, map_=map_)
     
-    def _draw_corner(self, canvas: skia.Canvas, corner: Point2, left: Point2, right: Point2) -> None:
+    def _draw_corner(self, canvas: skia.Canvas, corner: Point2D, left: Point2D, right: Point2D) -> None:
         """Draw a single corner decoration.
         
         Args:
@@ -105,17 +105,17 @@ class Room(MapElement):
         bottom = self._bounds.y + self._bounds.height - inset
         
         # Create corner points and wall vectors
-        from algorithms.math import Point2
+        from algorithms.math import Point2D
         
         # Corner positions
-        tl = Point2(left, top)
-        tr = Point2(right, top)
-        bl = Point2(left, bottom)
-        br = Point2(right, bottom)
+        tl = Point2D(left, top)
+        tr = Point2D(right, top)
+        bl = Point2D(left, bottom)
+        br = Point2D(right, bottom)
         
         # Wall direction vectors
-        right_vec = Point2(1, 0)
-        down_vec = Point2(0, 1)
+        right_vec = Point2D(1, 0)
+        down_vec = Point2D(0, 1)
         
         # Draw all four corners with appropriate wall vectors
         self._draw_corner(canvas, tl, right_vec, down_vec)      # Top-left
