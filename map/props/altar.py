@@ -40,11 +40,8 @@ class Altar(Prop):
     def get_prop_shape(cls) -> Shape:
         """Get the cached shape instance for this prop type."""
         if cls._shape_instance is None:
-            # Create a rectangle 1 cell wide by 2 cells high
-            width = CELL_SIZE
-            height = CELL_SIZE * 2
-            # Center it at origin
-            cls._shape_instance = Rectangle(-width/2, -height/2, width, height)
+            # Create a 1x2 grid rectangle centered at origin
+            cls._shape_instance = Rectangle.centered_grid(1, 2)
         return cls._shape_instance
         
     def _draw_content(self, canvas: skia.Canvas, bounds: Rectangle) -> None:

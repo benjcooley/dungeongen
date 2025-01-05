@@ -271,6 +271,42 @@ class Rectangle:
     def inflated(self, amount: float) -> 'Rectangle':
         """Return a new rectangle inflated by the given amount."""
         return Rectangle(self.x, self.y, self.width, self.height, self._inflate + amount)
+        
+    def adjust(self, left: float, top: float, right: float, bottom: float) -> 'Rectangle':
+        """Return a new rectangle with edges adjusted by the given amounts.
+        
+        Args:
+            left: Amount to adjust left edge (negative moves left)
+            top: Amount to adjust top edge (negative moves up)
+            right: Amount to adjust right edge (positive expands)
+            bottom: Amount to adjust bottom edge (positive expands)
+            
+        Returns:
+            A new Rectangle with adjusted edges
+        """
+        return Rectangle(
+            self.x + left,
+            self.y + top,
+            self.width + (right - left),
+            self.height + (bottom - top),
+            self._inflate
+        )
+    
+    @classmethod
+    def centered_grid(cls, grid_width: float, grid_height: float) -> 'Rectangle':
+        """Create a rectangle centered at (0,0) with dimensions in grid units.
+        
+        Args:
+            grid_width: Width in grid units
+            grid_height: Height in grid units
+            
+        Returns:
+            A new Rectangle centered at origin with given grid dimensions
+        """
+        from constants import CELL_SIZE
+        width = grid_width * CELL_SIZE
+        height = grid_height * CELL_SIZE
+        return cls(-width/2, -height/2, width, height)
 
 class Circle:
     def __init__(self, cx: float, cy: float, radius: float, inflate: float = 0) -> None:
