@@ -235,16 +235,13 @@ class ShapeGroup:
         This matches the expected behavior where excluded areas should
         not grow when inflating the overall shape.
         """
-        return ShapeGroup(
+        new_group = ShapeGroup(
             includes=[s.inflated(amount) for s in self.includes],
             excludes=list(self.excludes)  # Keep excludes unchanged
-        )._with_inflate(self._inflate + amount)
+        )
+        new_group._inflate = self._inflate + amount
+        return new_group
 
-    def _with_inflate(self, amount: float) -> 'ShapeGroup':
-        """Internal helper to set inflation amount."""
-        self._inflate = amount
-        return self
-        
     def rotate(self, rotation: 'Rotation') -> None:
         """Rotate all shapes in this group by 90-degree increment in-place."""
         for shape in self.includes:
