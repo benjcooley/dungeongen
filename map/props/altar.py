@@ -54,7 +54,7 @@ class Altar(Prop):
                 left=ALTAR_INSET,
                 top=ALTAR_INSET,
                 right=-right_inset,
-                bottom=ALTAR_INSET
+                bottom=-ALTAR_INSET
             )
         return cls._shape_instance
         
