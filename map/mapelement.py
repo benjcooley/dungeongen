@@ -138,7 +138,7 @@ class MapElement:
             for prop in self._props:
                 if not prop.is_decoration:
                     prop.draw(canvas)
-        elif layer == Layers.SHADOWS:
+        elif layer == Layers.SHADOW:
             # Only draw shadows for non-decoration props
             for prop in self._props:
                 if not prop.is_decoration:
