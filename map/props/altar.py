@@ -26,36 +26,14 @@ class Altar(Prop):
         return True
         
     @classmethod
-    def prop_size(cls) -> tuple[float, float]:
-        """Get the width and height of this prop type.
-        
-        Returns:
-            Tuple of (width, height) from the prop's shape
-        """
-        shape = cls.get_prop_shape()
-        return (shape.bounds.width, shape.bounds.height)
+    def prop_size(cls) -> float:
+        """Get the size of this prop type in drawing units."""
+        return CELL_SIZE
         
     @classmethod
     def prop_grid_size(cls) -> float:
-        """Altars occupy 1x2 grid cells."""
+        """Altars occupy 1x1 grid cells."""
         return 1.0
-        
-    _shape_instance: ClassVar[Shape] = None
-    
-    @classmethod
-    def get_prop_boundary_shape(cls) -> Shape:
-        """Get the cached shape instance for this prop type."""
-        if cls._shape_instance is None:
-            # Start with a 1x1 centered grid rectangle
-            base = Rectangle.centered_grid(1, 1)
-            # Adjust edges with insets
-            cls._shape_instance = base.adjust(
-                left=ALTAR_INSET,
-                top=ALTAR_INSET,
-                right=-(CELL_SIZE - ALTAR_INSET - ALTAR_WIDTH),
-                bottom=-ALTAR_INSET
-            )
-        return cls._shape_instance
         
     def _draw_content(self, canvas: skia.Canvas, bounds: Rectangle) -> None:
         dot_paint = skia.Paint(AntiAlias=True, Style=skia.Paint.kFill_Style, Color=self._map.options.prop_outline_color)
