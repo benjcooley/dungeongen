@@ -1,3 +1,4 @@
+from typing import ClassVar
 import skia
 from map.props.prop import Prop
 from map.props.rotation import Rotation
@@ -32,9 +33,14 @@ class Altar(Prop):
         """Altars occupy 1x2 grid cells."""
         return 1.0
         
+    _shape_instance: ClassVar[Shape] = None
+    
     @classmethod
     def get_prop_shape(cls) -> Shape:
-        return Rectangle(-0.5, -0.5, 0.25, 1.0)
+        """Get the cached shape instance for this prop type."""
+        if cls._shape_instance is None:
+            cls._shape_instance = Rectangle(-0.5, -0.5, 0.25, 1.0)
+        return cls._shape_instance
         
     def _draw_content(self, canvas: skia.Canvas, bounds: Rectangle) -> None:
         dot_paint = skia.Paint(AntiAlias=True, Style=skia.Paint.kFill_Style, Color=self._map.options.prop_outline_color)
