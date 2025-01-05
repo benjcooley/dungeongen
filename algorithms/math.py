@@ -3,7 +3,10 @@
 from __future__ import annotations
 import math
 from dataclasses import dataclass
-from typing import Tuple, List
+from typing import Tuple, List, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from algorithms.types import Point
 
 class Matrix2D:
     """A 2D transformation matrix using row-major order.
@@ -62,14 +65,14 @@ class Matrix2D:
             ty=self.c * other.tx + self.d * other.ty + self.ty
         )
     
-    def transform_point(self, point: 'Point') -> 'Point':
+    def transform_point(self, point: 'Point2') -> 'Point2':
         """Transform a point using this matrix."""
         return Point(
             self.a * point.x + self.b * point.y + self.tx,
             self.c * point.x + self.d * point.y + self.ty
         )
     
-    def transform_points(self, points: List['Point']) -> List['Point']:
+    def transform_points(self, points: List['Point2']) -> List['Point2']:
         """Transform multiple points using this matrix."""
         return [self.transform_point(p) for p in points]
     
@@ -94,7 +97,7 @@ class Matrix2D:
         )
 
 @dataclass
-class Point:
+class Point2:
     """A 2D point/vector with basic vector operations."""
     x: float
     y: float
