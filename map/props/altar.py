@@ -18,9 +18,14 @@ class Altar(Prop):
         return True
         
     @classmethod
-    def prop_size(cls) -> float:
-        """Standard altar size is 1/4 cell width."""
-        return 0.25
+    def prop_size(cls) -> tuple[float, float]:
+        """Get the width and height of this prop type.
+        
+        Returns:
+            Tuple of (width, height) from the prop's shape
+        """
+        shape = cls.get_prop_shape()
+        return (shape.bounds.width, shape.bounds.height)
         
     @classmethod
     def prop_grid_size(cls) -> float:
