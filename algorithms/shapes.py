@@ -125,6 +125,43 @@ class ShapeGroup:
         
         return cls(includes=includes, excludes=excludes)
     
+    @classmethod
+    def half_circle(cls, cx: float, cy: float, radius: float, angle: float, inflate: float = 0) -> 'ShapeGroup':
+        """Create a half circle as a ShapeGroup.
+        
+        Args:
+            cx: Center X coordinate
+            cy: Center Y coordinate
+            radius: Circle radius
+            angle: Angle in degrees (0, 90, 180, or 270) indicating which half to keep
+                  0 = right half, 90 = top half, 180 = left half, 270 = bottom half
+            inflate: Optional inflation amount
+            
+        Returns:
+            A ShapeGroup representing a half circle
+            
+        Raises:
+            ValueError: If angle is not 0, 90, 180, or 270
+        """
+        if angle not in (0, 90, 180, 270):
+            raise ValueError("Angle must be 0, 90, 180, or 270 degrees")
+            
+        # Create the base circle
+        circle = Circle(cx, cy, radius, inflate)
+        
+        # Calculate rectangle to exclude half the circle
+        rect_size = (radius + inflate) * 2
+        if angle == 0:  # Right half (exclude left)
+            rect = Rectangle(cx - rect_size, cy - rect_size, rect_size, rect_size * 2)
+        elif angle == 90:  # Top half (exclude bottom)
+            rect = Rectangle(cx - rect_size, cy, rect_size * 2, rect_size)
+        elif angle == 180:  # Left half (exclude right)
+            rect = Rectangle(cx, cy - rect_size, rect_size, rect_size * 2)
+        else:  # angle == 270, Bottom half (exclude top)
+            rect = Rectangle(cx - rect_size, cy - rect_size, rect_size * 2, rect_size)
+            
+        return cls(includes=[circle], excludes=[rect])
+    
     def contains(self, px: float, py: float) -> bool:
         """Check if a point is contained within this shape group."""
         return (
