@@ -81,20 +81,9 @@ class Rock(Prop):
         Returns:
             True if position is valid, False otherwise
         """
-        # Check center point
-        if not container.shape.contains(x, y):
-            return False
-            
-        # Check points around the perimeter
-        num_probes = 8
-        for i in range(num_probes):
-            angle = (i * 2 * math.pi / num_probes)
-            px = x + size * math.cos(angle)
-            py = y + size * math.sin(angle)
-            if not container.shape.contains(px, py):
-                return False
-                
-        return True
+        from algorithms.shapes import Circle
+        circle = Circle(x, y, size)
+        return container.contains_circle(circle)
 
     @classmethod
     def get_valid_position(cls, size: float, container: 'MapElement') -> tuple[float, float] | None:

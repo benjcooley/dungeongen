@@ -148,6 +148,69 @@ class MapElement:
             for prop in self._props:
                 prop.draw(canvas, layer)
     
+    def prop_intersects(self, prop: 'Prop') -> list['Prop']:
+        """Check if a prop intersects with any non-decoration props in this element.
+        
+        Args:
+            prop: The prop to check for intersections
+            
+        Returns:
+            List of non-decoration props that intersect with the given prop
+        """
+        intersecting = []
+        for existing_prop in self._props:
+            if not existing_prop.is_decoration:
+                # Check bounding box intersection first
+                if (prop.bounds.x < existing_prop.bounds.x + existing_prop.bounds.width and
+                    prop.bounds.x + prop.bounds.width > existing_prop.bounds.x and
+                    prop.bounds.y < existing_prop.bounds.y + existing_prop.bounds.height and
+                    prop.bounds.y + prop.bounds.height > existing_prop.bounds.y):
+                    intersecting.append(existing_prop)
+        return intersecting
+
+    def contains_point(self, x: float, y: float) -> bool:
+        """Check if a point is contained within this element's shape."""
+        return self._shape.contains(x, y)
+        
+    def contains_rectangle(self, rect: Rectangle, margin: float = 0) -> bool:
+        """Check if a rectangle is fully contained within this element's shape.
+        
+        Args:
+            rect: Rectangle to check
+            margin: Optional margin to maintain from shape edges
+            
+        Returns:
+            True if rectangle is fully contained
+        """
+        # Check all four corners
+        corners = [
+            (rect.x + margin, rect.y + margin),
+            (rect.x + rect.width - margin, rect.y + margin),
+            (rect.x + margin, rect.y + rect.height - margin),
+            (rect.x + rect.width - margin, rect.y + rect.height - margin)
+        ]
+        return all(self._shape.contains(x, y) for x, y in corners)
+        
+    def contains_circle(self, circle: Circle, margin: float = 0) -> bool:
+        """Check if a circle is fully contained within this element's shape.
+        
+        Args:
+            circle: Circle to check
+            margin: Optional margin to maintain from shape edges
+            
+        Returns:
+            True if circle is fully contained
+        """
+        # Check points around the circle perimeter
+        num_points = 8
+        for i in range(num_points):
+            angle = (i * 2 * math.pi / num_points)
+            x = circle.cx + (circle.radius + margin) * math.cos(angle)
+            y = circle.cy + (circle.radius + margin) * math.sin(angle)
+            if not self._shape.contains(x, y):
+                return False
+        return True
+
     def draw_occupied(self, grid: 'OccupancyGrid', element_idx: int) -> None:
         """Draw this element's shape into the occupancy grid.
         

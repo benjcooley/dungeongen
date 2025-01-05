@@ -34,18 +34,15 @@ class Altar(Prop):
         Returns:
             True if position is valid for altar placement
         """
-        # Check if altar's full bounds are within container
+        from algorithms.shapes import Rectangle
+        
+        # Create rectangle with margin
         margin = size * 0.1  # Add 10% margin from walls
-        for check_x in (x + margin, x + size - margin):
-            for check_y in (y + margin, y + size - margin):
-                if not container.shape.contains(check_x, check_y):
-                    return False
-                    
-        # Check if position is already occupied by another prop
-        if container.map.is_occupied(x + size/2, y + size/2):
-            return False
-            
-        return True
+        rect = Rectangle(x + margin, y + margin, size - 2*margin, size - 2*margin)
+        
+        # Check container bounds and prop intersection
+        return (container.contains_rectangle(rect) and 
+                not container.prop_intersects(cls(x, y, size, size, container._map)))
 
     def draw(self, canvas: skia.Canvas) -> None:
         """Draw the altar."""
