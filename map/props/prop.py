@@ -195,14 +195,15 @@ class Prop(MapElement, ABC):
         ...
 
     @classmethod
-    @abstractmethod
+    @classmethod
     def prop_grid_size(cls) -> tuple[float, float] | None:
         """Get the standard size of this prop type in grid units.
         
         Returns:
-            Tuple of (width, height) in grid units, or None if no standard grid size
+            Tuple of (width, height) in grid units, or None if no standard grid size.
+            Base implementation returns None since not all props are grid-aligned.
         """
-        ...
+        return None
         
     @classmethod
     def get_prop_boundary_shape(cls) -> Shape:
