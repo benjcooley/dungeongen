@@ -311,9 +311,14 @@ class Rectangle:
             new_width = self.width
             new_height = self.height
             
+        # Rotate center point around origin
+        angle = rotation.radians
+        new_center_x = center_x * math.cos(angle) - center_y * math.sin(angle)
+        new_center_y = center_x * math.sin(angle) + center_y * math.cos(angle)
+            
         # Calculate new top-left position relative to rotated center
-        new_x = center_x - new_width / 2
-        new_y = center_y - new_height / 2
+        new_x = new_center_x - new_width / 2
+        new_y = new_center_y - new_height / 2
         
         return Rectangle(new_x, new_y, new_width, new_height, self._inflate)
         
