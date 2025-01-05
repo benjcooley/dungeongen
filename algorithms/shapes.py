@@ -6,6 +6,7 @@ from typing import List, Protocol, Sequence, TypeAlias
 from algorithms.types import Point
 from algorithms.math import Matrix2D
 from map.props.rotation import Rotation
+from algorithms.intersections import shape_intersects, shape_group_intersect
 
 # Forward declaration of Rectangle type
 Rectangle: TypeAlias = 'Rectangle'
@@ -190,7 +191,6 @@ class ShapeGroup:
         
     def intersects(self, other: 'Shape') -> bool:
         """Check if this shape group intersects with another shape."""
-        from algorithms.intersections import shape_group_intersect
         return shape_group_intersect(self, other)
         
     def _bounds_intersect(self, other: Rectangle) -> bool:
@@ -371,7 +371,6 @@ class Rectangle:
         
     def intersects(self, other: 'Shape') -> bool:
         """Check if this rectangle intersects with another shape."""
-        from algorithms.intersections import shape_intersects
         return shape_intersects(self, other)
         
     def _bounds_intersect(self, other: 'Rectangle') -> bool:
@@ -464,7 +463,6 @@ class Circle:
         
     def intersects(self, other: 'Shape') -> bool:
         """Check if this circle intersects with another shape."""
-        from algorithms.intersections import shape_intersects
         return shape_intersects(self, other)
         
     def _bounds_intersect(self, other: Rectangle) -> bool:
