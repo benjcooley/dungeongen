@@ -59,9 +59,9 @@ class Room(MapElement):
         variation_left = 1.0 + (CORNER_LENGTH_VARIATION * math.sin(corner.x * 0.1))
         variation_right = 1.0 + (CORNER_LENGTH_VARIATION * math.cos(corner.y * 0.1))
         
-        # Normalize wall vectors and scale with individual variations
-        left_norm = left.normalized() * (base_size * variation_left)
-        right_norm = right.normalized() * (base_size * variation_right)
+        # Scale the normalized vectors by the varied sizes
+        left_norm = left * (base_size * variation_left)
+        right_norm = right * (base_size * variation_right)
         
         # Create corner path
         path = skia.Path()
