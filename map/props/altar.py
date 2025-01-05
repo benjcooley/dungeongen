@@ -1,15 +1,16 @@
-from typing import ClassVar
-from constants import CELL_SIZE
 import skia
-from map.props.prop import Prop
+from typing import ClassVar
+
+from algorithms.shapes import Rectangle, Shape
+from constants import CELL_SIZE
 from map.enums import Layers
+from map.mapelement import MapElement
+from map.props.prop import Prop
+from map.props.rotation import Rotation
 
 # Constants for altar dimensions
 ALTAR_INSET = CELL_SIZE * 0.15  # Inset from cell edges
 ALTAR_WIDTH = CELL_SIZE * 0.6   # Width of altar surface
-from map.props.rotation import Rotation
-from algorithms.shapes import Rectangle, Shape
-from map.mapelement import MapElement
 
 class Altar(Prop):
     """An altar prop that appears as a small rectangular table with decorative dots."""
