@@ -1,6 +1,7 @@
 """Base class for map props."""
 
 import math
+import math
 import random
 
 # Maximum attempts to find valid random position
@@ -208,14 +209,14 @@ class Prop(ABC):
     def grid_position(self) -> Point:
         """Get the prop's position in grid coordinates.
         
-        For grid-aligned props, returns the grid cell position accounting for rotation.
-        For non-grid props, returns the position modulo grid size.
+        For grid-aligned props, returns the integer grid cell position accounting for rotation.
+        For non-grid props, returns the position modulo grid size rounded down.
         
         Returns:
-            Tuple of (grid_x, grid_y) coordinates
+            Tuple of (grid_x, grid_y) integer coordinates
         """
         if not self.is_grid_aligned():
-            return (self._x / CELL_SIZE, self._y / CELL_SIZE)
+            return (math.floor(self._x / CELL_SIZE), math.floor(self._y / CELL_SIZE))
             
         # For grid-aligned props, calculate based on center and rotation
         center_x = self._x + self._width/2
@@ -226,16 +227,16 @@ class Prop(ABC):
         if grid_size is None:
             raise ValueError(f"Grid-aligned prop {self.__class__.__name__} must specify prop_grid_size")
             
-        # Calculate grid position based on rotation
+        # Calculate grid position based on rotation, rounding down to integers
         if self.rotation in (Rotation.ROT_0, Rotation.ROT_90):
             return (
-                (center_x / CELL_SIZE) - grid_size[0]/2,
-                (center_y / CELL_SIZE) - grid_size[1]/2
+                math.floor((center_x / CELL_SIZE) - grid_size[0]/2),
+                math.floor((center_y / CELL_SIZE) - grid_size[1]/2)
             )
         else:  # ROT_180, ROT_270
             return (
-                (center_x / CELL_SIZE) - (1 - grid_size[0]/2),
-                (center_y / CELL_SIZE) - (1 - grid_size[1]/2)
+                math.floor((center_x / CELL_SIZE) - (1 - grid_size[0]/2)),
+                math.floor((center_y / CELL_SIZE) - (1 - grid_size[1]/2))
             )
     
     @grid_position.setter
