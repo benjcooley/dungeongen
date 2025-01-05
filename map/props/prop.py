@@ -396,8 +396,15 @@ class Prop(ABC):
     def _get_grid_center_offset(cls, rotation: Rotation) -> Point:
         """Calculate offset from grid point to center based on rotation.
         
-        For grid-aligned props, calculates the offset from the upper-left grid point
+        For grid-aligned props, calculates the offset from the grid point
         to the prop's center point, accounting for rotation.
+        
+        The base offset (at rotation 0) is from the top-right corner of the grid.
+        This offset is then transformed based on rotation:
+        - ROT_0: Use base offset (x,y)
+        - ROT_90: Flip x,y coordinates
+        - ROT_180: Use (width-x, y)
+        - ROT_270: Use (x, height-y)
         
         Args:
             rotation: Prop rotation
@@ -408,25 +415,25 @@ class Prop(ABC):
         Raises:
             ValueError: If prop_grid_size is not defined for grid-aligned props
         """
+        # Get base offset from top-right corner at rotation 0
+        base_offset = cls.grid_offset()
+        
+        # Get grid size for width/height calculations
         grid_size = cls.prop_grid_size()
         if grid_size is None:
             raise ValueError(f"Grid-aligned prop {cls.__name__} must specify prop_grid_size")
             
         width, height = grid_size
         
-        # For 90° and 270° rotations, swap width and height
-        if rotation in (Rotation.ROT_90, Rotation.ROT_270):
-            width, height = height, width
-            
-        # Calculate center offset based on rotation
+        # Transform offset based on rotation
         if rotation == Rotation.ROT_0:
-            return (width/2, height/2)
+            return base_offset
         elif rotation == Rotation.ROT_90:
-            return (width/2, height/2)
+            return (base_offset[1], base_offset[0])  # Flip x,y
         elif rotation == Rotation.ROT_180:
-            return (1 - width/2, 1 - height/2)
+            return (width - base_offset[0], base_offset[1])
         else:  # ROT_270
-            return (1 - width/2, 1 - height/2)
+            return (base_offset[0], height - base_offset[1])
 
     @classmethod
     def center_to_map_position(cls, center: Point, rotation: Rotation) -> Point:
