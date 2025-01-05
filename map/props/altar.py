@@ -1,14 +1,12 @@
 """Altar prop implementation."""
 
-from typing import ClassVar, TYPE_CHECKING
+from typing import TYPE_CHECKING
 import skia
 
-from algorithms.shapes import Rectangle, Shape
+from algorithms.shapes import Rectangle
 from algorithms.types import Point
 from constants import CELL_SIZE
 from graphics.conversions import grid_to_drawing
-from map.enums import Layers
-from map.mapelement import MapElement
 from map.props.prop import Prop
 from map.props.rotation import Rotation
 
@@ -38,8 +36,8 @@ class Altar(Prop):
         """
         # Create rotated rectangle centered on point
         rect = Rectangle.rotated_rect(
-            center_x - ALTAR_WIDTH/2,
-            center_y - ALTAR_HEIGHT/2,
+            center_x,
+            center_y,
             ALTAR_WIDTH,
             ALTAR_HEIGHT,
             rotation
