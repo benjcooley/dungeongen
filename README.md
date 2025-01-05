@@ -1,6 +1,15 @@
 # Dungeon Map Generator
 
-A Python-based dungeon map generator that creates stylized, crosshatched dungeon layouts using Skia graphics.
+A Python-based dungeon map generator that creates stylized, crosshatched dungeon layouts using Skia graphics. This is a reimplementation of [Watabou's One Page Dungeon Generator](https://watabou.itch.io/one-page-dungeon).
+
+## Attribution
+
+This project is inspired by and reimplements the excellent work of Watabou:
+- Original generator: [One Page Dungeon](https://watabou.itch.io/one-page-dungeon)
+- Creator: [Watabou on itch.io](https://watabou.itch.io)
+- Support the original creator: [Watabou on Patreon](https://www.patreon.com/watawatabou)
+
+Please consider supporting Watabou's work through [Patreon](https://www.patreon.com/watawatabou) if you find this or the original generator useful!
 
 ![Example Map Output](map_output.png)
 
