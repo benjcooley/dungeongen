@@ -233,7 +233,7 @@ class Prop(MapElement, ABC):
         base_shape = cls.get_prop_boundary_shape()
         
         # Create transformed shape - rotate first, then translate to center point
-        return base_shape.rotated(rotation.radians).translated(center[0], center[1])
+        return base_shape.rotated(rotation).translated(center[0], center[1])
 
     @classmethod
     def get_map_aligned_bounds(cls, center: Point, rotation: Rotation) -> Rectangle:
