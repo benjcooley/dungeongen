@@ -22,23 +22,25 @@ class Prop(ABC):
     They have a bounding rectangle and custom drawing logic.
     """
     
-    def __init__(self, boundary_shape: Shape, map_: 'Map', rotation: Rotation = Rotation.ROT_0) -> None:
-        """Initialize a prop with a boundary shape.
+    def __init__(self, rect: Rectangle, boundary_shape: Shape, map_: 'Map', rotation: Rotation = Rotation.ROT_0) -> None:
+        """Initialize a prop with a grid-aligned rectangle and boundary shape.
         
         Props are drawn relative to their center point. The default orientation (0° rotation)
         has the prop facing right. Rotation happens counterclockwise in 90° increments.
         
         Args:
-            boundary_shape: Shape defining the prop's boundary
+            rect: Rectangle defining the prop's grid-aligned position and size
+            boundary_shape: Shape defining the prop's collision boundary
             map_: Parent map instance
             rotation: Rotation angle in 90° increments (default: facing right)
         """
+        self._rect = rect
         self._boundary_shape = boundary_shape
         self._bounds = boundary_shape.bounds
-        self._x = self._bounds.x
-        self._y = self._bounds.y
-        self._width = self._bounds.width
-        self._height = self._bounds.height
+        self._x = rect.x
+        self._y = rect.y
+        self._width = rect.width
+        self._height = rect.height
         self._map = map_
         self.rotation = rotation
         self.container: Optional['MapElement'] = None

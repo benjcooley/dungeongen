@@ -56,9 +56,11 @@ class Rock(Prop):
         bounds_x = x - bounds_size/2
         bounds_y = y - bounds_size/2
         
-        # Create circular boundary shape
+        # Create grid-aligned rectangle and circular boundary
+        bounds_size = size * 2 * 1.2  # Add 20% margin for variations
+        rect = Rectangle(x - bounds_size/2, y - bounds_size/2, bounds_size, bounds_size)
         boundary = Circle(x, y, size)
-        super().__init__(boundary, map_, rotation)
+        super().__init__(rect, boundary, map_, rotation)
         
         # Store additional rock-specific properties
         self._radius = size
