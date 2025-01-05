@@ -45,6 +45,17 @@ class Shape(Protocol):
     def is_valid(self) -> bool:
         """Check if this shape is valid and can be rendered."""
         ...
+        
+    def intersects(self, other: 'Shape') -> bool:
+        """Check if this shape intersects with another shape.
+        
+        Args:
+            other: Another shape to test intersection with
+            
+        Returns:
+            True if the shapes intersect, False otherwise
+        """
+        ...
 
 class ShapeGroup:
     """A group of shapes that can be combined to create complex shapes."""
@@ -176,6 +187,31 @@ class ShapeGroup:
     def is_valid(self) -> bool:
         """Check if this shape group is valid (has at least one included shape)."""
         return len(self.includes) > 0
+        
+    def intersects(self, other: 'Shape') -> bool:
+        """Check if this shape group intersects with another shape."""
+        # Quick rejection using bounds
+        if not self._bounds_intersect(other.bounds):
+            return False
+            
+        # Check if any included shape intersects
+        for shape in self.includes:
+            if shape.intersects(other):
+                # Check if any excluded shape contains the intersection
+                for exclude in self.excludes:
+                    if exclude.intersects(other):
+                        return False
+                return True
+                
+        return False
+        
+    def _bounds_intersect(self, other: Rectangle) -> bool:
+        """Test if this shape group's bounds intersect a rectangle."""
+        bounds = self.bounds
+        return (bounds.x < other.x + other.width and
+                bounds.x + bounds.width > other.x and
+                bounds.y < other.y + other.height and
+                bounds.y + bounds.height > other.y)
     
     @property
     def bounds(self) -> Rectangle:
@@ -344,6 +380,26 @@ class Rectangle:
             self.height + (bottom - top),
             self._inflate
         )
+        
+    def intersects(self, other: 'Shape') -> bool:
+        """Check if this rectangle intersects with another shape."""
+        # Quick rejection using bounds for non-Rectangle shapes
+        if not isinstance(other, Rectangle):
+            other_bounds = other.bounds
+            if not self._bounds_intersect(other_bounds):
+                return False
+            # Delegate to other shape's intersection test
+            return other.intersects(self)
+            
+        # For Rectangle-Rectangle, just need bounds test
+        return self._bounds_intersect(other)
+        
+    def _bounds_intersect(self, other: 'Rectangle') -> bool:
+        """Test if this rectangle's bounds intersect another rectangle."""
+        return (self._inflated_x < other._inflated_x + other._inflated_width and
+                self._inflated_x + self._inflated_width > other._inflated_x and
+                self._inflated_y < other._inflated_y + other._inflated_height and
+                self._inflated_y + self._inflated_height > other._inflated_y)
     
     @classmethod
     def centered_grid(cls, grid_width: float, grid_height: float) -> 'Rectangle':
@@ -425,3 +481,36 @@ class Circle:
         new_cx = self.cx * math.cos(angle) - self.cy * math.sin(angle)
         new_cy = self.cx * math.sin(angle) + self.cy * math.cos(angle)
         return Circle(new_cx, new_cy, self.radius, self._inflate)
+        
+    def intersects(self, other: 'Shape') -> bool:
+        """Check if this circle intersects with another shape."""
+        # Quick rejection using bounds
+        if not self._bounds_intersect(other.bounds):
+            return False
+            
+        if isinstance(other, Circle):
+            # Circle-Circle: Compare centers distance to sum of radii
+            dx = self.cx - other.cx
+            dy = self.cy - other.cy
+            radii_sum = self._inflated_radius + other._inflated_radius
+            return (dx * dx + dy * dy) <= (radii_sum * radii_sum)
+            
+        if isinstance(other, Rectangle):
+            # Circle-Rectangle: Find closest point on rectangle to circle center
+            closest_x = max(other._inflated_x, min(self.cx, other._inflated_x + other._inflated_width))
+            closest_y = max(other._inflated_y, min(self.cy, other._inflated_y + other._inflated_height))
+            
+            # Compare distance from closest point to circle center
+            dx = self.cx - closest_x
+            dy = self.cy - closest_y
+            return (dx * dx + dy * dy) <= (self._inflated_radius * self._inflated_radius)
+            
+        # For other shapes, delegate to their implementation
+        return other.intersects(self)
+        
+    def _bounds_intersect(self, other: Rectangle) -> bool:
+        """Test if this circle's bounds intersect a rectangle."""
+        return (self.cx - self._inflated_radius < other.x + other.width and
+                self.cx + self._inflated_radius > other.x and
+                self.cy - self._inflated_radius < other.y + other.height and
+                self.cy + self._inflated_radius > other.y)
