@@ -41,8 +41,8 @@ class Shape(Protocol):
         """Return a new shape rotated by the given angle in radians."""
         ...
     
-    def rotate(self, rotation: 'Rotation') -> 'Shape':
-        """Return a new shape rotated by the given rotation angle (90-degree increments only)."""
+    def rotate_90(self, rotation: 'Rotation') -> 'Shape':
+        """Return a new shape rotated by the given 90-degree increment."""
         ...
     
     @property
@@ -155,11 +155,11 @@ class ShapeGroup:
             excludes=[s.rotated(angle) for s in self.excludes]
         )
     
-    def rotate(self, rotation: 'Rotation') -> 'ShapeGroup':
+    def rotate_90(self, rotation: 'Rotation') -> 'ShapeGroup':
         """Return a new shape group with all shapes rotated by 90-degree increment."""
         return ShapeGroup(
-            includes=[s.rotate(rotation) for s in self.includes],
-            excludes=[s.rotate(rotation) for s in self.excludes]
+            includes=[s.rotate_90(rotation) for s in self.includes],
+            excludes=[s.rotate_90(rotation) for s in self.excludes]
         )
     
     def _recalculate_bounds(self) -> None:
@@ -304,35 +304,42 @@ class Rectangle:
         """Return a new rectangle translated by the given amounts."""
         return Rectangle(self.x + dx, self.y + dy, self.width, self.height, self._inflate)
     
-    def rotate(self, rotation: 'Rotation') -> 'Rectangle':
-        """Return a new rectangle rotated by the given rotation (90-degree increments only)."""
+    def rotated(self, angle: float) -> 'Rectangle':
+        """Return a new rectangle rotated by the given angle in radians."""
         # Calculate center point
         center_x = self.x + self.width / 2
         center_y = self.y + self.height / 2
         
-        # For 90/270 degree rotations, swap width and height
-        if rotation in (Rotation.ROT_90, Rotation.ROT_270):
-            new_width = self.height
-            new_height = self.width
-        else:
-            new_width = self.width
-            new_height = self.height
-            
         # Skip rotation if center is at origin
         if abs(center_x) < 1e-6 and abs(center_y) < 1e-6:
-            new_x = -new_width / 2
-            new_y = -new_height / 2
-        else:
-            # Rotate center point around origin
-            angle = rotation.radians
-            new_center_x = center_x * math.cos(angle) - center_y * math.sin(angle)
-            new_center_y = center_x * math.sin(angle) + center_y * math.cos(angle)
+            return Rectangle(
+                -self.width / 2,
+                -self.height / 2,
+                self.width,
+                self.height,
+                self._inflate
+            )
             
-            # Calculate new top-left position relative to rotated center
-            new_x = new_center_x - new_width / 2
-            new_y = new_center_y - new_height / 2
+        # Rotate center point around origin
+        new_center_x = center_x * math.cos(angle) - center_y * math.sin(angle)
+        new_center_y = center_x * math.sin(angle) + center_y * math.cos(angle)
         
-        return Rectangle(new_x, new_y, new_width, new_height, self._inflate)
+        # Calculate new top-left position relative to rotated center
+        new_x = new_center_x - self.width / 2
+        new_y = new_center_y - self.height / 2
+        
+        return Rectangle(new_x, new_y, self.width, self.height, self._inflate)
+    
+    def rotate_90(self, rotation: 'Rotation') -> 'Rectangle':
+        """Return a new rectangle rotated by the given 90-degree increment."""
+        # For 90/270 degree rotations, swap width and height
+        if rotation in (Rotation.ROT_90, Rotation.ROT_270):
+            return self.rotated(rotation.radians).adjust(
+                0, 0,
+                self.height - self.width,
+                self.width - self.height
+            )
+        return self.rotated(rotation.radians)
         
     def adjust(self, left: float, top: float, right: float, bottom: float) -> 'Rectangle':
         """Return a new rectangle with edges adjusted by the given amounts.
@@ -421,14 +428,17 @@ class Circle:
         """Return a new circle translated by the given amounts."""
         return Circle(self.cx + dx, self.cy + dy, self.radius, self._inflate)
     
-    def rotate(self, rotation: 'Rotation') -> 'Circle':
-        """Return a new circle rotated by the given rotation (90-degree increments only)."""
+    def rotated(self, angle: float) -> 'Circle':
+        """Return a new circle rotated by the given angle in radians."""
         # Skip rotation if center is at origin
         if abs(self.cx) < 1e-6 and abs(self.cy) < 1e-6:
             return Circle(0, 0, self.radius, self._inflate)
             
         # Rotate center point around origin
-        angle = rotation.radians
         new_cx = self.cx * math.cos(angle) - self.cy * math.sin(angle)
         new_cy = self.cx * math.sin(angle) + self.cy * math.cos(angle)
         return Circle(new_cx, new_cy, self.radius, self._inflate)
+    
+    def rotate_90(self, rotation: 'Rotation') -> 'Circle':
+        """Return a new circle rotated by the given 90-degree increment."""
+        return self.rotated(rotation.radians)
