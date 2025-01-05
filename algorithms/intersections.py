@@ -139,27 +139,39 @@ def circle_rect_contains(circle: 'Circle', rect: 'Rectangle') -> bool:
     )
 
 def shape_group_contains(group: 'ShapeGroup', other: 'Shape') -> bool:
-    """Test if a shape group fully contains another shape."""
+    """Test if a shape group fully contains another shape.
+    
+    A shape is contained if:
+    1. It's fully contained by at least one include shape
+    2. It doesn't intersect any exclude shapes
+    """
     # Must be contained by at least one include shape
     if not any(shape.contains_shape(other) for shape in group.includes):
         return False
         
-    # Must not intersect any exclude shapes
-    return not any(shape.intersects(other) for shape in group.excludes)
+    # Must not intersect any exclude shapes at all
+    if any(shape.intersects(other) for shape in group.excludes):
+        return False
+        
+    return True
 
 def shape_group_intersect(group: 'ShapeGroup', other: 'Shape') -> bool:
-    """Test intersection between a shape group and another shape."""
+    """Test intersection between a shape group and another shape.
+    
+    A shape intersects if:
+    1. It intersects at least one include shape
+    2. Has some portion not fully contained by any exclude shape
+    """
     # Quick rejection using bounds
     if not group._bounds_intersect(other.bounds):
         return False
         
-    # Check if any included shape intersects
-    for shape in group.includes:
-        if shape.intersects(other):
-            # Check if any excluded shape fully contains the other shape
-            for exclude in group.excludes:
-                if exclude.contains_shape(other):
-                    return False
-            return True
-            
-    return False
+    # Must intersect at least one include shape
+    if not any(shape.intersects(other) for shape in group.includes):
+        return False
+        
+    # If any exclude fully contains the shape, no intersection
+    if any(shape.contains_shape(other) for shape in group.excludes):
+        return False
+        
+    return True
