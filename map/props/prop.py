@@ -236,31 +236,72 @@ class Prop(MapElement, ABC):
         return base_shape.rotated(rotation).translated(center[0], center[1])
 
     @classmethod
-    def get_map_aligned_bounds(cls, center: Point, rotation: Rotation) -> Rectangle:
-        """Get the bounds of this prop type aligned to a map position and rotation.
+    def center_to_map_position(cls, center: Point, rotation: Rotation) -> Point:
+        """Convert a center point to map-aligned position.
+        
+        For grid-aligned props, converts center point to top-left grid position.
+        For non-grid props, returns the center point unchanged.
         
         Args:
             center: Center point in map space
             rotation: Prop rotation
             
         Returns:
-            A Rectangle representing the prop's bounds in map coordinates
+            Map position (top-left for grid props, center for non-grid)
         """
-        # Get size based on alignment type
-        if cls.is_grid_aligned():
-            grid_size = cls.prop_grid_size()
-            if grid_size is None:
-                raise ValueError(f"Grid-aligned prop {cls.__name__} must specify prop_grid_size")
-            width = grid_size[0] * CELL_SIZE
-            height = grid_size[1] * CELL_SIZE
-        else:
-            width, height = cls.prop_size()
+        if not cls.is_grid_aligned():
+            return center
             
-        # Create centered rectangle
-        rect = Rectangle(-width/2, -height/2, width, height)
+        # For grid props, convert center to top-left position
+        grid_size = cls.prop_grid_size()
+        if grid_size is None:
+            raise ValueError(f"Grid-aligned prop {cls.__name__} must specify prop_grid_size")
         
-        # Apply rotation then translation
-        return rect.rotated(rotation).translated(center[0], center[1])
+        width = grid_size[0] * CELL_SIZE
+        height = grid_size[1] * CELL_SIZE
+        
+        # If rotated 90° or 270°, swap width/height
+        if rotation in (Rotation.ROT_90, Rotation.ROT_270):
+            width, height = height, width
+            
+        return (
+            center[0] - width/2,
+            center[1] - height/2
+        )
+
+    @classmethod
+    def map_position_to_center(cls, pos: Point, rotation: Rotation) -> Point:
+        """Convert a map-aligned position to center point.
+        
+        For grid-aligned props, converts top-left position to center point.
+        For non-grid props, returns the position unchanged.
+        
+        Args:
+            pos: Map position (top-left for grid props, center for non-grid)
+            rotation: Prop rotation
+            
+        Returns:
+            Center point in map space
+        """
+        if not cls.is_grid_aligned():
+            return pos
+            
+        # For grid props, convert top-left to center position
+        grid_size = cls.prop_grid_size()
+        if grid_size is None:
+            raise ValueError(f"Grid-aligned prop {cls.__name__} must specify prop_grid_size")
+            
+        width = grid_size[0] * CELL_SIZE
+        height = grid_size[1] * CELL_SIZE
+        
+        # If rotated 90° or 270°, swap width/height
+        if rotation in (Rotation.ROT_90, Rotation.ROT_270):
+            width, height = height, width
+            
+        return (
+            pos[0] + width/2,
+            pos[1] + height/2
+        )
 
     def draw(self, canvas: skia.Canvas, layer: Layers = Layers.PROPS) -> None:
         """Override base MapElement draw to prevent drawing bounds rectangle."""
