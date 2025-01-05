@@ -23,6 +23,21 @@ class Rock(Prop):
     def is_decoration(self) -> bool:
         """Rocks are decorative floor items."""
         return True
+        
+    @property
+    def grid_aligned(self) -> bool:
+        """Rocks are not aligned to the grid."""
+        return False
+        
+    @property
+    def prop_size(self) -> float:
+        """Get the nominal size of this rock in drawing units."""
+        return self._radius * 2
+        
+    @property
+    def prop_grid_size(self) -> float | None:
+        """Rocks don't have a standard grid size."""
+        return None
     
     def __init__(self, x: float, y: float, size: float, map_: 'Map', rotation: float = 0.0) -> None:
         """Initialize a rock with position and size.
