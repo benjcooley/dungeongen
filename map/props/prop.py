@@ -326,14 +326,14 @@ class Prop(ABC):
 
     @classmethod
     def grid_offset(cls) -> Point:
-        """Get the offset from grid position to prop position.
+        """Get the offset from center to grid position for rotation 0.
         
-        For grid-aligned props, this returns the offset needed to properly
-        position the prop relative to a grid point. For non-grid props,
-        returns (0,0).
+        For grid-aligned props, this returns the offset from the prop's center
+        to its grid position when at 0 degree rotation (facing right).
+        For non-grid props, returns (0,0).
         
         Returns:
-            Tuple of (x,y) offsets in drawing units
+            Tuple of (x,y) offsets in grid units from center to grid position
         """
         return (0.0, 0.0)
 
