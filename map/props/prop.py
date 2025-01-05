@@ -186,16 +186,21 @@ class Prop(MapElement, ABC):
 
     @classmethod
     @abstractmethod
-    def prop_size(cls) -> float:
-        """Get the standard size of this prop type in drawing units."""
+    def prop_size(cls) -> tuple[float, float]:
+        """Get the standard size of this prop type in drawing units.
+        
+        Returns:
+            Tuple of (width, height) in drawing units
+        """
         ...
 
     @classmethod
     @abstractmethod
-    def prop_grid_size(cls) -> float | None:
+    def prop_grid_size(cls) -> tuple[float, float] | None:
         """Get the standard size of this prop type in grid units.
         
-        Returns None if the prop type doesn't have a standard grid size.
+        Returns:
+            Tuple of (width, height) in grid units, or None if no standard grid size
         """
         ...
         
@@ -252,12 +257,13 @@ class Prop(MapElement, ABC):
             grid_size = cls.prop_grid_size()
             if grid_size is None:
                 raise ValueError(f"Grid-aligned prop {cls.__name__} must specify prop_grid_size")
-            size = grid_size * CELL_SIZE
+            width = grid_size[0] * CELL_SIZE
+            height = grid_size[1] * CELL_SIZE
         else:
-            size = cls.prop_size()
+            width, height = cls.prop_size()
             
         # Create centered rectangle
-        rect = Rectangle(-size/2, -size/2, size, size)
+        rect = Rectangle(-width/2, -height/2, width, height)
         
         # Apply rotation then translation
         return rect.rotated(rotation).translated(center_x, center_y)

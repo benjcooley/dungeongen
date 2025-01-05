@@ -31,12 +31,13 @@ class Rock(Prop):
         return False
         
     @classmethod
-    def prop_size(cls) -> float:
+    def prop_size(cls) -> tuple[float, float]:
         """Get the nominal size of this rock in drawing units."""
-        return MEDIUM_ROCK_SIZE * 2  # Use medium rock size as standard
+        size = MEDIUM_ROCK_SIZE * 2 * CELL_SIZE  # Use medium rock size as standard
+        return (size, size)  # Rocks are circular, so width = height
         
     @classmethod
-    def prop_grid_size(cls) -> float | None:
+    def prop_grid_size(cls) -> tuple[float, float] | None:
         """Rocks don't have a standard grid size."""
         return None
     
