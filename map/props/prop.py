@@ -22,16 +22,21 @@ class Prop(MapElement, ABC):
     def __init__(self, x: float, y: float, width: float, height: float, map_: 'Map', rotation: Rotation = Rotation.ROT_0) -> None:
         """Initialize a prop with position and size.
         
+        Props are drawn relative to their center point. The default orientation (0° rotation)
+        has the prop facing right. Rotation happens counterclockwise in 90° increments.
+        
         Args:
-            x: X coordinate in drawing units
-            y: Y coordinate in drawing units
+            x: Left edge X coordinate in drawing units
+            y: Top edge Y coordinate in drawing units 
             width: Width in drawing units
             height: Height in drawing units
             map_: Parent map instance
-            rotation: Rotation angle (default: no rotation)
+            rotation: Rotation angle in 90° increments (default: facing right)
         """
         self._x = x
         self._y = y
+        self._width = width
+        self._height = height
         shape = Rectangle(x, y, width, height)
         super().__init__(shape=shape, map_=map_)
         self.rotation = rotation
@@ -45,12 +50,25 @@ class Prop(MapElement, ABC):
         """
         pass
 
+    @property
+    def width(self) -> float:
+        """Get prop width."""
+        return self._width
+        
+    @property 
+    def height(self) -> float:
+        """Get prop height."""
+        return self._height
+
     def _apply_rotation(self, canvas: skia.Canvas) -> None:
         """Apply rotation transform around prop center."""
-        cx = self._bounds.x + self._bounds.width / 2
-        cy = self._bounds.y + self._bounds.height / 2
+        # Calculate center point
+        cx = self._x + self._width / 2
+        cy = self._y + self._height / 2
+        
+        # Translate to center, rotate, translate back
         canvas.translate(cx, cy)
-        canvas.rotate(self.rotation.radians * (180 / 3.14159265359))  # Convert radians to degrees for Skia
+        canvas.rotate(self.rotation.radians * (180 / math.pi))  # Convert radians to degrees
         canvas.translate(-cx, -cy)
             
     def draw(self, canvas: skia.Canvas, layer: Layers = Layers.PROPS) -> None:
