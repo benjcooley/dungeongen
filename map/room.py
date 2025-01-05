@@ -15,11 +15,11 @@ from map.mapelement import MapElement
 # Constant to make rooms slightly larger to ensure proper passage connections
 ROOM_OVERLAP_OFFSET = 4.0  # pixels
 # Base corner size as fraction of cell size
-CORNER_SIZE = 0.25
+CORNER_SIZE = 0.35  # Increased from 0.25
 # How far corners are inset from room edges
-CORNER_INSET = 0.15  # Decreased from 0.20
+CORNER_INSET = 0.12  # Decreased from 0.15
 # How much to vary the line lengths by (as fraction of base size)
-CORNER_LENGTH_VARIATION = 0.5  # Increased from 0.3
+CORNER_LENGTH_VARIATION = 0.65  # Increased from 0.5
 # Control point scale for curve (relative to corner size)
 CURVE_CONTROL_SCALE = 0.8  # Increased from 0.5 for more concavity
 
