@@ -129,9 +129,10 @@ class Prop(MapElement, ABC):
         self._bounds = self._shape.bounds
 
     @classmethod
-    @abstractmethod
     def is_valid_position(cls, x: float, y: float, size: float, container: 'MapElement') -> bool:
         """Check if a position is valid for a prop within the container.
+        
+        Uses the prop's shape and grid requirements to determine validity.
         
         Args:
             x: X coordinate to check
@@ -142,7 +143,25 @@ class Prop(MapElement, ABC):
         Returns:
             True if position is valid, False otherwise
         """
-        pass
+        # Get prop's grid size if it has one
+        grid_size = cls.prop_grid_size()
+        if grid_size is not None:
+            # For grid-aligned props, ensure position is on grid intersection
+            if cls.is_grid_aligned():
+                cell_size = container._map.options.cell_size
+                if (x % cell_size != 0) or (y % cell_size != 0):
+                    return False
+            
+            # Create shape based on grid size
+            width = grid_size * container._map.options.cell_size
+            height = width if isinstance(grid_size, (int, float)) else grid_size[1] * container._map.options.cell_size
+            rect = Rectangle(x - width/2, y - height/2, width, height)
+        else:
+            # Use standard prop size if no grid size
+            rect = Rectangle(x - size/2, y - size/2, size, size)
+            
+        # Check if shape is contained within container
+        return container.contains_rectangle(rect)
 
 
     @classmethod
