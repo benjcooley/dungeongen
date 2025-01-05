@@ -108,7 +108,7 @@ class Prop(ABC):
         # Update the shape's position
         self._boundary_shape = Rectangle(self._x, self._y, self._bounds.width, self._bounds.height)
         # Update the bounds
-        self._bounds = self._shape.bounds
+        self._bounds = self._boundary_shape.bounds
 
     @property
     def center(self) -> tuple[float, float]:
