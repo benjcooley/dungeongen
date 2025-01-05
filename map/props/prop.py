@@ -218,12 +218,11 @@ class Prop(MapElement, ABC):
         return Rectangle(-size/2, -size/2, size, size)
 
     @classmethod
-    def get_map_aligned_boundary_shape(cls, center_x: float, center_y: float, rotation: Rotation) -> Shape:
+    def get_map_aligned_boundary_shape(cls, center: Point, rotation: Rotation) -> Shape:
         """Get the boundary shape aligned to a specific map position and rotation.
         
         Args:
-            center_x: Center X coordinate in map space
-            center_y: Center Y coordinate in map space
+            center: Center point in map space
             rotation: Rotation angle
             
         Returns:
@@ -234,20 +233,19 @@ class Prop(MapElement, ABC):
         bounds = base_shape.bounds
         
         # Calculate translation to move shape to center point
-        dx = center_x - bounds.x - bounds.width/2
-        dy = center_y - bounds.y - bounds.height/2
+        dx = center[0] - bounds.x - bounds.width/2
+        dy = center[1] - bounds.y - bounds.height/2
         
         # Create transformed shape
         # Note: This assumes the Shape classes implement proper translation and rotation
         return base_shape.translated(dx, dy).rotated(rotation.radians)
 
     @classmethod
-    def get_map_aligned_bounds(cls, center_x: float, center_y: float, rotation: Rotation) -> Rectangle:
+    def get_map_aligned_bounds(cls, center: Point, rotation: Rotation) -> Rectangle:
         """Get the bounds of this prop type aligned to a map position and rotation.
         
         Args:
-            center_x: Center X coordinate in map space
-            center_y: Center Y coordinate in map space
+            center: Center point in map space
             rotation: Prop rotation
             
         Returns:
@@ -267,7 +265,7 @@ class Prop(MapElement, ABC):
         rect = Rectangle(-width/2, -height/2, width, height)
         
         # Apply rotation then translation
-        return rect.rotated(rotation).translated(center_x, center_y)
+        return rect.rotated(rotation).translated(center[0], center[1])
 
     def draw(self, canvas: skia.Canvas, layer: Layers = Layers.PROPS) -> None:
         """Override base MapElement draw to prevent drawing bounds rectangle."""
