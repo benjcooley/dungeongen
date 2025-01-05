@@ -21,7 +21,7 @@ ALTAR_HEIGHT = CELL_SIZE * 0.7  # Height of altar
 ALTAR_INSET = (CELL_SIZE - ALTAR_HEIGHT) / 2  # Calculated inset from cell edges
 
 # Grid offset from cell corner to altar center
-ALTAR_GRID_OFFSET_X = 0.5  # Center horizontally in cell
+ALTAR_GRID_OFFSET_X = 0.3  # Align closer to right side of cell
 ALTAR_GRID_OFFSET_Y = 0.5  # Center vertically in cell
 
 class Altar(Prop):
