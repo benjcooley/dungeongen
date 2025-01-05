@@ -52,8 +52,9 @@ class Altar(Prop):
         return cls._boundary_shape
         
     def _draw_content(self, canvas: skia.Canvas, bounds: Rectangle) -> None:
-        # Get prop shape once
+        # Get prop shape once and cast to Rectangle since we know it's a rectangle
         prop_shape = self.get_prop_boundary_shape()
+        rect_shape = prop_shape if isinstance(prop_shape, Rectangle) else prop_shape.bounds
         
         # Draw fill
         fill_paint = skia.Paint(
@@ -80,6 +81,6 @@ class Altar(Prop):
         )
         dot_radius = CELL_SIZE * 0.05
         dot_offset = ALTAR_HEIGHT * 0.3  # Offset from center
-        center_x = prop_shape.center()[0]
+        center_x = rect_shape.center()[0]
         canvas.drawCircle(center_x, -dot_offset, dot_radius, dot_paint)
         canvas.drawCircle(center_x, dot_offset, dot_radius, dot_paint)
