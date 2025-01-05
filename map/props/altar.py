@@ -1,3 +1,4 @@
+import skia
 from map.props.prop import Prop
 from map.props.rotation import Rotation
 from algorithms.shapes import Rectangle, Shape
