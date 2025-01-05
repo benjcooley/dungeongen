@@ -42,8 +42,8 @@ class Altar(Prop):
         return Rectangle(
             -CELL_SIZE/2 + ALTAR_INSET,
             -CELL_SIZE/2 + ALTAR_INSET,
-            CELL_SIZE - 2*ALTAR_INSET,
-            CELL_SIZE - 2*ALTAR_INSET
+            ALTAR_WIDTH,
+            ALTAR_HEIGHT
         )
         
     def _draw_content(self, canvas: skia.Canvas, bounds: Rectangle) -> None:
