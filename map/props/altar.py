@@ -72,44 +72,54 @@ class Altar(Prop):
         return (container.contains_rectangle(rect) and 
                 not container.prop_intersects(cls(x, y, size, size, container._map)))
 
-    def _draw_content(self, canvas: skia.Canvas) -> None:
-        """Draw the altar's content."""
-        # Draw main rectangle
+    def _draw_content(self, canvas: skia.Canvas, bounds: Rectangle) -> None:
+        """Draw the altar's content in local coordinates."""
+        # Draw main rectangle with light fill
         rect_paint = skia.Paint(
-            AntiAlias=True,
-            Style=skia.Paint.kFill_Style,
-            Color=self._map.options.prop_dark_color
-        )
-        
-        # Main rectangle is 80% of prop size
-        rect_size = self.width * 0.8
-        x = self.x + (self.width - rect_size) / 2
-        y = self.y + (self.height - rect_size) / 2
-        
-        canvas.drawRect(skia.Rect.MakeXYWH(x, y, rect_size, rect_size), rect_paint)
-        
-        # Draw two dots
-        dot_paint = skia.Paint(
             AntiAlias=True,
             Style=skia.Paint.kFill_Style,
             Color=self._map.options.prop_light_color
         )
         
-        dot_radius = self.width * 0.1
-        dot_offset = self.width * 0.2
+        # Rectangle is 1/4 width of cell, inset from left
+        rect_width = bounds.width * 0.25
+        rect_height = bounds.height * 0.7  # 70% of height
+        rect_x = -bounds.width/2 + bounds.width * 0.15  # 15% inset from left
+        rect_y = -rect_height/2  # Center vertically
         
-        # Left dot
+        canvas.drawRect(skia.Rect.MakeXYWH(rect_x, rect_y, rect_width, rect_height), rect_paint)
+        
+        # Draw outline
+        outline_paint = skia.Paint(
+            AntiAlias=True,
+            Style=skia.Paint.kStroke_Style,
+            StrokeWidth=self._map.options.prop_stroke_width,
+            Color=self._map.options.prop_outline_color
+        )
+        canvas.drawRect(skia.Rect.MakeXYWH(rect_x, rect_y, rect_width, rect_height), outline_paint)
+        
+        # Draw two dots (candles)
+        dot_paint = skia.Paint(
+            AntiAlias=True,
+            Style=skia.Paint.kFill_Style,
+            Color=self._map.options.prop_outline_color
+        )
+        
+        dot_radius = bounds.width * 0.05
+        dot_y_offset = rect_height/2 * 0.8  # Place dots near top/bottom edges
+        
+        # Top dot
         canvas.drawCircle(
-            self.x + self.width/2 - dot_offset,
-            self.y + self.height/2,
+            rect_x + rect_width/2,  # Center of rectangle
+            rect_y - dot_y_offset,  # Above rectangle
             dot_radius,
             dot_paint
         )
         
-        # Right dot
+        # Bottom dot
         canvas.drawCircle(
-            self.x + self.width/2 + dot_offset,
-            self.y + self.height/2,
+            rect_x + rect_width/2,  # Center of rectangle
+            rect_y + rect_height + dot_y_offset,  # Below rectangle
             dot_radius,
             dot_paint
         )
