@@ -174,19 +174,19 @@ class Prop(ABC):
             
         return ((x, y), False)
 
-    def place_random_position(self, max_attempts: int = MAX_PLACEMENT_ATTEMPTS) -> bool:
+    def place_random_position(self, max_attempts: int = MAX_PLACEMENT_ATTEMPTS) -> tuple[float, float] | None:
         """Try to place this prop at a valid random position within its container.
         
         Args:
             max_attempts: Maximum number of random positions to try
             
         Returns:
-            True if a valid position was found, False if all attempts failed
+            Tuple of (x,y) coordinates if valid position found, None if all attempts failed
             
         Note: The prop must already be added to a container element.
         """
         if not self.container:
-            return False
+            return None
             
         # Get container bounds
         bounds = self.container.bounds
@@ -201,9 +201,9 @@ class Prop(ABC):
             snapped, valid = self.snap_valid_position(x, y)
             if valid:
                 self.position = snapped
-                return True
+                return snapped
                 
-        return False
+        return None
 
     @property
     def grid_position(self) -> Point:
