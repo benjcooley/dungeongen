@@ -23,32 +23,24 @@ ALTAR_INSET = (CELL_SIZE - ALTAR_HEIGHT) / 2  # Calculated inset from cell edges
 class Altar(Prop):
     """An altar prop that appears as a small rectangular table with decorative dots."""
     
-    def __init__(self, x: float, y: float, map_: 'Map', rotation: Rotation = Rotation.ROT_0) -> None:
+    def __init__(self, center_x: float, center_y: float, map_: 'Map', rotation: Rotation = Rotation.ROT_0) -> None:
         """Initialize an altar prop.
         
         Args:
-            x: Center X coordinate in drawing units
-            y: Center Y coordinate in drawing units
+            center_x: Center X coordinate in drawing units
+            center_y: Center Y coordinate in drawing units
             map_: Parent map instance
             rotation: Rotation angle in 90° increments (default: facing right)
         """
-        # Create grid-aligned rectangle for full cell
-        rect = Rectangle(
-            x - CELL_SIZE/2,
-            y - CELL_SIZE/2,
-            CELL_SIZE,
-            CELL_SIZE
-        )
-        
-        # Create boundary shape as rotated rectangle centered on point
-        boundary = Rectangle.rotated_rect(
-            x - ALTAR_WIDTH/2,
-            y - ALTAR_HEIGHT/2,
+        # Create rotated rectangle centered on point
+        rect = Rectangle.rotated_rect(
+            center_x - ALTAR_WIDTH/2,
+            center_y - ALTAR_HEIGHT/2,
             ALTAR_WIDTH,
             ALTAR_HEIGHT,
             rotation
         )
-        super().__init__(rect, boundary, map_, rotation)
+        super().__init__(rect, rect, map_, rotation)
     
     @classmethod
     def is_decoration(cls) -> bool:
