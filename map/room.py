@@ -62,7 +62,7 @@ class Room(MapElement):
             right: Direction vector parallel to right wall (from corner's perspective)
         """
         # Calculate base corner size
-        base_size = self._map.CELL_SIZE * CORNER_SIZE
+        base_size = CELL_SIZE * CORNER_SIZE
         
         # Calculate end points with constrained random lengths
         length1 = base_size * (MIN_CORNER_LENGTH + random.random() * (MAX_CORNER_LENGTH - MIN_CORNER_LENGTH))
@@ -98,7 +98,7 @@ class Room(MapElement):
             return
             
         # Calculate corner positions with inset
-        inset = self._map.CELL_SIZE * CORNER_INSET
+        inset = CELL_SIZE * CORNER_INSET
         left = self._bounds.x + inset
         right = self._bounds.x + self._bounds.width - inset
         top = self._bounds.y + inset
