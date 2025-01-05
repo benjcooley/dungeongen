@@ -39,35 +39,35 @@ class Room(MapElement):
         )
         super().__init__(shape=shape, map_=map_)
     
-    def _draw_corner(self, canvas: skia.Canvas, corner: Point, wall1: Point, wall2: Point) -> None:
+    def _draw_corner(self, canvas: skia.Canvas, corner: Point, left: Point, right: Point) -> None:
         """Draw a single corner decoration.
         
         Args:
             canvas: The canvas to draw on
             corner: Corner position
-            wall1: First wall direction vector
-            wall2: Second wall direction vector
+            left: Direction vector parallel to left wall (from corner's perspective)
+            right: Direction vector parallel to right wall (from corner's perspective)
         """
         # Calculate corner size based on cell size with variation
         base_size = self._map.options.cell_size * CORNER_SIZE
         var_size = base_size * (1 + (0.1 * (math.sin(corner.x * corner.y) * 0.5 + 0.5)))
         
         # Normalize wall vectors and scale to size
-        wall1_norm = wall1.normalized() * var_size
-        wall2_norm = wall2.normalized() * var_size
+        left_norm = left.normalized() * var_size
+        right_norm = right.normalized() * var_size
         
         # Create corner path
         path = skia.Path()
         path.moveTo(corner.x, corner.y)
         
-        # Draw first straight line along wall1
-        p1 = corner + wall1_norm
+        # Draw first straight line along left wall
+        p1 = corner + left_norm
         path.lineTo(p1.x, p1.y)
         
-        # Draw curved line to point along wall2
-        p2 = corner + wall2_norm
-        cp1 = p1 + wall2_norm * 0.5  # Control point near p1
-        cp2 = p2 + wall1_norm * 0.5  # Control point near p2
+        # Draw curved line to point along right wall
+        p2 = corner + right_norm
+        cp1 = p1 + right_norm * 0.5  # Control point near p1
+        cp2 = p2 + left_norm * 0.5  # Control point near p2
         path.cubicTo(cp1.x, cp1.y, cp2.x, cp2.y, p2.x, p2.y)
         
         # Draw straight line back to corner
