@@ -123,6 +123,6 @@ limitations under the License.
 This project is a reimplementation of Watabou's One Page Dungeon Generator:
 - Original creator: [Watabou](https://watabou.itch.io)
 - Human Advisor/Producer: Benjamin Cooley
-- Implementation: Claude 3.5 Sonnet and OpenAI ChatGPT 4.0
+- Implementation: Claude 3.5 Sonnet and OpenAI ChatGPT 4o
 
 Please consider supporting the original creator through [Patreon](https://www.patreon.com/watawatabou)!
