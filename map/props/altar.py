@@ -56,13 +56,16 @@ class Altar(Prop):
         x = center_x - CELL_SIZE / 2
         y = center_y - CELL_SIZE / 2
         
-        # Create grid-aligned rectangle and boundary shape
-        rect = Rectangle(x, y, CELL_SIZE, CELL_SIZE)  # Full grid cell
-        boundary = Rectangle(
-            center_x - ALTAR_WIDTH / 2,  # Center on given point
+        # Create grid-aligned rectangle for full cell
+        rect = Rectangle(x, y, CELL_SIZE, CELL_SIZE)
+        
+        # Create boundary shape as rotated rectangle centered on point
+        boundary = Rectangle.rotated_rect(
+            center_x - ALTAR_WIDTH / 2,
             center_y - ALTAR_HEIGHT / 2,
             ALTAR_WIDTH,
-            ALTAR_HEIGHT
+            ALTAR_HEIGHT,
+            rotation
         )
         super().__init__(rect, boundary, map_, rotation)
     
