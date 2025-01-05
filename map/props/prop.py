@@ -362,17 +362,6 @@ class Prop(ABC):
         ...
         
     @classmethod
-    def get_prop_boundary_shape(cls) -> Shape | None:
-        """Get the boundary shape of this prop type in local coordinates.
-        
-        Returns a shape centered at (0,0) and oriented to the right (0 degrees),
-        or None to use default rectangular boundary.
-        This shape is used for collision detection and placement validation.
-        The actual visual appearance may differ from this boundary shape.
-        """
-        return None  # Use default rectangular boundary
-
-    @classmethod
     def get_map_aligned_boundary_shape(cls, center: Point, rotation: Rotation) -> Shape | None:
         """Get the boundary shape aligned to a specific map position and rotation.
         
