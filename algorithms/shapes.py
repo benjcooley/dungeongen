@@ -228,10 +228,15 @@ class ShapeGroup:
         canvas.drawPath(self.to_path(), paint)
     
     def inflated(self, amount: float) -> 'ShapeGroup':
-        """Return a new shape group with all shapes inflated."""
+        """Return a new shape group with included shapes inflated.
+        
+        Only inflates the included shapes, excludes remain unchanged.
+        This matches the expected behavior where excluded areas should
+        not grow when inflating the overall shape.
+        """
         return ShapeGroup(
             includes=[s.inflated(amount) for s in self.includes],
-            excludes=[s.inflated(amount) for s in self.excludes]
+            excludes=list(self.excludes)  # Keep excludes unchanged
         )._with_inflate(self._inflate + amount)
 
     def _with_inflate(self, amount: float) -> 'ShapeGroup':
