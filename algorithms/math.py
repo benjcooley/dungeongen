@@ -23,6 +23,10 @@ class Point:
     def __truediv__(self, scalar: float) -> Point:
         return Point(self.x / scalar, self.y / scalar)
         
+    def __neg__(self) -> Point:
+        """Return negated vector (-x, -y)."""
+        return Point(-self.x, -self.y)
+        
     def dot(self, other: Point) -> float:
         """Compute dot product with another vector."""
         return self.x * other.x + self.y * other.y
