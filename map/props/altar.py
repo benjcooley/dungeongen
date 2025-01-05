@@ -54,10 +54,6 @@ class Altar(Prop):
         """Altars are not decorative - they're major props."""
         return False
         
-    @classmethod
-    def is_grid_aligned(cls) -> bool:
-        """Altars should be aligned to grid intersections."""
-        return True
         
     @classmethod
     def prop_size(cls) -> Point:
