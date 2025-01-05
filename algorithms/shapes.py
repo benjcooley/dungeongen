@@ -273,24 +273,18 @@ class ShapeGroup:
         )
     
     def _recalculate_bounds(self) -> None:
-        """Calculate bounds by combining all included shapes' bounds."""
+        """Calculate bounds using Skia path operations to handle excludes."""
         if not self.is_valid:
             return
-        
-        # Start with the first shape's bounds
-        bounds = self.includes[0].bounds
-        
-        # Expand bounds to include all other shapes
-        for shape in self.includes[1:]:
-            other_bounds = shape.bounds
-            bounds = Rectangle(
-                min(bounds.x, other_bounds.x),
-                min(bounds.y, other_bounds.y),
-                max(bounds.x + bounds.width, other_bounds.x + other_bounds.width) - min(bounds.x, other_bounds.x),
-                max(bounds.y + bounds.height, other_bounds.y + other_bounds.height) - min(bounds.y, other_bounds.y)
-            )
-        
-        self._bounds = bounds
+            
+        # Get bounds from final path which accounts for excludes
+        path_bounds = self.path.getBounds()
+        self._bounds = Rectangle(
+            path_bounds.left(),
+            path_bounds.top(),
+            path_bounds.width(),
+            path_bounds.height()
+        )
         self._bounds_dirty = False
 
     @property
