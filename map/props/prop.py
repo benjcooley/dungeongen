@@ -4,6 +4,7 @@ import random
 import math
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Optional, ClassVar
+from algorithms.types import Point
 import skia
 from algorithms.shapes import Rectangle, Shape
 from map.mapelement import MapElement
