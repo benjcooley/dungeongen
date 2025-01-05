@@ -119,13 +119,14 @@ class Prop(MapElement, ABC):
 
 
     @classmethod
+    @abstractmethod
     def is_decoration(cls) -> bool:
         """Whether this prop is a decoration that should be drawn before other props.
         
         Decoration props are small floor items like rocks and cracks that don't
         need to check intersection with other props.
         """
-        return False
+        ...
 
     @classmethod
     @abstractmethod
