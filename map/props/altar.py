@@ -44,10 +44,21 @@ class Altar(Prop):
         elif rotation == Rotation.ROT_270:  # Facing up
             y += wall_spacing
             
-        # Size is reduced to account for wall spacing
-        size = cell_size - (2 * wall_spacing)
+        # Full cell size for positioning
+        size = cell_size
         
-        return cls(x, y, size, size, map_, rotation.radians)
+        # Create altar with actual bounds matching its shape
+        altar = cls(x, y, size, size, map_, rotation.radians)
+        
+        # Update bounds to match actual altar rectangle (1/4 width of cell)
+        altar._bounds = Rectangle(
+            x + wall_spacing,  # Add wall spacing
+            y + wall_spacing,
+            size * 0.25,  # Altar is 1/4 width
+            size - (2 * wall_spacing)  # Full height minus spacing
+        )
+        
+        return altar
 
     @classmethod
     def is_valid_position(cls, x: float, y: float, size: float, container: 'MapElement') -> bool:
