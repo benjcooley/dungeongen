@@ -58,23 +58,26 @@ class Room(MapElement):
         dx = 1 if flip_x else -1
         dy = 1 if flip_y else -1
         
-        # Start at outer corner
-        path.moveTo(x + (size * dx), y + (size * dy))
+        # Add slight variation to size
+        var_size = size * (1 + (0.1 * (math.sin(x * y) * 0.5 + 0.5)))
         
-        # Draw the L shape going inward
-        path.lineTo(x + (size * dx), y)  # Vertical line to top
-        path.lineTo(x + (size * 0.3 * dx), y)  # Short horizontal to inner
-        path.lineTo(x, y + (size * 0.3 * dy))  # Short vertical to inner
-        path.lineTo(x, y + (size * dy))  # Horizontal line to side
+        # Start at wall edge
+        path.moveTo(x, y)
         
-        # Calculate control points for the curved outer section
-        cp1x = x + (size * 0.3 * dx)
-        cp1y = y + (size * dy)
-        cp2x = x + (size * dx)
-        cp2y = y + (size * 0.3 * dy)
+        # Draw straight edge parallel to wall
+        path.lineTo(x + (var_size * dx), y)  # Horizontal line
+        path.lineTo(x + (var_size * dx), y + (var_size * dy))  # Vertical line
+        path.lineTo(x, y + (var_size * dy))  # Back to wall
+        
+        # Calculate control points for curved inset
+        # Control points are positioned to create a natural curve facing room interior
+        cp1x = x + (var_size * 0.8 * dx)
+        cp1y = y + (var_size * 0.2 * dy)
+        cp2x = x + (var_size * 0.2 * dx)
+        cp2y = y + (var_size * 0.8 * dy)
         
         # Add curved section back to start
-        path.cubicTo(cp1x, cp1y, cp2x, cp2y, x + (size * dx), y + (size * dy))
+        path.cubicTo(cp1x, cp1y, cp2x, cp2y, x, y)
         
         # Fill the corner with black
         corner_paint = skia.Paint(
