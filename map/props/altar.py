@@ -52,9 +52,8 @@ class Altar(Prop):
         return cls._boundary_shape
         
     def _draw_content(self, canvas: skia.Canvas, bounds: Rectangle) -> None:
-        # Get prop shape once and cast to Rectangle since we know it's a rectangle
-        prop_shape = self.get_prop_boundary_shape()
-        rect_shape = prop_shape if isinstance(prop_shape, Rectangle) else prop_shape.bounds
+        # Get prop shape once and cast to Rectangle since we know it's always a rectangle
+        rect_shape = self.get_prop_boundary_shape()  # type: Rectangle
         
         # Draw fill
         fill_paint = skia.Paint(
