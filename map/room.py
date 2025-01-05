@@ -65,25 +65,25 @@ class Room(MapElement):
         variation_left = 1.0 + (random.random() * CORNER_LENGTH_VARIATION)
         variation_right = 1.0 + (random.random() * CORNER_LENGTH_VARIATION)
         
-        # Scale the normalized vectors by the varied sizes
-        left_norm = left * (base_size * variation_left)
-        right_norm = right * (base_size * variation_right)
-        
         # Create corner path
         path = skia.Path()
         path.moveTo(corner.x, corner.y)
         
+        # Scale and apply the vectors
+        left_scaled = left * (base_size * variation_left)
+        right_scaled = right * (base_size * variation_right)
+        
         # Draw first straight line along left wall
-        p1 = corner + left_norm
-        path.lineTo(p1.x, p1.y)
+        end1 = corner + left_scaled
+        path.lineTo(end1.x, end1.y)
         
         # Draw curved line to point along right wall
-        p2 = corner + right_norm
-        cp1 = p1 + right_norm * CURVE_CONTROL_SCALE
-        cp2 = p2 + left_norm * CURVE_CONTROL_SCALE
-        path.cubicTo(cp1.x, cp1.y, cp2.x, cp2.y, p2.x, p2.y)
+        end2 = corner + right_scaled
+        cp1 = end1 + right_scaled * CURVE_CONTROL_SCALE
+        cp2 = end2 + left_scaled * CURVE_CONTROL_SCALE
+        path.cubicTo(cp1.x, cp1.y, cp2.x, cp2.y, end2.x, end2.y)
         
-        # Draw straight line back to corner
+        # Close the path
         path.lineTo(corner.x, corner.y)
         
         # Fill the corner with black
