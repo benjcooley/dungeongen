@@ -123,10 +123,10 @@ class Prop(ABC):
             prop_height = prop_bounds.height
             
             # Find closest wall
-            left_dist = abs(x - room_bounds.x)
-            right_dist = abs(x - (room_bounds.x + room_bounds.width))
-            top_dist = abs(y - room_bounds.y)
-            bottom_dist = abs(y - (room_bounds.y + room_bounds.height))
+            left_dist = abs(x - room_bounds.left)
+            right_dist = abs(x - room_bounds.right)
+            top_dist = abs(y - room_bounds.top)
+            bottom_dist = abs(y - room_bounds.bottom)
             
             # Try walls in order of closest to furthest
             walls = [(left_dist, 'left'), (right_dist, 'right'), 
@@ -135,21 +135,21 @@ class Prop(ABC):
             
             for _, wall in walls:
                 if wall == 'left':
-                    test_x = room_bounds.x
-                    test_y = min(max(y, room_bounds.y + prop_height/2), 
-                               room_bounds.y + room_bounds.height - prop_height/2)
+                    test_x = room_bounds.left
+                    test_y = min(max(y, room_bounds.top + prop_height/2), 
+                               room_bounds.bottom - prop_height/2)
                 elif wall == 'right':
-                    test_x = room_bounds.x + room_bounds.width - prop_width
-                    test_y = min(max(y, room_bounds.y + prop_height/2),
-                               room_bounds.y + room_bounds.height - prop_height/2)
+                    test_x = room_bounds.right - prop_width
+                    test_y = min(max(y, room_bounds.top + prop_height/2),
+                               room_bounds.bottom - prop_height/2)
                 elif wall == 'top':
-                    test_x = min(max(x, room_bounds.x + prop_width/2),
-                               room_bounds.x + room_bounds.width - prop_width/2)
-                    test_y = room_bounds.y
+                    test_x = min(max(x, room_bounds.left + prop_width/2),
+                               room_bounds.right - prop_width/2)
+                    test_y = room_bounds.top
                 else:  # bottom
-                    test_x = min(max(x, room_bounds.x + prop_width/2),
-                               room_bounds.x + room_bounds.width - prop_width/2)
-                    test_y = room_bounds.y + room_bounds.height - prop_height
+                    test_x = min(max(x, room_bounds.left + prop_width/2),
+                               room_bounds.right - prop_width/2)
+                    test_y = room_bounds.bottom - prop_height
                 
                 if self.is_valid_position(test_x, test_y, self.rotation, self.container):
                     return (test_x, test_y)
