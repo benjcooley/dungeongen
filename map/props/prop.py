@@ -234,6 +234,24 @@ class Prop(MapElement, ABC):
         # Note: This assumes the Shape classes implement proper translation and rotation
         return base_shape.translated(dx, dy).rotated(rotation.radians)
 
+    def get_map_aligned_bounds(self) -> Rectangle:
+        """Get the bounds of this prop aligned to its current map position and rotation.
+        
+        Returns:
+            A Rectangle representing the prop's bounds in map coordinates
+        """
+        # Get base boundary shape (centered at origin)
+        base_shape = self.get_prop_boundary_shape()
+        bounds = base_shape.bounds
+        
+        # Calculate translation to move shape to center point
+        dx = self._x + self._width/2 - bounds.x - bounds.width/2
+        dy = self._y + self._height/2 - bounds.y - bounds.height/2
+        
+        # Create transformed shape and get its bounds
+        transformed = base_shape.translated(dx, dy).rotated(self.rotation)
+        return transformed.bounds
+
     def draw(self, canvas: skia.Canvas, layer: Layers = Layers.PROPS) -> None:
         """Override base MapElement draw to prevent drawing bounds rectangle."""
         # Props should implement their own draw logic
