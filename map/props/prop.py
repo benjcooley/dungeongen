@@ -15,7 +15,7 @@ from constants import CELL_SIZE
 if TYPE_CHECKING:
     from map.map import Map
 
-class Prop(MapElement, ABC):
+class Prop(ABC):
     """Base class for decorative map props.
     
     Props are visual elements that can be placed in rooms and passages.
@@ -40,8 +40,9 @@ class Prop(MapElement, ABC):
         self._y = y
         self._width = width
         self._height = height
-        boundary_shape = Rectangle(x, y, width, height)
-        super().__init__(shape=boundary_shape, map_=map_)
+        self._map = map_
+        self._boundary_shape = Rectangle(x, y, width, height)
+        self._bounds = self._boundary_shape.bounds
         self.rotation = rotation
         self.container: Optional['MapElement'] = None
     
@@ -302,7 +303,12 @@ class Prop(MapElement, ABC):
             pos[1] + height/2
         )
 
-    def draw(self, canvas: skia.Canvas, layer: Layers = Layers.PROPS) -> None:
-        """Override base MapElement draw to prevent drawing bounds rectangle."""
-        # Props should implement their own draw logic
-        pass
+    @property
+    def shape(self) -> Shape:
+        """Get the boundary shape of this prop."""
+        return self._boundary_shape
+        
+    @property
+    def bounds(self) -> Rectangle:
+        """Get the bounding rectangle of this prop."""
+        return self._bounds
