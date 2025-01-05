@@ -40,10 +40,10 @@ class Altar(Prop):
     def get_prop_boundary_shape(cls) -> Shape:
         """Get a slightly inset rectangle for better collision detection."""
         return Rectangle(
-            -ALTAR_WIDTH/2 + ALTAR_INSET,
-            -ALTAR_HEIGHT/2 + ALTAR_INSET,
-            ALTAR_WIDTH - 2*ALTAR_INSET,
-            ALTAR_HEIGHT - 2*ALTAR_INSET
+            -CELL_SIZE/2 + ALTAR_INSET,
+            -CELL_SIZE/2 + ALTAR_INSET,
+            CELL_SIZE - 2*ALTAR_INSET,
+            CELL_SIZE - 2*ALTAR_INSET
         )
         
     def _draw_content(self, canvas: skia.Canvas, bounds: Rectangle) -> None:
