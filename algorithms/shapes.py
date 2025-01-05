@@ -385,14 +385,16 @@ class Rectangle:
         """Check if this rectangle intersects with another shape."""
         # Quick rejection using bounds for non-Rectangle shapes
         if not isinstance(other, Rectangle):
-            other_bounds = other.bounds
-            if not self._bounds_intersect(other_bounds):
+            if not self._bounds_intersect(other.bounds):
                 return False
             # Delegate to other shape's intersection test
             return other.intersects(self)
             
-        # For Rectangle-Rectangle, just need bounds test
-        return self._bounds_intersect(other)
+        # For Rectangle-Rectangle, use actual dimensions
+        return (self.x < other.x + other.width and
+                self.x + self.width > other.x and
+                self.y < other.y + other.height and
+                self.y + self.height > other.y)
         
     def _bounds_intersect(self, other: 'Rectangle') -> bool:
         """Test if this rectangle's bounds intersect another rectangle."""
@@ -492,18 +494,18 @@ class Circle:
             # Circle-Circle: Compare centers distance to sum of radii
             dx = self.cx - other.cx
             dy = self.cy - other.cy
-            radii_sum = self._inflated_radius + other._inflated_radius
+            radii_sum = self.radius + other.radius
             return (dx * dx + dy * dy) <= (radii_sum * radii_sum)
             
         if isinstance(other, Rectangle):
             # Circle-Rectangle: Find closest point on rectangle to circle center
-            closest_x = max(other._inflated_x, min(self.cx, other._inflated_x + other._inflated_width))
-            closest_y = max(other._inflated_y, min(self.cy, other._inflated_y + other._inflated_height))
+            closest_x = max(other.x, min(self.cx, other.x + other.width))
+            closest_y = max(other.y, min(self.cy, other.y + other.height))
             
             # Compare distance from closest point to circle center
             dx = self.cx - closest_x
             dy = self.cy - closest_y
-            return (dx * dx + dy * dy) <= (self._inflated_radius * self._inflated_radius)
+            return (dx * dx + dy * dy) <= (self.radius * self.radius)
             
         # For other shapes, delegate to their implementation
         return other.intersects(self)
