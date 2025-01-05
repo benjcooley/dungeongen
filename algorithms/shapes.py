@@ -299,14 +299,23 @@ class Rectangle:
     
     def rotate(self, rotation: 'Rotation') -> 'Rectangle':
         """Return a new rectangle rotated by the given rotation (90-degree increments only)."""
-        if rotation == Rotation.ROT_0:
-            return Rectangle(self.x, self.y, self.width, self.height, self._inflate)
-        elif rotation == Rotation.ROT_90:
-            return Rectangle(self.x, self.y, self.height, self.width, self._inflate)
-        elif rotation == Rotation.ROT_180:
-            return Rectangle(self.x, self.y, self.width, self.height, self._inflate)
-        else:  # ROT_270
-            return Rectangle(self.x, self.y, self.height, self.width, self._inflate)
+        # Calculate center point
+        center_x = self.x + self.width / 2
+        center_y = self.y + self.height / 2
+        
+        # For 90/270 degree rotations, swap width and height
+        if rotation in (Rotation.ROT_90, Rotation.ROT_270):
+            new_width = self.height
+            new_height = self.width
+        else:
+            new_width = self.width
+            new_height = self.height
+            
+        # Calculate new top-left position relative to rotated center
+        new_x = center_x - new_width / 2
+        new_y = center_y - new_height / 2
+        
+        return Rectangle(new_x, new_y, new_width, new_height, self._inflate)
         
     def adjust(self, left: float, top: float, right: float, bottom: float) -> 'Rectangle':
         """Return a new rectangle with edges adjusted by the given amounts.
