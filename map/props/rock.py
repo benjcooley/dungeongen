@@ -24,18 +24,18 @@ class Rock(Prop):
         """Rocks are decorative floor items."""
         return True
         
-    @property
-    def grid_aligned(self) -> bool:
-        """Rocks are not aligned to the grid."""
+    @classmethod
+    def grid_aligned(cls) -> bool:
+        """Whether this prop should be aligned to the grid."""
         return False
         
-    @property
-    def prop_size(self) -> float:
+    @classmethod
+    def prop_size(cls) -> float:
         """Get the nominal size of this rock in drawing units."""
-        return self._radius * 2
+        return MEDIUM_ROCK_SIZE * 2  # Use medium rock size as standard
         
-    @property
-    def prop_grid_size(self) -> float | None:
+    @classmethod
+    def prop_grid_size(cls) -> float | None:
         """Rocks don't have a standard grid size."""
         return None
     
