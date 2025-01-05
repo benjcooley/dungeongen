@@ -49,11 +49,10 @@ class Altar(Prop):
             # Start with a 1x1 centered grid rectangle
             base = Rectangle.centered_grid(1, 1)
             # Adjust edges with insets
-            right_inset = CELL_SIZE - ALTAR_INSET - ALTAR_WIDTH
             cls._shape_instance = base.adjust(
                 left=ALTAR_INSET,
                 top=ALTAR_INSET,
-                right=-right_inset,
+                right=-(CELL_SIZE - ALTAR_INSET - ALTAR_WIDTH),
                 bottom=-ALTAR_INSET
             )
         return cls._shape_instance
