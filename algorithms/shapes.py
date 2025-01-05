@@ -332,13 +332,6 @@ class Rectangle:
     
     def rotate_90(self, rotation: 'Rotation') -> 'Rectangle':
         """Return a new rectangle rotated by the given 90-degree increment."""
-        # For 90/270 degree rotations, swap width and height
-        if rotation in (Rotation.ROT_90, Rotation.ROT_270):
-            return self.rotated(rotation.radians).adjust(
-                0, 0,
-                self.height - self.width,
-                self.width - self.height
-            )
         return self.rotated(rotation.radians)
         
     def adjust(self, left: float, top: float, right: float, bottom: float) -> 'Rectangle':
