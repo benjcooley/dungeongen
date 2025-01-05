@@ -8,9 +8,9 @@ import math
 # Constant to make rooms slightly larger to ensure proper passage connections
 ROOM_OVERLAP_OFFSET = 4.0  # pixels
 # Corner size as fraction of cell size
-CORNER_SIZE = 0.15  # Increased size for more prominent corners
+CORNER_SIZE = 0.25  # Increased size for more prominent corners
 # How far corners are inset from room edges
-CORNER_INSET = 0.15  # Increased inset to match example
+CORNER_INSET = 0.20  # Increased inset to match example
 
 from map.mapelement import MapElement
 from graphics.conversions import grid_to_drawing, grid_to_drawing_size
