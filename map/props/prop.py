@@ -142,19 +142,16 @@ class Prop(MapElement, ABC):
         Returns:
             True if position is valid, False otherwise
         """
+        # Get prop's boundary shape transformed to test position once
+        shape = cls.get_map_aligned_boundary_shape(x, y, rotation)
+        bounds = shape.bounds
+        
         # For grid-aligned props, ensure the shape's top-left corner aligns to grid
         if cls.is_grid_aligned():
-            # Get prop's boundary shape transformed to test position
-            shape = cls.get_map_aligned_boundary_shape(x, y, rotation)
-            bounds = shape.bounds
-            
             # Check if top-left corner aligns to grid
             if (bounds.x % CELL_SIZE != 0) or (bounds.y % CELL_SIZE != 0):
                 return False
 
-        # Get prop's boundary shape transformed to test position
-        shape = cls.get_map_aligned_boundary_shape(x, y, rotation)
-        
         # Check if shape is contained within container
         if not container.shape.contains_shape(shape):
             return False
