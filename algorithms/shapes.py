@@ -423,6 +423,8 @@ class Rectangle:
         self._inflated_y = self.y - self._inflate
         self._inflated_width = self.width + 2 * self._inflate
         self._inflated_height = self.height + 2 * self._inflate
+        # Update bounds for any observers
+        self._bounds_dirty = True
     
     def make_rotated(self, rotation: 'Rotation') -> 'Rectangle':
         """Return a new rectangle rotated by the given 90-degree increment."""
@@ -584,6 +586,7 @@ class Circle:
         """Translate this circle by the given amounts in-place."""
         self.cx += dx
         self.cy += dy
+        self._bounds_dirty = True
     
     def make_translated(self, dx: float, dy: float) -> 'Circle':
         """Return a new circle translated by the given amounts."""
@@ -604,6 +607,7 @@ class Circle:
         
         self.cx = new_cx
         self.cy = new_cy
+        self._bounds_dirty = True
     
     def make_rotated(self, rotation: 'Rotation') -> 'Circle':
         """Return a new circle rotated by the given 90-degree increment."""
