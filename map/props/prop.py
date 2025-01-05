@@ -118,8 +118,8 @@ class Prop(MapElement, ABC):
         pass
 
 
-    @property
-    def is_decoration(self) -> bool:
+    @classmethod
+    def is_decoration(cls) -> bool:
         """Whether this prop is a decoration that should be drawn before other props.
         
         Decoration props are small floor items like rocks and cracks that don't

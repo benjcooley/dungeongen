@@ -19,8 +19,8 @@ MEDIUM_ROCK_SIZE = 1/8
 class Rock(Prop):
     """A rock prop with irregular circular shape."""
     
-    @property
-    def is_decoration(self) -> bool:
+    @classmethod
+    def is_decoration(cls) -> bool:
         """Rocks are decorative floor items."""
         return True
         

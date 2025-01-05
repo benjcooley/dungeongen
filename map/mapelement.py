@@ -112,8 +112,8 @@ class MapElement:
             self._map.remove_element(self)
     
 
-    @property
-    def is_decoration(self) -> bool:
+    @classmethod
+    def is_decoration(cls) -> bool:
         """Whether this element is a decoration that should be drawn before other props."""
         return False
 
@@ -131,17 +131,17 @@ class MapElement:
         if layer == Layers.PROPS:
             # Draw decoration props first
             for prop in self._props:
-                if prop.is_decoration:
+                if prop.__class__.is_decoration():
                     prop.draw(canvas)
                     
             # Then draw non-decoration props
             for prop in self._props:
-                if not prop.is_decoration:
+                if not prop.__class__.is_decoration():
                     prop.draw(canvas)
         elif layer == Layers.SHADOW:
             # Only draw shadows for non-decoration props
             for prop in self._props:
-                if not prop.is_decoration:
+                if not prop.__class__.is_decoration():
                     prop.draw(canvas, layer)
         else:
             # For other layers, draw all props
