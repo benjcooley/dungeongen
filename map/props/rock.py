@@ -6,11 +6,6 @@ import skia
 from typing import List, Tuple, TYPE_CHECKING
 from map.enums import Layers, RockType
 from map.mapelement import MapElement
-
-# Rock sizes as fraction of grid cell
-SMALL_ROCK_SIZE = 1/12
-MEDIUM_ROCK_SIZE = 1/8
-
 from graphics.conversions import grid_to_drawing
 from map.props.prop import Prop
 from map.props.rotation import Rotation
