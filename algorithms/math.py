@@ -110,8 +110,8 @@ class Point2D:
         self.y = y
     
     @classmethod
-    def from_point(cls, point: 'Point') -> 'Point2':
-        """Create a Point2 from a Point tuple."""
+    def from_point(cls, point: 'Point') -> 'Point2D':
+        """Create a Point2D from a Point tuple."""
         return cls(point[0], point[1])
     
     def __add__(self, other: Point) -> 'Point2D':
