@@ -418,12 +418,13 @@ class Prop(ABC):
         # Get base offset from top-right corner at rotation 0
         base_offset = cls.grid_offset()
         
-        # Get grid size for width/height calculations
+        # Get grid size and convert to drawing units
         grid_size = cls.prop_grid_size()
         if grid_size is None:
             raise ValueError(f"Grid-aligned prop {cls.__name__} must specify prop_grid_size")
             
-        width, height = grid_size
+        width = grid_size[0] * CELL_SIZE
+        height = grid_size[1] * CELL_SIZE
         
         # Transform offset based on rotation
         if rotation == Rotation.ROT_0:
