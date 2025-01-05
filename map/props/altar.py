@@ -29,7 +29,7 @@ class Altar(Prop):
     @classmethod
     def prop_size(cls) -> tuple[float, float]:
         """Get the size of this prop type in drawing units."""
-        return (CELL_SIZE, CELL_SIZE)  # Altars are square
+        return (ALTAR_WIDTH, ALTAR_HEIGHT)  # Use altar-specific dimensions
         
     @classmethod
     def prop_grid_size(cls) -> tuple[float, float]:
