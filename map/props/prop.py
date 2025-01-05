@@ -142,9 +142,21 @@ class Prop(MapElement, ABC):
         Returns:
             True if position is valid, False otherwise
         """
-        # For grid-aligned props, ensure position is on grid intersection
+        # For grid-aligned props, ensure the top-left corner aligns to grid
         if cls.is_grid_aligned():
-            if (x % CELL_SIZE != 0) or (y % CELL_SIZE != 0):
+            # Get prop's grid size
+            grid_size = cls.prop_grid_size()
+            if isinstance(grid_size, tuple):
+                grid_width, grid_height = grid_size
+            else:
+                grid_width = grid_height = grid_size
+                
+            # Calculate top-left position from center point
+            top_left_x = x - (grid_width * CELL_SIZE) / 2
+            top_left_y = y - (grid_height * CELL_SIZE) / 2
+            
+            # Check if top-left aligns to grid
+            if (top_left_x % CELL_SIZE != 0) or (top_left_y % CELL_SIZE != 0):
                 return False
 
         # Get prop's boundary shape transformed to test position
