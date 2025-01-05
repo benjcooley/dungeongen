@@ -19,8 +19,27 @@ ALTAR_INSET = (CELL_SIZE - ALTAR_HEIGHT) / 2  # Calculated inset from cell edges
 class Altar(Prop):
     """An altar prop that appears as a small rectangular table with decorative dots."""
     
+    @classmethod
+    def from_grid(cls, grid_x: float, grid_y: float, map_: 'Map', rotation: Rotation = Rotation.ROT_0) -> 'Altar':
+        """Create an altar at grid coordinates.
+        
+        Args:
+            grid_x: Grid X coordinate (top-left)
+            grid_y: Grid Y coordinate (top-left)
+            map_: Parent map instance
+            rotation: Rotation angle in 90° increments (default: facing right)
+            
+        Returns:
+            New Altar instance
+        """
+        from graphics.conversions import grid_to_drawing
+        x, y = grid_to_drawing(grid_x, grid_y, map_.options)
+        return cls(x, y, map_, rotation)
+        
     def __init__(self, x: float, y: float, map_: 'Map', rotation: Rotation = Rotation.ROT_0) -> None:
         """Initialize an altar prop.
+        
+        Note: Use from_grid() to create altars at grid coordinates.
         
         Args:
             x: X coordinate in drawing units
