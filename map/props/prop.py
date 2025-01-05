@@ -168,7 +168,7 @@ class Prop(ABC):
             return None
             
     # For other props, just check if the original position is valid
-    if self.is_valid_position(x, y, self.rotation, self.container):
+        if self.is_valid_position(x, y, self.rotation, self.container):
             return (x, y)
             
         return None
