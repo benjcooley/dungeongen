@@ -14,11 +14,38 @@ class Altar(Prop):
     """An altar prop with a rectangular base and two dots."""
     
     @classmethod
-    def from_grid(cls, grid_x: float, grid_y: float, map_: 'Map', rotation: Rotation = Rotation.ROT0) -> 'Altar':
-        """Create an altar using grid coordinates."""
-        # Altar is 1x1 grid units
-        size = map_.options.cell_size
-        x, y = grid_x * size, grid_y * size
+    def from_grid(cls, grid_x: float, grid_y: float, map_: 'Map', rotation: Rotation = Rotation.ROT_0) -> 'Altar':
+        """Create an altar using grid coordinates.
+        
+        Args:
+            grid_x: Grid x-coordinate
+            grid_y: Grid y-coordinate
+            map_: Parent map instance
+            rotation: Altar orientation (0, 90, 180, or 270 degrees)
+            
+        Returns:
+            New Altar instance positioned on grid with proper wall spacing
+        """
+        cell_size = map_.options.cell_size
+        wall_spacing = cell_size * 0.15  # 15% of cell size spacing from walls
+        
+        # Base position at grid point
+        x = grid_x * cell_size
+        y = grid_y * cell_size
+        
+        # Adjust position based on rotation to maintain wall spacing
+        if rotation == Rotation.ROT_0:  # Facing right
+            x += wall_spacing
+        elif rotation == Rotation.ROT_90:  # Facing down
+            y += wall_spacing
+        elif rotation == Rotation.ROT_180:  # Facing left
+            x += wall_spacing
+        elif rotation == Rotation.ROT_270:  # Facing up
+            y += wall_spacing
+            
+        # Size is reduced to account for wall spacing
+        size = cell_size - (2 * wall_spacing)
+        
         return cls(x, y, size, size, map_, rotation.radians)
 
     @classmethod
@@ -36,9 +63,10 @@ class Altar(Prop):
         """
         from algorithms.shapes import Rectangle
         
-        # Create rectangle with margin
-        margin = size * 0.1  # Add 10% margin from walls
-        rect = Rectangle(x + margin, y + margin, size - 2*margin, size - 2*margin)
+        # Create rectangle with wall spacing
+        wall_spacing = container._map.options.cell_size * 0.15
+        rect = Rectangle(x + wall_spacing, y + wall_spacing, 
+                        size - 2*wall_spacing, size - 2*wall_spacing)
         
         # Check container bounds and prop intersection
         return (container.contains_rectangle(rect) and 
