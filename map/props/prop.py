@@ -157,34 +157,41 @@ class Prop(ABC):
         ...
 
     @classmethod
-    @abstractmethod
-    def is_grid_aligned(cls) -> bool:
-        """Whether this prop should be aligned to the grid.
+    def grid_offset(cls) -> tuple[float, float]:
+        """Get the offset from grid position to prop position.
         
-        Props that return True should be positioned at grid intersections.
+        For grid-aligned props, this returns the offset needed to properly
+        position the prop relative to a grid point. For non-grid props,
+        returns (0,0).
+        
+        Returns:
+            Tuple of (x,y) offsets in drawing units
         """
-        ...
+        return (0.0, 0.0)
+
+    @classmethod
+    def grid_size(cls) -> tuple[float, float]:
+        """Get the grid space occupied by this prop.
+        
+        For grid-aligned props, returns how many grid cells this prop occupies.
+        For non-grid props, returns (0,0).
+        
+        Returns:
+            Tuple of (width, height) in grid units
+        """
+        return (0.0, 0.0)
 
     @classmethod
     @abstractmethod
     def prop_size(cls) -> tuple[float, float]:
-        """Get the standard size of this prop type in drawing units.
+        """Get the actual size of this prop in drawing units.
+        
+        This defines the prop's tight bounding rectangle size.
         
         Returns:
             Tuple of (width, height) in drawing units
         """
         ...
-
-    @classmethod
-    @classmethod
-    def prop_grid_size(cls) -> tuple[float, float] | None:
-        """Get the standard size of this prop type in grid units.
-        
-        Returns:
-            Tuple of (width, height) in grid units, or None if no standard grid size.
-            Base implementation returns None since not all props are grid-aligned.
-        """
-        return None
         
     @classmethod
     def get_prop_boundary_shape(cls) -> Shape | None:
