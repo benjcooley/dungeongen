@@ -411,5 +411,8 @@ class Circle:
     
     def rotate(self, rotation: 'Rotation') -> 'Circle':
         """Return a new circle rotated by the given rotation (90-degree increments only)."""
-        # Circles look the same when rotated
-        return Circle(self.cx, self.cy, self.radius, self._inflate)
+        # Rotate center point around origin
+        angle = rotation.radians
+        new_cx = self.cx * math.cos(angle) - self.cy * math.sin(angle)
+        new_cy = self.cx * math.sin(angle) + self.cy * math.cos(angle)
+        return Circle(new_cx, new_cy, self.radius, self._inflate)
