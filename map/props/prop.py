@@ -125,7 +125,7 @@ class Prop(MapElement, ABC):
 
     @classmethod
     @abstractmethod
-    def grid_aligned(cls) -> bool:
+    def is_grid_aligned(cls) -> bool:
         """Whether this prop should be aligned to the grid.
         
         Props that return True should be positioned at grid intersections.

@@ -25,7 +25,7 @@ class Rock(Prop):
         return True
         
     @classmethod
-    def grid_aligned(cls) -> bool:
+    def is_grid_aligned(cls) -> bool:
         """Whether this prop should be aligned to the grid."""
         return False
         
