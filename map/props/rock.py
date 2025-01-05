@@ -113,7 +113,7 @@ class Rock(Prop):
             Tuple of (x,y) coordinates if valid position found, None otherwise
         """
         bounds = container.bounds
-        margin = max(size, container._map.CELL_SIZE * 0.25)  # Use larger of rock size or 25% cell size
+        margin = max(size, CELL_SIZE * 0.25)  # Use larger of rock size or 25% cell size
         
         # Calculate valid range for random positions
         min_x = bounds.x + margin
