@@ -199,6 +199,7 @@ class ShapeGroup:
         self._bounds: Rectangle | None = None
         self._bounds_dirty = True
         self._cached_path: skia.Path | None = None
+        self._inflate: float = 0.0
         
     @property
     def path(self) -> skia.Path:
