@@ -531,6 +531,26 @@ class Rectangle:
             self._inflate
         )
         
+    @property
+    def left(self) -> float:
+        """Get the left edge x-coordinate."""
+        return self._inflated_x
+        
+    @property 
+    def top(self) -> float:
+        """Get the top edge y-coordinate."""
+        return self._inflated_y
+        
+    @property
+    def right(self) -> float:
+        """Get the right edge x-coordinate."""
+        return self._inflated_x + self._inflated_width
+        
+    @property
+    def bottom(self) -> float:
+        """Get the bottom edge y-coordinate."""
+        return self._inflated_y + self._inflated_height
+
     def center(self) -> tuple[float, float]:
         """Get the center point of this rectangle.
         
