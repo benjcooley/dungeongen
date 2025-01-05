@@ -30,8 +30,8 @@ class Prop(ABC):
     
     def __init__(self, rect: Rectangle, boundary_shape: Shape, map_: 'Map', 
                  rotation: Rotation = Rotation.ROT_0, 
-                 grid_offset: Point | None = None,
-                 grid_bounds: Rectangle | None = None) -> None:
+                 grid_offset: tuple[float, float] | None = None,
+                 grid_bounds: tuple[float, float] | None = None) -> None:
         """Initialize a prop with a grid-aligned rectangle and boundary shape.
         
         Props are drawn relative to their center point. The default orientation (0° rotation)
@@ -221,24 +221,10 @@ class Prop(ABC):
         Returns:
             Tuple of (grid_x, grid_y) integer coordinates
         """
-        if not self.is_grid_aligned():
-            return (math.floor(self._x / CELL_SIZE), math.floor(self._y / CELL_SIZE))
-            
-        # For grid-aligned props, calculate based on center and rotation
-        center_x = self._x + self._width/2
-        center_y = self._y + self._height/2
-        
-        # Get offset from grid point to center
-        offset = self._get_grid_center_offset(self.rotation)
-        
-        # Subtract offset from center to get grid position, rounding down to integers
-        return (
-            math.floor(center_x / CELL_SIZE - offset[0]),
-            math.floor(center_y / CELL_SIZE - offset[1])
-        )
+        return self._grid_bounds.p1 if self._grid_bounds is not None else (self.x, self.y)
     
     @grid_position.setter
-    def grid_position(self, pos: tuple[float, float]) -> None:
+    def grid_position(self, pos: Point) -> None:
         """Set the prop's position using grid coordinates.
         
         For grid-aligned props, positions the prop centered on the grid cell
@@ -331,7 +317,7 @@ class Prop(ABC):
         ...
 
     @classmethod
-    def grid_offset(cls) -> Point:
+    def grid_offset(self) -> Point | None:
         """Get the offset from center to grid position for rotation 0.
         
         For grid-aligned props, this returns the offset from the prop's center
@@ -339,22 +325,20 @@ class Prop(ABC):
         For non-grid props, returns (0,0).
         
         Returns:
-            Tuple of (x,y) offsets in grid units from center to grid position
+            Point offsets in map units from top left to prop center in grid space or None if not grid alligned
         """
-        return (0.0, 0.0)
+        return self._grid_offset
 
     @property
-    def grid_size(self) -> Point:
+    def grid_bounds(self) -> Rectangle | None:
         """Get the grid space occupied by this prop.
         
-        For grid-aligned props, returns how many grid cells this prop occupies.
-        For non-grid props, returns (0,0).
+        For grid-aligned props, returns how map space size grid size prop occupies.
+        For non-grid props, just returns bounds.
         
         Returns:
-            Tuple of (width, height) in grid units
+            Bounding grid rectangle in map units or None if not grid aligned
         """
-        if self._grid_bounds is None:
-            return (0.0, 0.0)
         return self._grid_bounds
 
     @classmethod

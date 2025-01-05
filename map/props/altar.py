@@ -25,7 +25,13 @@ ALTAR_GRID_OFFSET_Y = 0.5  # Center vertically in cell
 class Altar(Prop):
     """An altar prop that appears as a small rectangular table with decorative dots."""
     
-    def __init__(self, center_x: float, center_y: float, map_: 'Map', rotation: Rotation = Rotation.ROT_0) -> None:
+    def __init__(self, 
+                 center_x: float, 
+                 center_y: float, 
+                 map_: 'Map', 
+                 rotation: Rotation = Rotation.ROT_0, 
+                 grid_offset: Point|None = None, 
+                 grid_bounds: Rectangle|None = None) -> None:
         """Initialize an altar prop.
         
         Args:
