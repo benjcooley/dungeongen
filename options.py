@@ -8,9 +8,6 @@ from map.enums import GridStyle
 class Options:
     """Configuration options for the crosshatch pattern generator."""
     
-    # Map grid configuration
-    cell_size: float = 32.0  # Size of one grid square in pixels
-    
     # Canvas dimensions
     canvas_width: int = 2000
     canvas_height: int = 2000
