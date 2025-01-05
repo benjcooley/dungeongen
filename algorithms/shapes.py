@@ -31,9 +31,14 @@ class Shape(Protocol):
         """Draw this shape on a canvas with the given paint."""
         ...
     
-    def to_path(self) -> 'skia.Path':
-        """Convert this shape to a Skia path."""
+    @property
+    def path(self) -> 'skia.Path':
+        """Get the cached Skia path for this shape."""
         ...
+        
+    def to_path(self) -> 'skia.Path':
+        """Convert this shape to a Skia path (deprecated, use path property)."""
+        return self.path
     
     def inflated(self, amount: float) -> 'Shape':
         """Return a new shape inflated by the given amount."""
@@ -177,23 +182,35 @@ class ShapeGroup:
             not any(shape.contains(px, py) for shape in self.excludes)
         )
     
-    def to_path(self) -> skia.Path:
-        """Convert this shape group to a Skia path."""
-        if not self.includes:
-            return skia.Path()
-            
-        # Start with the first included shape
-        result_path = self.includes[0].to_path()
+    def __init__(self, includes: Sequence[Shape], excludes: Sequence[Shape]) -> None:
+        self.includes = list(includes)
+        self.excludes = list(excludes)
+        self._bounds: Rectangle | None = None
+        self._bounds_dirty = True
+        self._cached_path: skia.Path | None = None
         
-        # Union with remaining included shapes
-        for shape in self.includes[1:]:
-            result_path = skia.Op(result_path, shape.to_path(), skia.PathOp.kUnion_PathOp)
-            
-        # Subtract excluded shapes
-        for shape in self.excludes:
-            result_path = skia.Op(result_path, shape.to_path(), skia.PathOp.kDifference_PathOp)
-            
-        return result_path
+    @property
+    def path(self) -> skia.Path:
+        """Get the cached Skia path for this shape group."""
+        if self._cached_path is None:
+            if not self.includes:
+                self._cached_path = skia.Path()
+            else:
+                # Start with the first included shape
+                self._cached_path = self.includes[0].path
+                
+                # Union with remaining included shapes
+                for shape in self.includes[1:]:
+                    self._cached_path = skia.Op(self._cached_path, shape.path, skia.PathOp.kUnion_PathOp)
+                    
+                # Subtract excluded shapes
+                for shape in self.excludes:
+                    self._cached_path = skia.Op(self._cached_path, shape.path, skia.PathOp.kDifference_PathOp)
+        return self._cached_path
+        
+    def to_path(self) -> skia.Path:
+        """Convert this shape group to a Skia path (deprecated, use path property)."""
+        return self.path
 
     def draw(self, canvas: skia.Canvas, paint: skia.Paint) -> None:
         """Draw this shape group using Skia's path operations."""
@@ -351,32 +368,50 @@ class Rectangle:
         # Point must be within the rounded corner radius
         return math.sqrt(dx * dx + dy * dy) <= self._inflate
     
-    def to_path(self) -> skia.Path:
-        """Convert this rectangle to a Skia path."""
-        path = skia.Path()
-        if self._inflate > 0:
-            path.addRRect(
-                skia.RRect.MakeRectXY(
+    def __init__(self, x: float, y: float, width: float, height: float, inflate: float = 0) -> None:
+        self.x = x  # Original x
+        self.y = y  # Original y
+        self.width = width  # Original width
+        self.height = height  # Original height
+        self._inflate = inflate
+        self._inflated_x = x - inflate
+        self._inflated_y = y - inflate
+        self._inflated_width = width + 2 * inflate
+        self._inflated_height = height + 2 * inflate
+        self._cached_path: skia.Path | None = None
+        
+    @property
+    def path(self) -> skia.Path:
+        """Get the cached Skia path for this rectangle."""
+        if self._cached_path is None:
+            self._cached_path = skia.Path()
+            if self._inflate > 0:
+                self._cached_path.addRRect(
+                    skia.RRect.MakeRectXY(
+                        skia.Rect.MakeXYWH(
+                            self._inflated_x,
+                            self._inflated_y,
+                            self._inflated_width,
+                            self._inflated_height
+                        ),
+                        self._inflate,  # x radius
+                        self._inflate   # y radius
+                    )
+                )
+            else:
+                self._cached_path.addRect(
                     skia.Rect.MakeXYWH(
                         self._inflated_x,
                         self._inflated_y,
                         self._inflated_width,
                         self._inflated_height
-                    ),
-                    self._inflate,  # x radius
-                    self._inflate   # y radius
+                    )
                 )
-            )
-        else:
-            path.addRect(
-                skia.Rect.MakeXYWH(
-                    self._inflated_x,
-                    self._inflated_y,
-                    self._inflated_width,
-                    self._inflated_height
-                )
-            )
-        return path
+        return self._cached_path
+        
+    def to_path(self) -> skia.Path:
+        """Convert this rectangle to a Skia path (deprecated, use path property)."""
+        return self.path
 
     def draw(self, canvas: skia.Canvas, paint: skia.Paint) -> None:
         """Draw this rectangle on a canvas."""
@@ -568,11 +603,25 @@ class Circle:
             self._inflated_radius * 2
         )
     
+    def __init__(self, cx: float, cy: float, radius: float, inflate: float = 0) -> None:
+        self.cx = cx
+        self.cy = cy
+        self.radius = radius  # Original radius
+        self._inflate = inflate
+        self._inflated_radius = radius + inflate
+        self._cached_path: skia.Path | None = None
+        
+    @property
+    def path(self) -> skia.Path:
+        """Get the cached Skia path for this circle."""
+        if self._cached_path is None:
+            self._cached_path = skia.Path()
+            self._cached_path.addCircle(self.cx, self.cy, self._inflated_radius)
+        return self._cached_path
+        
     def to_path(self) -> skia.Path:
-        """Convert this circle to a Skia path."""
-        path = skia.Path()
-        path.addCircle(self.cx, self.cy, self._inflated_radius)
-        return path
+        """Convert this circle to a Skia path (deprecated, use path property)."""
+        return self.path
 
     def draw(self, canvas: skia.Canvas, paint: skia.Paint) -> None:
         """Draw this circle on a canvas."""
