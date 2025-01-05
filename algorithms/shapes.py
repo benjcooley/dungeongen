@@ -89,6 +89,12 @@ class ShapeGroup:
         self.excludes = list(excludes)
         self._bounds: Rectangle | None = None
         self._bounds_dirty = True
+        self._inflate: float = 0.0
+
+    @property
+    def inflate(self) -> float:
+        """Get the inflation amount for this shape group."""
+        return self._inflate
 
     def add_include(self, shape: Shape) -> None:
         """Add a shape to the includes list."""
@@ -226,7 +232,12 @@ class ShapeGroup:
         return ShapeGroup(
             includes=[s.inflated(amount) for s in self.includes],
             excludes=[s.inflated(amount) for s in self.excludes]
-        )
+        )._with_inflate(self._inflate + amount)
+
+    def _with_inflate(self, amount: float) -> 'ShapeGroup':
+        """Internal helper to set inflation amount."""
+        self._inflate = amount
+        return self
         
     def rotate(self, rotation: 'Rotation') -> None:
         """Rotate all shapes in this group by 90-degree increment in-place."""
