@@ -18,14 +18,13 @@ GRID_ORIGIN_X = -0.5  # Grid origin X offset
 GRID_ORIGIN_Y = -0.5  # Grid origin Y offset
 
 # Constants for altar dimensions
-ALTAR_X = CELL_SIZE * (GRID_ORIGIN_X + 0.15)  # Small margin from left edge
-ALTAR_Y = CELL_SIZE * (GRID_ORIGIN_Y + 0.15)  # Small margin from top edge
 ALTAR_WIDTH = CELL_SIZE * 0.3   # Width of altar surface
 ALTAR_HEIGHT = CELL_SIZE * 0.7  # Height of altar, leaving equal margins top/bottom
 
+# Create boundary shape centered at origin for proper rotation
 ALTAR_PROP_TYPE = PropType(
     is_grid_aligned=True,
-    boundary_shape=Rectangle(ALTAR_X, ALTAR_Y, ALTAR_WIDTH, ALTAR_HEIGHT),
+    boundary_shape=Rectangle(-ALTAR_WIDTH/2, -ALTAR_HEIGHT/2, ALTAR_WIDTH, ALTAR_HEIGHT),
     grid_size=(1, 1)
     )
 
