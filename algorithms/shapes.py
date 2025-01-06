@@ -391,6 +391,20 @@ class Rectangle:
         
         # Point must be within the rounded corner radius
         return math.sqrt(dx * dx + dy * dy) <= self._inflate
+        
+    def contains_shape(self, other: 'Shape') -> bool:
+        """Check if this rectangle fully contains another shape."""
+        from algorithms.intersections import rect_rect_contains, rect_circle_contains
+        from algorithms.shapes import Circle
+        
+        if isinstance(other, Rectangle):
+            return rect_rect_contains(self, other)
+        elif isinstance(other, Circle):
+            return rect_circle_contains(self, other)
+        else:
+            # For other shapes, use Skia path operations
+            result = skia.Op(self.path, other.path, skia.PathOp.kDifference_PathOp)
+            return result.isEmpty()
     
     def __init__(self, x: float, y: float, width: float, height: float, inflate: float = 0) -> None:
         self.x = x  # Original x
