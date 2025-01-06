@@ -258,6 +258,19 @@ class MapElement:
                 return False
         return True
 
+    def get_grid_position(self, grid_x: int, grid_y: int) -> tuple[float, float]:
+        """Convert grid coordinates relative to this element into map coordinates.
+        
+        Args:
+            grid_x: X coordinate in grid units relative to element's top-left
+            grid_y: Y coordinate in grid units relative to element's top-left
+            
+        Returns:
+            Tuple of (x,y) coordinates in map space
+        """
+        return (self._bounds.x + (grid_x * CELL_SIZE), 
+                self._bounds.y + (grid_y * CELL_SIZE))
+
     def draw_occupied(self, grid: 'OccupancyGrid', element_idx: int) -> None:
         """Draw this element's shape into the occupancy grid.
         
