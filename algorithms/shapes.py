@@ -583,6 +583,7 @@ class Rectangle:
         return (self._inflated_x + self._inflated_width, 
                 self._inflated_y + self._inflated_height)
 
+    @property
     def center(self) -> tuple[float, float]:
         """Get the center point of this rectangle.
         
@@ -730,7 +731,7 @@ class Circle:
         self.cx = new_cx
         self.cy = new_cy
         self._bounds_dirty = True
-        
+
         return self
     
     def make_rotated(self, rotation: 'Rotation') -> 'Circle':

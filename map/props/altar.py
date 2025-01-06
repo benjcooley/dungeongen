@@ -49,13 +49,15 @@ class Altar(Prop):
             
         # Draw right facing version (this is moved, rotated by draw() method)
 
+        rect = self.prop_type.boundary_shape #type: Rectangle
+
         # Draw fill
         fill_paint = skia.Paint(
             AntiAlias=True,
             Style=skia.Paint.kFill_Style,
             Color=self._map.options.prop_fill_color
         )
-        self.shape.draw(canvas, fill_paint)
+        rect.draw(canvas, fill_paint)
         
         # Draw outline
         outline_paint = skia.Paint(
@@ -64,7 +66,7 @@ class Altar(Prop):
             StrokeWidth=self._map.options.prop_stroke_width,
             Color=self._map.options.prop_outline_color
         )
-        self.shape.draw(canvas, outline_paint)
+        rect.draw(canvas, outline_paint)
         
         # Draw candle dots
         dot_paint = skia.Paint(
@@ -72,13 +74,13 @@ class Altar(Prop):
             Style=skia.Paint.kFill_Style,
             Color=self._map.options.prop_outline_color
         )
-        dot_radius = CELL_SIZE * 0.08
+        dot_radius = CELL_SIZE * 0.04
         # Draw dots relative to bounds
-        center_x = 0  # Center in local coordinates
-        top_y = -self.bounds.height * 0.25  # 25% up from center
-        bottom_y = self.bounds.height * 0.25  # 25% down from center
-        canvas.drawCircle(center_x, top_y, dot_radius, dot_paint)
-        canvas.drawCircle(center_x, bottom_y, dot_radius, dot_paint)
+        center_x = rect.center.x
+        center_y = rect.center.y
+        dot_offset = ALTAR_HEIGHT * 0.25  # 25% up from center
+        canvas.drawCircle(center_x, center_y - dot_offset, dot_radius, dot_paint)
+        canvas.drawCircle(center_x, center_y + dot_offset, dot_radius, dot_paint)
 
     # Overridable class methods
     
