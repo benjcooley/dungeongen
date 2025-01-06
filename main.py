@@ -51,7 +51,7 @@ def main():
     
     # Add props to rooms and passage
     # Create and place altar at grid position 1,1 in start room
-    altar = Altar(start_room.get_grid_position(1, 1), Rotation.ROT_180)
+    altar = Altar(start_room.get_grid_position(1, 1), Rotation.ROT_270)
     start_room.add_prop(altar)
     
     start_room.create_props(PropType.MEDIUM_ROCK, max_count=4)
