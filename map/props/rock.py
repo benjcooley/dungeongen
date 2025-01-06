@@ -33,14 +33,15 @@ class Rock(Prop):
             radius: Final rock radius in drawing units (including any size variations)
             rotation: Rotation angle (affects perturbation)
         """
+        # Store rock-specific properties first
+        self._radius = radius
+        
         # Create boundary shape centered at origin with exact radius
         boundary = Circle(0, 0, radius)
         
-        # Initialize prop with center position and boundary
+        # Initialize base class
+        self._prop_type = ROCK_PROP_TYPE  # Set before super().__init__
         super().__init__(ROCK_PROP_TYPE, center, boundary)
-        
-        # Store rock-specific properties
-        self._radius = radius
         
         # Generate perturbed control points in local coordinates
         self._control_points = self._generate_control_points()
