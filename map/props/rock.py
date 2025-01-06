@@ -43,7 +43,7 @@ class Rock(Prop):
     @classmethod
     def prop_size(cls) -> 'Point':
         """Get the nominal size of this rock in drawing units."""
-        size = MEDIUM_ROCK_SIZE * 2 * CELL_SIZE  # Use medium rock size as standard
+        size = MEDIUM_ROCK_MAX_SIZE * 2 * CELL_SIZE  # Use maximum medium rock size as standard
         return (size, size)  # Rocks are circular, so width = height
         
     @classmethod
