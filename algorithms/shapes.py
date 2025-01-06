@@ -299,7 +299,7 @@ class ShapeGroup:
         from algorithms.intersections import shape_group_intersect
         return shape_group_intersect(self, other)
         
-    def _bounds_intersect(self, other: Rectangle) -> bool:
+    def intersects(self, other: Rectangle) -> bool:
         """Test if this shape group's bounds intersect a rectangle."""
         bounds = self.bounds
         return (bounds.x < other.x + other.width and
@@ -739,7 +739,7 @@ class Circle:
         new_cy = self.cx * math.sin(angle) + self.cy * math.cos(angle)
         return Circle(new_cx, new_cy, self.radius, self._inflate)
         
-    def _bounds_intersect(self, other: Rectangle) -> bool:
+    def intersects(self, other: Rectangle) -> bool:
         """Test if this circle's bounds intersect a rectangle."""
         return rect_circle_intersect(other, self)
 
@@ -758,7 +758,7 @@ def shape_intersects(shape1: 'Shape', shape2: 'Shape') -> bool:
         True if shapes intersect, False otherwise
     """
     # Quick bounds check first
-    if not shape1._bounds_intersect(shape2.bounds):
+    if not shape1.intersects(shape2.bounds):
         return False
         
     # Use Skia for ShapeGroups or inflated shapes
@@ -906,7 +906,7 @@ def shape_group_intersect(group: 'ShapeGroup', other: 'Shape') -> bool:
     2. Has some portion not fully contained by any exclude shape
     """
     # Quick rejection using bounds
-    if not group._bounds_intersect(other.bounds):
+    if not group.intersects(other.bounds):
         return False
         
     # Must intersect at least one include shape
