@@ -150,17 +150,22 @@ class Prop(ABC):
 
     def draw(self, canvas: skia.Canvas, layer: Layers = Layers.PROPS) -> None:
         """Draw the prop with proper coordinate transformation and styling."""
-        with canvas.save():
-            # Move to prop center
-            draw_bounds = self._grid_bounds if self._grid_bounds is not None else self._bounds
-            center = draw_bounds.center()
-            canvas.translate(center[0], center[1])
-            
-            # Apply rotation (skia uses degrees, Rotation gives radians)
-            canvas.rotate(-self.rotation.radians * (180 / math.pi))
-            
-            # Draw additional content in local coordinates centered at 0,0
-            self._draw_content(canvas, Rectangle(-draw_bounds.width/2, -draw_bounds.height/2, draw_bounds.width, draw_bounds.height))
+        # Save canvas state
+        save_count = canvas.save()
+        
+        # Move to prop center
+        draw_bounds = self._grid_bounds if self._grid_bounds is not None else self._bounds
+        center = draw_bounds.center()
+        canvas.translate(center[0], center[1])
+        
+        # Apply rotation (skia uses degrees, Rotation gives radians)
+        canvas.rotate(-self.rotation.radians * (180 / math.pi))
+        
+        # Draw additional content in local coordinates centered at 0,0
+        self._draw_content(canvas, Rectangle(-draw_bounds.width/2, -draw_bounds.height/2, draw_bounds.width, draw_bounds.height))
+        
+        # Restore canvas state
+        canvas.restoreToCount(save_count)
             
     @property
     def position(self) -> Point:
