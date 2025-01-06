@@ -172,8 +172,8 @@ class Rock(Prop):
             rock = cls((0, 0), final_radius, Rotation.from_radians(rotation))
             
             # Try to place it in the container
-            if container.try_add_prop(rock):
-                # Find valid position
-                if rock.place_random_position() is None:
-                    # Remove if no valid position found
-                    container.remove_prop(rock)
+            container.add_prop(rock)
+            # Find valid position
+            if rock.place_random_position() is None:
+                # Remove if no valid position found
+                container.remove_prop(rock)

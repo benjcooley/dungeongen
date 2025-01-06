@@ -30,17 +30,13 @@ class MapElement:
         self._options = map_.options
         self._props: List['Prop'] = []
         
-    def try_add_prop(self, prop: 'Prop') -> bool:
-        """Try to add a prop to this element at its current position.
+    def add_prop(self, prop: 'Prop') -> None:
+        """Add a prop to this element at its current position.
         
-        The prop must be contained within the element's bounds.
         Does not modify the prop's position.
         
         Args:
-            prop: The prop to try adding
-            
-        Returns:
-            True if prop was added successfully, False if position was invalid
+            prop: The prop to add
         """
         if prop.container is not None:
             prop.container.remove_prop(prop)
@@ -48,7 +44,6 @@ class MapElement:
         prop.container = self
         prop._map = self._map
         self._props.append(prop)
-        return True
         
     def remove_prop(self, prop: 'Prop') -> None:
         """Remove a prop from this element."""
