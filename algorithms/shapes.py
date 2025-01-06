@@ -653,6 +653,11 @@ class Circle:
 
     def contains(self, px: float, py: float) -> bool:
         return math.sqrt((px - self.cx)**2 + (py - self.cy)**2) <= self._inflated_radius
+        
+    def contains_shape(self, other: 'Shape') -> bool:
+        """Check if this circle fully contains another shape."""
+        from algorithms.intersections import shape_contains
+        return shape_contains(self, other)
     
     @property
     def is_valid(self) -> bool:
