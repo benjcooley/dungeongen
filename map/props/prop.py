@@ -229,7 +229,7 @@ class Prop(ABC):
             return None
             
         # For other props, just check if the original position is valid
-        if self.is_valid_position(x, y, self.rotation, self.container):
+        if self.is_valid_position(x, y):
             return (x, y)
             
         return None
@@ -314,40 +314,50 @@ class Prop(ABC):
         dy = pos[1] - bounds.center()[1]
         self.position = (self.position[0] + dx, self.position[1] + dy)
 
-    @classmethod
-    def is_valid_position(cls, x: float, y: float, rotation: Rotation, container: 'MapElement') -> bool:
-        """Check if a position is valid for a prop within the container.
+    def is_valid_position(self, x: float, y: float) -> bool:
+        """Check if a position is valid for a prop within its container.
         
         Args:
             x: X coordinate to check
             y: Y coordinate to check
-            rotation: Prop rotation
-            container: The MapElement to place the prop in
             
         Returns:
             True if position is valid, False otherwise
         """
-        # Get prop's boundary shape transformed to test position once
-        shape = cls.get_map_aligned_boundary_shape(x, y, rotation)
-        bounds = shape.bounds
+        # Store current position
+        old_pos = self.position
+        
+        # Temporarily move to test position
+        self.position = (x, y)
+        
+        # Get bounds at test position
+        bounds = self._boundary_shape.bounds
         
         # For grid-aligned props, ensure the shape's top-left corner aligns to grid
-        if cls.is_grid_aligned():
+        if self.is_grid_aligned():
             # Check if top-left corner aligns to grid
             if (bounds.x % CELL_SIZE != 0) or (bounds.y % CELL_SIZE != 0):
-                return False
+                valid = False
+            else:
+                valid = True
+        else:
+            valid = True
 
         # Check if shape is contained within container
-        if not container.shape.contains_shape(shape):
-            return False
+        if valid and not self.container.shape.contains_shape(self._boundary_shape):
+            valid = False
             
         # For non-decorative props, check intersection with other props
-        if not cls.is_decoration():
-            for prop in container._props:
-                if not prop.is_decoration() and prop.shape.intersects(shape):
-                    return False
+        if valid and not self.__class__.is_decoration():
+            for prop in self.container._props:
+                if prop is not self and not prop.__class__.is_decoration() and prop.shape.intersects(self._boundary_shape):
+                    valid = False
+                    break
+        
+        # Restore original position
+        self.position = old_pos
                     
-        return True
+        return valid
 
 
     @classmethod
