@@ -7,7 +7,7 @@ import random
 # Maximum attempts to find valid random position
 MAX_PLACEMENT_ATTEMPTS = 30
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Optional, ClassVar
+from typing import TYPE_CHECKING, Optional, ClassVar, Union
 
 import skia
 
@@ -98,7 +98,7 @@ class Prop(ABC):
         return self._grid_bounds
 
     @property
-    def container(self) -> 'MapElement' | None:
+    def container(self) -> Union['MapElement', None]:
         """Get the container element for this prop."""
         return self._container
     
