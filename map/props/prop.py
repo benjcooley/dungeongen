@@ -368,6 +368,14 @@ class Prop(ABC):
         Default implementation returns False.
         """
         return False
+        
+    def is_grid_aligned(self) -> bool:
+        """Whether this prop should be aligned to the grid when placed.
+        
+        Grid-aligned props will snap to grid intersections.
+        Returns True if the prop has grid bounds defined.
+        """
+        return self._grid_bounds is not None
 
     @classmethod
     @abstractmethod
