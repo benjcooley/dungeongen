@@ -4,6 +4,7 @@ import math
 import skia
 from map.enums import Layers
 from map.props.proptypes import PropType
+from map.props.altar import Altar
 
 if TYPE_CHECKING:
     from map.map import Map
