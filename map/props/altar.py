@@ -44,7 +44,9 @@ class Altar(Prop):
         )
     
     def _draw_content(self, canvas: skia.Canvas, bounds: Rectangle, layer: 'Layers' = Layers.PROPS) -> None:
-
+        if layer != Layers.PROPS:
+            return
+            
         # Draw right facing version (this is moved, rotated by draw() method)
 
         # Draw fill
