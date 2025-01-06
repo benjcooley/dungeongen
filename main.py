@@ -10,7 +10,7 @@ from map.map import Map
 from map.door import Door, DoorOrientation
 from map.passage import Passage
 from map.props.rotation import Rotation
-from map.enums import RockType
+from map.props.proptypes import PropType
 from options import Options
 
 def main():
@@ -48,13 +48,14 @@ def main():
     passage.connect_to(second_door)
     second_door.connect_to(end_room)
     
-    # Add some test rocks
-    from map.props.rock import Rock
+    # Add props to rooms and passage
+    start_room.create_props(PropType.MEDIUM_ROCK, min_count=2, max_count=4)
+    start_room.create_props(PropType.SMALL_ROCK, min_count=1, max_count=2)
     
-    # Add rocks to rooms and passage
-    Rock.add_rocks_to(start_room, 4, RockType.ANY)  # 4 random rocks
-    Rock.add_rocks_to(end_room, 3, RockType.ANY)  # 3 random rocks
-    Rock.add_rocks_to(passage, 3, RockType.SMALL)  # 3 small rocks in passage
+    end_room.create_props(PropType.MEDIUM_ROCK, min_count=1, max_count=2)
+    end_room.create_props(PropType.SMALL_ROCK, min_count=1, max_count=2)
+    
+    passage.create_props(PropType.SMALL_ROCK, min_count=2, max_count=3)
 
     # Draw the map (which will draw all rooms)
     dungeon_map.render(canvas)
