@@ -104,9 +104,10 @@ class Prop(ABC):
         """Get the container element for this prop."""
         return self._container
         
-    @container.setter
-    def container(self, value: Optional['MapElement']) -> None:
-        """Set the container element for this prop."""
+    def _set_container(self, value: Optional['MapElement']) -> None:
+        """Protected method to set the container element.
+        
+        Should only be called by MapElement.add_prop() and remove_prop()."""
         self._container = value
     
     @property
