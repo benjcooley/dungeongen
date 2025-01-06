@@ -13,6 +13,7 @@ from map.props.rotation import Rotation
 
 if TYPE_CHECKING:
     from map.map import Map
+    from map.mapelement import MapElement
 
 # Rock size ranges as fraction of grid cell
 SMALL_ROCK_MIN_SIZE = 1/16
