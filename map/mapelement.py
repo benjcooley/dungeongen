@@ -3,9 +3,7 @@ import random
 import math
 import skia
 from map.enums import Layers
-
-if TYPE_CHECKING:
-    from map.props.proptypes import PropType
+from map.props.proptypes import PropType
 
 if TYPE_CHECKING:
     from map.map import Map
