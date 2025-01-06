@@ -6,7 +6,6 @@ from typing import List, Protocol, Sequence, TypeAlias
 from algorithms.types import Point
 from algorithms.math import Matrix2D
 from map.props.rotation import Rotation
-from algorithms.intersections import shape_intersects, shape_group_intersect
 
 # Forward declaration of Rectangle type
 Rectangle: TypeAlias = 'Rectangle'
@@ -873,19 +872,6 @@ def rect_circle_contains(rect: 'Rectangle', circle: 'Circle') -> bool:
             circle.cy - circle.radius >= rect.y and
             circle.cy + circle.radius <= rect.y + rect.height)
 
-def circle_rect_contains(circle: 'Circle', rect: 'Rectangle') -> bool:
-    """Test if circle fully contains rectangle."""
-    # Check all four corners of rectangle
-    corners = [
-        (rect.x, rect.y),
-        (rect.x + rect.width, rect.y),
-        (rect.x, rect.y + rect.height),
-        (rect.x + rect.width, rect.y + rect.height)
-    ]
-    return all(
-        math.sqrt((x - circle.cx)**2 + (y - circle.cy)**2) <= circle.radius
-        for x, y in corners
-    )
 
 def shape_group_contains(group: 'ShapeGroup', other: 'Shape') -> bool:
     """Test if a shape group fully contains another shape.
