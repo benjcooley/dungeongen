@@ -72,11 +72,11 @@ class Altar(Prop):
             Style=skia.Paint.kFill_Style,
             Color=self._map.options.prop_outline_color
         )
-        dot_radius = CELL_SIZE * 0.05
-        center = self.bounds.center()
-        center_x = center[0] 
-        top_y = center[1] - 0.3
-        bottom_y = center[1] + 0.3
+        dot_radius = CELL_SIZE * 0.08
+        # Draw dots relative to bounds
+        center_x = 0  # Center in local coordinates
+        top_y = -bounds.height * 0.25  # 25% up from center
+        bottom_y = bounds.height * 0.25  # 25% down from center
         canvas.drawCircle(center_x, top_y, dot_radius, dot_paint)
         canvas.drawCircle(center_x, bottom_y, dot_radius, dot_paint)
 
