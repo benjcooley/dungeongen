@@ -50,8 +50,7 @@ def main():
     second_door.connect_to(end_room)
     
     # Add altar to center of start room
-    altar = Altar(0, 0, start_room)
-    start_room.add_prop(altar)
+    start_room.create_props(PropType.ALTAR, max_count=1)
     
     # Add props to rooms and passage
     start_room.create_props(PropType.MEDIUM_ROCK, max_count=4)
