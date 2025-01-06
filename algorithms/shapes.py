@@ -23,12 +23,10 @@ class Shape(Protocol):
         
     def contains_shape(self, other: 'Shape') -> bool:
         """Check if another shape is fully contained within this shape."""
-        from algorithms.intersections import shape_contains
         return shape_contains(self, other)
         
     def intersects(self, other: 'Shape') -> bool:
         """Check if this shape intersects with another shape."""
-        from algorithms.intersections import shape_intersects
         return shape_intersects(self, other)
     
     @property
@@ -393,7 +391,6 @@ class Rectangle:
         
     def contains_shape(self, other: 'Shape') -> bool:
         """Check if this rectangle fully contains another shape."""
-        from algorithms.intersections import rect_rect_contains, rect_circle_contains
         from algorithms.shapes import Circle
         
         if isinstance(other, Rectangle):
@@ -594,7 +591,6 @@ class Rectangle:
         
     def _bounds_intersect(self, other: 'Rectangle') -> bool:
         """Test if this rectangle's bounds intersect another rectangle."""
-        from algorithms.intersections import rect_rect_intersect
         return rect_rect_intersect(self, other)
     
     @classmethod
@@ -655,7 +651,6 @@ class Circle:
         
     def contains_shape(self, other: 'Shape') -> bool:
         """Check if this circle fully contains another shape."""
-        from algorithms.intersections import shape_contains
         return shape_contains(self, other)
     
     @property
@@ -746,7 +741,6 @@ class Circle:
         
     def _bounds_intersect(self, other: Rectangle) -> bool:
         """Test if this circle's bounds intersect a rectangle."""
-        from algorithms.intersections import rect_circle_intersect
         return rect_circle_intersect(other, self)
 
 
