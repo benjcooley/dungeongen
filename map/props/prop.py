@@ -359,6 +359,15 @@ class Prop(ABC):
         need to check intersection with other props.
         """
         ...
+        
+    @classmethod
+    def is_wall_aligned(cls) -> bool:
+        """Whether this prop should be aligned to walls when placed.
+        
+        Wall-aligned props will snap to the nearest wall when placed.
+        Default implementation returns False.
+        """
+        return False
 
     @classmethod
     @abstractmethod
