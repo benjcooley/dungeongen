@@ -71,23 +71,6 @@ class Rock(Prop):
             
         return points
 
-    @classmethod
-    def is_valid_position(cls, x: float, y: float, size: float, container: 'MapElement') -> bool:
-        """Check if a position is valid for a rock within the container.
-        
-        Args:
-            x: X coordinate to check
-            y: Y coordinate to check
-            size: Rock radius
-            container: The MapElement to place the rock in
-            
-        Returns:
-            True if position is valid, False otherwise
-        """
-        from algorithms.shapes import Circle
-        circle = Circle(x, y, size)
-        return container.contains_circle(circle)
-
 
         
     def draw(self, canvas: skia.Canvas, layer: Layers = Layers.PROPS) -> None:
