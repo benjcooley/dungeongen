@@ -73,6 +73,7 @@ class Prop(ABC):
                 self._grid_size = (grid_size[0], grid_size[1])
                 self._grid_bounds = Rectangle(position[0], position[1], 
                                            grid_size[0] * CELL_SIZE, grid_size[1] * CELL_SIZE)
+            self._boundary_shape.translate(self._grid_bounds.width / 2 * CELL_SIZE, self._grid_bounds.height / 2 * CELL_SIZE)
         else:
             self._grid_bounds = None
             self._grid_size = None
