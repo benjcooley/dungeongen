@@ -27,24 +27,20 @@ ALTAR_PROP_TYPE = PropType(
 class Altar(Prop):
     """An altar prop that appears as a small rectangular table with decorative dots."""
     
-    def __init__(self,
-                 grid_x: float,
-                 grid_y: float,
-                 rotation: Rotation = Rotation.ROT_0) -> None:
+    def __init__(self, position: Point, rotation: Rotation = Rotation.ROT_0) -> None:
         """Initialize an altar prop.
         
         Args:
-            grid_x: Grid X coordinate in map grid units
-            grid_y: Grid Y coordinate in map grid units
-            map_: Parent map instance
+            position: Position in map coordinates (x, y)
             rotation: Rotation angle in 90° increments (default: facing right)
         """
         super().__init__(
-            ALTAR_PROP_TYPE
-            (grid_x * CELL_SIZE, grid_y * CELL_SIZE), 
-            ALTAR_PROP_TYPE.boundary_shape, 
-            rotation=rotation, 
-            grid_size=Altar.grid_size)
+            ALTAR_PROP_TYPE,
+            position,
+            ALTAR_PROP_TYPE.boundary_shape,
+            rotation=rotation,
+            grid_size=(1, 1)
+        )
     
     def _draw_content(self, canvas: skia.Canvas, bounds: Rectangle) -> None:
 
@@ -101,3 +97,7 @@ class Altar(Prop):
     def grid_size(cls) -> Point:
         """Get the size of this prop in grid units."""
         return Point(1, 1)
+    @classmethod
+    def create(cls) -> 'Altar':
+        """Create an altar prop at origin."""
+        return cls((0, 0))

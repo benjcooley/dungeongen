@@ -74,7 +74,7 @@ class MapElement:
         elif prop_type == PropType.LARGE_ROCK:
             prop = Rock.create_large()
         elif prop_type == PropType.ALTAR:
-            prop = prop_type.create_prop()
+            prop = Altar.create()
         else:
             raise ValueError(f"Unsupported prop type: {prop_type}")
             
