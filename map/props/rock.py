@@ -88,41 +88,6 @@ class Rock(Prop):
         circle = Circle(x, y, size)
         return container.contains_circle(circle)
 
-    @classmethod
-    def get_valid_position(cls, size: float, container: 'MapElement') -> tuple[float, float] | None:
-        """Try to find a valid position for a rock within the container.
-        
-        Args:
-            size: Rock radius
-            container: The MapElement to place the rock in
-            
-        Returns:
-            Tuple of (x,y) coordinates if valid position found, None otherwise
-        """
-        bounds = container.bounds
-        margin = max(size, CELL_SIZE * 0.25)  # Use larger of rock size or 25% cell size
-        
-        # Calculate valid range for random positions
-        min_x = bounds.x + margin
-        max_x = bounds.x + bounds.width - margin
-        min_y = bounds.y + margin 
-        max_y = bounds.y + bounds.height - margin
-        
-        # Verify the container is large enough
-        if min_x >= max_x or min_y >= max_y:
-            print("Container too small for rock!")
-            return None
-            
-        # Try 30 random positions
-        for attempt in range(30):
-            # Generate random position within bounds
-            x = random.uniform(min_x, max_x)
-            y = random.uniform(min_y, max_y)
-            
-            if cls.is_valid_position(x, y, size, container):
-                return (x, y)
-                
-        return None
 
         
     def draw(self, canvas: skia.Canvas, layer: Layers = Layers.PROPS) -> None:
@@ -203,9 +168,12 @@ class Rock(Prop):
             else:
                 final_radius = random.uniform(MEDIUM_ROCK_MIN_SIZE, MEDIUM_ROCK_MAX_SIZE) * CELL_SIZE
             
-            valid_pos = cls.get_valid_position(final_radius, container)
+            # Create rock at origin first
+            rock = cls((0, 0), final_radius, Rotation.from_radians(rotation))
             
-            if valid_pos:
-                # Create rock at valid position with final radius
-                rock = cls(valid_pos, final_radius, Rotation.from_radians(rotation))
-                container.try_add_prop(rock)
+            # Try to place it in the container
+            if container.try_add_prop(rock):
+                # Find valid position
+                if rock.place_random_position() is None:
+                    # Remove if no valid position found
+                    container.remove_prop(rock)
