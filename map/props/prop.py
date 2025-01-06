@@ -366,7 +366,7 @@ class Prop(ABC):
             return False
             
         # For non-decorative props, check intersection with other props
-        if not self.__class__.is_decoration():
+        if not self.prop_type.is_decoration:
             for prop in self.container._props:
                 if prop is not self and \
                     not prop.__class__.is_decoration() and \
