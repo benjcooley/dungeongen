@@ -100,7 +100,7 @@ class Prop(ABC):
         return self._grid_bounds
 
     @property
-    def container(self) -> Union['MapElement', None]:
+    def container(self) -> Optional['MapElement']:
         """Get the container element for this prop."""
         return self._container
     
@@ -110,7 +110,7 @@ class Prop(ABC):
         return self._rotation
     
     @property
-    def map(self) -> 'Map' | None:
+    def map(self) -> Union['Map', None]:
         """Get the map this prop belongs to."""
         return self._map
 
