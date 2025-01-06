@@ -579,16 +579,10 @@ class Rectangle:
             self.y + self.height / 2
         )
         
-    def intersects(self, other: 'Shape') -> bool:
-        """Check if this rectangle intersects with another shape."""
-        return shape_intersects(self, other)
-        
     def _bounds_intersect(self, other: 'Rectangle') -> bool:
         """Test if this rectangle's bounds intersect another rectangle."""
-        return (self._inflated_x < other._inflated_x + other._inflated_width and
-                self._inflated_x + self._inflated_width > other._inflated_x and
-                self._inflated_y < other._inflated_y + other._inflated_height and
-                self._inflated_y + self._inflated_height > other._inflated_y)
+        from algorithms.intersections import rect_rect_intersect
+        return rect_rect_intersect(self, other)
     
     @classmethod
     def centered_grid(cls, grid_width: float, grid_height: float) -> 'Rectangle':
