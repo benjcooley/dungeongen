@@ -162,7 +162,7 @@ class Prop(ABC):
         canvas.rotate(-self.rotation.radians * (180 / math.pi))
         
         # Draw additional content in local coordinates centered at 0,0
-        self._draw_content(canvas, Rectangle(-draw_bounds.width/2, -draw_bounds.height/2, draw_bounds.width, draw_bounds.height))
+        self._draw_content(canvas, Rectangle(-draw_bounds.width/2, -draw_bounds.height/2, draw_bounds.width, draw_bounds.height), layer)
         
         # Restore canvas state
         canvas.restoreToCount(save_count)
