@@ -38,6 +38,7 @@ class Rock(Prop):
         
         # Initialize prop with center position and boundary
         super().__init__(ROCK_PROP_TYPE, center, boundary)
+        self._prop_type = ROCK_PROP_TYPE  # Use _prop_type instead of prop_type
         
         # Store rock-specific properties
         self._radius = radius
