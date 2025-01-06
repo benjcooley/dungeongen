@@ -57,9 +57,8 @@ class Prop(ABC):
             rotation: Rotation angle in 90° increments (default: facing right)
             grid_size: Optional size in grid units prop occupies if prop is grid aligned
         """
-        self.prop_type = prop_type
-        self._boundary_shape = boundary_shape.make_rotated(rotation)
         self._prop_type = prop_type
+        self._boundary_shape = boundary_shape.make_rotated(rotation)
         if (grid_size is not None):
             if rotation == Rotation.ROT_90 or rotation == Rotation.ROT_270:
                 self._boundary_shape.translate(grid_size[1] * CELL_SIZE / 2, grid_size[0] * CELL_SIZE / 2)
