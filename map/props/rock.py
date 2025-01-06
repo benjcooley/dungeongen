@@ -49,22 +49,22 @@ class Rock(Prop):
         """Rocks don't have a standard grid size."""
         return None
     
-    def __init__(self, center: Point, size: float, rotation: Rotation = Rotation.ROT_0) -> None:
+    def __init__(self, center: Point, radius: float, rotation: Rotation = Rotation.ROT_0) -> None:
         """Initialize a rock with position and size.
         
         Args:
             center: Center position in map coordinates (center_x, center_y)
-            size: Rock size (radius) in drawing units
+            radius: Final rock radius in drawing units (including any size variations)
             rotation: Rotation angle (affects perturbation)
         """
-        # Create boundary shape centered at origin
-        boundary = Circle(0, 0, size)
+        # Create boundary shape centered at origin with exact radius
+        boundary = Circle(0, 0, radius)
         
         # Initialize prop with center position and boundary
         super().__init__(center, boundary, rotation)
         
         # Store rock-specific properties
-        self._radius = size
+        self._radius = radius
         
         # Generate perturbed control points in local coordinates
         self._control_points = self._generate_control_points()
@@ -222,18 +222,16 @@ class Rock(Prop):
             # Random rotation
             rotation = random.uniform(0, 2 * math.pi)
             
-            # Calculate base rock size
-            base_size = (SMALL_ROCK_SIZE if actual_type == RockType.SMALL else MEDIUM_ROCK_SIZE) * CELL_SIZE
+            # Calculate rock radius with size variation
+            base_radius = (SMALL_ROCK_SIZE if actual_type == RockType.SMALL else MEDIUM_ROCK_SIZE) * CELL_SIZE
+            size_variation = random.uniform(0.7, 1.3)  # ±30% variation
+            final_radius = base_radius * size_variation
             
-            # Add overall size variation (±30%)
-            size_variation = random.uniform(0.7, 1.3)
-            size = base_size * size_variation
-            
-            valid_pos = cls.get_valid_position(size, container)
+            valid_pos = cls.get_valid_position(final_radius, container)
             
             if valid_pos:
-                # Create rock at valid position
-                rock = cls(valid_pos, size, Rotation.from_radians(rotation))
+                # Create rock at valid position with final radius
+                rock = cls(valid_pos, final_radius, Rotation.from_radians(rotation))
                 container.try_add_prop(rock)
     @classmethod
     def is_valid_position(cls, x: float, y: float, size: float, container: 'MapElement') -> bool:
