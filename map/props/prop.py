@@ -258,7 +258,7 @@ class Prop(ABC):
             y = random.uniform(bounds.y, bounds.y + bounds.height)
             
             # Try to snap to valid position
-            snapped_pos = self.snap_valid_position(x, y)
+            snapped_pos = self.snap_valid_position(x, y) if self.
             if snapped_pos is not None:
                 self.position = snapped_pos
                 return snapped_pos
@@ -378,7 +378,8 @@ class Prop(ABC):
         Default implementation returns False.
         """
         return False
-        
+    
+    @property
     def should_snap(self) -> bool:
         """Whether this prop should snap to grid or walls when placed.
         
@@ -387,6 +388,7 @@ class Prop(ABC):
         """
         return self.is_wall_aligned() or self.is_grid_aligned()
         
+    @property
     def is_grid_aligned(self) -> bool:
         """Whether this prop should be aligned to the grid when placed.
         
@@ -394,38 +396,6 @@ class Prop(ABC):
         Returns True if the prop has grid bounds defined.
         """
         return self._grid_bounds is not None
-
-    @classmethod
-    @abstractmethod
-    def prop_size(cls) -> Point:
-        """Get the actual size of this prop in drawing units.
-        
-        This defines the prop's tight bounding rectangle size.
-        
-        Returns:
-            Tuple of (width, height) in drawing units
-        """
-        ...
-        
-    @classmethod
-    def get_map_aligned_boundary_shape(cls, center: Point, rotation: Rotation) -> Shape | None:
-        """Get the boundary shape aligned to a specific map position and rotation.
-        
-        Args:
-            center: Center point in map space
-            rotation: Rotation angle
-            
-        Returns:
-            The boundary shape translated and rotated to the specified position,
-            or None to use default rectangular boundary
-        """
-        # Get base boundary shape (already centered at 0,0)
-        base_shape = cls.get_prop_boundary_shape()
-        if base_shape is None:
-            return None
-            
-        # Create transformed shape - rotate first, then translate to center point
-        return base_shape.rotated(rotation).translated(center[0], center[1])
 
     @classmethod
     def _get_rotated_grid_offset(cls, grid_offset: Point, grid_size: Point, rotation: Rotation) -> Point:
@@ -473,73 +443,5 @@ class Prop(ABC):
             return (grid_size[1], grid_size[0])
         else:
             return grid_size
-
-    @classmethod
-    def center_to_map_position(cls, center: Point, rotation: Rotation) -> Point:
-        """Convert a center point to map-aligned position.
-        
-        For grid-aligned props, converts center point to top-left grid position.
-        For non-grid props, returns the center point unchanged.
-        
-        Args:
-            center: Center point in map space
-            rotation: Prop rotation
-            
-        Returns:
-            Map position (top-left for grid props, center for non-grid)
-        """
-        if not cls.is_grid_aligned():
-            return center
-            
-        # For grid props, convert center to top-left position
-        grid_size = cls.prop_grid_size()
-        if grid_size is None:
-            raise ValueError(f"Grid-aligned prop {cls.__name__} must specify prop_grid_size")
-        
-        width = grid_size[0] * CELL_SIZE
-        height = grid_size[1] * CELL_SIZE
-        
-        # If rotated 90° or 270°, swap width/height
-        if rotation in (Rotation.ROT_90, Rotation.ROT_270):
-            width, height = height, width
-            
-        return (
-            center[0] - width/2,
-            center[1] - height/2
-        )
-
-    @classmethod
-    def map_position_to_center(cls, pos: Point, rotation: Rotation) -> Point:
-        """Convert a map-aligned position to center point.
-        
-        For grid-aligned props, converts top-left position to center point.
-        For non-grid props, returns the position unchanged.
-        
-        Args:
-            pos: Map position (top-left for grid props, center for non-grid)
-            rotation: Prop rotation
-            
-        Returns:
-            Center point in map space
-        """
-        if not cls.is_grid_aligned():
-            return pos
-            
-        # For grid props, convert top-left to center position
-        grid_size = cls.prop_grid_size()
-        if grid_size is None:
-            raise ValueError(f"Grid-aligned prop {cls.__name__} must specify prop_grid_size")
-            
-        width = grid_size[0] * CELL_SIZE
-        height = grid_size[1] * CELL_SIZE
-        
-        # If rotated 90° or 270°, swap width/height
-        if rotation in (Rotation.ROT_90, Rotation.ROT_270):
-            width, height = height, width
-            
-        return (
-            pos[0] + width/2,
-            pos[1] + height/2
-        )
 
         
