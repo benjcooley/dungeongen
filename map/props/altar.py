@@ -40,20 +40,22 @@ class Altar(Prop):
             map_: Parent map instance
             rotation: Rotation angle in 90° increments (default: facing right)
         """
-        # Create rotated rectangle centered on point
-        rect = Rectangle.rotated_rect(
+        # Create boundary shape as a rectangle
+        boundary = Rectangle.rotated_rect(
             center_x,
             center_y,
             ALTAR_WIDTH,
             ALTAR_HEIGHT,
             rotation
         )
-        # Create grid offset point and bounds rectangle
-        grid_offset = (ALTAR_GRID_OFFSET_X, ALTAR_GRID_OFFSET_Y)
-        grid_bounds = Rectangle(0, 0, 1.0, 1.0)
-        super().__init__(rect, rect, map_, rotation,
-                        grid_offset=grid_offset,
-                        grid_bounds=grid_bounds)
+        
+        # Initialize with position and boundary shape
+        super().__init__(
+            position=(center_x, center_y),
+            boundary_shape=boundary,
+            rotation=rotation,
+            grid_size=(1.0, 1.0)  # 1x1 grid cell
+        )
     
     @classmethod
     def is_decoration(cls) -> bool:
