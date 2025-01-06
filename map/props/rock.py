@@ -65,7 +65,7 @@ class Rock(Prop):
             
         return points
         
-    def _draw_content(self, canvas: skia.Canvas, bounds: Rectangle, layer: Layers = Layers.PROPS) -> None:
+    def _draw_content(self, canvas: skia.Canvas, bounds: Rectangle, layer: Layers) -> None:
         """Draw the rock using a perturbed circular path on the specified layer."""
         if layer != Layers.PROPS:
             return
