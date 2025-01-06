@@ -49,31 +49,20 @@ class Rock(Prop):
         """Rocks don't have a standard grid size."""
         return None
     
-    def __init__(self, x: float, y: float, size: float, map_: 'Map', rotation: float = 0.0) -> None:
+    def __init__(self, position: Point, size: float, rotation: Rotation = Rotation.ROT_0) -> None:
         """Initialize a rock with position and size.
         
         Args:
-            x: Center X coordinate
-            y: Center Y coordinate
+            position: Center position in map coordinates
             size: Rock size (radius) in drawing units
-            map_: Parent map instance
-            rotation: Rotation angle (affects perturbation but not overall shape)
+            rotation: Rotation angle (affects perturbation)
         """
-        # Calculate bounds (square that contains the perturbed circle)
-        bounds_size = size * 2 * 1.2  # Add 20% margin for variations
-        bounds_x = x - bounds_size/2
-        bounds_y = y - bounds_size/2
+        # Create boundary shape (circle)
+        boundary = Circle(0, 0, size)
+        super().__init__(position, boundary, rotation)
         
-        # Create grid-aligned rectangle and circular boundary
-        bounds_size = size * 2 * 1.2  # Add 20% margin for variations
-        rect = Rectangle(x - bounds_size/2, y - bounds_size/2, bounds_size, bounds_size)
-        boundary = Circle(x, y, size)
-        super().__init__(rect, boundary, map_, rotation)
-        
-        # Store additional rock-specific properties
+        # Store rock-specific properties
         self._radius = size
-        self._center_x = x
-        self._center_y = y
         
         # Generate perturbed control points for visual rendering
         self._control_points = self._generate_control_points()
@@ -242,7 +231,7 @@ class Rock(Prop):
             
             if valid_pos:
                 # Create rock at valid position
-                rock = cls(valid_pos[0], valid_pos[1], size, container._map, rotation)
+                rock = cls(valid_pos, size, Rotation.from_radians(rotation))
                 container.try_add_prop(rock)
     @classmethod
     def is_valid_position(cls, x: float, y: float, size: float, container: 'MapElement') -> bool:

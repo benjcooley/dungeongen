@@ -42,17 +42,11 @@ class MapElement:
         Returns:
             True if prop was added successfully, False if position was invalid
         """
-        # Check if prop's current position is valid
-        valid_pos = prop.__class__.get_valid_position(prop._bounds.width, self)
-        if valid_pos is None:
-            return False
-            
-        # Update prop position to valid position
-        prop.position = valid_pos
-            
         if prop.container is not None:
             prop.container.remove_prop(prop)
+            
         prop.container = self
+        prop._map = self._map
         self._props.append(prop)
         return True
         
@@ -61,6 +55,7 @@ class MapElement:
         if prop in self._props:
             self._props.remove(prop)
             prop.container = None
+            prop._map = None
     
     def recalculate_bounds(self) -> Rectangle:
         """Calculate the bounding rectangle that encompasses the shape."""
