@@ -47,8 +47,16 @@ class Altar(Prop):
         if layer != Layers.PROPS:
             return
             
+        # Draw debug grid cell bounds in blue
+        debug_paint = skia.Paint(
+            AntiAlias=True,
+            Style=skia.Paint.kStroke_Style,
+            StrokeWidth=2,
+            Color=skia.Color(0, 0, 255)  # Blue
+        )
+        canvas.drawRect(skia.Rect(-CELL_SIZE/2, -CELL_SIZE/2, CELL_SIZE/2, CELL_SIZE/2), debug_paint)
+            
         # Draw right facing version (this is moved, rotated by draw() method)
-
         rect = self.prop_type.boundary_shape #type: Rectangle
 
         # Draw fill
