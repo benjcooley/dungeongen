@@ -25,36 +25,29 @@ ALTAR_GRID_OFFSET_Y = 0.5  # Center vertically in cell
 class Altar(Prop):
     """An altar prop that appears as a small rectangular table with decorative dots."""
     
-    def __init__(self, 
-                 center_x: float, 
-                 center_y: float, 
-                 map_: 'Map', 
-                 rotation: Rotation = Rotation.ROT_0, 
-                 grid_offset: Point|None = None, 
-                 grid_bounds: Rectangle|None = None) -> None:
+    def __init__(self,
+                 grid_position: Point,
+                 rotation: Rotation = Rotation.ROT_0) -> None:
         """Initialize an altar prop.
         
         Args:
-            center_x: Center X coordinate in drawing units
-            center_y: Center Y coordinate in drawing units
-            map_: Parent map instance
+            grid_position: Position in grid coordinates (x, y)
             rotation: Rotation angle in 90° increments (default: facing right)
         """
-        # Create boundary shape as a rectangle
-        boundary = Rectangle.rotated_rect(
-            center_x,
-            center_y,
+        # Create boundary shape centered at origin
+        boundary = Rectangle(
+            -ALTAR_WIDTH/2,  # Center horizontally
+            -ALTAR_HEIGHT/2, # Center vertically
             ALTAR_WIDTH,
-            ALTAR_HEIGHT,
-            rotation
+            ALTAR_HEIGHT
         )
         
-        # Initialize with position and boundary shape
+        # Initialize base prop with position and boundary
         super().__init__(
-            position=(center_x, center_y),
+            position=(grid_position[0] * CELL_SIZE, grid_position[1] * CELL_SIZE),
             boundary_shape=boundary,
             rotation=rotation,
-            grid_size=(1.0, 1.0)  # 1x1 grid cell
+            grid_size=(1, 1)  # 1x1 grid cell
         )
     
     @classmethod
