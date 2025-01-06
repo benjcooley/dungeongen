@@ -1,15 +1,13 @@
+from typing import List, TYPE_CHECKING
 import math
 import random
-from typing import List, TYPE_CHECKING
 
 import skia
 
-from algorithms.shapes import Circle, Rectangle, Shape
+from algorithms.shapes import Circle, Shape
 from algorithms.types import Point
 from constants import CELL_SIZE
-from graphics.conversions import grid_to_drawing
 from map.enums import Layers, RockType
-from map.mapelement import MapElement
 from map.props.prop import Prop
 from map.props.rotation import Rotation
 
@@ -19,7 +17,7 @@ if TYPE_CHECKING:
 # Rock size ranges as fraction of grid cell
 SMALL_ROCK_MIN_SIZE = 1/16
 SMALL_ROCK_MAX_SIZE = 1/10
-MEDIUM_ROCK_MIN_SIZE = 1/10 
+MEDIUM_ROCK_MIN_SIZE = 1/10
 MEDIUM_ROCK_MAX_SIZE = 1/6
 
 class Rock(Prop):
