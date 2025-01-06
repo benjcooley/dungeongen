@@ -180,7 +180,7 @@ class MapElement:
                     
             # Then draw non-decoration props
             for prop in self._props:
-                if not prop.__class__.is_decoration():
+                if not prop.prop_type.is_decoration:
                     prop.draw(canvas)
         elif layer == Layers.SHADOW:
             # Only draw shadows for non-decoration props
