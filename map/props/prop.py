@@ -176,8 +176,8 @@ class Prop(ABC):
         if not self.container:
             return None
             
-        # Handle wall-aligned props that should snap
-        if self.should_snap() and self.is_wall_aligned() and isinstance(self.container._shape, Rectangle):
+        # Handle wall-aligned props
+        if self.is_wall_aligned() and isinstance(self.container._shape, Rectangle):
             room_bounds = self.container._shape.bounds
             prop_bounds = self.shape.bounds
             prop_width = prop_bounds.width
@@ -333,8 +333,8 @@ class Prop(ABC):
         # Get bounds at test position
         bounds = self._boundary_shape.bounds
         
-        # For grid-aligned props that should snap, ensure the shape's top-left corner aligns to grid
-        if self.should_snap() and self.is_grid_aligned():
+        # For grid-aligned props, ensure the shape's top-left corner aligns to grid
+        if self.is_grid_aligned():
             # Check if top-left corner aligns to grid
             if (bounds.x % CELL_SIZE != 0) or (bounds.y % CELL_SIZE != 0):
                 valid = False
