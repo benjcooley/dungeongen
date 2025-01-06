@@ -71,9 +71,10 @@ class Altar(Prop):
             Color=self._map.options.prop_outline_color
         )
         dot_radius = CELL_SIZE * 0.05
-        center_x = self.bounds.center[0]
-        top_y = self.bounds.center[1] - 0.3
-        bottom_y = self.bounds.center[1] + 0.3
+        center = self.bounds.center()
+        center_x = center[0] 
+        top_y = center[1] - 0.3
+        bottom_y = center[1] + 0.3
         canvas.drawCircle(center_x, top_y, dot_radius, dot_paint)
         canvas.drawCircle(center_x, bottom_y, dot_radius, dot_paint)
 
