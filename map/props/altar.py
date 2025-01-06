@@ -7,6 +7,7 @@ from algorithms.shapes import Rectangle
 from algorithms.types import Point
 from constants import CELL_SIZE
 from map.props.prop import Prop, PropType
+from map.enums import Layers
 from map.props.rotation import Rotation
 
 if TYPE_CHECKING:
@@ -42,7 +43,7 @@ class Altar(Prop):
             grid_size=(1, 1)
         )
     
-    def _draw_content(self, canvas: skia.Canvas, bounds: Rectangle) -> None:
+    def _draw_content(self, canvas: skia.Canvas, bounds: Rectangle, layer: 'Layers' = Layers.PROPS) -> None:
 
         # Draw right facing version (this is moved, rotated by draw() method)
 
