@@ -363,14 +363,15 @@ class Prop(ABC):
         """
         ...
         
-    @classmethod
-    def is_wall_aligned(cls) -> bool:
+    @property
+    @abstractmethod
+    def is_wall_aligned(self) -> bool:
         """Whether this prop should be aligned to walls when placed.
         
         Wall-aligned props will snap to the nearest wall when placed.
-        Default implementation returns False.
+        Must be implemented by subclasses.
         """
-        return False
+        ...
     
     @property
     def should_snap(self) -> bool:
@@ -382,13 +383,14 @@ class Prop(ABC):
         return self.is_wall_aligned() or self.is_grid_aligned()
         
     @property
+    @abstractmethod
     def is_grid_aligned(self) -> bool:
         """Whether this prop should be aligned to the grid when placed.
         
         Grid-aligned props will snap to grid intersections.
-        Returns True if the prop has grid bounds defined.
+        Must be implemented by subclasses.
         """
-        return self._grid_bounds is not None
+        ...
 
     @classmethod
     def _get_rotated_grid_offset(cls, grid_offset: Point, grid_size: Point, rotation: Rotation) -> Point:
