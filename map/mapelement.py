@@ -1,4 +1,6 @@
-from typing import List, TYPE_CHECKING
+from typing import List, Optional, TYPE_CHECKING
+
+from map.props.proptypes import PropType
 import random
 import math
 import skia
