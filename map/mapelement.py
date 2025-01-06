@@ -5,6 +5,7 @@ import skia
 from map.enums import Layers
 from map.props.proptypes import PropType
 from map.props.altar import Altar
+from constants import CELL_SIZE
 
 if TYPE_CHECKING:
     from map.map import Map
