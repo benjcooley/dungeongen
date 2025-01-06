@@ -209,30 +209,3 @@ class Rock(Prop):
                 # Create rock at valid position with final radius
                 rock = cls(valid_pos, final_radius, Rotation.from_radians(rotation))
                 container.try_add_prop(rock)
-    @classmethod
-    def is_valid_position(cls, x: float, y: float, size: float, container: 'MapElement') -> bool:
-        """Check if a position is valid for a rock within the container.
-        
-        Args:
-            x: X coordinate to check
-            y: Y coordinate to check
-            size: Rock radius
-            container: The MapElement to place the rock in
-            
-        Returns:
-            True if position is valid, False otherwise
-        """
-        # Check center point
-        if not container.shape.contains(x, y):
-            return False
-            
-        # Check points around the perimeter
-        num_probes = 8
-        for i in range(num_probes):
-            angle = (i * 2 * math.pi / num_probes)
-            px = x + size * math.cos(angle)
-            py = y + size * math.sin(angle)
-            if not container.shape.contains(px, py):
-                return False
-                
-        return True
