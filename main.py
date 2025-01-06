@@ -11,6 +11,7 @@ from map.door import Door, DoorOrientation
 from map.passage import Passage
 from map.props.rotation import Rotation
 from map.props.proptypes import PropType
+from map.props.altar import Altar
 from options import Options
 
 def main():
@@ -47,6 +48,10 @@ def main():
     first_door.connect_to(passage)
     passage.connect_to(second_door)
     second_door.connect_to(end_room)
+    
+    # Add altar to center of start room
+    altar = Altar(0, 0, start_room)
+    start_room.add_prop(altar)
     
     # Add props to rooms and passage
     start_room.create_props(PropType.MEDIUM_ROCK, max_count=4)
