@@ -258,10 +258,15 @@ class Prop(ABC):
             y = random.uniform(bounds.y, bounds.y + bounds.height)
             
             # Try to snap to valid position
-            snapped_pos = self.snap_valid_position(x, y) if self.
-            if snapped_pos is not None:
-                self.position = snapped_pos
-                return snapped_pos
+            if self.should_snap:
+                pos = self.snap_valid_position(x, y) if self.should_snap else (x, y)
+                if pos is not None:
+                    self.position = pos
+                return pos
+            else:
+                if self.is_valid_position():
+                    self.position = (x, y)
+                    return (x, y)
                 
         return None
 
@@ -315,50 +320,38 @@ class Prop(ABC):
         self.position = (self.position[0] + dx, self.position[1] + dy)
 
     def is_valid_position(self, x: float, y: float) -> bool:
-        """Check if a position is valid for a prop within its container.
-        
-        Args:
-            x: X coordinate to check
-            y: Y coordinate to check
-            
+        """Check if current position is valid.
+
         Returns:
             True if position is valid, False otherwise
         """
-        # Store current position
-        old_pos = self.position
-        
-        # Temporarily move to test position
-        self.position = (x, y)
-        
-        # Get bounds at test position
-        bounds = self._boundary_shape.bounds
-        
         # For grid-aligned props, ensure the shape's top-left corner aligns to grid
         if self.is_grid_aligned():
-            # Check if top-left corner aligns to grid
-            if (bounds.x % CELL_SIZE != 0) or (bounds.y % CELL_SIZE != 0):
-                valid = False
-            else:
-                valid = True
+            if (x % CELL_SIZE != 0) or (y % CELL_SIZE != 0):
+                return False
+        
+        pos = self.position
+        shape: Shape
+        if (x == pos[0]) and (y == pos[1]):
+            shape = self._boundary_shape
         else:
-            valid = True
+            dx = pos[0] - x
+            dy = pos[1] - y
+            shape = self._boundary_shape.make_translated(dx, dy)
 
         # Check if shape is contained within container
-        if valid and not self.container.shape.contains_shape(self._boundary_shape):
-            valid = False
+        if not self.container.shape.contains_shape(shape):
+            return False
             
         # For non-decorative props, check intersection with other props
-        if valid and not self.__class__.is_decoration():
+        if not self.__class__.is_decoration():
             for prop in self.container._props:
-                if prop is not self and not prop.__class__.is_decoration() and prop.shape.intersects(self._boundary_shape):
-                    valid = False
-                    break
-        
-        # Restore original position
-        self.position = old_pos
+                if prop is not self and \
+                    not prop.__class__.is_decoration() and \
+                    prop.shape.intersects(shape):
+                        return False
                     
-        return valid
-
+        return True
 
     @classmethod
     @abstractmethod

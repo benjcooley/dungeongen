@@ -18,7 +18,7 @@ ALTAR_WIDTH = CELL_SIZE * 0.3   # Width of altar surface
 ALTAR_HEIGHT = CELL_SIZE * 0.7  # Height of altar
 ALTAR_INSET = (CELL_SIZE - ALTAR_HEIGHT) / 2  # Calculated inset from cell edges
 
-# Grid offset from cell corner to altar center
+# Alter position relative to top left of grid cell
 ALTAR_GRID_OFFSET_X = 0.3  # Align closer to right side of cell
 ALTAR_GRID_OFFSET_Y = 0.5  # Center vertically in cell
 
@@ -26,63 +26,30 @@ class Altar(Prop):
     """An altar prop that appears as a small rectangular table with decorative dots."""
     
     def __init__(self,
-                 grid_position: Point,
+                 grid_x: float,
+                 grid_y: float,
                  rotation: Rotation = Rotation.ROT_0) -> None:
         """Initialize an altar prop.
         
         Args:
-            grid_position: Position in grid coordinates (x, y)
+            center_x: Center X coordinate in drawing units
+            center_y: Center Y coordinate in drawing units
+            map_: Parent map instance
             rotation: Rotation angle in 90° increments (default: facing right)
         """
-        # Create boundary shape centered at origin
-        boundary = Rectangle(
-            -ALTAR_WIDTH/2,  # Center horizontally
-            -ALTAR_HEIGHT/2, # Center vertically
+        position = grid_to_drawing((grid_x, grid_y), self._map.options)
+        boundary_shape = Rectangle(
+            ALTAR_GRID_OFFSET_X,
+            ALTAR_GRID_OFFSET_Y,
             ALTAR_WIDTH,
             ALTAR_HEIGHT
         )
-        
-        # Initialize base prop with position and boundary
-        super().__init__(
-            position=(grid_position[0] * CELL_SIZE, grid_position[1] * CELL_SIZE),
-            boundary_shape=boundary,
-            rotation=rotation,
-            grid_size=(1, 1)  # 1x1 grid cell
-        )
+        super().__init__(position, boundary_shape, rotation, grid_size=(1, 1))
     
     @classmethod
     def is_decoration(cls) -> bool:
         """Altars are not decorative - they're major props."""
         return False
-        
-        
-    @classmethod
-    def prop_size(cls) -> Point:
-        """Get the size of this prop type in drawing units."""
-        return (ALTAR_WIDTH, ALTAR_HEIGHT)  # Use altar-specific dimensions
-        
-    @classmethod
-    def prop_grid_size(cls) -> Point:
-        """Altars occupy 1x1 grid cells."""
-        return (1.0, 1.0)  # Square grid cell
-    
-    @classmethod
-    def from_grid(cls, grid_x: float, grid_y: float, map_: 'Map', rotation: Rotation = Rotation.ROT_0) -> 'Altar':
-        """Create an altar at a grid position.
-        
-        Args:
-            grid_x: Grid X coordinate
-            grid_y: Grid Y coordinate
-            map_: Parent map instance
-            rotation: Rotation angle in 90° increments (default: facing right)
-            
-        Returns:
-            A new Altar instance positioned at the grid coordinates
-        """
-        # Calculate center point from grid position and offset
-        center_x = (grid_x + ALTAR_GRID_OFFSET_X) * CELL_SIZE
-        center_y = (grid_y + ALTAR_GRID_OFFSET_Y) * CELL_SIZE
-        return cls(center_x, center_y, map_, rotation)
         
     def _draw_content(self, canvas: skia.Canvas, bounds: Rectangle) -> None:
         # Get prop shape once and cast to Rectangle since we know it's always a rectangle
