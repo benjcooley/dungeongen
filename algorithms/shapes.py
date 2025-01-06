@@ -864,6 +864,20 @@ def circle_circle_contains(circle1: 'Circle', circle2: 'Circle') -> bool:
     dist = math.sqrt(dx * dx + dy * dy)
     return dist + circle2.radius <= circle1.radius
 
+def circle_rect_contains(circle: 'Circle', rect: 'Rectangle') -> bool:
+    """Test if circle fully contains rectangle."""
+    # Check all four corners of rectangle
+    corners = [
+        (rect.x, rect.y),
+        (rect.x + rect.width, rect.y),
+        (rect.x, rect.y + rect.height),
+        (rect.x + rect.width, rect.y + rect.height)
+    ]
+    return all(
+        math.sqrt((x - circle.cx)**2 + (y - circle.cy)**2) <= circle.radius
+        for x, y in corners
+    )
+
 def rect_circle_contains(rect: 'Rectangle', circle: 'Circle') -> bool:
     """Test if rectangle fully contains circle."""
     # Circle must be inside rectangle bounds with radius margin
