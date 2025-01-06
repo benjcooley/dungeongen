@@ -76,7 +76,7 @@ class Altar(Prop):
         )
         dot_radius = CELL_SIZE * 0.04
         # Draw dots relative to bounds
-        center_x = rect.center[0]
+        center_x = rect.center[0] 
         center_y = rect.center[1]
         dot_offset = ALTAR_HEIGHT * 0.25  # 25% up from center
         canvas.drawCircle(center_x, center_y - dot_offset, dot_radius, dot_paint)
