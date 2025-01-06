@@ -14,10 +14,10 @@ if TYPE_CHECKING:
     from map.map import Map
 
 # Constants for altar dimensions
-ALTAR_X = CELL_SIZE * 0.3  # Align closer to right side of cell
-ALTAR_Y = CELL_SIZE * 0.5  # Center vertically in cell
+ALTAR_X = CELL_SIZE * 0.15  # Small margin from left edge
+ALTAR_Y = CELL_SIZE * 0.15  # Small margin from top edge
 ALTAR_WIDTH = CELL_SIZE * 0.3   # Width of altar surface
-ALTAR_HEIGHT = CELL_SIZE * 0.7  # Height of altar
+ALTAR_HEIGHT = CELL_SIZE * 0.7  # Height of altar, leaving equal margins top/bottom
 
 ALTAR_PROP_TYPE = PropType(
     is_grid_aligned=True,
