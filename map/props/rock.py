@@ -53,13 +53,17 @@ class Rock(Prop):
         for i in range(8):  # Use 8 points for a smoother shape
             angle = (i * 2 * math.pi / 8)
             
-            # Add random variation to radius (±25%)
-            radius_variation = random.uniform(-0.25, 0.25)
+            # Add random variation to radius (±40%)
+            radius_variation = random.uniform(-0.4, 0.4)
             perturbed_radius = self._radius * (1 + radius_variation)
             
+            # Add some angular variation (±15 degrees)
+            angle_variation = random.uniform(-0.26, 0.26)  # ±15 degrees in radians
+            perturbed_angle = angle + angle_variation
+            
             # Calculate point position in local coordinates (centered at 0,0)
-            x = perturbed_radius * math.cos(angle)
-            y = perturbed_radius * math.sin(angle)
+            x = perturbed_radius * math.cos(perturbed_angle)
+            y = perturbed_radius * math.sin(perturbed_angle)
             
             points.append((x, y))
             
