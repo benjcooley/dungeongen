@@ -43,7 +43,7 @@ class Altar(Prop):
             ALTAR_PROP_TYPE,
             position,
             ALTAR_PROP_TYPE.boundary_shape,
-            rotation=rotation
+            rotation=rotation,
             grid_size=(1, 1)
         )
     
