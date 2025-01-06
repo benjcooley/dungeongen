@@ -58,24 +58,29 @@ class Prop(ABC):
             grid_size: Optional size in grid units prop occupies if prop is grid aligned
         """
         self._prop_type = prop_type
+        # First rotate the boundary shape
         self._boundary_shape = boundary_shape.make_rotated(rotation)
-        if (grid_size is not None):
-            if rotation == Rotation.ROT_90 or rotation == Rotation.ROT_270:
-                self._boundary_shape.translate(grid_size[1] * CELL_SIZE / 2, grid_size[0] * CELL_SIZE / 2)
-            else:
-                self._boundary_shape.translate(grid_size[0] * CELL_SIZE / 2, grid_size[1] * CELL_SIZE / 2)
-            self._boundary_shape.translate(position[0], position[1])
+        # Calculate bounds before any translation
+        self._bounds = self._boundary_shape.bounds
+        
+        if grid_size is not None:
+            # For grid-aligned props, handle grid positioning
             if rotation == Rotation.ROT_90 or rotation == Rotation.ROT_270:
                 self._grid_size = (grid_size[1], grid_size[0])
-                self._grid_bounds = Rectangle(position[0], position[1], grid_size[1] * CELL_SIZE, grid_size[0] * CELL_SIZE)
+                self._grid_bounds = Rectangle(position[0], position[1], 
+                                           grid_size[1] * CELL_SIZE, grid_size[0] * CELL_SIZE)
             else:
                 self._grid_size = (grid_size[0], grid_size[1])
-                self._grid_bounds = Rectangle(position[0], position[1], grid_size[0] * CELL_SIZE, grid_size[1] * CELL_SIZE)
-        else:            
-            self._boundary_shape.translate(position[0], position[1])
+                self._grid_bounds = Rectangle(position[0], position[1], 
+                                           grid_size[0] * CELL_SIZE, grid_size[1] * CELL_SIZE)
+        else:
             self._grid_bounds = None
             self._grid_size = None
-        self._bounds = boundary_shape.bounds
+            
+        # Finally translate the boundary shape to its position
+        self._boundary_shape.translate(position[0], position[1])
+        # Update bounds after translation
+        self._bounds = self._boundary_shape.bounds
         self._rotation = rotation
         self._map: Optional['Map'] = None
         self._container: Optional['MapElement'] = None
