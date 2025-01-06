@@ -16,9 +16,11 @@ from map.props.rotation import Rotation
 if TYPE_CHECKING:
     from map.map import Map
 
-# Rock sizes as fraction of grid cell
-SMALL_ROCK_SIZE = 1/12
-MEDIUM_ROCK_SIZE = 1/8
+# Rock size ranges as fraction of grid cell
+SMALL_ROCK_MIN_SIZE = 1/16
+SMALL_ROCK_MAX_SIZE = 1/10
+MEDIUM_ROCK_MIN_SIZE = 1/10 
+MEDIUM_ROCK_MAX_SIZE = 1/6
 
 class Rock(Prop):
     """A rock prop with irregular circular shape."""
@@ -145,9 +147,9 @@ class Rock(Prop):
     @classmethod
     def get_prop_boundary_shape(cls) -> Shape | None:
         """Get the rock's shape in local coordinates."""
-        # Return a circle sized between small and medium rocks
-        nominal_size = (SMALL_ROCK_SIZE + MEDIUM_ROCK_SIZE) / 2
-        radius = nominal_size * CELL_SIZE
+        # Return a circle sized between medium min/max
+        nominal_size = (MEDIUM_ROCK_MIN_SIZE + MEDIUM_ROCK_MAX_SIZE) / 2
+        radius = nominal_size * CELL_SIZE 
         return Circle(0, 0, radius)
         
     def draw(self, canvas: skia.Canvas, layer: Layers = Layers.PROPS) -> None:
@@ -222,10 +224,11 @@ class Rock(Prop):
             # Random rotation
             rotation = random.uniform(0, 2 * math.pi)
             
-            # Calculate rock radius with size variation
-            base_radius = (SMALL_ROCK_SIZE if actual_type == RockType.SMALL else MEDIUM_ROCK_SIZE) * CELL_SIZE
-            size_variation = random.uniform(0.7, 1.3)  # ±30% variation
-            final_radius = base_radius * size_variation
+            # Get random radius within range for rock type
+            if actual_type == RockType.SMALL:
+                final_radius = random.uniform(SMALL_ROCK_MIN_SIZE, SMALL_ROCK_MAX_SIZE) * CELL_SIZE
+            else:
+                final_radius = random.uniform(MEDIUM_ROCK_MIN_SIZE, MEDIUM_ROCK_MAX_SIZE) * CELL_SIZE
             
             valid_pos = cls.get_valid_position(final_radius, container)
             
