@@ -7,7 +7,7 @@ import random
 # Maximum attempts to find valid random position
 MAX_PLACEMENT_ATTEMPTS = 30
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Optional, ClassVar, Union
+from typing import TYPE_CHECKING, Optional, ClassVar, Union, Protocol
 
 import skia
 
@@ -15,8 +15,10 @@ from algorithms.shapes import Rectangle, Shape
 from algorithms.types import Point
 from constants import CELL_SIZE
 from map.enums import Layers
-from map.mapelement import MapElement
 from map.props.rotation import Rotation
+
+if TYPE_CHECKING:
+    from map.mapelement import MapElement
 
 if TYPE_CHECKING:
     from map.map import Map

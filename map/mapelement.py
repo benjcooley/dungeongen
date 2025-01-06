@@ -1,11 +1,11 @@
-from typing import List, Optional, TYPE_CHECKING
-
-from map.props.proptypes import PropType
+from typing import List, Optional, TYPE_CHECKING, Union
 import random
 import math
 import skia
 from map.enums import Layers
-from map.enums import Layers
+
+if TYPE_CHECKING:
+    from map.props.proptypes import PropType
 
 if TYPE_CHECKING:
     from map.map import Map

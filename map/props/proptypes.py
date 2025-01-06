@@ -1,13 +1,12 @@
 """Prop type definitions."""
 
 from enum import StrEnum, auto
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Type
 
 if TYPE_CHECKING:
     from map.props.prop import Prop
-
-from map.props.rock import Rock
-from map.props.rotation import Rotation
+    from map.props.rock import Rock
+    from map.props.rotation import Rotation
 
 class PropType(StrEnum):
     """Available prop types that can be added to map elements."""
