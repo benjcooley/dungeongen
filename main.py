@@ -49,13 +49,13 @@ def main():
     second_door.connect_to(end_room)
     
     # Add props to rooms and passage
-    start_room.create_props(PropType.MEDIUM_ROCK, min_count=2, max_count=4)
-    start_room.create_props(PropType.SMALL_ROCK, min_count=1, max_count=2)
+    start_room.create_props(PropType.MEDIUM_ROCK, max_count=4)
+    start_room.create_props(PropType.SMALL_ROCK, max_count=2)
     
-    end_room.create_props(PropType.MEDIUM_ROCK, min_count=1, max_count=2)
-    end_room.create_props(PropType.SMALL_ROCK, min_count=1, max_count=2)
+    end_room.create_props(PropType.MEDIUM_ROCK, max_count=2)
+    end_room.create_props(PropType.SMALL_ROCK, max_count=2)
     
-    passage.create_props(PropType.SMALL_ROCK, min_count=2, max_count=3)
+    passage.create_props(PropType.SMALL_ROCK, max_count=3)
 
     # Draw the map (which will draw all rooms)
     dungeon_map.render(canvas)
