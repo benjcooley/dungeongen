@@ -103,12 +103,6 @@ class Prop(ABC):
     def container(self) -> Optional['MapElement']:
         """Get the container element for this prop."""
         return self._container
-        
-    def _set_container(self, value: Optional['MapElement']) -> None:
-        """Protected method to set the container element.
-        
-        Should only be called by MapElement.add_prop() and remove_prop()."""
-        self._container = value
     
     @property
     def rotation(self) -> Rotation:

@@ -95,7 +95,7 @@ class MapElement:
         if prop.container is not None:
             prop.container.remove_prop(prop)
             
-        prop._set_container(self)
+        prop._container = self
         prop._map = self._map
         self._props.append(prop)
         
@@ -103,7 +103,7 @@ class MapElement:
         """Remove a prop from this element."""
         if prop in self._props:
             self._props.remove(prop)
-            prop._set_container(None)
+            prop._container = None
             prop._map = None
     
     def recalculate_bounds(self) -> Rectangle:
