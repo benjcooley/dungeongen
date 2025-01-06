@@ -49,20 +49,22 @@ class Rock(Prop):
         """Rocks don't have a standard grid size."""
         return None
     
-    def __init__(self, position: Point, size: float, rotation: Rotation = Rotation.ROT_0) -> None:
+    def __init__(self, center: Point, size: float, rotation: Rotation = Rotation.ROT_0) -> None:
         """Initialize a rock with position and size.
         
         Args:
-            position: Center position in map coordinates
+            center: Center position in map coordinates (center_x, center_y)
             size: Rock size (radius) in drawing units
             rotation: Rotation angle (affects perturbation)
         """
         # Create boundary shape (circle)
         boundary = Circle(0, 0, size)
-        super().__init__(position, boundary, rotation)
+        super().__init__(center, boundary, rotation)
         
         # Store rock-specific properties
         self._radius = size
+        self._center_x = center[0]
+        self._center_y = center[1]
         
         # Generate perturbed control points for visual rendering
         self._control_points = self._generate_control_points()
