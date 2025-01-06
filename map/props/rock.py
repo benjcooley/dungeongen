@@ -57,33 +57,33 @@ class Rock(Prop):
             size: Rock size (radius) in drawing units
             rotation: Rotation angle (affects perturbation)
         """
-        # Create boundary shape (circle)
+        # Create boundary shape centered at origin
         boundary = Circle(0, 0, size)
+        
+        # Initialize prop with center position and boundary
         super().__init__(center, boundary, rotation)
         
         # Store rock-specific properties
         self._radius = size
-        self._center_x = center[0]
-        self._center_y = center[1]
         
-        # Generate perturbed control points for visual rendering
+        # Generate perturbed control points in local coordinates
         self._control_points = self._generate_control_points()
     
     def _generate_control_points(self) -> List[Point]:
-        """Generate slightly perturbed control points for the rock shape."""
+        """Generate slightly perturbed control points for the rock shape in local coordinates."""
         points = []
         
         # Generate points around the circle with small random variations
         for i in range(8):  # Use 8 points for a smoother shape
-            angle = (i * 2 * math.pi / 8) + self.rotation
+            angle = (i * 2 * math.pi / 8)
             
             # Add random variation to radius (±25%)
             radius_variation = random.uniform(-0.25, 0.25)
             perturbed_radius = self._radius * (1 + radius_variation)
             
-            # Calculate point position
-            x = self._center_x + perturbed_radius * math.cos(angle)
-            y = self._center_y + perturbed_radius * math.sin(angle)
+            # Calculate point position in local coordinates (centered at 0,0)
+            x = perturbed_radius * math.cos(angle)
+            y = perturbed_radius * math.sin(angle)
             
             points.append((x, y))
             
