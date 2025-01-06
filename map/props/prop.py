@@ -25,39 +25,93 @@ class Prop(ABC):
     """Base class for decorative map props.
     
     Props are visual elements that can be placed in rooms and passages.
-    They have a bounding rectangle and custom drawing logic.
+    They have a bounding shape, and optional grid bounds (in map units) and custom 
+    drawing logic.
     """
     
-    def __init__(self, rect: Rectangle, boundary_shape: Shape, map_: 'Map', 
-                 rotation: Rotation = Rotation.ROT_0, 
-                 grid_offset: tuple[float, float] | None = None,
-                 grid_bounds: tuple[float, float] | None = None) -> None:
-        """Initialize a prop with a grid-aligned rectangle and boundary shape.
-        
+    def __init__(self, 
+                 position: Point,
+                 boundary_shape: Shape, 
+                 rotation: Rotation = Rotation.ROT_0,
+                 grid_size: Point | None = None) -> None:
+        """
         Props are drawn relative to their center point. The default orientation (0° rotation)
         has the prop facing right. Rotation happens counterclockwise in 90° increments.
         
         Args:
-            rect: Rectangle defining the prop's grid-aligned position and size
-            boundary_shape: Shape defining the prop's collision boundary
-            map_: Parent map instance
+            position: Position to place prop in map units
+            boundary_shape: Shape defining the prop's collision boundary, centered at (0,0) at rotation 0
             rotation: Rotation angle in 90° increments (default: facing right)
-            grid_offset: Optional tuple of (x,y) grid offset from cell corner to prop center
-            grid_bounds: Optional tuple of (width,height) in grid units
+            grid_size: Optional size in grid units prop occupies if prop is grid aligned
         """
-        self._rect = rect
-        self._boundary_shape = boundary_shape
+        self._boundary_shape = boundary_shape.make_rotated(rotation)
+        if (grid_size is not None):
+            if rotation == Rotation.ROT_90 or rotation == Rotation.ROT_270:
+                self._boundary_shape.translate(grid_size[1] * CELL_SIZE / 2, grid_size[0] * CELL_SIZE / 2)
+            else:
+                self._boundary_shape.translate(grid_size[0] * CELL_SIZE / 2, grid_size[1] * CELL_SIZE / 2)
+            self._boundary_shape.translate(position[0], position[1])
+            if rotation == Rotation.ROT_90 or rotation == Rotation.ROT_270:
+                self._grid_size = (grid_size[1], grid_size[0])
+                self._grid_bounds = Rectangle(position[0], position[1], grid_size[1] * CELL_SIZE, grid_size[0] * CELL_SIZE)
+            else:
+                self._grid_size = (grid_size[0], grid_size[1])
+                self._grid_bounds = Rectangle(position[0], position[1], grid_size[0] * CELL_SIZE, grid_size[1] * CELL_SIZE)
+        else:            
+            self._boundary_shape.translate(position[0], position[1])
+            self._grid_bounds = None
+            self._grid_size = None
         self._bounds = boundary_shape.bounds
-        self._x = rect.x
-        self._y = rect.y
-        self._width = rect.width
-        self._height = rect.height
-        self._map = map_
-        self.rotation = rotation
-        self.container: Optional['MapElement'] = None
-        self._grid_offset = grid_offset
-        self._grid_bounds = grid_bounds
+        self._rotation = rotation
+        self._map: Optional['Map'] = None
+        self._container: Optional['MapElement'] = None
     
+    @property
+    def shape(self) -> Shape:
+        """Get the boundary shape of this prop."""
+        return self._boundary_shape
+
+    @property
+    def bounds(self) -> Rectangle:
+        """Get the bounding rectangle of this prop."""
+        return self._bounds
+
+    @classmethod
+    def grid_size(self) -> Point | None:
+        """Get the size in grid units of this prop.
+        
+        Returns:
+            Point with integer grid unit size of the prop or None if not grid aligned
+        """
+        return self._grid_size
+
+    @property
+    def grid_bounds(self) -> Rectangle | None:
+        """Get the grid space occupied by this prop.
+        
+        For grid-aligned props, returns how map space size grid size prop occupies.
+        For non-grid props, just returns bounds.
+        
+        Returns:
+            Bounding grid rectangle in map units or None if not grid aligned
+        """
+        return self._grid_bounds
+
+    @property
+    def container(self) -> 'MapElement' | None:
+        """Get the container element for this prop."""
+        return self._container
+    
+    @property
+    def rotation(self) -> Rotation:
+        """Get the rotation of this prop."""
+        return self._rotation
+    
+    @property
+    def map(self) -> 'Map' | None:
+        """Get the map this prop belongs to."""
+        return self._map
+
     def _draw_content(self, canvas: skia.Canvas, bounds: Rectangle) -> None:
         """Draw the prop's content in local coordinates.
         
@@ -74,36 +128,34 @@ class Prop(ABC):
         """Draw the prop with proper coordinate transformation and styling."""
         with canvas.save():
             # Move to prop center
-            center = self._bounds.center()
+            draw_bounds = self._grid_bounds if self._grid_bounds is not None else self._bounds
+            center = draw_bounds.center()
             canvas.translate(center[0], center[1])
             
             # Apply rotation
             canvas.rotate(self.rotation.radians * (180 / math.pi))
             
-            # Create bounds rect centered at origin
-            bounds = Rectangle(
-                -self._width/2, -self._height/2,
-                self._width, self._height
-            )
-            
             # Draw additional content
-            self._draw_content(canvas, bounds)
+            self._draw_content(canvas, Rectangle(-draw_bounds.width/2, -draw_bounds.height/2, draw_bounds.width, draw_bounds.height))
             
     @property
     def position(self) -> Point:
         """Get the current position of the prop."""
-        return (self._x, self._y)
+        return self._grid_bounds.p1 if self._grid_bounds is not None else self._bounds.p1
         
     @position.setter 
     def position(self, pos: tuple[float, float]) -> None:
         """Set the position of the prop and update its shape."""
-        dx = pos[0] - self._x
-        dy = pos[1] - self._y
-        self._x, self._y = pos
+        old_pos = self.position
+        dx = pos[0] - old_pos._x
+        dy = pos[1] - old_pos._y
         # Translate the boundary shape to new position in-place
         self._boundary_shape.translate(dx, dy)
         # Update the bounds
         self._bounds = self._boundary_shape.bounds
+        # Update grid bounds if set
+        if self._grid_bounds is not None:
+            self._grid_bounds.translate(dx, dy)
 
     def snap_valid_position(self, x: float, y: float) -> Point | None:
         """Snap a position to the nearest valid position for this prop.
@@ -219,7 +271,7 @@ class Prop(ABC):
         For non-grid props, returns the position modulo grid size rounded down.
         
         Returns:
-            Tuple of (grid_x, grid_y) integer coordinates
+            Position of s
         """
         return self._grid_bounds.p1 if self._grid_bounds is not None else (self.x, self.y)
     
@@ -237,18 +289,10 @@ class Prop(ABC):
             self.position = (pos[0] * CELL_SIZE, pos[1] * CELL_SIZE)
             return
             
-        # Get offset from grid point to center
-        offset = self._get_grid_center_offset(self.rotation)
-        
-        # Calculate center position by adding offset to grid position
-        center_x = (pos[0] + offset[0]) * CELL_SIZE
-        center_y = (pos[1] + offset[1]) * CELL_SIZE
-        
-        # Set position based on calculated center
-        self.position = (
-            center_x - self._width/2,
-            center_y - self._height/2
-        )
+        offset_x = self._x - self._grid_bounds.x
+        offset_y = self._y - self._grid_bounds.y
+
+        self.position = (pos[0] * CELL_SIZE + offset_x, pos[1] * CELL_SIZE + offset_y)
     
     @property
     def center(self) -> Point:
@@ -317,31 +361,6 @@ class Prop(ABC):
         ...
 
     @classmethod
-    def grid_offset(self) -> Point | None:
-        """Get the offset from center to grid position for rotation 0.
-        
-        For grid-aligned props, this returns the offset from the prop's center
-        to its grid position when at 0 degree rotation (facing right).
-        For non-grid props, returns (0,0).
-        
-        Returns:
-            Point offsets in map units from top left to prop center in grid space or None if not grid alligned
-        """
-        return self._grid_offset
-
-    @property
-    def grid_bounds(self) -> Rectangle | None:
-        """Get the grid space occupied by this prop.
-        
-        For grid-aligned props, returns how map space size grid size prop occupies.
-        For non-grid props, just returns bounds.
-        
-        Returns:
-            Bounding grid rectangle in map units or None if not grid aligned
-        """
-        return self._grid_bounds
-
-    @classmethod
     @abstractmethod
     def prop_size(cls) -> Point:
         """Get the actual size of this prop in drawing units.
@@ -374,19 +393,12 @@ class Prop(ABC):
         return base_shape.rotated(rotation).translated(center[0], center[1])
 
     @classmethod
-    def _get_grid_center_offset(cls, rotation: Rotation) -> Point:
+    def _get_rotated_grid_offset(cls, grid_offset: Point, grid_size: Point, rotation: Rotation) -> Point:
         """Calculate offset from grid point to center based on rotation.
         
         For grid-aligned props, calculates the offset from the grid point
         to the prop's center point, accounting for rotation.
-        
-        The base offset (at rotation 0) is from the top-right corner of the grid.
-        This offset is then transformed based on rotation:
-        - ROT_0: Use base offset (x,y)
-        - ROT_90: Flip x,y coordinates
-        - ROT_180: Use (width-x, y)
-        - ROT_270: Use (x, height-y)
-        
+
         Args:
             rotation: Prop rotation
             
@@ -396,26 +408,36 @@ class Prop(ABC):
         Raises:
             ValueError: If prop_grid_size is not defined for grid-aligned props
         """
-        # Get base offset from top-right corner at rotation 0
-        base_offset = cls.grid_offset()
-        
-        # Get grid size and convert to drawing units
-        grid_size = cls.prop_grid_size()
-        if grid_size is None:
-            raise ValueError(f"Grid-aligned prop {cls.__name__} must specify prop_grid_size")
-            
         width = grid_size[0] * CELL_SIZE
         height = grid_size[1] * CELL_SIZE
         
         # Transform offset based on rotation
         if rotation == Rotation.ROT_0:
-            return base_offset
+            return grid_offset
         elif rotation == Rotation.ROT_90:
-            return (base_offset[1], base_offset[0])  # Flip x,y
+            return (grid_offset[1], grid_offset[0])  # Flip x,y
         elif rotation == Rotation.ROT_180:
-            return (width - base_offset[0], base_offset[1])
+            return (width - grid_offset[0], grid_offset[1])
         else:  # ROT_270
-            return (base_offset[0], height - base_offset[1])
+            return (grid_offset[0], height - grid_offset[1])
+
+    @classmethod
+    def _get_rotated_grid_size(cls, grid_size: Point, rotation: Rotation) -> Point:
+        """Returns the grid size rotated.
+
+        Args:
+            rotation: Prop rotation
+            
+        Returns:
+            Tuple of (offset_x, offset_y) in grid units
+            
+        Raises:
+            ValueError: If prop_grid_size is not defined for grid-aligned props
+        """
+        if rotation == Rotation.ROT_90 or rotation == Rotation.ROT_270:
+            return (grid_size[1], grid_size[0])
+        else:
+            return grid_size
 
     @classmethod
     def center_to_map_position(cls, center: Point, rotation: Rotation) -> Point:
@@ -485,12 +507,4 @@ class Prop(ABC):
             pos[1] + height/2
         )
 
-    @property
-    def shape(self) -> Shape:
-        """Get the boundary shape of this prop."""
-        return self._boundary_shape
         
-    @property
-    def bounds(self) -> Rectangle:
-        """Get the bounding rectangle of this prop."""
-        return self._bounds
