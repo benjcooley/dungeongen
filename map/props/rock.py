@@ -1,8 +1,7 @@
-from typing import List, TYPE_CHECKING
 import math
 import random
-
 import skia
+from typing import List, TYPE_CHECKING
 
 from algorithms.shapes import Circle, Shape
 from algorithms.types import Point
