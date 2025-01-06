@@ -30,26 +30,6 @@ class Rock(Prop):
         """Rocks are decorative floor items."""
         return True
         
-    @classmethod
-    def is_grid_aligned(cls) -> bool:
-        """Whether this prop should be aligned to the grid."""
-        return False
-        
-    @classmethod
-    def is_wall_aligned(cls) -> bool:
-        """Whether this prop should be aligned to room walls."""
-        return False
-        
-    @classmethod
-    def prop_size(cls) -> 'Point':
-        """Get the nominal size of this rock in drawing units."""
-        size = MEDIUM_ROCK_MAX_SIZE * 2 * CELL_SIZE  # Use maximum medium rock size as standard
-        return (size, size)  # Rocks are circular, so width = height
-        
-    @classmethod
-    def prop_grid_size(cls) -> tuple[float, float] | None:
-        """Rocks don't have a standard grid size."""
-        return None
     
     def __init__(self, center: Point, radius: float, rotation: Rotation = Rotation.ROT_0) -> None:
         """Initialize a rock with position and size.
@@ -144,13 +124,6 @@ class Rock(Prop):
                 
         return None
 
-    @classmethod
-    def get_prop_boundary_shape(cls) -> Shape | None:
-        """Get the rock's shape in local coordinates."""
-        # Return a circle sized between medium min/max
-        nominal_size = (MEDIUM_ROCK_MIN_SIZE + MEDIUM_ROCK_MAX_SIZE) / 2
-        radius = nominal_size * CELL_SIZE 
-        return Circle(0, 0, radius)
         
     def draw(self, canvas: skia.Canvas, layer: Layers = Layers.PROPS) -> None:
         """Draw the rock using a perturbed circular path on the specified layer."""
