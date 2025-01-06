@@ -297,7 +297,8 @@ class Prop(ABC):
     @property
     def center(self) -> Point:
         """Get the center position of the prop."""
-        return (self._x + self._width/2, self._y + self._height/2)
+        bounds = self._grid_bounds if self._grid_bounds is not None else self._bounds
+        return bounds.center()
         
     @center.setter
     def center(self, pos: tuple[float, float]) -> None:
@@ -306,13 +307,10 @@ class Prop(ABC):
         Args:
             pos: Tuple of (x,y) coordinates for the new center position
         """
-        # Calculate new top-left position from center
-        self._x = pos[0] - self._width/2
-        self._y = pos[1] - self._height/2
-        # Update the shape's position
-        self._boundary_shape = Rectangle(self._x, self._y, self._bounds.width, self._bounds.height)
-        # Update the bounds
-        self._bounds = self._shape.bounds
+        bounds = self._grid_bounds if self._grid_bounds is not None else self._bounds
+        dx = pos[0] - bounds.center()[0]
+        dy = pos[1] - bounds.center()[1]
+        self.position = (self.position[0] + dx, self.position[1] + dy)
 
     @classmethod
     def is_valid_position(cls, x: float, y: float, rotation: Rotation, container: 'MapElement') -> bool:
