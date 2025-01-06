@@ -362,12 +362,12 @@ class Prop(ABC):
         if (x == pos[0]) and (y == pos[1]):
             shape = self._boundary_shape
         else:
-            dx = pos[0] - x
-            dy = pos[1] - y
+            dx = x - pos[0]  # Fixed: Corrected direction of translation
+            dy = y - pos[1]
             shape = self._boundary_shape.make_translated(dx, dy)
 
         # Check if shape is contained within container
-        if not self.container.shape.contains_shape(shape):
+        if not self.container.contains_point(x, y):  # Changed to simpler point check
             return False
             
         # For non-decorative props, check intersection with other props
