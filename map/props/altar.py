@@ -13,9 +13,13 @@ from map.props.rotation import Rotation
 if TYPE_CHECKING:
     from map.map import Map
 
+# Constants for grid-based positioning
+GRID_ORIGIN_X = -0.5  # Grid origin X offset
+GRID_ORIGIN_Y = -0.5  # Grid origin Y offset
+
 # Constants for altar dimensions
-ALTAR_X = CELL_SIZE * 0.15  # Small margin from left edge
-ALTAR_Y = CELL_SIZE * 0.15  # Small margin from top edge
+ALTAR_X = CELL_SIZE * (GRID_ORIGIN_X + 0.15)  # Small margin from left edge
+ALTAR_Y = CELL_SIZE * (GRID_ORIGIN_Y + 0.15)  # Small margin from top edge
 ALTAR_WIDTH = CELL_SIZE * 0.3   # Width of altar surface
 ALTAR_HEIGHT = CELL_SIZE * 0.7  # Height of altar, leaving equal margins top/bottom
 
