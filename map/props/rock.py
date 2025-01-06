@@ -121,6 +121,17 @@ class Rock(Prop):
         canvas.drawPath(path, stroke_paint)
     
     @classmethod
+    def prop_size(cls) -> Point:
+        """Get the size of this prop in drawing units.
+        
+        Returns:
+            Tuple of (width, height) in drawing units
+        """
+        # Use maximum possible size for collision detection
+        max_size = MEDIUM_ROCK_MAX_SIZE * CELL_SIZE * 2
+        return (max_size, max_size)
+        
+    @classmethod
     def create_small(cls) -> 'Rock':
         """Create a small rock."""
         radius = random.uniform(SMALL_ROCK_MIN_SIZE, SMALL_ROCK_MAX_SIZE) * CELL_SIZE
