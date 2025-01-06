@@ -195,6 +195,17 @@ class MapElement:
             # For other layers, draw all props
             for prop in self._props:
                 prop.draw(canvas, layer)
+                
+        # Debug draw all prop boundary shapes
+        if layer == Layers.PROPS:
+            debug_paint = skia.Paint(
+                AntiAlias=True,
+                Style=skia.Paint.kStroke_Style,
+                StrokeWidth=1,
+                Color=skia.Color(255, 0, 0)  # Red
+            )
+            for prop in self._props:
+                prop.shape.draw(canvas, debug_paint)
     
     def prop_intersects(self, prop: 'Prop') -> list['Prop']:
         """Check if a prop intersects with any non-decoration props in this element.
