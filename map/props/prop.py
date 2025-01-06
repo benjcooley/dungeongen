@@ -256,7 +256,7 @@ class Prop(ABC):
             return None
             
         # For other props, just check if the original position is valid
-        if self.is_valid_position(x, y):
+        if self.is_valid_position(x, y, self.rotation, self.container):
             return (x, y)
             
         return None
@@ -346,7 +346,7 @@ class Prop(ABC):
         dy = pos[1] - bounds.center()[1]
         self.position = (self.position[0] + dx, self.position[1] + dy)
 
-    def is_valid_position(self, x: float, y: float) -> bool:
+    def is_valid_position(self, x: float, y: float, rotation: Rotation = None, container: 'MapElement' = None) -> bool:
         """Check if current position is valid.
 
         Returns:
@@ -367,7 +367,8 @@ class Prop(ABC):
             shape = self._boundary_shape.make_translated(dx, dy)
 
         # Check if shape is contained within container
-        if not self.container.contains_point(x, y):  # Changed to simpler point check
+        container = container or self.container
+        if not container.contains_point(x, y):  # Changed to simpler point check
             return False
             
         # For non-decorative props, check intersection with other props
