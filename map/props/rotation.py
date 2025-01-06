@@ -17,16 +17,27 @@ class Rotation(Enum):
         return math.radians(self.value)
         
     @classmethod
-    def from_radians(cls, radians: float) -> Union[float, 'Rotation']:
-        """Convert radians to rotation angle.
+    def from_radians(cls, radians: float) -> 'Rotation':
+        """Convert radians to nearest rotation angle.
         
         Args:
             radians: Angle in radians
             
         Returns:
-            The angle in radians as a float
+            Nearest Rotation enum value
         """
-        return radians
+        # Convert to degrees and normalize to 0-359
+        degrees = int(math.degrees(radians)) % 360
+        
+        # Map to nearest enum value
+        if degrees <= 45 or degrees > 315:
+            return cls.ROT_0
+        elif degrees <= 135:
+            return cls.ROT_90  
+        elif degrees <= 225:
+            return cls.ROT_180
+        else:  # degrees <= 315
+            return cls.ROT_270
         
     @classmethod
     def from_radians_snapped(cls, radians: float) -> 'Rotation':
