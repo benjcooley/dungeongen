@@ -149,8 +149,8 @@ class Prop(ABC):
     def position(self, pos: tuple[float, float]) -> None:
         """Set the position of the prop and update its shape."""
         old_pos = self.position
-        dx = pos[0] - old_pos._x
-        dy = pos[1] - old_pos._y
+        dx = pos[0] - old_pos[0]
+        dy = pos[1] - old_pos[1]
         # Translate the boundary shape to new position in-place
         self._boundary_shape.translate(dx, dy)
         # Update the bounds
