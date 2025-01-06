@@ -117,19 +117,16 @@ class Rock(Prop):
     def create_small(cls) -> 'Rock':
         """Create a small rock."""
         radius = random.uniform(SMALL_ROCK_MIN_SIZE, SMALL_ROCK_MAX_SIZE) * CELL_SIZE
-        rotation = random.uniform(0, 2 * math.pi)
-        return cls((0, 0), radius, Rotation.from_radians(rotation))
+        return cls((0, 0), radius)
         
     @classmethod
     def create_medium(cls) -> 'Rock':
         """Create a medium rock."""
         radius = random.uniform(MEDIUM_ROCK_MIN_SIZE, MEDIUM_ROCK_MAX_SIZE) * CELL_SIZE
-        rotation = random.uniform(0, 2 * math.pi)
-        return cls((0, 0), radius, rotation)
+        return cls((0, 0), radius)
         
     @classmethod
     def create_large(cls) -> 'Rock':
         """Create a large rock."""
         radius = random.uniform(MEDIUM_ROCK_MAX_SIZE, MEDIUM_ROCK_MAX_SIZE * 1.5) * CELL_SIZE
-        rotation = random.uniform(0, 2 * math.pi)
-        return cls((0, 0), radius, Rotation.from_radians(rotation))
+        return cls((0, 0), radius)
