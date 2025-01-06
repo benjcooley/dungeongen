@@ -39,7 +39,7 @@ class Altar(Prop):
             ALTAR_PROP_TYPE,
             position,
             ALTAR_PROP_TYPE.boundary_shape,
-            rotation=rotation,
+            rotation=Rotation.ROT_0,
             grid_size=(1, 1)
         )
     
@@ -75,8 +75,8 @@ class Altar(Prop):
         dot_radius = CELL_SIZE * 0.08
         # Draw dots relative to bounds
         center_x = 0  # Center in local coordinates
-        top_y = -bounds.height * 0.25  # 25% up from center
-        bottom_y = bounds.height * 0.25  # 25% down from center
+        top_y = -self.bounds.height * 0.25  # 25% up from center
+        bottom_y = self.bounds.height * 0.25  # 25% down from center
         canvas.drawCircle(center_x, top_y, dot_radius, dot_paint)
         canvas.drawCircle(center_x, bottom_y, dot_radius, dot_paint)
 
