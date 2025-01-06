@@ -2,22 +2,17 @@
 
 import skia
 from typing import TYPE_CHECKING
-from map.props.prop import Prop
+from map.props.prop import Prop, PropType
 from map.props.rotation import Rotation
 from graphics.conversions import grid_to_drawing, grid_to_drawing_size
 
 if TYPE_CHECKING:
     from map.map import Map
 
+COFFIN_PROP_TYPE = PropType(is_decoration=True)
+
 class Coffin(Prop):
     """A coffin-shaped prop with nested polygons."""
-    
-    @classmethod
-    def from_grid(cls, grid_x: float, grid_y: float, map_: 'Map', rotation: Rotation = Rotation.ROT_0) -> 'Coffin':
-        """Create a coffin using grid coordinates."""
-        x, y = grid_to_drawing(grid_x, grid_y, map_.options)
-        width, height = grid_to_drawing_size(1/3, 0.8, map_.options)
-        return cls(x, y, width, height, map_, rotation)
     
     def draw(self, canvas: skia.Canvas) -> None:
         canvas.save()

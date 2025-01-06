@@ -6,21 +6,23 @@ import skia
 from algorithms.shapes import Rectangle
 from algorithms.types import Point
 from constants import CELL_SIZE
-from graphics.conversions import grid_to_drawing
-from map.props.prop import Prop
+from map.props.prop import Prop, PropType
 from map.props.rotation import Rotation
 
 if TYPE_CHECKING:
     from map.map import Map
 
 # Constants for altar dimensions
+ALTAR_X = CELL_SIZE * 0.3  # Align closer to right side of cell
+ALTAR_Y = CELL_SIZE * 0.5  # Center vertically in cell
 ALTAR_WIDTH = CELL_SIZE * 0.3   # Width of altar surface
 ALTAR_HEIGHT = CELL_SIZE * 0.7  # Height of altar
-ALTAR_INSET = (CELL_SIZE - ALTAR_HEIGHT) / 2  # Calculated inset from cell edges
 
-# Alter position relative to top left of grid cell
-ALTAR_GRID_OFFSET_X = 0.3  # Align closer to right side of cell
-ALTAR_GRID_OFFSET_Y = 0.5  # Center vertically in cell
+ALTAR_PROP_TYPE = PropType(
+    is_grid_aligned=True,
+    boundary_shape=Rectangle(ALTAR_X, ALTAR_Y, ALTAR_WIDTH, ALTAR_HEIGHT),
+    grid_size=(1, 1)
+    )
 
 class Altar(Prop):
     """An altar prop that appears as a small rectangular table with decorative dots."""
@@ -32,26 +34,22 @@ class Altar(Prop):
         """Initialize an altar prop.
         
         Args:
-            center_x: Center X coordinate in drawing units
-            center_y: Center Y coordinate in drawing units
+            grid_x: Grid X coordinate in map grid units
+            grid_y: Grid Y coordinate in map grid units
             map_: Parent map instance
             rotation: Rotation angle in 90° increments (default: facing right)
         """
-        position = grid_to_drawing((grid_x, grid_y), self._map.options)
-        boundary_shape = Rectangle(
-            ALTAR_GRID_OFFSET_X,
-            ALTAR_GRID_OFFSET_Y,
-            ALTAR_WIDTH,
-            ALTAR_HEIGHT
-        )
-        super().__init__(position, boundary_shape, rotation, grid_size=(1, 1))
+        super().__init__(
+            ALTAR_PROP_TYPE
+            (grid_x * CELL_SIZE, grid_y * CELL_SIZE), 
+            ALTAR_PROP_TYPE.boundary_shape, 
+            rotation=rotation, 
+            grid_size=Altar.grid_size)
     
-    @classmethod
-    def is_decoration(cls) -> bool:
-        """Altars are not decorative - they're major props."""
-        return False
-        
     def _draw_content(self, canvas: skia.Canvas, bounds: Rectangle) -> None:
+
+        # Draw right facing version (this is moved, rotated by draw() method)
+
         # Draw fill
         fill_paint = skia.Paint(
             AntiAlias=True,
@@ -69,7 +67,7 @@ class Altar(Prop):
         )
         self.shape.draw(canvas, outline_paint)
         
-        # Draw decorative dots
+        # Draw candle dots
         dot_paint = skia.Paint(
             AntiAlias=True,
             Style=skia.Paint.kFill_Style,
@@ -81,3 +79,25 @@ class Altar(Prop):
         bottom_y = self.bounds.center[1] + 0.3
         canvas.drawCircle(center_x, top_y, dot_radius, dot_paint)
         canvas.drawCircle(center_x, bottom_y, dot_radius, dot_paint)
+
+    # Overridable class methods
+    
+    @classmethod
+    def is_grid_aligned(cls) -> bool:
+        """Altars are not decorative - they're major props."""
+        return False
+
+    @classmethod
+    def boundary_shape(cls) -> Rectangle:
+        """Get the boundary shape for this prop."""
+        return Rectangle(
+            ALTAR_X,
+            ALTAR_Y,
+            ALTAR_WIDTH,
+            ALTAR_HEIGHT
+        )
+
+    @classmethod
+    def grid_size(cls) -> Point:
+        """Get the size of this prop in grid units."""
+        return Point(1, 1)

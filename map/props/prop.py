@@ -1,5 +1,6 @@
 """Base class for map props."""
 
+from dataclasses import dataclass
 import math
 import math
 import random
@@ -23,6 +24,14 @@ if TYPE_CHECKING:
 if TYPE_CHECKING:
     from map.map import Map
 
+@dataclass
+class PropType:
+    is_decoration: bool = False
+    is_wall_aligned: bool = False
+    is_grid_aligned: bool = False
+    grid_size: Point | None = None
+    boundary_shape: Shape | None = None
+    
 class Prop(ABC):
     """Base class for decorative map props.
     
@@ -32,8 +41,9 @@ class Prop(ABC):
     """
     
     def __init__(self, 
+                 prop_type: PropType,                    
                  position: Point,
-                 boundary_shape: Shape, 
+                 boundary_shape: Shape,               
                  rotation: Rotation = Rotation.ROT_0,
                  grid_size: Point | None = None) -> None:
         """
@@ -41,12 +51,15 @@ class Prop(ABC):
         has the prop facing right. Rotation happens counterclockwise in 90° increments.
         
         Args:
+            prop_type: Type info for the prop
             position: Position to place prop in map units
             boundary_shape: Shape defining the prop's collision boundary, centered at (0,0) at rotation 0
             rotation: Rotation angle in 90° increments (default: facing right)
             grid_size: Optional size in grid units prop occupies if prop is grid aligned
         """
+        self.prop_type = prop_type
         self._boundary_shape = boundary_shape.make_rotated(rotation)
+        self._prop_type = prop_type
         if (grid_size is not None):
             if rotation == Rotation.ROT_90 or rotation == Rotation.ROT_270:
                 self._boundary_shape.translate(grid_size[1] * CELL_SIZE / 2, grid_size[0] * CELL_SIZE / 2)
@@ -68,6 +81,11 @@ class Prop(ABC):
         self._map: Optional['Map'] = None
         self._container: Optional['MapElement'] = None
     
+    @property
+    def prop_type(self) -> PropType:
+        """Get the type info of the prop."""
+        return self._prop_type
+
     @property
     def shape(self) -> Shape:
         """Get the boundary shape of this prop."""
@@ -113,8 +131,13 @@ class Prop(ABC):
     def map(self) -> Union['Map', None]:
         """Get the map this prop belongs to."""
         return self._map
+    
+    @property
+    def should_snap(self) -> bool:
+        """Check if this prop should snap to positions."""
+        return self.prop_type.is_grid_aligned or self.prop_type.is_wall_aligned
 
-    def _draw_content(self, canvas: skia.Canvas, bounds: Rectangle) -> None:
+    def _draw_content(self, canvas: skia.Canvas, bounds: Rectangle, layer: Layers) -> None:
         """Draw the prop's content in local coordinates.
         
         This method should be implemented by subclasses to draw their specific content.
@@ -177,7 +200,7 @@ class Prop(ABC):
             return None
             
         # Handle wall-aligned props
-        if self.is_wall_aligned() and isinstance(self.container._shape, Rectangle):
+        if self.prop_type.is_wall_aligned and isinstance(self.container._shape, Rectangle):
             room_bounds = self.container._shape.bounds
             prop_bounds = self.shape.bounds
             prop_width = prop_bounds.width
@@ -218,7 +241,7 @@ class Prop(ABC):
             return None
             
         # Handle grid-aligned props
-        if self.is_grid_aligned():
+        if self.prop_type.is_grid_aligned:
             # Snap to nearest grid intersection
             grid_x = round(x / CELL_SIZE) * CELL_SIZE
             grid_y = round(y / CELL_SIZE) * CELL_SIZE
@@ -264,7 +287,7 @@ class Prop(ABC):
                     self.position = pos
                 return pos
             else:
-                if self.is_valid_position():
+                if self.is_valid_position(x, y):
                     self.position = (x, y)
                     return (x, y)
                 
@@ -292,7 +315,7 @@ class Prop(ABC):
         Args:
             pos: Tuple of (grid_x, grid_y) coordinates
         """
-        if not self.is_grid_aligned():
+        if not self.prop_type.is_grid_aligned:
             self.position = (pos[0] * CELL_SIZE, pos[1] * CELL_SIZE)
             return
             
@@ -326,7 +349,7 @@ class Prop(ABC):
             True if position is valid, False otherwise
         """
         # For grid-aligned props, ensure the shape's top-left corner aligns to grid
-        if self.is_grid_aligned():
+        if self.prop_type.is_grid_aligned:
             if (x % CELL_SIZE != 0) or (y % CELL_SIZE != 0):
                 return False
         
@@ -352,45 +375,6 @@ class Prop(ABC):
                         return False
                     
         return True
-
-    @classmethod
-    @abstractmethod
-    def is_decoration(cls) -> bool:
-        """Whether this prop is a decoration that should be drawn before other props.
-        
-        Decoration props are small floor items like rocks and cracks that don't
-        need to check intersection with other props.
-        """
-        ...
-        
-    @property
-    @abstractmethod
-    def is_wall_aligned(self) -> bool:
-        """Whether this prop should be aligned to walls when placed.
-        
-        Wall-aligned props will snap to the nearest wall when placed.
-        Must be implemented by subclasses.
-        """
-        ...
-    
-    @property
-    def should_snap(self) -> bool:
-        """Whether this prop should snap to grid or walls when placed.
-        
-        Returns True if prop is either wall-aligned or grid-aligned.
-        Can be overridden by subclasses for custom snapping behavior.
-        """
-        return self.is_wall_aligned() or self.is_grid_aligned()
-        
-    @property
-    @abstractmethod
-    def is_grid_aligned(self) -> bool:
-        """Whether this prop should be aligned to the grid when placed.
-        
-        Grid-aligned props will snap to grid intersections.
-        Must be implemented by subclasses.
-        """
-        ...
 
     @classmethod
     def _get_rotated_grid_offset(cls, grid_offset: Point, grid_size: Point, rotation: Rotation) -> Point:
@@ -438,5 +422,3 @@ class Prop(ABC):
             return (grid_size[1], grid_size[0])
         else:
             return grid_size
-
-        

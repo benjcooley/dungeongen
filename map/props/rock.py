@@ -3,11 +3,11 @@ import random
 import skia
 from typing import List, TYPE_CHECKING
 
-from algorithms.shapes import Circle, Shape
+from algorithms.shapes import Circle, Rectangle, Shape
 from algorithms.types import Point
 from constants import CELL_SIZE
 from map.enums import Layers, RockType
-from map.props.prop import Prop
+from map.props.prop import Prop, PropType
 from map.props.rotation import Rotation
 
 if TYPE_CHECKING:
@@ -20,25 +20,12 @@ SMALL_ROCK_MAX_SIZE = 1/10
 MEDIUM_ROCK_MIN_SIZE = 1/10
 MEDIUM_ROCK_MAX_SIZE = 1/6
 
+ROCK_PROP_TYPE = PropType(is_decoration=True)
+
 class Rock(Prop):
     """A rock prop with irregular circular shape."""
     
-    @classmethod
-    def is_decoration(cls) -> bool:
-        """Rocks are decorative floor items."""
-        return True
-        
-    @property
-    def is_wall_aligned(self) -> bool:
-        """Rocks are not wall-aligned."""
-        return False
-        
-    @property 
-    def is_grid_aligned(self) -> bool:
-        """Rocks are not grid-aligned."""
-        return False
-    
-    def __init__(self, center: Point, radius: float, rotation: Rotation = Rotation.ROT_0) -> None:
+    def __init__(self, center: Point, radius: float) -> None:
         """Initialize a rock with position and size.
         
         Args:
@@ -50,7 +37,7 @@ class Rock(Prop):
         boundary = Circle(0, 0, radius)
         
         # Initialize prop with center position and boundary
-        super().__init__(center, boundary, rotation)
+        super().__init__(ROCK_PROP_TYPE, center, boundary)
         
         # Store rock-specific properties
         self._radius = radius
@@ -77,10 +64,8 @@ class Rock(Prop):
             points.append((x, y))
             
         return points
-
-
         
-    def draw(self, canvas: skia.Canvas, layer: Layers = Layers.PROPS) -> None:
+    def _draw_context(self, canvas: skia.Canvas, bounds: Rectangle, layer: Layers) -> None:
         """Draw the rock using a perturbed circular path on the specified layer."""
         if layer != Layers.PROPS:
             return
@@ -127,17 +112,6 @@ class Rock(Prop):
             StrokeJoin=skia.Paint.kRound_Join
         )
         canvas.drawPath(path, stroke_paint)
-    
-    @classmethod
-    def prop_size(cls) -> Point:
-        """Get the size of this prop in drawing units.
-        
-        Returns:
-            Tuple of (width, height) in drawing units
-        """
-        # Use maximum possible size for collision detection
-        max_size = MEDIUM_ROCK_MAX_SIZE * CELL_SIZE * 2
-        return (max_size, max_size)
         
     @classmethod
     def create_small(cls) -> 'Rock':
