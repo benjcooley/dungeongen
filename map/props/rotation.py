@@ -2,6 +2,7 @@
 
 import math
 from enum import Enum
+from typing import Union
 
 class Rotation(Enum):
     """Rotation angles for props in 90-degree increments."""
@@ -16,7 +17,19 @@ class Rotation(Enum):
         return math.radians(self.value)
         
     @classmethod
-    def from_radians(cls, radians: float) -> 'Rotation':
+    def from_radians(cls, radians: float) -> Union[float, 'Rotation']:
+        """Convert radians to rotation angle.
+        
+        Args:
+            radians: Angle in radians
+            
+        Returns:
+            The angle in radians as a float
+        """
+        return radians
+        
+    @classmethod
+    def from_radians_snapped(cls, radians: float) -> 'Rotation':
         """Convert radians to nearest 90-degree rotation.
         
         Args:

@@ -132,7 +132,7 @@ class Rock(Prop):
         """Create a medium rock."""
         radius = random.uniform(MEDIUM_ROCK_MIN_SIZE, MEDIUM_ROCK_MAX_SIZE) * CELL_SIZE
         rotation = random.uniform(0, 2 * math.pi)
-        return cls((0, 0), radius, Rotation.from_radians(rotation))
+        return cls((0, 0), radius, rotation)
         
     @classmethod
     def create_large(cls) -> 'Rock':
