@@ -121,41 +121,22 @@ class Rock(Prop):
         canvas.drawPath(path, stroke_paint)
     
     @classmethod
-    def add_rocks_to(cls, container: 'MapElement', count: int, rock_type: RockType = RockType.ANY) -> None:
-        """Add a specified number of rocks to a map element.
+    def create_small(cls) -> 'Rock':
+        """Create a small rock."""
+        radius = random.uniform(SMALL_ROCK_MIN_SIZE, SMALL_ROCK_MAX_SIZE) * CELL_SIZE
+        rotation = random.uniform(0, 2 * math.pi)
+        return cls((0, 0), radius, Rotation.from_radians(rotation))
         
-        Args:
-            container: The MapElement to add rocks to
-            count: Number of rocks to add
-            rock_type: Type of rocks to add (defaults to ANY which randomly selects types)
-            
-        Note: Does nothing if container is a Door element.
-        """
-        from map.door import Door
+    @classmethod
+    def create_medium(cls) -> 'Rock':
+        """Create a medium rock."""
+        radius = random.uniform(MEDIUM_ROCK_MIN_SIZE, MEDIUM_ROCK_MAX_SIZE) * CELL_SIZE
+        rotation = random.uniform(0, 2 * math.pi)
+        return cls((0, 0), radius, Rotation.from_radians(rotation))
         
-        # Skip if this is a door
-        if isinstance(container, Door):
-            return
-            
-        for _ in range(count):
-            # Determine rock type
-            actual_type = rock_type if rock_type != RockType.ANY else RockType.random_type()
-            
-            # Random rotation
-            rotation = random.uniform(0, 2 * math.pi)
-            
-            # Get random radius within range for rock type
-            if actual_type == RockType.SMALL:
-                final_radius = random.uniform(SMALL_ROCK_MIN_SIZE, SMALL_ROCK_MAX_SIZE) * CELL_SIZE
-            else:
-                final_radius = random.uniform(MEDIUM_ROCK_MIN_SIZE, MEDIUM_ROCK_MAX_SIZE) * CELL_SIZE
-            
-            # Create rock at origin first
-            rock = cls((0, 0), final_radius, Rotation.from_radians(rotation))
-            
-            # Try to place it in the container
-            container.add_prop(rock)
-            # Find valid position
-            if rock.place_random_position() is None:
-                # Remove if no valid position found
-                container.remove_prop(rock)
+    @classmethod
+    def create_large(cls) -> 'Rock':
+        """Create a large rock."""
+        radius = random.uniform(MEDIUM_ROCK_MAX_SIZE, MEDIUM_ROCK_MAX_SIZE * 1.5) * CELL_SIZE
+        rotation = random.uniform(0, 2 * math.pi)
+        return cls((0, 0), radius, Rotation.from_radians(rotation))

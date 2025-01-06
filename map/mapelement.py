@@ -30,6 +30,60 @@ class MapElement:
         self._options = map_.options
         self._props: List['Prop'] = []
         
+    def create_props(self, prop_type: 'PropType', min_count: int = 1, max_count: int = 1, options: dict = None) -> list['Prop']:
+        """Create and add multiple props of the specified type.
+        
+        Args:
+            prop_type: Type of prop to create
+            min_count: Minimum number of props to create
+            max_count: Maximum number of props to create
+            options: Optional dict of prop-specific options
+            
+        Returns:
+            List of successfully placed props
+        """
+        from map.props.rock import Rock  # Avoid circular import
+        
+        count = random.randint(min_count, max_count)
+        placed_props = []
+        
+        # Create and try to place each prop
+        for _ in range(count):
+            if prop := self.create_prop(prop_type, options):
+                placed_props.append(prop)
+                
+        return placed_props
+        
+    def create_prop(self, prop_type: 'PropType', options: dict = None) -> Optional['Prop']:
+        """Create and add a single prop of the specified type.
+        
+        Args:
+            prop_type: Type of prop to create
+            options: Optional dict of prop-specific options
+            
+        Returns:
+            The created prop if successfully placed, None otherwise
+        """
+        from map.props.rock import Rock  # Avoid circular import
+        
+        # Create prop based on type
+        if prop_type == PropType.SMALL_ROCK:
+            prop = Rock.create_small()
+        elif prop_type == PropType.MEDIUM_ROCK:
+            prop = Rock.create_medium()
+        elif prop_type == PropType.LARGE_ROCK:
+            prop = Rock.create_large()
+        else:
+            raise ValueError(f"Unsupported prop type: {prop_type}")
+            
+        # Try to add and place the prop
+        self.add_prop(prop)
+        if prop.place_random_position() is None:
+            self.remove_prop(prop)
+            return None
+            
+        return prop
+        
     def add_prop(self, prop: 'Prop') -> None:
         """Add a prop to this element at its current position.
         
