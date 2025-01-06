@@ -369,7 +369,7 @@ class Prop(ABC):
         if not self.prop_type.is_decoration:
             for prop in self.container._props:
                 if prop is not self and \
-                    not prop.__class__.is_decoration() and \
+                    not prop.prop_type.is_decoration and \
                     prop.shape.intersects(shape):
                         return False
                     

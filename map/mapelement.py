@@ -175,7 +175,7 @@ class MapElement:
         if layer == Layers.PROPS:
             # Draw decoration props first
             for prop in self._props:
-                if prop.__class__.is_decoration():
+                if prop.prop_type.is_decoration:
                     prop.draw(canvas)
                     
             # Then draw non-decoration props
