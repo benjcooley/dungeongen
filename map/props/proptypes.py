@@ -3,10 +3,11 @@
 from enum import StrEnum, auto
 from typing import TYPE_CHECKING, Type
 
+from map.props.rotation import Rotation
+
 if TYPE_CHECKING:
     from map.props.prop import Prop
     from map.props.rock import Rock
-    from map.props.rotation import Rotation
 
 class PropType(StrEnum):
     """Available prop types that can be added to map elements."""
