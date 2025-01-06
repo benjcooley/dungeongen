@@ -155,7 +155,7 @@ class Prop(ABC):
         
         # Move to prop center
         draw_bounds = self._grid_bounds if self._grid_bounds is not None else self._bounds
-        center = draw_bounds.center()
+        center = draw_bounds.center
         canvas.translate(center[0], center[1])
         
         # Apply rotation (skia uses degrees, Rotation gives radians)
