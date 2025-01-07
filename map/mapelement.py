@@ -55,18 +55,15 @@ class MapElement:
                 
         return placed_props
         
-    def create_prop(self, prop_type: 'PropType', options: dict = None) -> Optional['Prop']:
-        """Create and add a single prop of the specified type.
+    def create_prop(self, prop_type: 'PropType') -> Optional['Prop']:
+        """Create a single prop of the specified type.
         
         Args:
             prop_type: Type of prop to create
-            options: Optional dict of prop-specific options
             
         Returns:
             The created prop if successfully placed, None otherwise
         """
-        from map.props.rock import Rock  # Avoid circular import
-        
         # Create prop based on type
         if prop_type == PropType.SMALL_ROCK:
             prop = Rock.create_small()

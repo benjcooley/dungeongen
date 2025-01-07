@@ -52,11 +52,11 @@ def main():
     # Add props to rooms and passage
     # Add random props to start room
     start_room.create_random_props([PropType.ALTAR], min_count=0, max_count=3)
-    start_room.create_props(PropType.MEDIUM_ROCK, max_count=4)
-    start_room.create_props(PropType.SMALL_ROCK, max_count=2)
+    start_room.create_random_props([PropType.MEDIUM_ROCK], min_count=0, max_count=4)
+    start_room.create_random_props([PropType.SMALL_ROCK], min_count=0, max_count=2)
     
-    end_room.create_props(PropType.MEDIUM_ROCK, max_count=2)
-    end_room.create_props(PropType.SMALL_ROCK, max_count=2)
+    end_room.create_random_props([PropType.MEDIUM_ROCK], min_count=0, max_count=2)
+    end_room.create_random_props([PropType.SMALL_ROCK], min_count=0, max_count=2)
     
     passage.create_props(PropType.SMALL_ROCK, max_count=3)
 
