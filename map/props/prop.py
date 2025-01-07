@@ -62,21 +62,13 @@ class Prop(ABC):
         if grid_size is None:
             grid_size = prop_type.grid_size
         self._prop_type = prop_type
-        print(f"Debug: Initializing {self.__class__.__name__}")
-        print(f"Debug: Initial position: {position}")
-        bounds = boundary_shape.bounds
-        print(f"Debug: Initial boundary shape bounds: x={bounds.x:.1f}, y={bounds.y:.1f}, w={bounds.width:.1f}, h={bounds.height:.1f}")
-        
         # First rotate the boundary shape
         self._boundary_shape = boundary_shape.make_rotated(rotation)
-        bounds = self._boundary_shape.bounds
-        print(f"Debug: After rotation bounds: x={bounds.x:.1f}, y={bounds.y:.1f}, w={bounds.width:.1f}, h={bounds.height:.1f}")
         
         # Calculate bounds before any translation
         self._bounds = self._boundary_shape.bounds
         
         if grid_size is not None:
-            print(f"Debug: Grid size: {grid_size}")
             # For grid-aligned props, handle grid positioning
             if rotation == Rotation.ROT_90 or rotation == Rotation.ROT_270:
                 self._grid_size = (grid_size[1], grid_size[0])
@@ -86,7 +78,6 @@ class Prop(ABC):
                 self._grid_size = (grid_size[0], grid_size[1])
                 self._grid_bounds = Rectangle(position[0], position[1], 
                                            grid_size[0] * CELL_SIZE, grid_size[1] * CELL_SIZE)
-            print(f"Debug: Grid bounds: {self._grid_bounds}")
             # Don't multiply by CELL_SIZE here since grid_bounds is already in map units
             self._boundary_shape.translate(self._grid_bounds.width / 2, self._grid_bounds.height / 2)
         else:
