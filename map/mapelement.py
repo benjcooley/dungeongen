@@ -207,7 +207,8 @@ class MapElement:
             for prop in self._props:
                 print(f"Debug drawing prop: {prop.__class__.__name__}")
                 print(f"Prop shape: {prop.shape.__class__.__name__}")
-                print(f"Prop bounds: {prop.shape.bounds}")
+                bounds = prop.shape.bounds
+                print(f"Prop bounds: x={bounds.x:.1f}, y={bounds.y:.1f}, w={bounds.width:.1f}, h={bounds.height:.1f}")
                 prop.shape.draw(canvas, debug_paint)
                 
     def prop_intersects(self, prop: 'Prop') -> list['Prop']:
