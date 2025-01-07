@@ -195,8 +195,7 @@ class Room(MapElement):
                 # Place columns at each grid intersection within margins
                 for x in range(int(start_x), int(end_x + 1)):
                     for y in range(int(start_y), int(end_y + 1)):
-                        column = Column.create_square(x * CELL_SIZE, y * CELL_SIZE)
-                        self.add_prop(column)
+                        column = Column.create_square(rect.x + x * CELL_SIZE, rect.y + y * CELL_SIZE)
                         columns.append(column)
                             
             elif arrangement == ColumnArrangement.RECTANGLE:
@@ -204,15 +203,13 @@ class Room(MapElement):
                 # Top and bottom rows
                 for x in range(int(start_x), int(end_x + 1)):
                     for y in (int(start_y), int(end_y)):
-                        column = Column.create_square(x * CELL_SIZE, y * CELL_SIZE)
-                        self.add_prop(column)
+                        column = Column.create_square(rect.x + x * CELL_SIZE, rect.y + y * CELL_SIZE)
                         columns.append(column)
                 
                 # Left and right columns (excluding corners)
                 for y in range(int(start_y + 1), int(end_y)):
                     for x in (start_x, end_x):
-                        column = Column.create_square(x * CELL_SIZE, y * CELL_SIZE)
-                        self.add_prop(column)
+                        column = Column.create_square(rect.x + x * CELL_SIZE, rect.y + y * CELL_SIZE)
                         columns.append(column)
                             
             elif arrangement == ColumnArrangement.ROWS:
@@ -238,8 +235,7 @@ class Room(MapElement):
                     # Place columns along each row
                     for x in range(int(start_x), int(end_x + 1)):
                         for y in (row1, row2):
-                            column = Column.create_square(x * CELL_SIZE, y * CELL_SIZE)
-                            self.add_prop(column)
+                            column = Column.create_square(rect.x + x * CELL_SIZE, rect.y + y * CELL_SIZE)
                             columns.append(column)
                 else:  # VERTICAL
                     # Calculate total available width
@@ -262,8 +258,7 @@ class Room(MapElement):
                     # Place columns along each column
                     for y in range(int(start_y), int(end_y + 1)):
                         for x in (col1, col2):
-                            column = Column.create_square(x * CELL_SIZE, y * CELL_SIZE)
-                            self.add_prop(column)
+                            column = Column.create_square(rect.x + x * CELL_SIZE, rect.y + y * CELL_SIZE)
                             columns.append(column)
                                 
             return columns
