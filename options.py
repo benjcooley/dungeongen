@@ -57,8 +57,8 @@ class Options:
     prop_fill_color: int = 0xFFFFFFFF  # White for prop fill (same as room_color)
     prop_outline_color: int = 0xFF000000  # Black for prop outline (same as border_color)
     prop_stroke_width: float = 2.0  # Width of prop borders (thinner than door_stroke_width)
-    room_shadow_offset_x: float = 10.0   # Shadow x offset in pixels (positive for left)
-    room_shadow_offset_y: float = 14.0  # Shadow y offset in pixels (positive for up)
+    room_shadow_offset_x: float = 6.0   # Shadow x offset in pixels (positive for left)
+    room_shadow_offset_y: float = 8.0  # Shadow y offset in pixels (positive for up)
     
     # Grid options
     grid_style: 'GridStyle' = GridStyle.DOTS  # Grid drawing style using dots
