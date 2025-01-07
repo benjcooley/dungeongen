@@ -52,7 +52,9 @@ class Column(Prop):
         if self._column_type == ColumnType.ROUND:
             shape = Circle(0, 0, COLUMN_SIZE/2)
         else:
+            # For square columns, rotate the shape
             shape = Rectangle(-COLUMN_SIZE/2, -COLUMN_SIZE/2, COLUMN_SIZE, COLUMN_SIZE)
+            shape.rotate(self.rotation)
             
         if layer == Layers.SHADOW:
             # Draw slightly inflated shadow shape
