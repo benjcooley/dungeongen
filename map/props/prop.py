@@ -64,11 +64,13 @@ class Prop(ABC):
         self._prop_type = prop_type
         print(f"Debug: Initializing {self.__class__.__name__}")
         print(f"Debug: Initial position: {position}")
-        print(f"Debug: Initial boundary shape bounds: {boundary_shape.bounds}")
+        bounds = boundary_shape.bounds
+        print(f"Debug: Initial boundary shape bounds: x={bounds.x:.1f}, y={bounds.y:.1f}, w={bounds.width:.1f}, h={bounds.height:.1f}")
         
         # First rotate the boundary shape
         self._boundary_shape = boundary_shape.make_rotated(rotation)
-        print(f"Debug: After rotation bounds: {self._boundary_shape.bounds}")
+        bounds = self._boundary_shape.bounds
+        print(f"Debug: After rotation bounds: x={bounds.x:.1f}, y={bounds.y:.1f}, w={bounds.width:.1f}, h={bounds.height:.1f}")
         
         # Calculate bounds before any translation
         self._bounds = self._boundary_shape.bounds
