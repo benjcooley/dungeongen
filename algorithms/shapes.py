@@ -459,32 +459,21 @@ class Rectangle:
 
     def draw(self, canvas: skia.Canvas, paint: skia.Paint) -> None:
         """Draw this rectangle on a canvas with proper inflation."""
+        # Create the Skia rect with inflated dimensions
+        rect = skia.Rect.MakeXYWH(
+            self._inflated_x,
+            self._inflated_y,
+            self._inflated_width,
+            self._inflated_height
+        )
+        
         if self._inflate > 0:
             # Draw as rounded rectangle
-            canvas.drawRRect(
-                skia.RRect.MakeRectXY(
-                    skia.Rect.MakeXYWH(
-                        self._inflated_x,
-                        self._inflated_y,
-                        self._inflated_width,
-                        self._inflated_height
-                    ),
-                    self._inflate,  # x radius
-                    self._inflate   # y radius
-                ),
-                paint
-            )
+            rrect = skia.RRect.MakeRectXY(rect, self._inflate, self._inflate)
+            canvas.drawRRect(rrect, paint)
         else:
             # Draw as regular rectangle
-            canvas.drawRect(
-                skia.Rect.MakeXYWH(
-                    self._inflated_x,
-                    self._inflated_y,
-                    self._inflated_width,
-                    self._inflated_height
-                ),
-                paint
-            )
+            canvas.drawRect(rect, paint)
     
     def inflated(self, amount: float) -> 'Rectangle':
         """Return a new rectangle inflated by the given amount."""
