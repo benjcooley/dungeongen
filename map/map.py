@@ -336,8 +336,8 @@ class Map:
             )
             canvas.save()
             canvas.translate(
-                self.options.room_shadow_offset_x,
-                self.options.room_shadow_offset_y
+                self.options.room_shadow_offset_x + self.options.border_width,
+                self.options.room_shadow_offset_y + self.options.border_width
             )
             region.shape.draw(canvas, room_paint)
             canvas.restore()
