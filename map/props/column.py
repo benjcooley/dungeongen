@@ -21,17 +21,13 @@ COLUMN_SIZE = CELL_SIZE / 2
 
 # Prop types for each column variant
 ROUND_COLUMN_TYPE = PropType(
-    is_grid_aligned=True,
     boundary_shape=Circle(0, 0, COLUMN_SIZE/2),
-    grid_size=(1, 1),
-    is_wall_aligned=False
+    grid_size=(1, 1)
 )
 
 SQUARE_COLUMN_TYPE = PropType(
-    is_grid_aligned=True,
     boundary_shape=Rectangle(-COLUMN_SIZE/2, -COLUMN_SIZE/2, COLUMN_SIZE, COLUMN_SIZE),
-    grid_size=(1, 1),
-    is_wall_aligned=False
+    grid_size=(1, 1)
 )
 
 class Column(Prop):
