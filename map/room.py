@@ -5,12 +5,14 @@ from typing import List, TYPE_CHECKING, Tuple, Optional
 
 import random
 import skia
+import math
 
 from algorithms.math import Point2D
 from algorithms.shapes import Rectangle, Circle, Shape
 from graphics.conversions import grid_to_drawing, grid_to_drawing_size
 from map.enums import Layers
 from map.mapelement import MapElement
+from map.props.columnarrangement import ColumnArrangement, RowOrientation
 from constants import CELL_SIZE
 
 # Constant to make rooms slightly larger to ensure proper passage connections
