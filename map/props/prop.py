@@ -251,11 +251,11 @@ class Prop(ABC):
             if self.rotation == Rotation.ROT_0:
                 wall = 'left'
             elif self.rotation == Rotation.ROT_90:
-                wall = 'bottom'
+                wall = 'top'
             elif self.rotation == Rotation.ROT_180:
                 wall = 'right'
             elif self.rotation == Rotation.ROT_270:
-                wall = 'top'
+                wall = 'bottom'
                 
             print(f"Selected wall: {wall}")
             if wall:
