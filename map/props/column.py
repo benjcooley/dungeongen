@@ -90,11 +90,11 @@ class Column(Prop):
             shape.draw(canvas, outline_paint)
 
     @classmethod
-    def create_round(cls) -> 'Column':
+    def create_round(cls, x: float, y: float) -> 'Column':
         """Create a round column prop at origin."""
-        return cls((0, 0), ColumnType.ROUND)
+        return cls((x, y), ColumnType.ROUND)
         
     @classmethod
-    def create_square(cls) -> 'Column':
+    def create_square(cls, x: float, y: float, angle: float = 0) -> 'Column':
         """Create a square column prop at origin."""
-        return cls((0, 0), ColumnType.SQUARE)
+        return cls((x, y), ColumnType.SQUARE, rotation=Rotation.from_degrees(angle))
