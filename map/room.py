@@ -223,18 +223,32 @@ class Room(MapElement):
             elif arrangement == ColumnArrangement.ROWS:
                 # Place columns in parallel rows
                 if orientation == RowOrientation.HORIZONTAL:
-                    # Two horizontal rows
-                    for x in range(int(start_x), int(end_x + 1)):
-                        for y in (start_y, end_y):
+                    # Calculate row positions at 1/3 and 2/3 of height
+                    row1 = start_y + (end_y - start_y) / 3
+                    row2 = start_y + 2 * (end_y - start_y) / 3
+                    # Round to nearest grid position
+                    row1 = round(row1)
+                    row2 = round(row2)
+                    
+                    # Place columns along each row
+                    for x in range(math.ceil(start_x), math.floor(end_x + 1)):
+                        for y in (row1, row2):
                             column = Column.create_square()
                             if self.add_prop(column):
                                 pos = self.get_grid_position(x, y)
                                 column.position = pos
                                 columns.append(column)
                 else:  # VERTICAL
-                    # Two vertical rows
-                    for y in range(int(start_y), int(end_y + 1)):
-                        for x in (start_x, end_x):
+                    # Calculate column positions at 1/3 and 2/3 of width
+                    col1 = start_x + (end_x - start_x) / 3
+                    col2 = start_x + 2 * (end_x - start_x) / 3
+                    # Round to nearest grid position
+                    col1 = round(col1)
+                    col2 = round(col2)
+                    
+                    # Place columns along each column
+                    for y in range(math.ceil(start_y), math.floor(end_y + 1)):
+                        for x in (col1, col2):
                             column = Column.create_square()
                             if self.add_prop(column):
                                 pos = self.get_grid_position(x, y)
