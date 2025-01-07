@@ -50,17 +50,8 @@ def main():
     second_door.connect_to(end_room)
     
     # Add props to rooms and passage
-    # Create 2x2 grid of altars with different rotations
-    altar1 = Altar(start_room.get_grid_position(0, 0), Rotation.ROT_0)
-    altar2 = Altar(start_room.get_grid_position(1, 0), Rotation.ROT_90)
-    altar3 = Altar(start_room.get_grid_position(0, 1), Rotation.ROT_180)
-    altar4 = Altar(start_room.get_grid_position(1, 1), Rotation.ROT_270)
-    
-    start_room.add_prop(altar1)
-    start_room.add_prop(altar2)
-    start_room.add_prop(altar3)
-    start_room.add_prop(altar4)
-    
+    # Add random props to start room
+    start_room.create_random_props([PropType.ALTAR], min_count=0, max_count=3)
     start_room.create_props(PropType.MEDIUM_ROCK, max_count=4)
     start_room.create_props(PropType.SMALL_ROCK, max_count=2)
     

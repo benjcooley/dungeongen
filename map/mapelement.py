@@ -32,26 +32,25 @@ class MapElement:
         self._options = map_.options
         self._props: List['Prop'] = []
         
-    def create_props(self, prop_type: 'PropType', min_count: int = 1, max_count: int = 1, options: dict = None) -> list['Prop']:
-        """Create and add multiple props of the specified type.
+    def create_random_props(self, prop_types: list['PropType'], min_count: int = 0, max_count: int = 3) -> list['Prop']:
+        """Create and add multiple randomly selected props from a list of types.
         
         Args:
-            prop_type: Type of prop to create
+            prop_types: List of prop types to choose from
             min_count: Minimum number of props to create
             max_count: Maximum number of props to create
-            options: Optional dict of prop-specific options
             
         Returns:
             List of successfully placed props
         """
-        from map.props.rock import Rock  # Avoid circular import
-        
         count = random.randint(min_count, max_count)
         placed_props = []
         
         # Create and try to place each prop
         for _ in range(count):
-            if prop := self.create_prop(prop_type, options):
+            # Randomly select a prop type
+            prop_type = random.choice(prop_types)
+            if prop := self.create_prop(prop_type):
                 placed_props.append(prop)
                 
         return placed_props
