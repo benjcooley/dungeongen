@@ -237,14 +237,13 @@ class Prop(ABC):
         if self.prop_type.is_wall_aligned and isinstance(self.container._shape, Rectangle):
             room_bounds = self.container._shape.bounds
             
-            # Use grid size if available, otherwise use shape bounds
-            if self._grid_size:
-                prop_width = self._grid_size[0] * CELL_SIZE
-                prop_height = self._grid_size[1] * CELL_SIZE
+            # Get bounds based on whether prop is grid-aligned
+            if self.prop_type.is_grid_aligned and self._grid_bounds:
+                prop_bounds = self._grid_bounds
             else:
                 prop_bounds = self.shape.bounds
-                prop_width = prop_bounds.width
-                prop_height = prop_bounds.height
+            prop_width = prop_bounds.width
+            prop_height = prop_bounds.height
             
             # Only allow snapping to wall based on rotation
             wall = None
