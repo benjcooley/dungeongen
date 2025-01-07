@@ -387,9 +387,12 @@ class Prop(ABC):
         Returns:
             True if position is valid, False otherwise
         """
+        print(f"\nChecking position validity for ({x}, {y})")
+        
         # For grid-aligned props, ensure the shape's top-left corner aligns to grid
         if self.prop_type.is_grid_aligned:
             if (x % CELL_SIZE != 0) or (y % CELL_SIZE != 0):
+                print("Failed: Position not aligned to grid")
                 return False
         
         pos = self.position
@@ -400,10 +403,12 @@ class Prop(ABC):
             dx = x - pos[0]  # Fixed: Corrected direction of translation
             dy = y - pos[1]
             shape = self._boundary_shape.make_translated(dx, dy)
+            print(f"Translated shape by dx={dx}, dy={dy}")
 
         # Check if shape is contained within container
         container = container or self.container
-        if not container.contains_point(x, y):  # Changed to simpler point check
+        if not container.contains_point(x, y):
+            print(f"Failed: Point ({x}, {y}) not contained in container")
             return False
             
         # For non-decorative props, check intersection with other props
@@ -412,8 +417,10 @@ class Prop(ABC):
                 if prop is not self and \
                     not prop.prop_type.is_decoration and \
                     prop.shape.intersects(shape):
+                        print(f"Failed: Intersects with another prop")
                         return False
-                    
+            
+        print("Position is valid!")
         return True
 
     @classmethod
