@@ -1,7 +1,7 @@
 """Room map element definition."""
 
 import math
-from typing import List, TYPE_CHECKING, Tuple
+from typing import List, TYPE_CHECKING, Tuple, Optional
 
 import random
 import skia
@@ -122,6 +122,126 @@ class Room(MapElement):
         self._draw_corner(canvas, tr, -right_vec, down_vec)     # Top-right  
         self._draw_corner(canvas, bl, right_vec, -down_vec)     # Bottom-left
         self._draw_corner(canvas, br, -right_vec, -down_vec)    # Bottom-right
+
+    def create_columns(self, 
+                      arrangement: ColumnArrangement,
+                      orientation: RowOrientation = RowOrientation.HORIZONTAL,
+                      margin: float = 1.0) -> List['Prop']:
+        """Create columns in this room according to the specified arrangement pattern.
+        
+        Args:
+            arrangement: Pattern to arrange columns in
+            orientation: Orientation for ROWS arrangement (default: HORIZONTAL)
+            margin: Margin in grid units from room edges (default: 1.0)
+            
+        Returns:
+            List of created column props
+            
+        Raises:
+            ValueError: If arrangement is invalid for this room type
+        """
+        from map.props.column import Column, ColumnType
+        from map.props.rotation import Rotation
+        import math
+        
+        columns = []
+        
+        # For circular rooms, only allow CIRCLE arrangement
+        if isinstance(self._shape, Circle):
+            if arrangement != ColumnArrangement.CIRCLE:
+                raise ValueError("Only CIRCLE arrangement supported for circular rooms")
+                
+            # Calculate radius as 2/3 of room radius
+            room_radius = self._shape.radius
+            radius = room_radius * 0.66
+            
+            # Place 12 columns in a circle
+            num_columns = 12
+            center = self._shape.bounds.center
+            
+            for i in range(num_columns):
+                angle = (i * 2 * math.pi / num_columns)
+                x = center[0] + radius * math.cos(angle)
+                y = center[1] + radius * math.sin(angle)
+                
+                # Create column rotated to face center
+                rotation = Rotation.from_radians(angle + math.pi/2)
+                column = Column.create_round()
+                
+                # Try to place at calculated position
+                if self.add_prop(column):
+                    column.position = (x, y)
+                    column._rotation = rotation
+                    columns.append(column)
+                    
+            return columns
+            
+        # For rectangular rooms
+        if isinstance(self._shape, Rectangle):
+            # Get room dimensions in grid units
+            grid_width = int(self._shape.width / CELL_SIZE)
+            grid_height = int(self._shape.height / CELL_SIZE)
+            
+            # Calculate usable area accounting for margin
+            start_x = margin
+            start_y = margin
+            end_x = grid_width - margin
+            end_y = grid_height - margin
+            
+            if arrangement == ColumnArrangement.GRID:
+                # Place columns at each grid intersection within margins
+                for x in range(int(start_x), int(end_x + 1)):
+                    for y in range(int(start_y), int(end_y + 1)):
+                        column = Column.create_square()
+                        if self.add_prop(column):
+                            pos = self.get_grid_position(x, y)
+                            column.position = pos
+                            columns.append(column)
+                            
+            elif arrangement == ColumnArrangement.RECTANGLE:
+                # Place columns around perimeter
+                # Top and bottom rows
+                for x in range(int(start_x), int(end_x + 1)):
+                    for y in (start_y, end_y):
+                        column = Column.create_square()
+                        if self.add_prop(column):
+                            pos = self.get_grid_position(x, y)
+                            column.position = pos
+                            columns.append(column)
+                
+                # Left and right columns (excluding corners)
+                for y in range(int(start_y + 1), int(end_y)):
+                    for x in (start_x, end_x):
+                        column = Column.create_square()
+                        if self.add_prop(column):
+                            pos = self.get_grid_position(x, y)
+                            column.position = pos
+                            columns.append(column)
+                            
+            elif arrangement == ColumnArrangement.ROWS:
+                # Place columns in parallel rows
+                if orientation == RowOrientation.HORIZONTAL:
+                    # Two horizontal rows
+                    for x in range(int(start_x), int(end_x + 1)):
+                        for y in (start_y, end_y):
+                            column = Column.create_square()
+                            if self.add_prop(column):
+                                pos = self.get_grid_position(x, y)
+                                column.position = pos
+                                columns.append(column)
+                else:  # VERTICAL
+                    # Two vertical rows
+                    for y in range(int(start_y), int(end_y + 1)):
+                        for x in (start_x, end_x):
+                            column = Column.create_square()
+                            if self.add_prop(column):
+                                pos = self.get_grid_position(x, y)
+                                column.position = pos
+                                columns.append(column)
+                                
+            return columns
+            
+        raise ValueError(f"Unsupported room shape for column arrangement: {type(self._shape)}")
 
     def draw(self, canvas: 'skia.Canvas', layer: Layers = Layers.PROPS) -> None:
         """Draw the room and its props."""
