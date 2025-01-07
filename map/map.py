@@ -326,8 +326,8 @@ class Map:
                 StrokeWidth=0
             )
             # Draw inflated shape for shadow to account for stroke width
-            # Inflate by 4x border width for more pronounced shadow
-            inflate_amount = self.options.border_width * 4
+            # Inflate by 10x border width for more pronounced shadow
+            inflate_amount = self.options.border_width * 10
             inflated_shadow = region.shape.inflated(inflate_amount)
             inflated_shadow.draw(canvas, shadow_paint)
             
