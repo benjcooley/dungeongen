@@ -53,7 +53,7 @@ class Options:
     # Room rendering options
     room_shadow_color: int = 0xFFD0D0D0  # Lighter gray for room shadows
     room_color: int = 0xFFFFFFFF  # White for room fill
-    prop_light_color: int = 0xFF808080  # Medium gray for props
+    prop_light_color: int = 0xFFC0C0C0  # Light gray for props
     prop_fill_color: int = 0xFFFFFFFF  # White for prop fill (same as room_color)
     prop_outline_color: int = 0xFF000000  # Black for prop outline (same as border_color)
     prop_stroke_width: float = 2.0  # Width of prop borders (thinner than door_stroke_width)
