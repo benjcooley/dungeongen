@@ -325,11 +325,8 @@ class Map:
                 Color=self.options.room_shadow_color,
                 StrokeWidth=0
             )
-            # Draw inflated shape for shadow to account for stroke width
-            # Inflate by 10x border width for more pronounced shadow
-            inflate_amount = self.options.border_width * 10
-            inflated_shadow = region.shape.inflated(inflate_amount)
-            inflated_shadow.draw(canvas, shadow_paint)
+            # Draw shadow shape
+            region.shape.draw(canvas, shadow_paint)
             
             # 4. Draw the filled room on top of shadow (with offset)
             room_paint = skia.Paint(
