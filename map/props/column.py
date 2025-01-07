@@ -55,8 +55,8 @@ class Column(Prop):
             shape = Rectangle(-COLUMN_SIZE/2, -COLUMN_SIZE/2, COLUMN_SIZE, COLUMN_SIZE)
             
         if layer == Layers.SHADOW:
-            # Draw inflated shadow shape
-            shadow_shape = shape.inflated(self._map.options.border_width * 2)
+            # Draw slightly inflated shadow shape
+            shadow_shape = shape.inflated(self._map.options.border_width * 0.5)
             canvas.save()
             canvas.translate(
                 self._map.options.room_shadow_offset_x,
