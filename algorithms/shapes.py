@@ -594,6 +594,10 @@ class Rectangle:
     def _bounds_intersect(self, other: 'Rectangle') -> bool:
         """Test if this rectangle's bounds intersect another rectangle."""
         return rect_rect_intersect(self, other)
+        
+    def intersects(self, other: 'Shape') -> bool:
+        """Test if this rectangle intersects with another shape."""
+        return shape_intersects(self, other)
     
     @classmethod
     def centered_grid(cls, grid_width: float, grid_height: float) -> 'Rectangle':
