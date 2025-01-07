@@ -20,6 +20,8 @@ class PropType(StrEnum):
     # Furniture
     ALTAR = auto()
     COFFIN = auto()
+    COLUMN = auto()
+    DAIS = auto()
     
     @classmethod
     def rock_types(cls) -> list['PropType']:
