@@ -242,6 +242,7 @@ class Prop(ABC):
             
             # Only allow snapping to wall based on rotation
             wall = None
+            print(f"Checking snap for rotation: {self.rotation.name}")
             if self.rotation == Rotation.ROT_0:
                 wall = 'left'
             elif self.rotation == Rotation.ROT_90:
@@ -251,6 +252,7 @@ class Prop(ABC):
             elif self.rotation == Rotation.ROT_270:
                 wall = 'top'
                 
+            print(f"Selected wall: {wall}")
             if wall:
                 if wall == 'left':
                     test_x = room_bounds.left
@@ -269,8 +271,11 @@ class Prop(ABC):
                                room_bounds.right - prop_width/2)
                     test_y = room_bounds.bottom - prop_height
                 
+                print(f"Testing position: ({test_x}, {test_y})")
                 if self.is_valid_position(test_x, test_y, self.rotation, self.container):
+                    print("Position is valid!")
                     return (test_x, test_y)
+                print("Position is invalid")
             
             return None
             
