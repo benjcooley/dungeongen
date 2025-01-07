@@ -223,12 +223,20 @@ class Room(MapElement):
             elif arrangement == ColumnArrangement.ROWS:
                 # Place columns in parallel rows
                 if orientation == RowOrientation.HORIZONTAL:
-                    # Calculate row positions at 1/3 and 2/3 of height
-                    row1 = start_y + (end_y - start_y) / 3
-                    row2 = start_y + 2 * (end_y - start_y) / 3
-                    # Round to nearest grid position
-                    row1 = round(row1)
-                    row2 = round(row2)
+                    # Calculate total available height
+                    available_height = end_y - start_y
+                    
+                    # Need at least 3 grid spaces for two rows with 2-grid separation
+                    if available_height < 3:
+                        return columns
+                        
+                    # Calculate row positions with at least 2 grid separation
+                    row1 = start_y + 1  # One grid from top
+                    row2 = end_y - 1    # One grid from bottom
+                    
+                    # Verify minimum separation
+                    if row2 - row1 < 2:
+                        return columns
                     
                     # Place columns along each row
                     for x in range(math.ceil(start_x), math.floor(end_x + 1)):
@@ -239,12 +247,20 @@ class Room(MapElement):
                                 column.position = pos
                                 columns.append(column)
                 else:  # VERTICAL
-                    # Calculate column positions at 1/3 and 2/3 of width
-                    col1 = start_x + (end_x - start_x) / 3
-                    col2 = start_x + 2 * (end_x - start_x) / 3
-                    # Round to nearest grid position
-                    col1 = round(col1)
-                    col2 = round(col2)
+                    # Calculate total available width
+                    available_width = end_x - start_x
+                    
+                    # Need at least 3 grid spaces for two columns with 2-grid separation
+                    if available_width < 3:
+                        return columns
+                        
+                    # Calculate column positions with at least 2 grid separation
+                    col1 = start_x + 1  # One grid from left
+                    col2 = end_x - 1    # One grid from right
+                    
+                    # Verify minimum separation
+                    if col2 - col1 < 2:
+                        return columns
                     
                     # Place columns along each column
                     for y in range(math.ceil(start_y), math.floor(end_y + 1)):
