@@ -50,10 +50,11 @@ def main():
     second_door.connect_to(end_room)
     
     # Add props to rooms and passage
-    # Add one altar to start room (square room)
-    start_room.create_random_props([PropType.ALTAR], min_count=1, max_count=1)
+    # Add altars to start room (square room)
+    start_room.create_random_props([PropType.ALTAR], min_count=2, max_count=3)
     
-    # Add rocks to end room (circular room)
+    # Add altar and rocks to end room (circular room)
+    end_room.create_random_props([PropType.ALTAR], min_count=1, max_count=2)
     
     end_room.create_random_props([PropType.MEDIUM_ROCK], min_count=0, max_count=2)
     end_room.create_random_props([PropType.SMALL_ROCK], min_count=0, max_count=2)
