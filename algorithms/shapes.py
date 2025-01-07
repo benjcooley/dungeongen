@@ -301,13 +301,21 @@ class ShapeGroup:
         from algorithms.intersections import shape_group_intersect
         return shape_group_intersect(self, other)
         
-    def intersects(self, other: Rectangle) -> bool:
-        """Test if this shape group's bounds intersect a rectangle."""
-        bounds = self.bounds
-        return (bounds.x < other.x + other.width and
-                bounds.x + bounds.width > other.x and
-                bounds.y < other.y + other.height and
-                bounds.y + bounds.height > other.y)
+    def intersects(self, other: 'Shape') -> bool:
+        """Test if this shape group intersects with another shape."""
+        # Get bounds once to avoid recursion
+        my_bounds = self.bounds
+        other_bounds = other.bounds
+        
+        # Quick bounds check
+        if not (my_bounds.x < other_bounds.x + other_bounds.width and
+                my_bounds.x + my_bounds.width > other_bounds.x and
+                my_bounds.y < other_bounds.y + other_bounds.height and
+                my_bounds.y + my_bounds.height > other_bounds.y):
+            return False
+            
+        # If bounds intersect, do detailed shape intersection test
+        return shape_intersects(self, other)
     
     @property
     def bounds(self) -> Rectangle:
@@ -765,9 +773,6 @@ def shape_intersects(shape1: 'Shape', shape2: 'Shape') -> bool:
     Returns:
         True if shapes intersect, False otherwise
     """
-    # Quick bounds check first
-    if not shape1.intersects(shape2.bounds):
-        return False
         
     # Use Skia for ShapeGroups or inflated shapes
     if (isinstance(shape1, ShapeGroup) or isinstance(shape2, ShapeGroup) or
