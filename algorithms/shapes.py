@@ -755,9 +755,13 @@ class Circle:
         new_cy = self.cy * math.cos(angle) + self.cx * math.sin(angle)
         return Circle(new_cx, new_cy, self.radius, self._inflate)
         
-    def intersects(self, other: Rectangle) -> bool:
-        """Test if this circle's bounds intersect a rectangle."""
-        return rect_circle_intersect(other, self)
+    def intersects(self, other: Shape) -> bool:
+        """Test if this circle intersects with another shape."""
+        if isinstance(other, Rectangle):
+            return rect_circle_intersect(other, self)
+        elif isinstance(other, Circle):
+            return circle_circle_intersect(self, other)
+        return shape_intersects(self, other)
 
 
 def shape_intersects(shape1: 'Shape', shape2: 'Shape') -> bool:
