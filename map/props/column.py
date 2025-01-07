@@ -73,7 +73,7 @@ class Column(Prop):
             fill_paint = skia.Paint(
                 AntiAlias=True,
                 Style=skia.Paint.kFill_Style,
-                Color=self._map.options.prop_light_color
+                Color=self._map.options.room_shadow_color  # Use room shadow color for lighter gray
             )
             shape.draw(canvas, fill_paint)
             
