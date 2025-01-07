@@ -326,9 +326,8 @@ class Map:
                 StrokeWidth=0
             )
             # Draw inflated shape for shadow to account for stroke width
-            # For circles, inflate by half stroke width to match outer edge
-            # For rectangles, inflate by full stroke width since it grows from center
-            inflate_amount = self.options.border_width
+            # Inflate by full stroke width to match outer edge
+            inflate_amount = self.options.border_width * 2
             inflated_shadow = region.shape.inflated(inflate_amount)
             inflated_shadow.draw(canvas, shadow_paint)
             
