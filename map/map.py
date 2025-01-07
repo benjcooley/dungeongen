@@ -379,3 +379,25 @@ class Map:
 
         # Restore canvas state
         canvas.restore()
+
+if __name__ == '__main__':
+    import skia
+    from options import Options
+    
+    # Create a test map
+    options = Options()
+    test_map = Map(options)
+    
+    # Create a test surface and canvas
+    surface = skia.Surface(800, 600)
+    canvas = surface.getCanvas()
+    
+    # Add a test room
+    test_map.add_rectangular_room(1, 1, 3, 2)
+    
+    # Render the map
+    test_map.render(canvas)
+    
+    # Save the output
+    image = surface.makeImageSnapshot()
+    image.save('test_map.png', skia.kPNG)
