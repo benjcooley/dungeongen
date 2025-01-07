@@ -196,8 +196,8 @@ class MapElement:
             for prop in self._props:
                 prop.draw(canvas, layer)
                 
-        # After all layers are drawn, add debug visualization on top
-        if layer == Layers.PROPS:
+        # Draw debug visualization on overlay layer
+        if layer == Layers.OVERLAY:
             debug_paint = skia.Paint(
                 AntiAlias=True,
                 Style=skia.Paint.kStroke_Style,
