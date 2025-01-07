@@ -458,8 +458,33 @@ class Rectangle:
         return self.path
 
     def draw(self, canvas: skia.Canvas, paint: skia.Paint) -> None:
-        """Draw this rectangle on a canvas."""
-        canvas.drawPath(self.to_path(), paint)
+        """Draw this rectangle on a canvas with proper inflation."""
+        if self._inflate > 0:
+            # Draw as rounded rectangle
+            canvas.drawRRect(
+                skia.RRect.MakeRectXY(
+                    skia.Rect.MakeXYWH(
+                        self._inflated_x,
+                        self._inflated_y,
+                        self._inflated_width,
+                        self._inflated_height
+                    ),
+                    self._inflate,  # x radius
+                    self._inflate   # y radius
+                ),
+                paint
+            )
+        else:
+            # Draw as regular rectangle
+            canvas.drawRect(
+                skia.Rect.MakeXYWH(
+                    self._inflated_x,
+                    self._inflated_y,
+                    self._inflated_width,
+                    self._inflated_height
+                ),
+                paint
+            )
     
     def inflated(self, amount: float) -> 'Rectangle':
         """Return a new rectangle inflated by the given amount."""
@@ -705,8 +730,8 @@ class Circle:
         return self.path
 
     def draw(self, canvas: skia.Canvas, paint: skia.Paint) -> None:
-        """Draw this circle on a canvas."""
-        canvas.drawPath(self.to_path(), paint)
+        """Draw this circle on a canvas with proper inflation."""
+        canvas.drawCircle(self.cx, self.cy, self._inflated_radius, paint)
     
     def inflated(self, amount: float) -> 'Circle':
         """Return a new circle inflated by the given amount."""
