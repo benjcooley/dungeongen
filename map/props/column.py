@@ -55,7 +55,8 @@ class Column(Prop):
             shape = Rectangle(-COLUMN_SIZE/2, -COLUMN_SIZE/2, COLUMN_SIZE, COLUMN_SIZE)
             
         if layer == Layers.SHADOW:
-            # Draw shadow offset slightly
+            # Draw inflated shadow shape
+            shadow_shape = shape.inflated(self._map.options.border_width * 2)
             canvas.save()
             canvas.translate(
                 self._map.options.room_shadow_offset_x,
@@ -66,7 +67,7 @@ class Column(Prop):
                 Style=skia.Paint.kFill_Style,
                 Color=self._map.options.room_shadow_color
             )
-            shape.draw(canvas, shadow_paint)
+            shadow_shape.draw(canvas, shadow_paint)
             canvas.restore()
         else:
             # Draw fill
