@@ -238,7 +238,7 @@ class Room(MapElement):
                         
                     # Calculate row positions with margins
                     row1 = start_y + margin_grids + 1  # One grid in from margin
-                    row2 = end_y - (margin_grids + 1)  # One grid in from margin
+                    row2 = end_y - margin_grids - 1  # One grid in from margin
                     
                     # Verify minimum separation
                     if row2 - row1 < 2:
@@ -264,7 +264,7 @@ class Room(MapElement):
                         
                     # Calculate column positions with margins
                     col1 = start_x + margin_grids + 1  # One grid in from margin
-                    col2 = end_x - (margin_grids + 1)  # One grid in from margin
+                    col2 = end_x - margin_grids - 1  # One grid in from margin
                     
                     # Verify minimum separation
                     if col2 - col1 < 2:
