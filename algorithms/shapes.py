@@ -502,20 +502,16 @@ class Rectangle:
     
     def make_rotated(self, rotation: 'Rotation') -> 'Rectangle':
         """Return a new rectangle rotated by the given 90-degree increment."""
+        # For 90/270 degree rotations, swap width and height
+        if rotation in (Rotation.ROT_90, Rotation.ROT_270):
+            width, height = self.height, self.width
+        else:
+            width, height = self.width, self.height
+
         # Calculate center point
         center_x = self.x + self.width / 2
         center_y = self.y + self.height / 2
         
-        # Skip rotation if center is at origin
-        if abs(center_x) < 1e-6 and abs(center_y) < 1e-6:
-            return Rectangle(
-                -self.width / 2,
-                -self.height / 2,
-                self.width,
-                self.height,
-                self._inflate
-            )
-            
         # Get rotation angle in radians
         angle = rotation.radians
             
@@ -524,13 +520,13 @@ class Rectangle:
         new_center_y = center_x * math.sin(angle) + center_y * math.cos(angle)
         
         # Calculate new top-left position relative to rotated center
-        new_x = new_center_x - self.width / 2
-        new_y = new_center_y - self.height / 2
-        
-        # For 90/270 degree rotations, swap width and height
-        if rotation in (Rotation.ROT_90, Rotation.ROT_270):
-            return Rectangle(new_x, new_y, self.height, self.width, self._inflate)
-        return Rectangle(new_x, new_y, self.width, self.height, self._inflate)
+        return Rectangle(
+            new_center_x - width / 2,
+            new_center_y - height / 2,
+            width,
+            height,
+            self._inflate
+        )
         
     def adjust(self, left: float, top: float, right: float, bottom: float) -> 'Rectangle':
         """Return a new rectangle with edges adjusted by the given amounts.
