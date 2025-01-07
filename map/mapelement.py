@@ -201,7 +201,7 @@ class MapElement:
             debug_paint = skia.Paint(
                 AntiAlias=True,
                 Style=skia.Paint.kStroke_Style,
-                StrokeWidth=1,
+                StrokeWidth=2,
                 Color=skia.Color(255, 0, 0)  # Red
             )
             for prop in self._props:
