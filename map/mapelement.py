@@ -6,6 +6,7 @@ from map.enums import Layers
 from map.props.proptypes import PropType
 from map.props.altar import Altar
 from map.props.rock import Rock
+from map.props.rotation import Rotation
 from constants import CELL_SIZE
 
 if TYPE_CHECKING:
