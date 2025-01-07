@@ -76,6 +76,12 @@ class MapElement:
         elif prop_type == PropType.ALTAR:
             # Create altar with random rotation
             prop = Altar.create(rotation=random.choice(list(Rotation)))
+        elif prop_type == PropType.ROUND_COLUMN:
+            from map.props.column import Column, ColumnType
+            prop = Column.create_round()
+        elif prop_type == PropType.SQUARE_COLUMN:
+            from map.props.column import Column, ColumnType
+            prop = Column.create_square()
         else:
             raise ValueError(f"Unsupported prop type: {prop_type}")
             
