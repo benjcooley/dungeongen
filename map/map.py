@@ -343,7 +343,7 @@ class Map:
 
             # 5. Draw region element shadows
             for element in region.elements:
-                element.draw(canvas, Layers.PROPS)
+                element.draw(canvas, Layers.SHADOW)
 
             # 5. Draw grid if enabled (still clipped by mask)
             if self.options.grid_style not in (None, GridStyle.NONE):
