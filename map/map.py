@@ -318,14 +318,16 @@ class Map:
             # 2. Clip to region shape
             canvas.clipPath(region.shape.to_path(), skia.ClipOp.kIntersect, True)  # antialiased
             
-            # 3. Draw shadows first (no offset)
+            # 3. Draw shadows first (no offset, but account for stroke width)
             shadow_paint = skia.Paint(
                 AntiAlias=True,
                 Style=skia.Paint.kFill_Style,
                 Color=self.options.room_shadow_color,
                 StrokeWidth=0
             )
-            region.shape.draw(canvas, shadow_paint)
+            # Draw inflated shape for shadow to account for stroke width
+            inflated_shadow = region.shape.inflated(self.options.border_width/2)
+            inflated_shadow.draw(canvas, shadow_paint)
             
             # 4. Draw the filled room on top of shadow (with offset)
             room_paint = skia.Paint(
