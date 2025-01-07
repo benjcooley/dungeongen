@@ -240,18 +240,18 @@ class Prop(ABC):
             prop_width = prop_bounds.width
             prop_height = prop_bounds.height
             
-            # Find closest wall
-            left_dist = abs(x - room_bounds.left)
-            right_dist = abs(x - room_bounds.right)
-            top_dist = abs(y - room_bounds.top)
-            bottom_dist = abs(y - room_bounds.bottom)
-            
-            # Try walls in order of closest to furthest
-            walls = [(left_dist, 'left'), (right_dist, 'right'), 
-                    (top_dist, 'top'), (bottom_dist, 'bottom')]
-            walls.sort(key=lambda x: x[0])
-            
-            for _, wall in walls:
+            # Only allow snapping to wall based on rotation
+            wall = None
+            if self.rotation == Rotation.ROT_0:
+                wall = 'left'
+            elif self.rotation == Rotation.ROT_90:
+                wall = 'bottom'
+            elif self.rotation == Rotation.ROT_180:
+                wall = 'right'
+            elif self.rotation == Rotation.ROT_270:
+                wall = 'top'
+                
+            if wall:
                 if wall == 'left':
                     test_x = room_bounds.left
                     test_y = min(max(y, room_bounds.top + prop_height/2), 
