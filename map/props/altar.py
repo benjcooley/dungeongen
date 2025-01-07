@@ -42,9 +42,7 @@ class Altar(Prop):
         super().__init__(
             ALTAR_PROP_TYPE,
             position,
-            ALTAR_PROP_TYPE.boundary_shape,
-            rotation=rotation,
-            grid_size=(1, 1)
+            rotation=rotation
         )
     
     def _draw_content(self, canvas: skia.Canvas, bounds: Rectangle, layer: 'Layers' = Layers.PROPS) -> None:

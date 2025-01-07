@@ -43,8 +43,8 @@ class Prop(ABC):
     def __init__(self, 
                  prop_type: PropType,                    
                  position: Point,
-                 boundary_shape: Shape,               
                  rotation: Rotation = Rotation.ROT_0,
+                 boundary_shape: Shape | None = None,
                  grid_size: Point | None = None) -> None:
         """
         Props are drawn relative to their center point. The default orientation (0° rotation)
@@ -57,6 +57,10 @@ class Prop(ABC):
             rotation: Rotation angle in 90° increments (default: facing right)
             grid_size: Optional size in grid units prop occupies if prop is grid aligned
         """
+        if boundary_shape is None:
+            boundary_shape = prop_type.boundary_shape
+        if grid_size is None:
+            grid_size = prop_type.grid_size
         self._prop_type = prop_type
         # First rotate the boundary shape
         self._boundary_shape = boundary_shape.make_rotated(rotation)

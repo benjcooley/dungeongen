@@ -40,7 +40,7 @@ class Rock(Prop):
         boundary = Circle(0, 0, radius)
         
         # Initialize base class
-        super().__init__(ROCK_PROP_TYPE, center, boundary)
+        super().__init__(ROCK_PROP_TYPE, center, boundary_shape=boundary)
         
         # Generate perturbed control points in local coordinates
         self._control_points = self._generate_control_points()
