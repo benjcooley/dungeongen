@@ -254,25 +254,31 @@ class Prop(ABC):
                 
             print(f"Selected wall: {wall}")
             if wall:
-                # First calculate raw wall positions
+                # Get grid-aligned room bounds
+                grid_left = round(room_bounds.left / CELL_SIZE) * CELL_SIZE
+                grid_right = round(room_bounds.right / CELL_SIZE) * CELL_SIZE
+                grid_top = round(room_bounds.top / CELL_SIZE) * CELL_SIZE
+                grid_bottom = round(room_bounds.bottom / CELL_SIZE) * CELL_SIZE
+
+                # Calculate test position using grid-aligned bounds
                 if wall == 'left':
-                    test_x = room_bounds.left
-                    test_y = min(max(y, room_bounds.top + prop_height/2), 
-                               room_bounds.bottom - prop_height/2)
+                    test_x = grid_left
+                    test_y = min(max(y, grid_top + prop_height/2), 
+                               grid_bottom - prop_height/2)
                 elif wall == 'right':
-                    test_x = room_bounds.right - prop_width
-                    test_y = min(max(y, room_bounds.top + prop_height/2),
-                               room_bounds.bottom - prop_height/2)
+                    test_x = grid_right - prop_width
+                    test_y = min(max(y, grid_top + prop_height/2),
+                               grid_bottom - prop_height/2)
                 elif wall == 'top':
-                    test_x = min(max(x, room_bounds.left + prop_width/2),
-                               room_bounds.right - prop_width/2)
-                    test_y = room_bounds.top
+                    test_x = min(max(x, grid_left + prop_width/2),
+                               grid_right - prop_width/2)
+                    test_y = grid_top
                 else:  # bottom
-                    test_x = min(max(x, room_bounds.left + prop_width/2),
-                               room_bounds.right - prop_width/2)
-                    test_y = room_bounds.bottom - prop_height
-                
-                # Then snap to grid
+                    test_x = min(max(x, grid_left + prop_width/2),
+                               grid_right - prop_width/2)
+                    test_y = grid_bottom - prop_height
+
+                # Ensure final position is grid-aligned
                 test_x = round(test_x / CELL_SIZE) * CELL_SIZE
                 test_y = round(test_y / CELL_SIZE) * CELL_SIZE
                 
