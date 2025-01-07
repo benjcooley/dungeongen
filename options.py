@@ -72,3 +72,6 @@ class Options:
     border_width: float = 6.0  # Width of region borders in pixels
     door_stroke_width: float = 4.0  # Width of door border strokes (2/3 of border_width)
     map_border_cells: float = 4.0  # Number of cells padding around the map
+    
+    # Debug options
+    debug_draw_prop_bounds: bool = False  # Whether to draw debug visualization of prop bounds
