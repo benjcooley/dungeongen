@@ -176,6 +176,24 @@ class Prop(ABC):
         # Draw additional content in local coordinates centered at 0,0
         self._draw_content(canvas, Rectangle(-draw_bounds.width/2, -draw_bounds.height/2, draw_bounds.width, draw_bounds.height), layer)
         
+        # Draw debug grid bounds if enabled
+        if self._map and self._map.options.debug_draw_grid_bounds and self._grid_bounds:
+            debug_paint = skia.Paint(
+                AntiAlias=True,
+                Style=skia.Paint.kStroke_Style,
+                StrokeWidth=2,
+                Color=skia.Color(0, 0, 255)  # Blue
+            )
+            canvas.drawRect(
+                skia.Rect.MakeXYWH(
+                    -draw_bounds.width/2, 
+                    -draw_bounds.height/2,
+                    draw_bounds.width,
+                    draw_bounds.height
+                ),
+                debug_paint
+            )
+        
         # Restore canvas state
         canvas.restoreToCount(save_count)
             

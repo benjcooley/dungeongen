@@ -76,3 +76,4 @@ class Options:
     # Debug options
     debug_draw_prop_bounds: bool = False  # Whether to draw debug visualization of prop bounds in red
     debug_draw_grid: bool = False  # Whether to draw debug grid visualization
+    debug_draw_grid_bounds: bool = False  # Whether to draw debug visualization of grid-aligned prop bounds in blue
