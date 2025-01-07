@@ -16,8 +16,8 @@ class ColumnType(Enum):
     ROUND = auto()
     SQUARE = auto()
 
-# Size is 1/2 of a cell
-COLUMN_SIZE = CELL_SIZE / 2
+# Size is 1/3 of a cell
+COLUMN_SIZE = CELL_SIZE / 3
 
 # Prop types for each column variant
 ROUND_COLUMN_TYPE = PropType(
