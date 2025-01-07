@@ -25,6 +25,7 @@ ALTAR_HEIGHT = CELL_SIZE * 0.7  # Height of altar, leaving equal margins top/bot
 
 ALTAR_PROP_TYPE = PropType(
     is_grid_aligned=True,
+    is_wall_aligned=True,
     boundary_shape=Rectangle(ALTAR_X, ALTAR_Y, ALTAR_WIDTH, ALTAR_HEIGHT),
     grid_size=(1, 1)
     )
