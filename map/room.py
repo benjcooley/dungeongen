@@ -153,9 +153,13 @@ class Room(MapElement):
             if arrangement != ColumnArrangement.CIRCLE:
                 raise ValueError("Only CIRCLE arrangement supported for circular rooms")
                 
-            # Calculate radius as 2/3 of room radius
+            # Calculate radius based on margin
             room_radius = self._shape.radius
-            radius = room_radius * 0.66
+            margin_grids = math.floor(margin)  # Convert to integer grid units
+            radius = room_radius - ((margin_grids + 1) * CELL_SIZE)  # One grid in from margin
+            
+            if radius <= CELL_SIZE:  # Ensure we have space for columns
+                return columns
             
             # Place 12 columns in a circle
             num_columns = 12
@@ -225,14 +229,16 @@ class Room(MapElement):
                 if orientation == RowOrientation.HORIZONTAL:
                     # Calculate total available height
                     available_height = end_y - start_y
+                    margin_grids = math.floor(margin)  # Convert to integer grid units
                     
-                    # Need at least 3 grid spaces for two rows with 2-grid separation
-                    if available_height < 3:
+                    # Need enough space for columns plus margins
+                    min_space = (2 * margin_grids) + 3  # 2 margins + 3 spaces (2 for separation + 1 for columns)
+                    if available_height < min_space:
                         return columns
                         
-                    # Calculate row positions with at least 2 grid separation
-                    row1 = start_y + 1  # One grid from top
-                    row2 = end_y - 1    # One grid from bottom
+                    # Calculate row positions with margins
+                    row1 = start_y + margin_grids + 1  # One grid in from margin
+                    row2 = end_y - (margin_grids + 1)  # One grid in from margin
                     
                     # Verify minimum separation
                     if row2 - row1 < 2:
@@ -249,14 +255,16 @@ class Room(MapElement):
                 else:  # VERTICAL
                     # Calculate total available width
                     available_width = end_x - start_x
+                    margin_grids = math.floor(margin)  # Convert to integer grid units
                     
-                    # Need at least 3 grid spaces for two columns with 2-grid separation
-                    if available_width < 3:
+                    # Need enough space for columns plus margins
+                    min_space = (2 * margin_grids) + 3  # 2 margins + 3 spaces (2 for separation + 1 for columns)
+                    if available_width < min_space:
                         return columns
                         
-                    # Calculate column positions with at least 2 grid separation
-                    col1 = start_x + 1  # One grid from left
-                    col2 = end_x - 1    # One grid from right
+                    # Calculate column positions with margins
+                    col1 = start_x + margin_grids + 1  # One grid in from margin
+                    col2 = end_x - (margin_grids + 1)  # One grid in from margin
                     
                     # Verify minimum separation
                     if col2 - col1 < 2:
