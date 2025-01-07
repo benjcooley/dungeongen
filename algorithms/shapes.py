@@ -471,6 +471,10 @@ class Rectangle:
     
     def rotate(self, rotation: 'Rotation') -> 'Rectangle':
         """Rotate this rectangle by the given 90-degree increment in-place."""
+        # For 90/270 degree rotations, swap width and height first
+        if rotation in (Rotation.ROT_90, Rotation.ROT_270):
+            self.width, self.height = self.height, self.width
+            
         # Calculate center point
         center_x = self.x + self.width / 2
         center_y = self.y + self.height / 2
@@ -486,18 +490,14 @@ class Rectangle:
         self.x = new_center_x - self.width / 2
         self.y = new_center_y - self.height / 2
         
-        # For 90/270 degree rotations, swap width and height
-        if rotation in (Rotation.ROT_90, Rotation.ROT_270):
-            self.width, self.height = self.height, self.width
-        
         # Update inflated values
         self._inflated_x = self.x - self._inflate
         self._inflated_y = self.y - self._inflate
         self._inflated_width = self.width + 2 * self._inflate
         self._inflated_height = self.height + 2 * self._inflate
-        # Update bounds for any observers
-        self._bounds_dirty = True
-
+        
+        # Clear cached path since shape changed
+        self._cached_path = None
         return self
     
     def make_rotated(self, rotation: 'Rotation') -> 'Rectangle':
@@ -517,7 +517,7 @@ class Rectangle:
             
         # Rotate center point around origin
         new_center_x = center_x * math.cos(angle) - center_y * math.sin(angle)
-        new_center_y = center_x * math.sin(angle) + center_y * math.cos(angle)
+        new_center_y = center_y * math.cos(angle) + center_x * math.sin(angle)
         
         # Calculate new top-left position relative to rotated center
         return Rectangle(
@@ -715,19 +715,18 @@ class Circle:
         """Rotate this circle by the given 90-degree increment in-place."""
         # Skip rotation if center is at origin
         if abs(self.cx) < 1e-6 and abs(self.cy) < 1e-6:
-            return
+            return self
             
         # Get rotation angle in radians
         angle = rotation.radians
             
         # Rotate center point around origin
         new_cx = self.cx * math.cos(angle) - self.cy * math.sin(angle)
-        new_cy = self.cx * math.sin(angle) + self.cy * math.cos(angle)
+        new_cy = self.cy * math.cos(angle) + self.cx * math.sin(angle)
         
         self.cx = new_cx
         self.cy = new_cy
-        self._bounds_dirty = True
-
+        self._cached_path = None
         return self
     
     def make_rotated(self, rotation: 'Rotation') -> 'Circle':
@@ -741,7 +740,7 @@ class Circle:
             
         # Rotate center point around origin
         new_cx = self.cx * math.cos(angle) - self.cy * math.sin(angle)
-        new_cy = self.cx * math.sin(angle) + self.cy * math.cos(angle)
+        new_cy = self.cy * math.cos(angle) + self.cx * math.sin(angle)
         return Circle(new_cx, new_cy, self.radius, self._inflate)
         
     def intersects(self, other: Rectangle) -> bool:
