@@ -319,12 +319,17 @@ class Prop(ABC):
             x = random.uniform(bounds.x, bounds.x + bounds.width)
             y = random.uniform(bounds.y, bounds.y + bounds.height)
             
+            # For grid-aligned props, snap to grid first
+            if self.prop_type.is_grid_aligned:
+                x = round(x / CELL_SIZE) * CELL_SIZE
+                y = round(y / CELL_SIZE) * CELL_SIZE
+            
             # Try to snap to valid position
             if self.should_snap:
-                pos = self.snap_valid_position(x, y) if self.should_snap else (x, y)
+                pos = self.snap_valid_position(x, y)
                 if pos is not None:
                     self.position = pos
-                return pos
+                    return pos
             else:
                 if self.is_valid_position(x, y):
                     self.position = (x, y)
