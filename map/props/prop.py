@@ -179,8 +179,8 @@ class Prop(ABC):
         center = draw_bounds.center
         canvas.translate(center[0], center[1])
         
-        # Apply rotation (skia uses degrees, Rotation gives radians)
-        canvas.rotate(-self.rotation.radians * (180 / math.pi))
+        # Apply rotation (skia uses clockwise degrees, we use counterclockwise radians)
+        canvas.rotate(self.rotation.radians * (180 / math.pi))
         
         # Draw additional content in local coordinates centered at 0,0
         self._draw_content(canvas, Rectangle(-draw_bounds.width/2, -draw_bounds.height/2, draw_bounds.width, draw_bounds.height), layer)
