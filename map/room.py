@@ -128,7 +128,7 @@ class Room(MapElement):
     def create_columns(self, 
                       arrangement: ColumnArrangement,
                       orientation: RowOrientation = RowOrientation.HORIZONTAL,
-                      margin: float = 1.0) -> List['Prop']:
+                      margin: float = 0.5) -> List['Prop']:
         """Create columns in this room according to the specified arrangement pattern.
         
         Args:
