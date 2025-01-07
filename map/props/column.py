@@ -1,60 +1,99 @@
 """Column prop implementation."""
 
+from enum import Enum, auto
 from typing import TYPE_CHECKING
 import skia
 
-from algorithms.shapes import Circle, Rectangle
+from algorithms.shapes import Circle, Rectangle, Shape
 from algorithms.types import Point
 from constants import CELL_SIZE
 from map.props.prop import Prop, PropType
 from map.enums import Layers
 from map.props.rotation import Rotation
 
-COLUMN_RADIUS = CELL_SIZE * 0.3
-COLUMN_PROP_TYPE = PropType(
+class ColumnType(Enum):
+    """Types of column props."""
+    ROUND = auto()
+    SQUARE = auto()
+
+# Size is 1/3rd of a cell
+COLUMN_SIZE = CELL_SIZE / 3
+
+# Prop types for each column variant
+ROUND_COLUMN_TYPE = PropType(
     is_grid_aligned=True,
-    boundary_shape=Circle(0, 0, COLUMN_RADIUS),
+    boundary_shape=Circle(0, 0, COLUMN_SIZE/2),
+    grid_size=(1, 1)
+)
+
+SQUARE_COLUMN_TYPE = PropType(
+    is_grid_aligned=True,
+    boundary_shape=Rectangle(-COLUMN_SIZE/2, -COLUMN_SIZE/2, COLUMN_SIZE, COLUMN_SIZE),
     grid_size=(1, 1)
 )
 
 class Column(Prop):
-    """A circular column prop."""
+    """A column prop that can be either round or square."""
     
-    def __init__(self, position: Point) -> None:
+    def __init__(self, position: Point, column_type: ColumnType = ColumnType.ROUND) -> None:
         """Initialize a column prop.
         
         Args:
             position: Position in map coordinates (x, y)
+            column_type: Type of column (round or square)
         """
-        super().__init__(
-            COLUMN_PROP_TYPE,
-            position
-        )
+        self._column_type = column_type
+        prop_type = ROUND_COLUMN_TYPE if column_type == ColumnType.ROUND else SQUARE_COLUMN_TYPE
+        super().__init__(prop_type, position)
     
     def _draw_content(self, canvas: skia.Canvas, bounds: Rectangle, layer: Layers = Layers.PROPS) -> None:
-        if layer != Layers.PROPS:
+        if layer not in (Layers.PROPS, Layers.SHADOW):
             return
             
-        circle = Circle(0, 0, COLUMN_RADIUS)
-        
-        # Draw fill
-        fill_paint = skia.Paint(
-            AntiAlias=True,
-            Style=skia.Paint.kFill_Style,
-            Color=self._map.options.prop_fill_color
-        )
-        circle.draw(canvas, fill_paint)
-        
-        # Draw outline
-        outline_paint = skia.Paint(
-            AntiAlias=True,
-            Style=skia.Paint.kStroke_Style,
-            StrokeWidth=self._map.options.prop_stroke_width,
-            Color=self._map.options.prop_outline_color
-        )
-        circle.draw(canvas, outline_paint)
+        # Get shape based on column type
+        if self._column_type == ColumnType.ROUND:
+            shape = Circle(0, 0, COLUMN_SIZE/2)
+        else:
+            shape = Rectangle(-COLUMN_SIZE/2, -COLUMN_SIZE/2, COLUMN_SIZE, COLUMN_SIZE)
+            
+        if layer == Layers.SHADOW:
+            # Draw shadow offset slightly
+            canvas.save()
+            canvas.translate(
+                self._map.options.room_shadow_offset_x,
+                self._map.options.room_shadow_offset_y
+            )
+            shadow_paint = skia.Paint(
+                AntiAlias=True,
+                Style=skia.Paint.kFill_Style,
+                Color=self._map.options.room_shadow_color
+            )
+            shape.draw(canvas, shadow_paint)
+            canvas.restore()
+        else:
+            # Draw fill
+            fill_paint = skia.Paint(
+                AntiAlias=True,
+                Style=skia.Paint.kFill_Style,
+                Color=self._map.options.prop_fill_color
+            )
+            shape.draw(canvas, fill_paint)
+            
+            # Draw outline
+            outline_paint = skia.Paint(
+                AntiAlias=True,
+                Style=skia.Paint.kStroke_Style,
+                StrokeWidth=self._map.options.prop_stroke_width,
+                Color=self._map.options.prop_outline_color
+            )
+            shape.draw(canvas, outline_paint)
 
     @classmethod
-    def create(cls) -> 'Column':
-        """Create a column prop at origin."""
-        return cls((0, 0))
+    def create_round(cls) -> 'Column':
+        """Create a round column prop at origin."""
+        return cls((0, 0), ColumnType.ROUND)
+        
+    @classmethod
+    def create_square(cls) -> 'Column':
+        """Create a square column prop at origin."""
+        return cls((0, 0), ColumnType.SQUARE)

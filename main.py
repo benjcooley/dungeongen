@@ -56,10 +56,15 @@ def main():
     # Add altar and rocks to end room (circular room)
     end_room.create_random_props([PropType.ALTAR], min_count=1, max_count=2)
     
+    # Add columns in a circle pattern
+    end_room.create_random_props([PropType.ROUND_COLUMN], min_count=12, max_count=12)
+    
+    # Add some rocks
     end_room.create_random_props([PropType.MEDIUM_ROCK], min_count=0, max_count=2)
     end_room.create_random_props([PropType.SMALL_ROCK], min_count=0, max_count=2)
     
-    passage.create_random_props([PropType.SMALL_ROCK], min_count=0, max_count=3)
+    # Add square columns to passage
+    passage.create_random_props([PropType.SQUARE_COLUMN], min_count=2, max_count=2)
 
     # Draw the map (which will draw all rooms)
     dungeon_map.render(canvas)

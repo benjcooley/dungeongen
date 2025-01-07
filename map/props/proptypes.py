@@ -20,7 +20,8 @@ class PropType(StrEnum):
     # Furniture
     ALTAR = auto()
     COFFIN = auto()
-    COLUMN = auto()
+    ROUND_COLUMN = auto()
+    SQUARE_COLUMN = auto() 
     DAIS = auto()
     
     @classmethod
