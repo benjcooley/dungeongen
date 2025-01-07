@@ -73,7 +73,10 @@ class MapElement:
         elif prop_type == PropType.LARGE_ROCK:
             prop = Rock.create_large()
         elif prop_type == PropType.ALTAR:
+            # Create altar with random rotation
+            rotation = random.choice(list(Rotation))
             prop = Altar.create()
+            prop._rotation = rotation
         else:
             raise ValueError(f"Unsupported prop type: {prop_type}")
             
