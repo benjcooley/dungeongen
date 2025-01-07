@@ -254,6 +254,7 @@ class Prop(ABC):
                 
             print(f"Selected wall: {wall}")
             if wall:
+                # First calculate raw wall positions
                 if wall == 'left':
                     test_x = room_bounds.left
                     test_y = min(max(y, room_bounds.top + prop_height/2), 
@@ -270,6 +271,10 @@ class Prop(ABC):
                     test_x = min(max(x, room_bounds.left + prop_width/2),
                                room_bounds.right - prop_width/2)
                     test_y = room_bounds.bottom - prop_height
+                
+                # Then snap to grid
+                test_x = round(test_x / CELL_SIZE) * CELL_SIZE
+                test_y = round(test_y / CELL_SIZE) * CELL_SIZE
                 
                 print(f"Testing position: ({test_x}, {test_y})")
                 if self.is_valid_position(test_x, test_y, self.rotation, self.container):
