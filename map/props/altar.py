@@ -105,6 +105,6 @@ class Altar(Prop):
         """Get the size of this prop in grid units."""
         return Point(1, 1)
     @classmethod
-    def create(cls) -> 'Altar':
-        """Create an altar prop at origin."""
-        return cls((0, 0))
+    def create(cls, rotation: Rotation = Rotation.ROT_0) -> 'Altar':
+        """Create an altar prop at origin with optional rotation."""
+        return cls((0, 0), rotation=rotation)
