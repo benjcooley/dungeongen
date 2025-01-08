@@ -283,6 +283,16 @@ class ShapeGroup:
             
         # Get bounds from final path which accounts for excludes
         path_bounds = self.path.getBounds()
+        
+        # Sanity check the bounds
+        if (abs(path_bounds.left()) > 1000 or abs(path_bounds.top()) > 1000 or
+            path_bounds.width() > 1000 or path_bounds.height() > 1000):
+            raise ValueError(
+                f"Shape group bounds exceed reasonable limits: "
+                f"pos=({path_bounds.left()}, {path_bounds.top()}), "
+                f"size={path_bounds.width()}x{path_bounds.height()}"
+            )
+            
         self._bounds = Rectangle(
             path_bounds.left(),
             path_bounds.top(),
