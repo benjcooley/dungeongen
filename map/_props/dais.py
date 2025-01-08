@@ -63,7 +63,7 @@ class Dais(Prop):
         # Outer circle radius is 100% of height
         outer_radius = DAIS_HEIGHT / 2
         # Inner circle radius is 80% of outer
-        inner_radius = outer_radius / 2 * 0.8
+        inner_radius = DAIS_HEIGHT / 2 * 0.8
         
         # Create paths for the half circles
         outer_path = skia.Path()
