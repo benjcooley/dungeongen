@@ -68,7 +68,7 @@ class Column(Prop):
         
         # Apply rotation to shape
         if self.rotation != Rotation.ROT_0:
-            shape.rotate(math.pi * self.rotation.degrees / 180)
+            shape.rotate(self.rotation.radians)
             
         if layer == Layers.SHADOW:
             # Draw slightly inflated shadow shape
