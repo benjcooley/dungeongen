@@ -12,12 +12,13 @@ from algorithms.rotation import Rotation
 
 # Constants for dais dimensions (2x2 grid cells)
 DAIS_WIDTH = CELL_SIZE * 2
-DAIS_HEIGHT = CELL_SIZE * 2
+DAIS_HEIGHT = CELL_SIZE * 3
 
 DAIS_PROP_TYPE = PropType(
+    is_wall_aligned=True,
     is_grid_aligned=True,
     boundary_shape=Rectangle(-DAIS_WIDTH/2, -DAIS_HEIGHT/2, DAIS_WIDTH, DAIS_HEIGHT),
-    grid_size=(2, 2)
+    grid_size=(2, 3)
 )
 
 class Dais(Prop):
@@ -59,10 +60,10 @@ class Dais(Prop):
         center_x = -CELL_SIZE
         center_y = 0
         
-        # Outer circle radius is 80% of height
-        outer_radius = DAIS_HEIGHT * 0.4
-        # Inner circle radius is 60% of outer
-        inner_radius = outer_radius * 0.6
+        # Outer circle radius is 100% of height
+        outer_radius = DAIS_HEIGHT
+        # Inner circle radius is 80% of outer
+        inner_radius = outer_radius * 0.8
         
         # Create paths for the half circles
         outer_path = skia.Path()
