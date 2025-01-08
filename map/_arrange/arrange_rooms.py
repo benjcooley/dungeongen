@@ -15,6 +15,7 @@ This module provides different strategies for arranging rooms in a dungeon map:
 from enum import Enum, auto
 from typing import List, Optional, Tuple
 import random
+from algorithms.shapes import Circle
 from map.map import Map
 from map.room import Room
 from map.passage import Passage
