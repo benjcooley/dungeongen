@@ -48,7 +48,7 @@ class Column(Prop):
         if layer not in (Layers.PROPS, Layers.SHADOW):
             return
             
-        print(f"Drawing column at {self._position} for layer {layer}")
+        print(f"Drawing column at {self.position} for layer {layer}")
             
         # Get shape based on column type
         if self._column_type == ColumnType.ROUND:
