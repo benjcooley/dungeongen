@@ -60,8 +60,8 @@ def main():
     # Test horizontal row layout for columns
     start_room.create_columns(ColumnArrangement.ROWS, orientation=RowOrientation.HORIZONTAL)
     
-    # Add columns in a circle arrangement
-    end_room.create_columns(ColumnArrangement.CIRCLE)
+    # Add columns in a circle arrangement with 0.5 grid unit margin
+    end_room.create_columns(ColumnArrangement.CIRCLE, margin=0.5)
     
     # Add some rocks
     end_room.create_random_props([PropType.MEDIUM_ROCK], min_count=0, max_count=2)

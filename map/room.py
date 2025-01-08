@@ -154,8 +154,8 @@ class Room(MapElement):
                 raise ValueError("Only CIRCLE arrangement supported for circular rooms")
                 
             circle = self._shape  # type: Circle
-            # Place columns 1 grid unit from wall
-            radius = circle.radius - CELL_SIZE
+            # Place columns away from wall based on margin
+            radius = circle.radius - ((margin + 1) * CELL_SIZE)
             center = circle.bounds.center
             
             # Use 8 columns for now
