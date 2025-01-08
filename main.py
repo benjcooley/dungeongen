@@ -24,41 +24,14 @@ def main():
     # Create map
     dungeon_map = Map(options)
     
-    # Add central rectangular room (5x5, centered at 0,0)
-    # Since we want grid alignment and center at 0,0, we'll offset by -2,-2
-    start_room = dungeon_map.add_rectangular_room(-2, -2, 5, 5)
+    # Generate rooms using the linear arrangement strategy
+    rooms = arrange_rooms(dungeon_map, ArrangeRoomStyle.LINEAR, min_rooms=4, max_rooms=6)
     
-    # Add door to the right of the room (at x=3, centered vertically)
-    first_door = Door.from_grid(3, 0, DoorOrientation.HORIZONTAL, dungeon_map, open=True)
-    dungeon_map.add_element(first_door)
-    
-    # Add 5-grid long passage
-    passage = Passage.from_grid(4, 0, 5, 1, dungeon_map)
-    dungeon_map.add_element(passage)
-    
-    # Add closed door at the end of the passage
-    second_door = Door.from_grid(9, 0, DoorOrientation.HORIZONTAL, dungeon_map, open=False)
-    dungeon_map.add_element(second_door)
-    
-    # Add circular room (5x5 grid units, 11 units right of start room)
-    end_room = dungeon_map.add_circular_room(10, -2, 5)
-    
-    # Connect everything together
-    start_room.connect_to(first_door)
-    first_door.connect_to(passage)
-    passage.connect_to(second_door)
-    second_door.connect_to(end_room)
-    
-    # Add props to rooms and passage
-    # Test vertical row layout for columns
-    arrange_columns(start_room, ColumnArrangement.VERTICAL_ROWS, column_type=ColumnType.SQUARE)
-    
-    # Add square columns in a circle arrangement
-    arrange_columns(end_room, ColumnArrangement.CIRCLE, column_type=ColumnType.SQUARE)
-    
-    # Add some rocks
-    arrange_random_props(end_room, [PropType.MEDIUM_ROCK], min_count=0, max_count=2)
-    arrange_random_props(end_room, [PropType.SMALL_ROCK], min_count=0, max_count=2)
+    # Add some decorations to the first and last rooms
+    if rooms:
+        arrange_columns(rooms[0], ColumnArrangement.VERTICAL_ROWS, column_type=ColumnType.SQUARE)
+        arrange_columns(rooms[-1], ColumnArrangement.CIRCLE, column_type=ColumnType.SQUARE)
+        arrange_random_props(rooms[-1], [PropType.MEDIUM_ROCK, PropType.SMALL_ROCK], min_count=2, max_count=4)
 
     # Draw the map (which will draw all rooms)
     dungeon_map.render(canvas)
