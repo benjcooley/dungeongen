@@ -153,16 +153,15 @@ class Room(MapElement):
             if arrangement != ColumnArrangement.CIRCLE:
                 raise ValueError("Only CIRCLE arrangement supported for circular rooms")
                 
-            # Calculate radius based on margin
+            # Calculate optimal radius and number of columns based on room size
             room_radius = self._shape.radius
-            margin_grids = math.floor(margin)  # Convert to integer grid units
-            radius = room_radius - ((margin_grids + 1) * CELL_SIZE)  # One grid in from margin
+            radius = room_radius * 0.7  # Place columns at 70% of room radius
             
-            if radius <= CELL_SIZE:  # Ensure we have space for columns
-                return columns
+            # Calculate number of columns based on circumference
+            circumference = 2 * math.pi * radius
+            column_spacing = CELL_SIZE * 2  # Space columns 2 grid units apart
+            num_columns = max(8, min(16, int(circumference / column_spacing)))
             
-            # Place 12 columns in a circle
-            num_columns = 12
             center = self._shape.bounds.center
             
             for i in range(num_columns):
@@ -170,9 +169,9 @@ class Room(MapElement):
                 x = center[0] + radius * math.cos(angle)
                 y = center[1] + radius * math.sin(angle)
                 
-                # Create column rotated to face center
+                # Create square column rotated to face center
                 rotation = Rotation.from_radians(angle + math.pi/2)
-                column = Column.create_round(0, 0)
+                column = Column.create_square(x, y, rotation)
                 columns.append(column)
                     
             return columns
@@ -192,77 +191,58 @@ class Room(MapElement):
             end_y = grid_height - margin - 1
             
             if arrangement == ColumnArrangement.GRID:
-                # Place columns at each grid intersection within margins
-                for x in range(int(start_x), int(end_x + 1)):
-                    for y in range(int(start_y), int(end_y + 1)):
-                        grid_x = x * CELL_SIZE
-                        grid_y = y * CELL_SIZE
-                        draw_x, draw_y = grid_to_drawing(grid_x, grid_y, self._options)
-                        column = Column.create_square(draw_x + rect.x, draw_y + rect.y)
-                        self.add_prop(column)
+                # Place columns at each interior grid intersection
+                for x in range(1, grid_width-1):
+                    for y in range(1, grid_height-1):
+                        x_pos = rect.x + (x * CELL_SIZE)
+                        y_pos = rect.y + (y * CELL_SIZE)
+                        column = Column.create_square(x_pos, y_pos)
                         columns.append(column)
                             
             elif arrangement == ColumnArrangement.RECTANGLE:
-                # Place columns around perimeter
+                # Place columns around perimeter at grid intersections
+                # Skip corners to avoid overlap
                 # Top and bottom rows
-                for x in range(int(start_x), int(end_x + 1)):
-                    for y in (int(start_y), int(end_y)):
-                        grid_x = x * CELL_SIZE
-                        grid_y = y * CELL_SIZE
-                        draw_x, draw_y = grid_to_drawing(grid_x, grid_y, self._options)
-                        column = Column.create_square(draw_x + rect.x, draw_y + rect.y)
+                for x in range(1, grid_width-1):
+                    for y in (1, grid_height-2):
+                        x_pos = rect.x + (x * CELL_SIZE)
+                        y_pos = rect.y + (y * CELL_SIZE)
+                        column = Column.create_square(x_pos, y_pos)
                         columns.append(column)
                 
                 # Left and right columns (excluding corners)
-                for y in range(int(start_y + 1), int(end_y)):
-                    for x in (start_x, end_x):
-                        grid_x = x * CELL_SIZE
-                        grid_y = y * CELL_SIZE
-                        draw_x, draw_y = grid_to_drawing(grid_x, grid_y, self._options)
-                        column = Column.create_square(draw_x + rect.x, draw_y + rect.y)
+                for y in range(2, grid_height-2):
+                    for x in (1, grid_width-2):
+                        x_pos = rect.x + (x * CELL_SIZE)
+                        y_pos = rect.y + (y * CELL_SIZE)
+                        column = Column.create_square(x_pos, y_pos)
                         columns.append(column)
                             
             elif arrangement == ColumnArrangement.ROWS:
-                # Place columns in parallel rows
+                # Calculate grid positions for rows/columns with proper spacing
+                grid_positions = list(range(1, grid_width-1))  # Skip edges
+                if len(grid_positions) < 2:
+                    return columns
+
+                # Select two positions that divide space into thirds
+                pos1 = grid_positions[len(grid_positions)//3]
+                pos2 = grid_positions[2*len(grid_positions)//3]
+
                 if orientation == RowOrientation.HORIZONTAL:
-                    # For a 5x5 room, we want columns at grid positions 1 and 3
-                    # This places them evenly spaced with 1 grid cell between them
-                    row1 = 1  # First row at y=1
-                    row2 = 3  # Second row at y=3
-                    
-                    # Place columns at grid intersections 1 and 3 along each row
-                    for x in (1, 3):
-                        for y in (row1, row2):
-                            # Convert grid coordinates to drawing coordinates
-                            x_pos = rect.x + (x * CELL_SIZE) 
+                    # Place columns in two horizontal rows
+                    for x in range(1, grid_width-1):
+                        for y in (pos1, pos2):
+                            x_pos = rect.x + (x * CELL_SIZE)
                             y_pos = rect.y + (y * CELL_SIZE)
                             column = Column.create_square(x_pos, y_pos)
                             columns.append(column)
                 else:  # VERTICAL
-                    # Calculate total available width
-                    available_width = end_x - start_x
-                    margin_grids = math.floor(margin)  # Convert to integer grid units
-                    
-                    # Need enough space for columns plus margins
-                    min_space = (2 * margin_grids) + 3  # 2 margins + 3 spaces (2 for separation + 1 for columns)
-                    if available_width < min_space:
-                        return columns
-                        
-                    # Calculate column positions with margins
-                    spacing = (available_width - 2*margin_grids) / 3  # Divide available space into thirds
-                    col1 = start_x + spacing  # First third
-                    col2 = end_x - spacing    # Last third
-                    
-                    print(f"Column positions: {col1}, {col2}")
-                    
-                    # Place columns along each column
-                    for y in range(int(start_y), int(end_y + 1)):
-                        for x in (col1, col2):
-                            grid_x = x * CELL_SIZE
-                            grid_y = y * CELL_SIZE
-                            draw_x, draw_y = grid_to_drawing(grid_x, grid_y, self._options)
-                            column = Column.create_square(draw_x + rect.x, draw_y + rect.y)
-                            self.add_prop(column)
+                    # Place columns in two vertical columns
+                    for y in range(1, grid_height-1):
+                        for x in (pos1, pos2):
+                            x_pos = rect.x + (x * CELL_SIZE)
+                            y_pos = rect.y + (y * CELL_SIZE)
+                            column = Column.create_square(x_pos, y_pos)
                             columns.append(column)
                                 
             # Add all created columns to room's props
