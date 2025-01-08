@@ -195,25 +195,26 @@ class Room(MapElement):
             top = 1 + margin
             bottom = grid_height - (1 + margin)
             
-            column_positions = []  # List of (x,y) grid coordinates
+            # Calculate all positions in grid coordinates first
+            grid_positions = []  # List of (x,y) grid coordinates
             
             if arrangement == ColumnArrangement.GRID:
                 # Place columns in a grid pattern with 2-unit spacing
-                for x in range(math.ceil(left), math.floor(right) + 1, 2):
-                    for y in range(math.ceil(top), math.floor(bottom) + 1, 2):
-                        column_positions.append((x, y))
+                for x in range(int(left), int(right) + 1, 2):
+                    for y in range(int(top), int(bottom) + 1, 2):
+                        grid_positions.append((x, y))
                             
             elif arrangement == ColumnArrangement.RECTANGLE:
                 # Place columns around perimeter
                 # Top and bottom rows
-                for x in range(math.ceil(left), math.floor(right) + 1, 2):
-                    column_positions.append((x, math.ceil(top)))  # Top row
-                    column_positions.append((x, math.floor(bottom)))  # Bottom row
+                for x in range(int(left), int(right) + 1, 2):
+                    grid_positions.append((x, int(top)))  # Top row
+                    grid_positions.append((x, int(bottom)))  # Bottom row
                 
                 # Left and right columns (excluding corners)
-                for y in range(math.ceil(top) + 2, math.floor(bottom) - 1, 2):
-                    column_positions.append((math.ceil(left), y))  # Left column
-                    column_positions.append((math.floor(right), y))  # Right column
+                for y in range(int(top) + 2, int(bottom) - 1, 2):
+                    grid_positions.append((int(left), y))  # Left column
+                    grid_positions.append((int(right), y))  # Right column
                             
             elif arrangement == ColumnArrangement.ROWS:
                 if right - left < 2:  # Room too small
@@ -222,28 +223,28 @@ class Room(MapElement):
                 if orientation == RowOrientation.HORIZONTAL:
                     # Calculate two rows at 1/3 and 2/3 of height
                     usable_height = bottom - top
-                    row1 = top + (usable_height / 3)  # First row at 1/3
-                    row2 = top + (2 * usable_height / 3)  # Second row at 2/3
+                    row1 = int(top + (usable_height / 3))  # First row at 1/3
+                    row2 = int(top + (2 * usable_height / 3))  # Second row at 2/3
                     
                     # Place columns along both rows with 2-unit spacing
-                    for x in range(math.ceil(left), math.floor(right) + 1, 2):
-                        column_positions.append((x, row1))
-                        column_positions.append((x, row2))
+                    for x in range(int(left), int(right) + 1, 2):
+                        grid_positions.append((x, row1))
+                        grid_positions.append((x, row2))
                 else:  # VERTICAL
                     # Calculate two columns at 1/3 and 2/3 of width
                     usable_width = right - left
-                    x1 = left + (usable_width * 0.33)
-                    x2 = left + (usable_width * 0.67)
+                    col1 = int(left + (usable_width / 3))  # First column at 1/3
+                    col2 = int(left + (2 * usable_width / 3))  # Second column at 2/3
                     
                     # Place columns along both columns with 2-unit spacing
-                    for y in range(math.ceil(top), math.floor(bottom) + 1, 2):
-                        column_positions.append((math.ceil(x1), y))
-                        column_positions.append((math.ceil(x2), y))
+                    for y in range(int(top), int(bottom) + 1, 2):
+                        grid_positions.append((col1, y))
+                        grid_positions.append((col2, y))
 
-            # Create columns at calculated positions
-            for grid_x, grid_y in column_positions:
-                x, y = grid_to_map(grid_x, grid_y)
-                column = Column.create_square(x, y)
+            # Convert grid positions to map space and create columns
+            for grid_x, grid_y in grid_positions:
+                map_x, map_y = grid_to_map(grid_x, grid_y)
+                column = Column.create_square(map_x, map_y)
                 columns.append(column)
                                 
             # Add all created columns to room's props
