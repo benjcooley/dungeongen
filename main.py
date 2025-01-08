@@ -31,9 +31,12 @@ def main():
     
     # Add a test column at room center
     from map.props.column import Column
-    center_x = start_room.bounds.x + start_room.bounds.width/2
-    center_y = start_room.bounds.y + start_room.bounds.height/2
-    test_column = Column.create_round(center_x, center_y)
+    # Get room center in grid coordinates
+    grid_center_x = -2 + 5/2  # start_x + width/2 
+    grid_center_y = -2 + 5/2  # start_y + height/2
+    # Convert to drawing coordinates
+    draw_x, draw_y = grid_to_drawing(grid_center_x, grid_center_y, dungeon_map.options)
+    test_column = Column.create_round(draw_x, draw_y)
     start_room.add_prop(test_column)
     
     # Add door to the right of the room (at x=3, centered vertically)
