@@ -47,12 +47,12 @@ class Rotation:
     @property
     def radians(self) -> float:
         """Get the rotation angle in radians."""
-        return math.radians(self._degrees)
+        return self._degrees * math.pi / 180
         
     @radians.setter 
     def radians(self, value: float) -> None:
         """Set the rotation angle in radians."""
-        self._degrees = math.degrees(value) % 360
+        self._degrees = (value / 180 * math.pi) % 360
         
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Rotation):
