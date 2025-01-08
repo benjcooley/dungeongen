@@ -165,7 +165,7 @@ class Room(MapElement):
                 x = center[0] + radius * math.cos(angle)
                 y = center[1] + radius * math.sin(angle)
                 
-                column = Column.create_round(x, y)
+                column = Column.create_square(x, y)
                 columns.append(column)
                 self.add_prop(column)
                     
