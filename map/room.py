@@ -215,25 +215,15 @@ class Room(MapElement):
                     return columns
 
                 if orientation == RowOrientation.HORIZONTAL:
-                    # Calculate two rows at 1/3 and 2/3 of height
-                    usable_height = bottom - top
-                    row1 = int(top + (usable_height / 3))  # First row at 1/3
-                    row2 = int(top + (2 * usable_height / 3))  # Second row at 2/3
-                    
-                    # Place columns along both rows with 2-unit spacing
+                    # Place columns in two horizontal rows
                     for x in range(int(left), int(right) + 1):
-                        grid_positions.append((x, row1))
-                        grid_positions.append((x, row2))
+                        grid_positions.append((x, int(top)))      # Top row
+                        grid_positions.append((x, int(bottom)))   # Bottom row
                 else:  # VERTICAL
-                    # Calculate two columns at 1/3 and 2/3 of width
-                    usable_width = right - left
-                    col1 = int(left + (usable_width / 3))  # First column at 1/3
-                    col2 = int(left + (2 * usable_width / 3))  # Second column at 2/3
-                    
-                    # Place columns along both columns with 2-unit spacing
+                    # Place columns in two vertical rows
                     for y in range(int(top), int(bottom) + 1):
-                        grid_positions.append((col1, y))
-                        grid_positions.append((col2, y))
+                        grid_positions.append((int(left), y))     # Left column
+                        grid_positions.append((int(right), y))    # Right column
 
             # Convert grid positions to map space and create columns
             for grid_x, grid_y in grid_positions:
