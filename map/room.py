@@ -128,7 +128,8 @@ class Room(MapElement):
     def create_columns(self, 
                       arrangement: ColumnArrangement,
                       orientation: RowOrientation = RowOrientation.HORIZONTAL,
-                      margin: float = 0) -> List['Prop']:
+                      margin: float = 0,
+                      column_type: ColumnType = ColumnType.ROUND) -> List['Prop']:
         """Create columns in this room according to the specified arrangement pattern.
         
         Args:
@@ -147,6 +148,7 @@ class Room(MapElement):
         import math
         
         columns = []
+        column_angles = None
         
         # For circular rooms, only allow CIRCLE arrangement
         if isinstance(self._shape, Circle):
@@ -160,13 +162,21 @@ class Room(MapElement):
             
             # Use 8 columns for now
             num_columns = 8
+            column_angles = []
             for i in range(num_columns):
                 angle = (i * 2 * math.pi / num_columns)
                 x = center[0] + radius * math.cos(angle)
                 y = center[1] + radius * math.sin(angle)
                 
-                column = Column.create_square(x, y)
+                if column_type == ColumnType.SQUARE:
+                    # For square columns, angle them to face center
+                    # Add pi/2 to make the flat face point toward center
+                    column = Column.create_square(x, y, angle + math.pi/2)
+                else:
+                    column = Column.create_round(x, y)
+                    
                 columns.append(column)
+                column_angles.append(angle)
                 self.add_prop(column)
                     
             return columns
