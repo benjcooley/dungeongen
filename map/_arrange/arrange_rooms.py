@@ -152,11 +152,19 @@ class _RoomArranger:
         x1, y1 = self._get_room_connection_point(room1, orientation)
         x2, y2 = self._get_room_connection_point(room2, orientation)
         
+        print(f"\nCreating passage:")
+        print(f"  Room1 connection point: ({x1}, {y1})")
+        print(f"  Room2 connection point: ({x2}, {y2})")
+        
         # Determine passage dimensions and position
         if orientation == Orientation.HORIZONTAL:
             passage_x = min(x1, x2)
             passage_width = abs(x2 - x1)
             passage_y = (y1 + y2) / 2 - 0.5  # Center between rooms
+            
+            print(f"  Horizontal passage:")
+            print(f"    Position: ({passage_x}, {passage_y})")
+            print(f"    Width: {passage_width}")
             
             # Create passage and doors
             passage = Passage.from_grid(passage_x, passage_y, passage_width, 1, self.dungeon_map)
@@ -182,6 +190,10 @@ class _RoomArranger:
 
     def connect_rooms(self, room1: Room, room2: Room, orientation: Orientation) -> None:
         """Connect two rooms with a passage and doors."""
+        print(f"\nConnecting rooms:")
+        print(f"  Room1 bounds: ({room1.bounds.x}, {room1.bounds.y}) to ({room1.bounds.x + room1.bounds.width}, {room1.bounds.y + room1.bounds.height})")
+        print(f"  Room2 bounds: ({room2.bounds.x}, {room2.bounds.y}) to ({room2.bounds.x + room2.bounds.width}, {room2.bounds.y + room2.bounds.height})")
+        print(f"  Orientation: {orientation}")
         self._create_passage(room1, room2, orientation)
         
     def arrange_linear(
