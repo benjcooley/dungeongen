@@ -235,10 +235,19 @@ class Room(MapElement):
             for grid_x, grid_y in grid_positions:
                 map_x = rect.left + (grid_x * CELL_SIZE)
                 map_y = rect.top + (grid_y * CELL_SIZE)
-                if column_type == ColumnType.SQUARE:
-                    column = Column.create_square(map_x, map_y)
+                # If we have angles (from circular arrangement), use them
+                if column_angles is not None and len(column_angles) > len(columns):
+                    angle = column_angles[len(columns)]
+                    if column_type == ColumnType.SQUARE:
+                        column = Column.create_square(map_x, map_y, angle + math.pi/2)
+                    else:
+                        column = Column.create_round(map_x, map_y)
                 else:
-                    column = Column.create_round(map_x, map_y)
+                    # Default behavior for rectangular rooms
+                    if column_type == ColumnType.SQUARE:
+                        column = Column.create_square(map_x, map_y)
+                    else:
+                        column = Column.create_round(map_x, map_y)
                 columns.append(column)
                                 
             # Add all columns at once
