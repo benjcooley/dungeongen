@@ -11,7 +11,7 @@ from map.map import Map
 from map.door import Door, DoorOrientation
 from map.passage import Passage
 from algorithms.rotation import Rotation
-from map.props import ColumnType, Altar, Coffin, Dais, Rock
+from map.props import ColumnType, Altar, Coffin, Dais, Rock, Dais
 from map.arrange import PropType, arrange_columns, ColumnArrangement, \
     arrange_random_props, arrange_rooms, ArrangeRoomStyle
 from options import Options
@@ -36,7 +36,11 @@ def main():
         # Add central rectangular room (5x5, centered at 0,0)
         # Since we want grid alignment and center at 0,0, we'll offset by -2,-2
         start_room0 = dungeon_map.add_rectangular_room(-10, -2, 5, 5) 
-        rooms.append(start_room0)   
+        rooms.append(start_room0)
+        
+        # Add dais to left side of room0
+        dais = Dais((start_room0.bounds.left + CELL_SIZE, start_room0.bounds.center[1]), Rotation.ROT_270)
+        start_room0.add_prop(dais)
         
         # Add 5-grid long passage
         passage0 = Passage.from_grid(-5, 0, 5, 1, dungeon_map)
