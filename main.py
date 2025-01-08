@@ -57,14 +57,8 @@ def main():
     second_door.connect_to(end_room)
     
     # Add props to rooms and passage
-    # Add altars to start room (square room)
-    start_room.create_random_props([PropType.ALTAR], min_count=2, max_count=3)
-    
-    # Add columns in rows
+    # Test horizontal row layout for columns
     start_room.create_columns(ColumnArrangement.ROWS, orientation=RowOrientation.HORIZONTAL)
-    
-    # Add altar and rocks to end room (circular room)
-    end_room.create_random_props([PropType.ALTAR], min_count=1, max_count=2)
     
     # Add columns in a circle arrangement
     end_room.create_columns(ColumnArrangement.CIRCLE)
