@@ -174,8 +174,10 @@ class Room(MapElement):
                     
                 columns.append(column)
                 column_angles.append(angle)
-                self.add_prop(column)
                     
+            # Add all columns at once
+            for column in columns:
+                self.add_prop(column)
             return columns
             
         # For rectangular rooms
@@ -236,7 +238,7 @@ class Room(MapElement):
                 column = Column.create_square(map_x, map_y)
                 columns.append(column)
                                 
-            # Add all created columns to room's props
+            # Add all columns at once
             for column in columns:
                 self.add_prop(column)
             return columns
