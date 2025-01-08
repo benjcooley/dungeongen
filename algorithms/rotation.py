@@ -42,22 +42,22 @@ class Rotation:
     @degrees.setter
     def degrees(self, value: float) -> None:
         """Set the rotation angle in degrees."""
-        self._degrees = value % 360.0
+        self._degrees = value % 360
         
     @property
     def radians(self) -> float:
         """Get the rotation angle in radians."""
-        return self._degrees * math.pi / 180.0
+        return math.radians(self._degrees)
         
     @radians.setter 
     def radians(self, value: float) -> None:
         """Set the rotation angle in radians."""
-        self._degrees = (value / 180.0 * math.pi) % 360.0
+        self._degrees = math.degrees(value) % 360
         
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Rotation):
             return NotImplemented
-        return abs((self._degrees - other._degrees) % 360.0) < 0.001
+        return abs((self._degrees - other._degrees) % 360) < 0.001
         
     def __str__(self) -> str:
         return f"Rotation({self._degrees}°)"
