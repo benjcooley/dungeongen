@@ -40,7 +40,7 @@ class Column(Prop):
         """
         self._column_type = column_type
         prop_type = ROUND_COLUMN_TYPE if column_type == ColumnType.ROUND else SQUARE_COLUMN_TYPE
-        super().__init__(prop_type, position)
+        super().__init__(prop_type, position, rotation=rotation)
     
     def _draw_content(self, canvas: skia.Canvas, bounds: Rectangle, layer: Layers = Layers.PROPS) -> None:
         if layer not in (Layers.PROPS, Layers.SHADOW, Layers.OVERLAY):
