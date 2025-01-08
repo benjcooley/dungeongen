@@ -67,23 +67,6 @@ class Rotation:
         """
         return cls(math.degrees(radians))
         
-    @property
-    def to_radians(self) -> float:
-        """Convert this rotation to radians.
-        
-        Returns:
-            Angle in radians
-        """
-        return self.radians
-        
-    @property
-    def to_degrees(self) -> float:
-        """Convert this rotation to degrees.
-        
-        Returns:
-            Angle in degrees
-        """
-        return self.degrees
         
     @classmethod
     def from_degrees(cls, degrees: float) -> 'Rotation':
