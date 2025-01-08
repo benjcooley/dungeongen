@@ -183,66 +183,58 @@ class Room(MapElement):
             grid_width = int(rect.width / CELL_SIZE)
             grid_height = int(rect.height / CELL_SIZE)
             
-            # Calculate usable area accounting for margin
-            start_x = margin + 1
-            start_y = margin + 1
-            end_x = grid_width - margin - 1
-            end_y = grid_height - margin - 1
+            # Work in grid coordinates (0,0 is top-left of room)
+            def grid_to_map(grid_x: int, grid_y: int) -> tuple[float, float]:
+                return (rect.x + (grid_x * CELL_SIZE), 
+                       rect.y + (grid_y * CELL_SIZE))
+
+            # Calculate valid column positions (1 unit in from edges)
+            valid_x = range(1, grid_width-1)
+            valid_y = range(1, grid_height-1)
+            
+            column_positions = []  # List of (x,y) grid coordinates
             
             if arrangement == ColumnArrangement.GRID:
                 # Place columns at each interior grid intersection
-                for x in range(1, grid_width-1):
-                    for y in range(1, grid_height-1):
-                        x_pos = rect.x + (x * CELL_SIZE)
-                        y_pos = rect.y + (y * CELL_SIZE)
-                        column = Column.create_square(x_pos, y_pos)
-                        columns.append(column)
+                for x in valid_x:
+                    for y in valid_y:
+                        column_positions.append((x, y))
                             
             elif arrangement == ColumnArrangement.RECTANGLE:
                 # Place columns around perimeter at grid intersections
-                # Skip corners to avoid overlap
-                # Top and bottom rows
-                for x in range(1, grid_width-1):
-                    for y in (1, grid_height-2):
-                        x_pos = rect.x + (x * CELL_SIZE)
-                        y_pos = rect.y + (y * CELL_SIZE)
-                        column = Column.create_square(x_pos, y_pos)
-                        columns.append(column)
+                # Top and bottom rows (skip corners)
+                for x in valid_x:
+                    column_positions.append((x, 1))  # Top row
+                    column_positions.append((x, grid_height-2))  # Bottom row
                 
-                # Left and right columns (excluding corners)
+                # Left and right columns (excluding corners and overlap)
                 for y in range(2, grid_height-2):
-                    for x in (1, grid_width-2):
-                        x_pos = rect.x + (x * CELL_SIZE)
-                        y_pos = rect.y + (y * CELL_SIZE)
-                        column = Column.create_square(x_pos, y_pos)
-                        columns.append(column)
+                    column_positions.append((1, y))  # Left column
+                    column_positions.append((grid_width-2, y))  # Right column
                             
             elif arrangement == ColumnArrangement.ROWS:
-                # Calculate grid positions for rows/columns with proper spacing
-                grid_positions = list(range(1, grid_width-1))  # Skip edges
-                if len(grid_positions) < 2:
+                if len(valid_x) < 2:  # Room too small
                     return columns
 
-                # Select two positions that divide space into thirds
-                pos1 = grid_positions[len(grid_positions)//3]
-                pos2 = grid_positions[2*len(grid_positions)//3]
-
+                # Calculate row/column positions that divide space into thirds
                 if orientation == RowOrientation.HORIZONTAL:
-                    # Place columns in two horizontal rows
-                    for x in range(1, grid_width-1):
-                        for y in (pos1, pos2):
-                            x_pos = rect.x + (x * CELL_SIZE)
-                            y_pos = rect.y + (y * CELL_SIZE)
-                            column = Column.create_square(x_pos, y_pos)
-                            columns.append(column)
+                    y1 = 1 + (grid_height-2)//3
+                    y2 = 1 + 2*(grid_height-2)//3
+                    for x in valid_x:
+                        column_positions.append((x, y1))
+                        column_positions.append((x, y2))
                 else:  # VERTICAL
-                    # Place columns in two vertical columns
-                    for y in range(1, grid_height-1):
-                        for x in (pos1, pos2):
-                            x_pos = rect.x + (x * CELL_SIZE)
-                            y_pos = rect.y + (y * CELL_SIZE)
-                            column = Column.create_square(x_pos, y_pos)
-                            columns.append(column)
+                    x1 = 1 + (grid_width-2)//3
+                    x2 = 1 + 2*(grid_width-2)//3
+                    for y in valid_y:
+                        column_positions.append((x1, y))
+                        column_positions.append((x2, y))
+
+            # Create columns at calculated positions
+            for grid_x, grid_y in column_positions:
+                x, y = grid_to_map(grid_x, grid_y)
+                column = Column.create_square(x, y)
+                columns.append(column)
                                 
             # Add all created columns to room's props
             for column in columns:
