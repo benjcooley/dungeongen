@@ -285,10 +285,10 @@ class ShapeGroup:
         path_bounds = self.path.getBounds()
         
         # Sanity check the bounds
-        if (abs(path_bounds.left()) > 1000 or abs(path_bounds.top()) > 1000 or
-            path_bounds.width() > 1000 or path_bounds.height() > 1000):
+        if (abs(path_bounds.left()) > 3200 or abs(path_bounds.top()) > 3200 or
+            path_bounds.width() > 3200 or path_bounds.height() > 3200):
             raise ValueError(
-                f"Shape group bounds exceed reasonable limits: "
+                f"Shape group bounds exceed reasonable limits (±3200): "
                 f"pos=({path_bounds.left()}, {path_bounds.top()}), "
                 f"size={path_bounds.width()}x{path_bounds.height()}"
             )
