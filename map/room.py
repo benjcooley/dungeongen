@@ -184,9 +184,10 @@ class Room(MapElement):
             grid_height = int(rect.height / CELL_SIZE)
             
             # Work in grid coordinates (0,0 is top-left of room)
-            def grid_to_map(grid_x: int, grid_y: int) -> tuple[float, float]:
-                return (rect.x + (grid_x * CELL_SIZE), 
-                       rect.y + (grid_y * CELL_SIZE))
+            def grid_to_map(grid_x: float, grid_y: float) -> tuple[float, float]:
+                # Convert grid coordinates to absolute map coordinates
+                return (rect.left + (grid_x * CELL_SIZE), 
+                       rect.top + (grid_y * CELL_SIZE))
 
             # Calculate valid column placement rectangle
             left = 1 + margin
@@ -221,13 +222,13 @@ class Room(MapElement):
                 if orientation == RowOrientation.HORIZONTAL:
                     # Calculate two rows at 1/3 and 2/3 of height
                     usable_height = bottom - top
-                    y1 = top + (usable_height * 0.33)
-                    y2 = top + (usable_height * 0.67)
+                    row1 = top + (usable_height / 3)  # First row at 1/3
+                    row2 = top + (2 * usable_height / 3)  # Second row at 2/3
                     
                     # Place columns along both rows with 2-unit spacing
                     for x in range(math.ceil(left), math.floor(right) + 1, 2):
-                        column_positions.append((x, math.ceil(y1)))
-                        column_positions.append((x, math.ceil(y2)))
+                        column_positions.append((x, row1))
+                        column_positions.append((x, row2))
                 else:  # VERTICAL
                     # Calculate two columns at 1/3 and 2/3 of width
                     usable_width = right - left
