@@ -36,6 +36,7 @@ def main():
     grid_center_y = -2 + 5/2  # start_y + height/2
     # Convert to drawing coordinates
     draw_x, draw_y = grid_to_drawing(grid_center_x, grid_center_y, dungeon_map.options)
+    print(f"Creating test column at grid ({grid_center_x}, {grid_center_y}) -> drawing ({draw_x}, {draw_y})")
     test_column = Column.create_round(draw_x, draw_y)
     start_room.add_prop(test_column)
     
