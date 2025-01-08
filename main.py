@@ -10,10 +10,8 @@ from map.map import Map
 from map.door import Door, DoorOrientation
 from map.passage import Passage
 from algorithms.rotation import Rotation
-from map.props.proptypes import PropType
-from map.props.columnarrangement import ColumnArrangement, RowOrientation
-from map.props.column import ColumnType
-from map.props.altar import Altar
+from map.props import ColumnType, Altar, Coffin, Dais, Rock
+from map.arrange import PropType, arrange_columns, ColumnArrangement, arrange_random_props, arrange_prop
 from options import Options
 
 def main():
@@ -29,10 +27,6 @@ def main():
     # Add central rectangular room (5x5, centered at 0,0)
     # Since we want grid alignment and center at 0,0, we'll offset by -2,-2
     start_room = dungeon_map.add_rectangular_room(-2, -2, 5, 5)
-    
-    print("Creating columns in vertical row arrangement")
-    columns = start_room.create_columns(ColumnArrangement.ROWS, orientation=RowOrientation.VERTICAL)
-    print(f"Created {len(columns)} columns")
     
     # Add door to the right of the room (at x=3, centered vertically)
     first_door = Door.from_grid(3, 0, DoorOrientation.HORIZONTAL, dungeon_map, open=True)
@@ -57,14 +51,14 @@ def main():
     
     # Add props to rooms and passage
     # Test vertical row layout for columns
-    start_room.create_columns(ColumnArrangement.ROWS, orientation=RowOrientation.VERTICAL)
+    arrange_columns(start_room, ColumnArrangement.VERTICAL_ROWS, column_type=ColumnType.SQUARE)
     
     # Add square columns in a circle arrangement
-    end_room.create_columns(ColumnArrangement.CIRCLE, column_type=ColumnType.SQUARE)
+    arrange_columns(end_room, ColumnArrangement.CIRCLE, column_type=ColumnType.SQUARE)
     
     # Add some rocks
-    end_room.create_random_props([PropType.MEDIUM_ROCK], min_count=0, max_count=2)
-    end_room.create_random_props([PropType.SMALL_ROCK], min_count=0, max_count=2)
+    arrange_random_props(end_room, [PropType.MEDIUM_ROCK], min_count=0, max_count=2)
+    arrange_random_props(end_room, [PropType.SMALL_ROCK], min_count=0, max_count=2)
 
     # Draw the map (which will draw all rooms)
     dungeon_map.render(canvas)

@@ -3,17 +3,12 @@ import random
 import math
 import skia
 from map.enums import Layers
-from map.props.proptypes import PropType
-from map.props.altar import Altar
-from map.props.rock import Rock
-from algorithms.rotation import Rotation
-from map.props.columnarrangement import ColumnArrangement, RowOrientation
 from constants import CELL_SIZE
 
 if TYPE_CHECKING:
     from map.map import Map
     from options import Options
-    from map.props.prop import Prop
+    from map._props.prop import Prop
     from map.occupancy import OccupancyGrid
 from algorithms.shapes import Rectangle, Circle
 from algorithms.shapes import Shape
@@ -34,66 +29,7 @@ class MapElement:
         self._map = map_
         self._options = map_.options
         self._props: List['Prop'] = []
-        
-    def create_random_props(self, prop_types: list['PropType'], min_count: int = 0, max_count: int = 3) -> list['Prop']:
-        """Create and add multiple randomly selected props from a list of types.
-        
-        Args:
-            prop_types: List of prop types to choose from
-            min_count: Minimum number of props to create
-            max_count: Maximum number of props to create
-            
-        Returns:
-            List of successfully placed props
-        """
-        count = random.randint(min_count, max_count)
-        placed_props = []
-        
-        # Create and try to place each prop
-        for _ in range(count):
-            # Randomly select a prop type
-            prop_type = random.choice(prop_types)
-            if prop := self.create_prop(prop_type):
-                placed_props.append(prop)
-                
-        return placed_props
-        
-    def create_prop(self, prop_type: 'PropType') -> Optional['Prop']:
-        """Create a single prop of the specified type.
-        
-        Args:
-            prop_type: Type of prop to create
-            
-        Returns:
-            The created prop if successfully placed, None otherwise
-        """
-        # Create prop based on type
-        if prop_type == PropType.SMALL_ROCK:
-            prop = Rock.create_small()
-        elif prop_type == PropType.MEDIUM_ROCK:
-            prop = Rock.create_medium()
-        elif prop_type == PropType.LARGE_ROCK:
-            prop = Rock.create_large()
-        elif prop_type == PropType.ALTAR:
-            # Create altar with random rotation
-            prop = Altar.create(rotation=random.choice(list(Rotation)))
-        elif prop_type == PropType.ROUND_COLUMN:
-            from map.props.column import Column, ColumnType
-            prop = Column.create_round(0, 0)
-        elif prop_type == PropType.SQUARE_COLUMN:
-            from map.props.column import Column, ColumnType
-            prop = Column.create_square(0, 0)
-        else:
-            raise ValueError(f"Unsupported prop type: {prop_type}")
-            
-        # Try to add and place the prop
-        self.add_prop(prop)
-        if prop.place_random_position() is None:
-            self.remove_prop(prop)
-            return None
-            
-        return prop
-        
+               
     def add_prop(self, prop: 'Prop') -> None:
         """Add a prop to this element at its current position.
         
@@ -303,51 +239,3 @@ class MapElement:
             # For rectangles and other shapes, use bounds
             bounds = self._shape.recalculate_bounds()
             grid.mark_rectangle(bounds, element_idx, self._options)
-        
-    def create_columns(self, arrangement: 'ColumnArrangement', orientation: 'RowOrientation' = RowOrientation.HORIZONTAL) -> list['Prop']:
-        """Create columns in the specified arrangement within this element.
-            
-        Args:
-            arrangement: The arrangement of columns (e.g., ROWS, CIRCLE)
-            orientation: The orientation for row arrangements (HORIZONTAL or VERTICAL)
-            
-        Returns:
-            List of created column props
-        """
-        from map.props.column import Column
-        columns = []
-        
-        if arrangement == ColumnArrangement.ROWS:
-            num_columns = int(self._bounds.width // (2 * CELL_SIZE))
-            num_rows = int(self._bounds.height // (2 * CELL_SIZE))
-            x_spacing = self._bounds.width / (num_columns + 1)
-            y_spacing = self._bounds.height / (num_rows + 1)
-            
-            for i in range(1, num_columns + 1):
-                for j in range(1, num_rows + 1):
-                    if orientation == RowOrientation.HORIZONTAL:
-                        x = self._bounds.x + i * x_spacing
-                        y = self._bounds.y + j * y_spacing
-                    else:
-                        x = self._bounds.x + j * x_spacing
-                        y = self._bounds.y + i * y_spacing
-                        
-                    column = Column.create_round(x, y)
-                    self.add_prop(column)
-                    columns.append(column)
-                    
-        elif arrangement == ColumnArrangement.CIRCLE:
-            center_x, center_y = self._bounds.center
-            radius = min(self._bounds.width, self._bounds.height) / 2 - CELL_SIZE
-            num_columns = 8
-            
-            for i in range(num_columns):
-                angle = (i * 2 * math.pi) / num_columns
-                x = center_x + radius * math.cos(angle)
-                y = center_y + radius * math.sin(angle)
-                
-                column = Column.create_round(x, y)
-                self.add_prop(column)
-                columns.append(column)
-                
-        return columns

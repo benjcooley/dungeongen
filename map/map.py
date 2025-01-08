@@ -34,7 +34,7 @@ class Map:
     
     def add_element(self, element: MapElement) -> None:
         """Add a map element."""
-        from map.props.prop import Prop
+        from map._props.prop import Prop
         if not isinstance(element, Prop):
             self._elements.append(element)
             self._bounds_dirty = True
