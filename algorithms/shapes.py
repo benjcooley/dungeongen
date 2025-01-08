@@ -66,6 +66,10 @@ class Shape(Protocol):
     def make_rotated(self, rotation: 'Rotation') -> 'Shape':
         """Return a new shape rotated by the given 90-degree increment."""
         ...
+        
+    def make_copy(self) -> 'Shape':
+        """Return a new copy of this shape."""
+        ...
     
     @property
     def is_valid(self) -> bool:
@@ -262,6 +266,13 @@ class ShapeGroup:
         self._bounds_dirty = True
         return self
     
+    def make_copy(self) -> 'ShapeGroup':
+        """Return a new copy of this shape group."""
+        return ShapeGroup(
+            includes=[s.make_copy() for s in self.includes],
+            excludes=[s.make_copy() for s in self.excludes]
+        )
+        
     def make_rotated(self, rotation: 'Rotation') -> 'ShapeGroup':
         """Return a new shape group with all shapes rotated by 90-degree increment."""
         return ShapeGroup(
@@ -531,6 +542,10 @@ class Rectangle:
         self._cached_path = None
         return self
     
+    def make_copy(self) -> 'Rectangle':
+        """Return a new copy of this rectangle."""
+        return Rectangle(self.x, self.y, self.width, self.height, self._inflate)
+        
     def make_rotated(self, rotation: 'Rotation') -> 'Rectangle':
         """Return a new rectangle rotated by the given 90-degree increment."""
         # For 90/270 degree rotations, swap width and height
@@ -766,6 +781,10 @@ class Circle:
         self._cached_path = None
         return self
     
+    def make_copy(self) -> 'Circle':
+        """Return a new copy of this circle."""
+        return Circle(self.cx, self.cy, self.radius, self._inflate)
+        
     def make_rotated(self, rotation: 'Rotation') -> 'Circle':
         """Return a new circle rotated by the given 90-degree increment."""
         # Skip rotation if center is at origin
