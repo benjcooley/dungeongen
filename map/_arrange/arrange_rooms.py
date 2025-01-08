@@ -106,8 +106,18 @@ class _RoomArranger:
         
     def create_room(self, grid_x: float, grid_y: float) -> Room:
         """Create a room at the given grid position."""
+        # Sanity checks for position
+        if abs(grid_x) > 1000 or abs(grid_y) > 1000:
+            raise ValueError(f"Room position ({grid_x}, {grid_y}) is too far from origin")
+            
         width = random.randint(self.min_size, self.max_size)
         height = random.randint(self.min_size, self.max_size)
+        
+        # Sanity checks for dimensions
+        if width < 1 or height < 1:
+            raise ValueError(f"Invalid room dimensions: {width}x{height}")
+        if width > 100 or height > 100:
+            raise ValueError(f"Room dimensions {width}x{height} exceed maximum allowed size")
         print(f"\nGenerating room {len(self.rooms) + 1}:")
         print(f"  Grid position: ({grid_x}, {grid_y})")
         print(f"  Grid size: {width}x{height}")
@@ -225,16 +235,27 @@ class _RoomArranger:
             spacing = random.randint(self.min_spacing, self.max_spacing)
             
             # Calculate new position based on orientation
+            next_x = current_x
+            next_y = current_y
+            
             if orientation == Orientation.HORIZONTAL:
                 if direction == Direction.FORWARD or (direction == Direction.BOTH and len(self.rooms) % 2 == 0):
-                    current_x += spacing + self.max_size
+                    next_x = current_x + spacing + self.max_size
                 else:
-                    current_x -= spacing + self.max_size
+                    next_x = current_x - spacing - self.max_size
             else:  # VERTICAL
                 if direction == Direction.FORWARD or (direction == Direction.BOTH and len(self.rooms) % 2 == 0):
-                    current_y += spacing + self.max_size
+                    next_y = current_y + spacing + self.max_size
                 else:
-                    current_y -= spacing + self.max_size
+                    next_y = current_y - spacing - self.max_size
+                    
+            # Sanity check the new position
+            if abs(next_x) > 1000 or abs(next_y) > 1000:
+                print(f"Warning: Room position ({next_x}, {next_y}) exceeds reasonable bounds, retrying...")
+                continue
+                
+            current_x = next_x
+            current_y = next_y
                     
             # Create and connect new room
             new_room = self.create_room(current_x, current_y)
