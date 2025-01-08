@@ -144,8 +144,8 @@ class Room(MapElement):
         Raises:
             ValueError: If arrangement is invalid for this room type
         """
-        columns = []
-        column_angles = None
+        positions = []  # List of (x,y) map coordinates
+        angles = []     # Optional list of angles for columns
         
         # For circular rooms, only allow CIRCLE arrangement
         if isinstance(self._shape, Circle):
@@ -159,31 +159,17 @@ class Room(MapElement):
             
             # Use 8 columns for now
             num_columns = 8
-            column_angles = []
             for i in range(num_columns):
                 angle = (i * 2 * math.pi / num_columns)
                 x = center[0] + radius * math.cos(angle)
                 y = center[1] + radius * math.sin(angle)
+                positions.append((x, y))
+                angles.append(angle)
                 
-                if column_type == ColumnType.SQUARE:
-                    # For square columns, angle them to face center
-                    # Add pi/2 to make the flat face point toward center
-                    column = Column.create_square(x, y, angle + math.pi/2)
-                else:
-                    column = Column.create_round(x, y)
-                    
-                columns.append(column)
-                column_angles.append(angle)
-                    
-            # Add all columns at once
-            for column in columns:
-                self.add_prop(column)
-            return columns
-            
         # For rectangular rooms
-        if isinstance(self._shape, Rectangle):
-            rect = self._shape #type: Rectangle
-
+        elif isinstance(self._shape, Rectangle):
+            rect = self._shape  # type: Rectangle
+            
             # Get room dimensions in grid units
             grid_width = int(rect.width / CELL_SIZE)
             grid_height = int(rect.height / CELL_SIZE)
@@ -218,32 +204,39 @@ class Room(MapElement):
             elif arrangement == ColumnArrangement.ROWS:
                 if orientation == RowOrientation.HORIZONTAL:
                     if bottom - top < 2:  # Not enough vertical space for two rows
-                        return columns
+                        return []
                     # Place columns in two horizontal rows
                     for x in range(int(left), int(right) + 1):
                         grid_positions.append((x, int(top)))      # Top row
                         grid_positions.append((x, int(bottom)))   # Bottom row
                 else:  # VERTICAL 
                     if right - left < 2:  # Not enough horizontal space for two columns
-                        return columns
+                        return []
                     # Place columns in two vertical rows
                     for y in range(int(top), int(bottom) + 1):
                         grid_positions.append((int(left), y))     # Left column
                         grid_positions.append((int(right), y))    # Right column
 
-            # Convert grid positions to map space and create columns
+            # Convert grid positions to map space
             for grid_x, grid_y in grid_positions:
                 map_x = rect.left + (grid_x * CELL_SIZE)
                 map_y = rect.top + (grid_y * CELL_SIZE)
-                angle = column_angles[len(columns)] if column_angles else 0
-                column = (Column.create_square(map_x, map_y, angle + math.pi/2) 
-                         if column_type == ColumnType.SQUARE 
-                         else Column.create_round(map_x, map_y))
-                self.add_prop(column)
-                columns.append(column)
-            return columns
+                positions.append((map_x, map_y))
+        
+        else:
+            raise ValueError(f"Unsupported room shape for column arrangement: {type(self._shape)}")
             
-        raise ValueError(f"Unsupported room shape for column arrangement: {type(self._shape)}")
+        # Create and add columns
+        columns = []
+        for i, pos in enumerate(positions):
+            angle = angles[i] if angles else 0
+            column = (Column.create_square(pos[0], pos[1], angle + math.pi/2) 
+                     if column_type == ColumnType.SQUARE 
+                     else Column.create_round(pos[0], pos[1]))
+            self.add_prop(column)
+            columns.append(column)
+            
+        return columns
 
     def draw(self, canvas: 'skia.Canvas', layer: Layers = Layers.PROPS) -> None:
         """Draw the room and its props."""
