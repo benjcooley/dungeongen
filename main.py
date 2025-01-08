@@ -27,7 +27,7 @@ def main():
     # Create map
     dungeon_map = Map(options)
 
-    DEMO = False
+    DEMO = True
 
     if DEMO:
 
