@@ -193,9 +193,19 @@ class _RoomArranger:
             passage_height = abs(y2 - y1)
             
             # Create passage and doors
-            passage = Passage.from_grid(passage_x, passage_y, 1, passage_height, self.dungeon_map)
-            door1 = Door.from_grid(passage_x, passage_y, DoorOrientation.VERTICAL, self.dungeon_map, open=True)
-            door2 = Door.from_grid(passage_x, passage_y + passage_height - 1,
+            # Convert to grid coordinates
+            grid_passage_x = passage_x / CELL_SIZE
+            grid_passage_y = passage_y / CELL_SIZE
+            grid_passage_height = passage_height / CELL_SIZE
+            
+            print(f"  Vertical passage:")
+            print(f"    Position: ({grid_passage_x}, {grid_passage_y})")
+            print(f"    Height: {grid_passage_height}")
+            
+            # Create passage and doors
+            passage = Passage.from_grid(grid_passage_x, grid_passage_y, 1, grid_passage_height, self.dungeon_map)
+            door1 = Door.from_grid(grid_passage_x, grid_passage_y, DoorOrientation.VERTICAL, self.dungeon_map, open=True)
+            door2 = Door.from_grid(grid_passage_x, grid_passage_y + grid_passage_height - 1,
                                 DoorOrientation.VERTICAL, self.dungeon_map, open=True)
         
         # Connect everything
