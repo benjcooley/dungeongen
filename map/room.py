@@ -253,10 +253,10 @@ class Room(MapElement):
                     # Place columns along each row
                     for x in range(int(start_x), int(end_x + 1)):
                         for y in (row1, row2):
-                            grid_x = x * CELL_SIZE
-                            grid_y = y * CELL_SIZE
-                            draw_x, draw_y = grid_to_drawing(grid_x, grid_y, self._options)
-                            column = Column.create_square(draw_x + rect.x, draw_y + rect.y)
+                            # Convert grid position to room-relative coordinates
+                            x_pos = rect.x + (x * CELL_SIZE)
+                            y_pos = rect.y + (y * CELL_SIZE)
+                            column = Column.create_square(x_pos, y_pos)
                             self.add_prop(column)
                             columns.append(column)
                 else:  # VERTICAL
