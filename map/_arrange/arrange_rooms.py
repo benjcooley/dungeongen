@@ -244,6 +244,10 @@ class _RoomArranger:
             next_x = current_x
             next_y = current_y
             
+            # Limit maximum spacing between rooms
+            max_allowed_spacing = 10  # Maximum spacing in grid units
+            spacing = min(spacing, max_allowed_spacing)
+            
             if orientation == Orientation.HORIZONTAL:
                 if direction == Direction.FORWARD or (direction == Direction.BOTH and len(self.rooms) % 2 == 0):
                     next_x = current_x + spacing + self.max_size
