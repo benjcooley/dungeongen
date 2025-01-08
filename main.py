@@ -29,10 +29,10 @@ def main():
     # Since we want grid alignment and center at 0,0, we'll offset by -2,-2
     start_room = dungeon_map.add_rectangular_room(-2, -2, 5, 5)
     
-    # Test horizontal row layout
+    # Test vertical row layout
     from map.props.columnarrangement import ColumnArrangement, RowOrientation
-    print("Creating columns in horizontal row arrangement")
-    columns = start_room.create_columns(ColumnArrangement.ROWS, orientation=RowOrientation.HORIZONTAL)
+    print("Creating columns in vertical row arrangement")
+    columns = start_room.create_columns(ColumnArrangement.ROWS, orientation=RowOrientation.VERTICAL)
     print(f"Created {len(columns)} columns")
     
     # Add door to the right of the room (at x=3, centered vertically)
@@ -57,8 +57,8 @@ def main():
     second_door.connect_to(end_room)
     
     # Add props to rooms and passage
-    # Test horizontal row layout for columns
-    start_room.create_columns(ColumnArrangement.ROWS, orientation=RowOrientation.HORIZONTAL)
+    # Test vertical row layout for columns
+    start_room.create_columns(ColumnArrangement.ROWS, orientation=RowOrientation.VERTICAL)
     
     # Add columns in a circle arrangement
     end_room.create_columns(ColumnArrangement.CIRCLE)
