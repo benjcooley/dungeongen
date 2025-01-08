@@ -245,19 +245,22 @@ class _RoomArranger:
             next_y = current_y
             
             # Limit maximum spacing between rooms
-            max_allowed_spacing = 10  # Maximum spacing in grid units
+            max_allowed_spacing = 3  # Maximum spacing in grid units
             spacing = min(spacing, max_allowed_spacing)
+            
+            # Calculate room offset based on max size
+            room_offset = min(self.max_size, 5)  # Limit maximum room size contribution
             
             if orientation == Orientation.HORIZONTAL:
                 if direction == Direction.FORWARD or (direction == Direction.BOTH and len(self.rooms) % 2 == 0):
-                    next_x = current_x + spacing + self.max_size
+                    next_x = current_x + spacing + room_offset
                 else:
-                    next_x = current_x - spacing - self.max_size
+                    next_x = current_x - spacing - room_offset
             else:  # VERTICAL
                 if direction == Direction.FORWARD or (direction == Direction.BOTH and len(self.rooms) % 2 == 0):
-                    next_y = current_y + spacing + self.max_size
+                    next_y = current_y + spacing + room_offset
                 else:
-                    next_y = current_y - spacing - self.max_size
+                    next_y = current_y - spacing - room_offset
                     
             # Sanity check the new position
             if abs(next_x) > 1000 or abs(next_y) > 1000:

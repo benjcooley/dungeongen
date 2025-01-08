@@ -49,8 +49,8 @@ class Door(MapElement):
         print(f"  Open: {open}")
         
         # Validate position is within reasonable limits
-        if abs(x) > 1000 or abs(y) > 1000:
-            raise ValueError(f"Door position ({x}, {y}) exceeds reasonable limits (±1000)")
+        if abs(x) > 2000 or abs(y) > 2000:
+            raise ValueError(f"Door position ({x}, {y}) exceeds reasonable limits (±2000)")
             
         self._x = x
         self._y = y
