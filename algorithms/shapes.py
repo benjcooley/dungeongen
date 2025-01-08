@@ -354,10 +354,6 @@ class Rectangle:
         
     def __str__(self) -> str:
         return f"Rectangle(x={self.x:.1f}, y={self.y:.1f}, w={self.width:.1f}, h={self.height:.1f})"
-        self._inflated_x = x - inflate
-        self._inflated_y = y - inflate
-        self._inflated_width = width + 2 * inflate
-        self._inflated_height = height + 2 * inflate
 
     @property
     def inflate(self) -> float:
@@ -668,7 +664,6 @@ class Circle:
         
     def __str__(self) -> str:
         return f"Circle(cx={self.cx:.1f}, cy={self.cy:.1f}, r={self.radius:.1f})"
-        self._inflated_radius = radius + inflate
 
     @property
     def inflate(self) -> float:
