@@ -143,9 +143,6 @@ class Room(MapElement):
         Raises:
             ValueError: If arrangement is invalid for this room type
         """
-        from map.props.column import Column, ColumnType
-        from map.props.rotation import Rotation
-        
         columns = []
         column_angles = None
         
