@@ -501,7 +501,7 @@ class Rectangle:
         center_y = self.y + self.height / 2
         
         # Get rotation angle in radians
-        angle = rotation.radians
+        angle = math.pi * rotation / 180
             
         # Rotate center point around origin
         new_center_x = center_x * math.cos(angle) - center_y * math.sin(angle)
