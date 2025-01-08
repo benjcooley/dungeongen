@@ -211,15 +211,16 @@ class Room(MapElement):
                     grid_positions.append((int(right), y))  # Right column
                             
             elif arrangement == ColumnArrangement.ROWS:
-                if right - left < 2:  # Room too small
-                    return columns
-
                 if orientation == RowOrientation.HORIZONTAL:
+                    if bottom - top < 2:  # Not enough vertical space for two rows
+                        return columns
                     # Place columns in two horizontal rows
                     for x in range(int(left), int(right) + 1):
                         grid_positions.append((x, int(top)))      # Top row
                         grid_positions.append((x, int(bottom)))   # Bottom row
-                else:  # VERTICAL
+                else:  # VERTICAL 
+                    if right - left < 2:  # Not enough horizontal space for two columns
+                        return columns
                     # Place columns in two vertical rows
                     for y in range(int(top), int(bottom) + 1):
                         grid_positions.append((int(left), y))     # Left column
