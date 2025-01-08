@@ -67,33 +67,23 @@ class Rotation:
         """
         return cls(math.degrees(radians))
         
-    @staticmethod
-    def to_radians(angle: Union[float, 'Rotation']) -> float:
-        """Convert a rotation or angle to radians.
+    @property
+    def to_radians(self) -> float:
+        """Convert this rotation to radians.
         
-        Args:
-            angle: Either a Rotation object or angle in radians
-            
         Returns:
             Angle in radians
         """
-        if isinstance(angle, Rotation):
-            return angle.radians
-        return angle
+        return self.radians
         
-    @staticmethod
-    def to_degrees(angle: Union[float, 'Rotation']) -> float:
-        """Convert a rotation or angle to degrees.
+    @property
+    def to_degrees(self) -> float:
+        """Convert this rotation to degrees.
         
-        Args:
-            angle: Either a Rotation object or angle in radians
-            
         Returns:
             Angle in degrees
         """
-        if isinstance(angle, Rotation):
-            return angle.degrees
-        return math.degrees(angle)
+        return self.degrees
         
     @classmethod
     def from_degrees(cls, degrees: float) -> 'Rotation':
