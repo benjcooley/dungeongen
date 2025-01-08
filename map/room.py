@@ -183,12 +183,6 @@ class Room(MapElement):
             grid_width = int(rect.width / CELL_SIZE)
             grid_height = int(rect.height / CELL_SIZE)
             
-            # Work in grid coordinates (0,0 is top-left of room)
-            def grid_to_map(grid_x: float, grid_y: float) -> tuple[float, float]:
-                # Convert grid coordinates to absolute map coordinates
-                return (rect.left + (grid_x * CELL_SIZE), 
-                       rect.top + (grid_y * CELL_SIZE))
-
             # Calculate valid column placement rectangle
             left = 1 + margin
             right = grid_width - (1 + margin)
@@ -243,7 +237,8 @@ class Room(MapElement):
 
             # Convert grid positions to map space and create columns
             for grid_x, grid_y in grid_positions:
-                map_x, map_y = grid_to_map(grid_x, grid_y)
+                map_x = rect.left + (grid_x * CELL_SIZE)
+                map_y = rect.top + (grid_y * CELL_SIZE)
                 column = Column.create_square(map_x, map_y)
                 columns.append(column)
                                 
