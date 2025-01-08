@@ -216,17 +216,25 @@ class Room(MapElement):
                 if len(valid_x) < 2:  # Room too small
                     return columns
 
-                # Calculate row/column positions that divide space into thirds
+                # Calculate row/column positions with better spacing
                 if orientation == RowOrientation.HORIZONTAL:
-                    y1 = 1 + (grid_height-2)//3
-                    y2 = 1 + 2*(grid_height-2)//3
-                    for x in valid_x:
+                    # For horizontal rows, place at 1/3 and 2/3 of usable height
+                    usable_height = grid_height - 2  # Exclude edges
+                    y1 = 1 + round(usable_height * 0.33)  # First row at 1/3
+                    y2 = 1 + round(usable_height * 0.67)  # Second row at 2/3
+                    
+                    # Place columns with consistent spacing
+                    for x in range(2, grid_width-1, 2):  # Step by 2 for spacing
                         column_positions.append((x, y1))
                         column_positions.append((x, y2))
                 else:  # VERTICAL
-                    x1 = 1 + (grid_width-2)//3
-                    x2 = 1 + 2*(grid_width-2)//3
-                    for y in valid_y:
+                    # For vertical rows, place at 1/3 and 2/3 of usable width
+                    usable_width = grid_width - 2  # Exclude edges
+                    x1 = 1 + round(usable_width * 0.33)  # First column at 1/3
+                    x2 = 1 + round(usable_width * 0.67)  # Second column at 2/3
+                    
+                    # Place columns with consistent spacing
+                    for y in range(2, grid_height-1, 2):  # Step by 2 for spacing
                         column_positions.append((x1, y))
                         column_positions.append((x2, y))
 
