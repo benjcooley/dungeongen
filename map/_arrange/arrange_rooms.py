@@ -24,6 +24,17 @@ from map.room import Room
 from map.passage import Passage
 from map.door import Door, DoorOrientation
 
+class Direction(Enum):
+    """Direction to generate rooms."""
+    BOTH = auto()
+    FORWARD = auto()
+    BACKWARD = auto()
+
+class Orientation(Enum):
+    """Orientation for room generation."""
+    HORIZONTAL = auto()
+    VERTICAL = auto()
+
 class ArrangeRoomStyle(Enum):
     """Room arrangement strategies."""
     SYMMETRIC = auto()  # Arrange rooms symmetrically where possible
