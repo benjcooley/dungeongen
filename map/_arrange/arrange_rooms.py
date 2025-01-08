@@ -22,6 +22,7 @@ from algorithms.shapes import Circle
 from map.map import Map
 from map.room import Room
 from map.passage import Passage
+from constants import CELL_SIZE
 from map.door import Door, DoorOrientation
 
 class Direction(Enum):
@@ -176,10 +177,15 @@ class _RoomArranger:
             print(f"    Position: ({passage_x}, {passage_y})")
             print(f"    Width: {passage_width}")
             
+            # Convert passage position to grid coordinates
+            grid_passage_x = passage_x / CELL_SIZE
+            grid_passage_y = passage_y / CELL_SIZE
+            grid_passage_width = passage_width / CELL_SIZE
+            
             # Create passage and doors
-            passage = Passage.from_grid(passage_x, passage_y, passage_width, 1, self.dungeon_map)
-            door1 = Door.from_grid(passage_x, passage_y, DoorOrientation.HORIZONTAL, self.dungeon_map, open=True)
-            door2 = Door.from_grid(passage_x + passage_width - 1, passage_y,
+            passage = Passage.from_grid(grid_passage_x, grid_passage_y, grid_passage_width, 1, self.dungeon_map)
+            door1 = Door.from_grid(grid_passage_x, grid_passage_y, DoorOrientation.HORIZONTAL, self.dungeon_map, open=True)
+            door2 = Door.from_grid(grid_passage_x + grid_passage_width - 1, grid_passage_y,
                                 DoorOrientation.HORIZONTAL, self.dungeon_map, open=True)
         else:
             passage_x = (x1 + x2) / 2 - 0.5  # Center between rooms
