@@ -5,7 +5,8 @@ from typing import List, TYPE_CHECKING, Tuple, Optional
 
 import random
 import skia
-import math
+
+from map.props.column import Column, ColumnType
 
 from algorithms.math import Point2D
 from algorithms.shapes import Rectangle, Circle, Shape
