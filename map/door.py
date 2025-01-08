@@ -43,6 +43,11 @@ class Door(MapElement):
             map_: Parent map instance
             open: Initial open/closed state
         """
+        print(f"\nDoor initialization:")
+        print(f"  Position: ({x}, {y})")
+        print(f"  Orientation: {orientation}")
+        print(f"  Open: {open}")
+        
         self._x = x
         self._y = y
         self._width = self._height = CELL_SIZE
@@ -129,8 +134,17 @@ class Door(MapElement):
         
         # Initialize with empty shape if closed, or full I-shape if open
         shape = self._calculate_shape()
+        print("  Shape groups:")
+        if self._orientation == DoorOrientation.HORIZONTAL:
+            print(f"    Left group bounds: {self._left_group.bounds}")
+            print(f"    Right group bounds: {self._right_group.bounds}")
+        else:
+            print(f"    Top group bounds: {self._top_group.bounds}")
+            print(f"    Bottom group bounds: {self._bottom_group.bounds}")
+        
         super().__init__(shape=shape, map_=map_)
         self._bounds = Rectangle(self._x, self._y, self._width, self._height)
+        print(f"  Final bounds: {self._bounds}")
     
     def _calculate_shape(self) -> Shape:
         """Calculate the current shape based on open/closed state."""
