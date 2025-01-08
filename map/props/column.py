@@ -55,7 +55,7 @@ class Column(Prop):
         else:
             # For square columns, rotate the shape
             shape = Rectangle(-COLUMN_SIZE/2, -COLUMN_SIZE/2, COLUMN_SIZE, COLUMN_SIZE)
-            shape.rotate(self.rotation)
+            shape.rotate(self.rotation.radians)
             
         if layer == Layers.SHADOW:
             # Draw slightly inflated shadow shape
