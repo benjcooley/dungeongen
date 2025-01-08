@@ -257,7 +257,6 @@ class Room(MapElement):
                             x_pos = rect.x + (x * CELL_SIZE)
                             y_pos = rect.y + (y * CELL_SIZE)
                             column = Column.create_square(x_pos, y_pos)
-                            self.add_prop(column)
                             columns.append(column)
                 else:  # VERTICAL
                     # Calculate total available width
@@ -286,6 +285,9 @@ class Room(MapElement):
                             self.add_prop(column)
                             columns.append(column)
                                 
+            # Add all created columns to room's props
+            for column in columns:
+                self.add_prop(column)
             return columns
             
         raise ValueError(f"Unsupported room shape for column arrangement: {type(self._shape)}")
