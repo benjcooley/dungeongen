@@ -8,7 +8,7 @@ from algorithms.types import Point
 from constants import CELL_SIZE
 from map.props.prop import Prop, PropType
 from map.enums import Layers
-from map.props.rotation import Rotation
+from algorithms.rotation import Rotation
 
 # Constants for dais dimensions (2x2 grid cells)
 DAIS_WIDTH = CELL_SIZE * 2

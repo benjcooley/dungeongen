@@ -9,7 +9,7 @@ from map.room import Room
 from map.map import Map
 from map.door import Door, DoorOrientation
 from map.passage import Passage
-from map.props.rotation import Rotation
+from algorithms.rotation import Rotation
 from map.props.proptypes import PropType
 from map.props.columnarrangement import ColumnArrangement, RowOrientation
 from map.props.column import ColumnType

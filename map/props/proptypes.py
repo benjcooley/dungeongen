@@ -3,7 +3,7 @@
 from enum import StrEnum, auto
 from typing import TYPE_CHECKING, Type
 
-from map.props.rotation import Rotation
+from algorithms.rotation import Rotation
 
 if TYPE_CHECKING:
     from map.props.prop import Prop

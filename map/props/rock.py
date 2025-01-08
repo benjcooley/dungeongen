@@ -8,7 +8,7 @@ from algorithms.types import Point
 from constants import CELL_SIZE
 from map.enums import Layers, RockType
 from map.props.prop import Prop, PropType
-from map.props.rotation import Rotation
+from algorithms.rotation import Rotation
 
 if TYPE_CHECKING:
     from map.map import Map

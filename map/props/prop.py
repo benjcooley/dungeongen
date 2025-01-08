@@ -16,7 +16,7 @@ from algorithms.shapes import Rectangle, Shape
 from algorithms.types import Point
 from constants import CELL_SIZE
 from map.enums import Layers
-from map.props.rotation import Rotation
+from algorithms.rotation import Rotation
 
 if TYPE_CHECKING:
     from map.mapelement import MapElement
