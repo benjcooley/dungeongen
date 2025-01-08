@@ -225,10 +225,11 @@ class Room(MapElement):
             elif arrangement == ColumnArrangement.ROWS:
                 # Place columns in parallel rows
                 if orientation == RowOrientation.HORIZONTAL:
-                    # Calculate total available height
+                    # Calculate total available dimensions
+                    available_width = end_x - start_x
                     available_height = end_y - start_y
                     margin_grids = math.floor(margin)  # Convert to integer grid units
-                    print(f"Available width: {available_width}, margin: {margin_grids}")
+                    print(f"Available width: {available_width}, height: {available_height}, margin: {margin_grids}")
                     
                     # Need enough space for columns plus margins
                     min_space = margin_grids + 2  # margin + 2 spaces for columns
