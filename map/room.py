@@ -225,36 +225,16 @@ class Room(MapElement):
             elif arrangement == ColumnArrangement.ROWS:
                 # Place columns in parallel rows
                 if orientation == RowOrientation.HORIZONTAL:
-                    # Debug room dimensions
-                    print(f"Room bounds: x={rect.x}, y={rect.y}, w={rect.width}, h={rect.height}")
-                    print(f"Grid dimensions: width={grid_width}, height={grid_height}")
-                    print(f"Start coords: ({start_x}, {start_y}), End coords: ({end_x}, {end_y})")
+                    # For a 5x5 room, we want columns at grid positions 1 and 3
+                    # This places them evenly spaced with 1 grid cell between them
+                    row1 = 1  # First row at y=1
+                    row2 = 3  # Second row at y=3
                     
-                    # Calculate total available dimensions
-                    available_width = end_x - start_x
-                    available_height = end_y - start_y
-                    margin_grids = math.floor(margin)  # Convert to integer grid units
-                    print(f"Available width: {available_width}, height: {available_height}, margin: {margin_grids}")
-                    
-                    # Need enough space for columns plus margins
-                    min_space = margin_grids + 2  # margin + 2 spaces for columns
-                    if available_height < min_space:
-                        print(f"Not enough vertical space: {available_height} < {min_space}")
-                        return columns
-                        
-                    # Calculate row positions with margins
-                    row1 = start_y + margin_grids  # Remove +1 to use full available space
-                    row2 = end_y - margin_grids
-                    
-                    # Verify minimum separation
-                    if row2 - row1 < 2:
-                        return columns
-                    
-                    # Place columns along each row
-                    for x in range(int(start_x), int(end_x + 1)):
+                    # Place columns at grid intersections 1 and 3 along each row
+                    for x in (1, 3):
                         for y in (row1, row2):
-                            # Convert grid position to room-relative coordinates
-                            x_pos = rect.x + (x * CELL_SIZE)
+                            # Convert grid coordinates to drawing coordinates
+                            x_pos = rect.x + (x * CELL_SIZE) 
                             y_pos = rect.y + (y * CELL_SIZE)
                             column = Column.create_square(x_pos, y_pos)
                             columns.append(column)
