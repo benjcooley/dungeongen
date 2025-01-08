@@ -170,8 +170,7 @@ class Room(MapElement):
                 y = center[1] + radius * math.sin(angle)
                 
                 # Create square column rotated to face center
-                rotation = Rotation.from_radians(angle + math.pi/2)
-                column = Column.create_square(x, y, rotation)
+                column = Column.create_square(x, y, angle + math.pi/2)
                 columns.append(column)
                     
             return columns
