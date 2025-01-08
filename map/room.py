@@ -188,55 +188,56 @@ class Room(MapElement):
                 return (rect.x + (grid_x * CELL_SIZE), 
                        rect.y + (grid_y * CELL_SIZE))
 
-            # Calculate valid column positions (1 unit in from edges)
-            valid_x = range(1, grid_width-1)
-            valid_y = range(1, grid_height-1)
+            # Calculate valid column placement rectangle
+            left = 1 + margin
+            right = grid_width - (1 + margin)
+            top = 1 + margin
+            bottom = grid_height - (1 + margin)
             
             column_positions = []  # List of (x,y) grid coordinates
             
             if arrangement == ColumnArrangement.GRID:
-                # Place columns at each interior grid intersection
-                for x in valid_x:
-                    for y in valid_y:
+                # Place columns in a grid pattern with 2-unit spacing
+                for x in range(math.ceil(left), math.floor(right) + 1, 2):
+                    for y in range(math.ceil(top), math.floor(bottom) + 1, 2):
                         column_positions.append((x, y))
                             
             elif arrangement == ColumnArrangement.RECTANGLE:
-                # Place columns around perimeter at grid intersections
-                # Top and bottom rows (skip corners)
-                for x in valid_x:
-                    column_positions.append((x, 1))  # Top row
-                    column_positions.append((x, grid_height-2))  # Bottom row
+                # Place columns around perimeter
+                # Top and bottom rows
+                for x in range(math.ceil(left), math.floor(right) + 1, 2):
+                    column_positions.append((x, math.ceil(top)))  # Top row
+                    column_positions.append((x, math.floor(bottom)))  # Bottom row
                 
-                # Left and right columns (excluding corners and overlap)
-                for y in range(2, grid_height-2):
-                    column_positions.append((1, y))  # Left column
-                    column_positions.append((grid_width-2, y))  # Right column
+                # Left and right columns (excluding corners)
+                for y in range(math.ceil(top) + 2, math.floor(bottom) - 1, 2):
+                    column_positions.append((math.ceil(left), y))  # Left column
+                    column_positions.append((math.floor(right), y))  # Right column
                             
             elif arrangement == ColumnArrangement.ROWS:
-                if len(valid_x) < 2:  # Room too small
+                if right - left < 2:  # Room too small
                     return columns
 
-                # Calculate row/column positions with better spacing
                 if orientation == RowOrientation.HORIZONTAL:
-                    # For horizontal rows, place at 1/3 and 2/3 of usable height
-                    usable_height = grid_height - 2  # Exclude edges
-                    y1 = 1 + round(usable_height * 0.33)  # First row at 1/3
-                    y2 = 1 + round(usable_height * 0.67)  # Second row at 2/3
+                    # Calculate two rows at 1/3 and 2/3 of height
+                    usable_height = bottom - top
+                    y1 = top + (usable_height * 0.33)
+                    y2 = top + (usable_height * 0.67)
                     
-                    # Place columns with consistent spacing
-                    for x in range(2, grid_width-1, 2):  # Step by 2 for spacing
-                        column_positions.append((x, y1))
-                        column_positions.append((x, y2))
+                    # Place columns along both rows with 2-unit spacing
+                    for x in range(math.ceil(left), math.floor(right) + 1, 2):
+                        column_positions.append((x, math.ceil(y1)))
+                        column_positions.append((x, math.ceil(y2)))
                 else:  # VERTICAL
-                    # For vertical rows, place at 1/3 and 2/3 of usable width
-                    usable_width = grid_width - 2  # Exclude edges
-                    x1 = 1 + round(usable_width * 0.33)  # First column at 1/3
-                    x2 = 1 + round(usable_width * 0.67)  # Second column at 2/3
+                    # Calculate two columns at 1/3 and 2/3 of width
+                    usable_width = right - left
+                    x1 = left + (usable_width * 0.33)
+                    x2 = left + (usable_width * 0.67)
                     
-                    # Place columns with consistent spacing
-                    for y in range(2, grid_height-1, 2):  # Step by 2 for spacing
-                        column_positions.append((x1, y))
-                        column_positions.append((x2, y))
+                    # Place columns along both columns with 2-unit spacing
+                    for y in range(math.ceil(top), math.floor(bottom) + 1, 2):
+                        column_positions.append((math.ceil(x1), y))
+                        column_positions.append((math.ceil(x2), y))
 
             # Create columns at calculated positions
             for grid_x, grid_y in column_positions:
