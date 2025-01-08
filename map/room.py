@@ -195,7 +195,10 @@ class Room(MapElement):
                 # Place columns at each grid intersection within margins
                 for x in range(int(start_x), int(end_x + 1)):
                     for y in range(int(start_y), int(end_y + 1)):
-                        column = Column.create_square(rect.x + x * CELL_SIZE, rect.y + y * CELL_SIZE)
+                        grid_x = x * CELL_SIZE
+                        grid_y = y * CELL_SIZE
+                        draw_x, draw_y = grid_to_drawing(grid_x, grid_y, self._options)
+                        column = Column.create_square(draw_x + rect.x, draw_y + rect.y)
                         self.add_prop(column)
                         columns.append(column)
                             
@@ -204,13 +207,19 @@ class Room(MapElement):
                 # Top and bottom rows
                 for x in range(int(start_x), int(end_x + 1)):
                     for y in (int(start_y), int(end_y)):
-                        column = Column.create_square(rect.x + x * CELL_SIZE, rect.y + y * CELL_SIZE)
+                        grid_x = x * CELL_SIZE
+                        grid_y = y * CELL_SIZE
+                        draw_x, draw_y = grid_to_drawing(grid_x, grid_y, self._options)
+                        column = Column.create_square(draw_x + rect.x, draw_y + rect.y)
                         columns.append(column)
                 
                 # Left and right columns (excluding corners)
                 for y in range(int(start_y + 1), int(end_y)):
                     for x in (start_x, end_x):
-                        column = Column.create_square(rect.x + x * CELL_SIZE, rect.y + y * CELL_SIZE)
+                        grid_x = x * CELL_SIZE
+                        grid_y = y * CELL_SIZE
+                        draw_x, draw_y = grid_to_drawing(grid_x, grid_y, self._options)
+                        column = Column.create_square(draw_x + rect.x, draw_y + rect.y)
                         columns.append(column)
                             
             elif arrangement == ColumnArrangement.ROWS:
@@ -236,7 +245,11 @@ class Room(MapElement):
                     # Place columns along each row
                     for x in range(int(start_x), int(end_x + 1)):
                         for y in (row1, row2):
-                            column = Column.create_square(rect.x + x * CELL_SIZE, rect.y + y * CELL_SIZE)
+                            grid_x = x * CELL_SIZE
+                            grid_y = y * CELL_SIZE
+                            draw_x, draw_y = grid_to_drawing(grid_x, grid_y, self._options)
+                            column = Column.create_square(draw_x + rect.x, draw_y + rect.y)
+                            self.add_prop(column)
                             columns.append(column)
                 else:  # VERTICAL
                     # Calculate total available width
