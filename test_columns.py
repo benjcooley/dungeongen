@@ -14,8 +14,13 @@ def main():
     room = Room(100, 100, 300, 200, map_)
     map_.add_element(room)
     
-    # Test different column arrangements
-    room.create_columns(ColumnArrangement.GRID, column_type=ColumnType.ROUND)
+    # Test different column arrangements with rotation
+    room.create_columns(ColumnArrangement.GRID, column_type=ColumnType.SQUARE)
+    
+    # Add some rotated columns
+    from math import pi
+    room.create_prop(Column.create_square(200, 150, pi/4))  # 45 degrees
+    room.create_prop(Column.create_square(300, 150, pi/2))  # 90 degrees
     
     # Create surface and canvas
     surface = skia.Surface(800, 600)

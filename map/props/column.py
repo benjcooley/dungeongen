@@ -49,12 +49,12 @@ class Column(Prop):
         if layer == Layers.OVERLAY:
             return
             
-        # Get shape based on column type
-        if self._column_type == ColumnType.ROUND:
-            shape = Circle(0, 0, COLUMN_SIZE/2)
-        else:
-            # For square columns, rotate the shape
-            shape = Rectangle(-COLUMN_SIZE/2, -COLUMN_SIZE/2, COLUMN_SIZE, COLUMN_SIZE)
+        # Create base shape based on column type
+        shape = (Circle(0, 0, COLUMN_SIZE/2) if self._column_type == ColumnType.ROUND
+                else Rectangle(-COLUMN_SIZE/2, -COLUMN_SIZE/2, COLUMN_SIZE, COLUMN_SIZE))
+        
+        # Apply rotation to shape
+        if self.rotation != Rotation.ROT_0:
             shape.rotate(self.rotation.radians)
             
         if layer == Layers.SHADOW:
