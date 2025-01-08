@@ -97,50 +97,73 @@ class _RoomArranger:
         self.rooms.append(room)
         return room
         
+    def _get_room_connection_point(self, room: Room, orientation: Orientation) -> tuple[float, float]:
+        """Get a point on the room's edge for connecting a passage.
+        
+        For circular rooms, uses the center point projected to the edge.
+        For rectangular rooms, uses the center of the appropriate side.
+        """
+        bounds = room.bounds
+        is_circle = isinstance(room.shape, Circle)
+        
+        if is_circle:
+            # For circles, project from center to edge
+            cx = bounds.x + bounds.width / 2
+            cy = bounds.y + bounds.height / 2
+            radius = bounds.width / 2  # Assuming width == height for circles
+            
+            if orientation == Orientation.HORIZONTAL:
+                return (cx + radius if bounds.x < 0 else cx - radius, cy)
+            else:
+                return (cx, cy + radius if bounds.y < 0 else cy - radius)
+        else:
+            # For rectangles, use center of appropriate side
+            if orientation == Orientation.HORIZONTAL:
+                x = bounds.x + bounds.width if bounds.x < 0 else bounds.x
+                y = bounds.y + bounds.height / 2
+                return (x, y)
+            else:
+                x = bounds.x + bounds.width / 2
+                y = bounds.y + bounds.height if bounds.y < 0 else bounds.y
+                return (x, y)
+
+    def _create_passage(self, room1: Room, room2: Room, orientation: Orientation) -> None:
+        """Create a passage between two rooms with appropriate doors."""
+        # Get connection points
+        x1, y1 = self._get_room_connection_point(room1, orientation)
+        x2, y2 = self._get_room_connection_point(room2, orientation)
+        
+        # Determine passage dimensions and position
+        if orientation == Orientation.HORIZONTAL:
+            passage_x = min(x1, x2)
+            passage_width = abs(x2 - x1)
+            passage_y = (y1 + y2) / 2 - 0.5  # Center between rooms
+            
+            # Create passage and doors
+            passage = Passage.from_grid(passage_x, passage_y, passage_width, 1, self.dungeon_map)
+            door1 = Door.from_grid(passage_x, passage_y, DoorOrientation.HORIZONTAL, self.dungeon_map, open=True)
+            door2 = Door.from_grid(passage_x + passage_width - 1, passage_y,
+                                DoorOrientation.HORIZONTAL, self.dungeon_map, open=True)
+        else:
+            passage_x = (x1 + x2) / 2 - 0.5  # Center between rooms
+            passage_y = min(y1, y2)
+            passage_height = abs(y2 - y1)
+            
+            # Create passage and doors
+            passage = Passage.from_grid(passage_x, passage_y, 1, passage_height, self.dungeon_map)
+            door1 = Door.from_grid(passage_x, passage_y, DoorOrientation.VERTICAL, self.dungeon_map, open=True)
+            door2 = Door.from_grid(passage_x, passage_y + passage_height - 1,
+                                DoorOrientation.VERTICAL, self.dungeon_map, open=True)
+        
+        # Connect everything
+        room1.connect_to(door1)
+        door1.connect_to(passage)
+        passage.connect_to(door2)
+        door2.connect_to(room2)
+
     def connect_rooms(self, room1: Room, room2: Room, orientation: Orientation) -> None:
         """Connect two rooms with a passage and doors."""
-        if orientation == Orientation.HORIZONTAL:
-            self._connect_horizontal(room1, room2)
-        else:
-            self._connect_vertical(room1, room2)
-            
-    def _connect_horizontal(self, room1: Room, room2: Room) -> None:
-        """Connect two rooms horizontally with passage and doors."""
-        # Calculate passage position
-        passage_x = min(room1.bounds.x + room1.bounds.width, room2.bounds.x)
-        passage_width = abs(room2.bounds.x - (room1.bounds.x + room1.bounds.width))
-        passage_y = (room1.bounds.y + room1.bounds.height/2) - 0.5  # Center vertically
-        
-        # Create passage and doors
-        passage = Passage.from_grid(passage_x, passage_y, passage_width, 1, self.dungeon_map)
-        door1 = Door.from_grid(passage_x, passage_y, DoorOrientation.HORIZONTAL, self.dungeon_map, open=True)
-        door2 = Door.from_grid(passage_x + passage_width - 1, passage_y, 
-                             DoorOrientation.HORIZONTAL, self.dungeon_map, open=True)
-                             
-        # Connect everything
-        room1.connect_to(door1)
-        door1.connect_to(passage)
-        passage.connect_to(door2)
-        door2.connect_to(room2)
-        
-    def _connect_vertical(self, room1: Room, room2: Room) -> None:
-        """Connect two rooms vertically with passage and doors."""
-        # Calculate passage position
-        passage_y = min(room1.bounds.y + room1.bounds.height, room2.bounds.y)
-        passage_height = abs(room2.bounds.y - (room1.bounds.y + room1.bounds.height))
-        passage_x = (room1.bounds.x + room1.bounds.width/2) - 0.5  # Center horizontally
-        
-        # Create passage and doors
-        passage = Passage.from_grid(passage_x, passage_y, 1, passage_height, self.dungeon_map)
-        door1 = Door.from_grid(passage_x, passage_y, DoorOrientation.VERTICAL, self.dungeon_map, open=True)
-        door2 = Door.from_grid(passage_x, passage_y + passage_height - 1,
-                             DoorOrientation.VERTICAL, self.dungeon_map, open=True)
-                             
-        # Connect everything
-        room1.connect_to(door1)
-        door1.connect_to(passage)
-        passage.connect_to(door2)
-        door2.connect_to(room2)
+        self._create_passage(room1, room2, orientation)
         
     def arrange_linear(
         self,
