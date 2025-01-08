@@ -11,7 +11,7 @@ from map.door import Door, DoorOrientation
 from map.passage import Passage
 from algorithms.rotation import Rotation
 from map.props import ColumnType, Altar, Coffin, Dais, Rock
-from map.arrange import PropType, arrange_columns, ColumnArrangement, arrange_random_props, arrange_prop
+from map.arrange import PropType, arrange_columns, ColumnArrangement, arrange_random_props, arrange_prop, arrange_rooms, ArrangeRoomStyle
 from options import Options
 
 def main():
