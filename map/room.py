@@ -145,7 +145,6 @@ class Room(MapElement):
         """
         from map.props.column import Column, ColumnType
         from map.props.rotation import Rotation
-        import math
         
         columns = []
         column_angles = None
