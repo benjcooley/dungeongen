@@ -245,14 +245,15 @@ class _RoomArranger:
         
         # Generate remaining rooms
         attempts = 0
+        last_room = self.rooms[-1]  # Track the last room we added
         while len(self.rooms) < num_rooms and attempts < max_attempts:
             attempts += 1
             # Choose spacing
             spacing = random.randint(self.min_spacing, self.max_spacing)
             
-            # Calculate new position based on orientation
-            next_x = current_x
-            next_y = current_y
+            # Get position of last room
+            current_x = last_room.bounds.x / CELL_SIZE
+            current_y = last_room.bounds.y / CELL_SIZE
             
             # Limit maximum spacing between rooms
             max_allowed_spacing = 3  # Maximum spacing in grid units
@@ -260,6 +261,10 @@ class _RoomArranger:
             
             # Calculate room offset based on max size
             room_offset = min(self.max_size, 5)  # Limit maximum room size contribution
+            
+            # Calculate new position based on orientation
+            next_x = current_x
+            next_y = current_y
             
             if orientation == Orientation.HORIZONTAL:
                 if direction == Direction.FORWARD or (direction == Direction.BOTH and len(self.rooms) % 2 == 0):
@@ -277,11 +282,9 @@ class _RoomArranger:
                 print(f"Warning: Room position ({next_x}, {next_y}) exceeds reasonable bounds (±3200), retrying...")
                 continue
                 
-            current_x = next_x
-            current_y = next_y
-                    
             # Create and connect new room
-            new_room = self.create_room(current_x, current_y)
-            self.connect_rooms(self.rooms[-2], new_room, orientation)
+            new_room = self.create_room(next_x, next_y)
+            self.connect_rooms(last_room, new_room, orientation)
+            last_room = new_room  # Update last room
             
         return self.rooms
