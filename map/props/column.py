@@ -119,4 +119,4 @@ class Column(Prop):
     @classmethod
     def create_square(cls, x: float, y: float, angle: float = 0) -> 'Column':
         """Create a square column prop at origin."""
-        return cls((x, y), ColumnType.SQUARE, rotation=Rotation.from_degrees(angle))
+        return cls((x, y), ColumnType.SQUARE, rotation=Rotation.from_radians(angle))
