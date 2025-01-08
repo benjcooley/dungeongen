@@ -225,6 +225,11 @@ class Room(MapElement):
             elif arrangement == ColumnArrangement.ROWS:
                 # Place columns in parallel rows
                 if orientation == RowOrientation.HORIZONTAL:
+                    # Debug room dimensions
+                    print(f"Room bounds: x={rect.x}, y={rect.y}, w={rect.width}, h={rect.height}")
+                    print(f"Grid dimensions: width={grid_width}, height={grid_height}")
+                    print(f"Start coords: ({start_x}, {start_y}), End coords: ({end_x}, {end_y})")
+                    
                     # Calculate total available dimensions
                     available_width = end_x - start_x
                     available_height = end_y - start_y
@@ -234,11 +239,12 @@ class Room(MapElement):
                     # Need enough space for columns plus margins
                     min_space = margin_grids + 2  # margin + 2 spaces for columns
                     if available_height < min_space:
+                        print(f"Not enough vertical space: {available_height} < {min_space}")
                         return columns
                         
                     # Calculate row positions with margins
-                    row1 = start_y + margin_grids + 1  # One grid in from margin
-                    row2 = end_y - margin_grids - 1  # One grid in from margin
+                    row1 = start_y + margin_grids  # Remove +1 to use full available space
+                    row2 = end_y - margin_grids
                     
                     # Verify minimum separation
                     if row2 - row1 < 2:
