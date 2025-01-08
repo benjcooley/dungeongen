@@ -12,6 +12,7 @@ from map.passage import Passage
 from map.props.rotation import Rotation
 from map.props.proptypes import PropType
 from map.props.columnarrangement import ColumnArrangement, RowOrientation
+from map.props.column import ColumnType
 from map.props.altar import Altar
 from options import Options
 
@@ -60,8 +61,8 @@ def main():
     # Test vertical row layout for columns
     start_room.create_columns(ColumnArrangement.ROWS, orientation=RowOrientation.VERTICAL)
     
-    # Add columns in a circle arrangement
-    end_room.create_columns(ColumnArrangement.CIRCLE)
+    # Add square columns in a circle arrangement
+    end_room.create_columns(ColumnArrangement.CIRCLE, column_type=ColumnType.SQUARE)
     
     # Add some rocks
     end_room.create_random_props([PropType.MEDIUM_ROCK], min_count=0, max_count=2)
