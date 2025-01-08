@@ -33,7 +33,7 @@ SQUARE_COLUMN_TYPE = PropType(
 class Column(Prop):
     """A column prop that can be either round or square."""
     
-    def __init__(self, position: Point, column_type: ColumnType = ColumnType.ROUND) -> None:
+    def __init__(self, position: Point, column_type: ColumnType = ColumnType.ROUND, rotation: Rotation = Rotation.ROT_0) -> None:
         """Initialize a column prop.
         
         Args:

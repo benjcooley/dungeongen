@@ -196,6 +196,7 @@ class Room(MapElement):
                 for x in range(int(start_x), int(end_x + 1)):
                     for y in range(int(start_y), int(end_y + 1)):
                         column = Column.create_square(rect.x + x * CELL_SIZE, rect.y + y * CELL_SIZE)
+                        self.add_prop(column)
                         columns.append(column)
                             
             elif arrangement == ColumnArrangement.RECTANGLE:

@@ -304,19 +304,25 @@ class MapElement:
             bounds = self._shape.recalculate_bounds()
             grid.mark_rectangle(bounds, element_idx, self._options)
         
-    def create_columns(self, arrangement: 'ColumnArrangement', orientation: 'RowOrientation' = RowOrientation.HORIZONTAL) -> None:
+    def create_columns(self, arrangement: 'ColumnArrangement', orientation: 'RowOrientation' = RowOrientation.HORIZONTAL) -> list['Prop']:
         """Create columns in the specified arrangement within this element.
             
         Args:
             arrangement: The arrangement of columns (e.g., ROWS, CIRCLE)
             orientation: The orientation for row arrangements (HORIZONTAL or VERTICAL)
+            
+        Returns:
+            List of created column props
         """
+        from map.props.column import Column
+        columns = []
+        
         if arrangement == ColumnArrangement.ROWS:
-            from map.props.proptypes import PropType
             num_columns = int(self._bounds.width // (2 * CELL_SIZE))
             num_rows = int(self._bounds.height // (2 * CELL_SIZE))
             x_spacing = self._bounds.width / (num_columns + 1)
             y_spacing = self._bounds.height / (num_rows + 1)
+            
             for i in range(1, num_columns + 1):
                 for j in range(1, num_rows + 1):
                     if orientation == RowOrientation.HORIZONTAL:
@@ -325,18 +331,23 @@ class MapElement:
                     else:
                         x = self._bounds.x + j * x_spacing
                         y = self._bounds.y + i * y_spacing
-                    prop = self.create_prop(PropType.ROUND_COLUMN)
-                    if prop is not None:
-                        prop.center = (x, y)
+                        
+                    column = Column.create_round(x, y)
+                    self.add_prop(column)
+                    columns.append(column)
+                    
         elif arrangement == ColumnArrangement.CIRCLE:
-            from map.props.proptypes import PropType
             center_x, center_y = self._bounds.center
             radius = min(self._bounds.width, self._bounds.height) / 2 - CELL_SIZE
             num_columns = 8
+            
             for i in range(num_columns):
                 angle = (i * 2 * math.pi) / num_columns
                 x = center_x + radius * math.cos(angle)
                 y = center_y + radius * math.sin(angle)
-                prop = self.create_prop(PropType.ROUND_COLUMN)
-                if prop is not None:
-                    prop.center = (x, y)
+                
+                column = Column.create_round(x, y)
+                self.add_prop(column)
+                columns.append(column)
+                
+        return columns
