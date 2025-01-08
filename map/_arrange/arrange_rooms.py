@@ -10,6 +10,9 @@ This module provides different strategies for arranging rooms in a dungeon map:
 
 - ArrangeSpiral: Arranges rooms in a spiral pattern expanding outward from the
   center. Good for creating maze-like dungeons that loop back on themselves.
+
+  This is a submodule of the arrange.py module. Update this aggregator module
+  when you add new symbols here.
 """
 
 from enum import Enum, auto
