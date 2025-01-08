@@ -153,25 +153,21 @@ class Room(MapElement):
             if arrangement != ColumnArrangement.CIRCLE:
                 raise ValueError("Only CIRCLE arrangement supported for circular rooms")
                 
-            # Calculate optimal radius and number of columns based on room size
-            room_radius = self._shape.radius
-            radius = room_radius * 0.7  # Place columns at 70% of room radius
+            circle = self._shape  # type: Circle
+            # Place columns 1 grid unit from wall
+            radius = circle.radius - CELL_SIZE
+            center = circle.bounds.center
             
-            # Calculate number of columns based on circumference
-            circumference = 2 * math.pi * radius
-            column_spacing = CELL_SIZE * 2  # Space columns 2 grid units apart
-            num_columns = max(8, min(16, int(circumference / column_spacing)))
-            
-            center = self._shape.bounds.center
-            
+            # Use 8 columns for now
+            num_columns = 8
             for i in range(num_columns):
                 angle = (i * 2 * math.pi / num_columns)
                 x = center[0] + radius * math.cos(angle)
                 y = center[1] + radius * math.sin(angle)
                 
-                # Create square column rotated to face center
-                column = Column.create_square(x, y, angle + math.pi/2)
+                column = Column.create_round(x, y)
                 columns.append(column)
+                self.add_prop(column)
                     
             return columns
             
