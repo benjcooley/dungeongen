@@ -48,7 +48,7 @@ class Column(Prop):
         if layer not in (Layers.PROPS, Layers.SHADOW, Layers.OVERLAY):
             return
             
-        print(f"Drawing column at {self.position} (bounds: {bounds}) for layer {layer}")
+        print(f"Drawing column at {self.position} with bounds {bounds} for layer {layer}")
 
         # Debug visualization
         if layer == Layers.OVERLAY:
