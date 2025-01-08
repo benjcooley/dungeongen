@@ -193,10 +193,10 @@ class _RoomArranger:
             passage_height = abs(y2 - y1)
             
             # Create passage and doors
-            # Convert to grid coordinates
-            grid_passage_x = passage_x / CELL_SIZE
-            grid_passage_y = passage_y / CELL_SIZE
-            grid_passage_height = passage_height / CELL_SIZE
+            # Calculate grid coordinates
+            grid_passage_x = round(passage_x / CELL_SIZE)
+            grid_passage_y = round(passage_y / CELL_SIZE)
+            grid_passage_height = round(abs(y2 - y1) / CELL_SIZE)
             
             print(f"  Vertical passage:")
             print(f"    Position: ({grid_passage_x}, {grid_passage_y})")
