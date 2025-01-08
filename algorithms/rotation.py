@@ -67,6 +67,46 @@ class Rotation:
         """
         return cls(math.degrees(radians))
         
+    @staticmethod
+    def to_radians(angle: Union[float, 'Rotation']) -> float:
+        """Convert a rotation or angle to radians.
+        
+        Args:
+            angle: Either a Rotation object or angle in radians
+            
+        Returns:
+            Angle in radians
+        """
+        if isinstance(angle, Rotation):
+            return angle.radians
+        return angle
+        
+    @staticmethod
+    def to_degrees(angle: Union[float, 'Rotation']) -> float:
+        """Convert a rotation or angle to degrees.
+        
+        Args:
+            angle: Either a Rotation object or angle in radians
+            
+        Returns:
+            Angle in degrees
+        """
+        if isinstance(angle, Rotation):
+            return angle.degrees
+        return math.degrees(angle)
+        
+    @classmethod
+    def from_degrees(cls, degrees: float) -> 'Rotation':
+        """Create rotation from angle in degrees.
+        
+        Args:
+            degrees: Angle in degrees
+            
+        Returns:
+            New Rotation instance
+        """
+        return cls(degrees)
+        
     @classmethod
     def from_radians_snapped(cls, radians: float) -> 'Rotation':
         """Convert radians to nearest 90-degree rotation.
