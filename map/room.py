@@ -235,11 +235,10 @@ class Room(MapElement):
             for grid_x, grid_y in grid_positions:
                 map_x = rect.left + (grid_x * CELL_SIZE)
                 map_y = rect.top + (grid_y * CELL_SIZE)
-                angle = column_angles[i] if column_angles and i < len(column_angles) else 0
-                if column_type == ColumnType.SQUARE:
-                    column = Column.create_square(map_x, map_y, angle + math.pi/2)
-                else:
-                    column = Column.create_round(map_x, map_y)
+                angle = column_angles[len(columns)] if column_angles else 0
+                column = (Column.create_square(map_x, map_y, angle + math.pi/2) 
+                         if column_type == ColumnType.SQUARE 
+                         else Column.create_round(map_x, map_y))
                 self.add_prop(column)
                 columns.append(column)
             return columns
