@@ -210,12 +210,12 @@ class _RoomArranger:
             
             # Calculate new position based on orientation
             if orientation == Orientation.HORIZONTAL:
-                if direction == Direction.FORWARD or (direction == Direction.BOTH and i % 2 == 0):
+                if direction == Direction.FORWARD or (direction == Direction.BOTH and len(self.rooms) % 2 == 0):
                     current_x += spacing + self.max_size
                 else:
                     current_x -= spacing + self.max_size
             else:  # VERTICAL
-                if direction == Direction.FORWARD or (direction == Direction.BOTH and i % 2 == 0):
+                if direction == Direction.FORWARD or (direction == Direction.BOTH and len(self.rooms) % 2 == 0):
                     current_y += spacing + self.max_size
                 else:
                     current_y -= spacing + self.max_size
