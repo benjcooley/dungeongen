@@ -185,7 +185,8 @@ class _RoomArranger:
         num_rooms: int,
         start_room: Optional[Room] = None,
         direction: Optional[Direction] = None,
-        orientation: Optional[Orientation] = None
+        orientation: Optional[Orientation] = None,
+        max_attempts: int = 100
     ) -> List[Room]:
         """Arrange rooms in a linear sequence."""
         if start_room:
@@ -201,7 +202,9 @@ class _RoomArranger:
         orientation = orientation or random.choice(list(Orientation))
         
         # Generate remaining rooms
-        for i in range(len(self.rooms), num_rooms):
+        attempts = 0
+        while len(self.rooms) < num_rooms and attempts < max_attempts:
+            attempts += 1
             # Choose spacing
             spacing = random.randint(self.min_spacing, self.max_spacing)
             
