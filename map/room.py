@@ -228,9 +228,10 @@ class Room(MapElement):
                     # Calculate total available height
                     available_height = end_y - start_y
                     margin_grids = math.floor(margin)  # Convert to integer grid units
+                    print(f"Available width: {available_width}, margin: {margin_grids}")
                     
                     # Need enough space for columns plus margins
-                    min_space = (2 * margin_grids) + 3  # 2 margins + 3 spaces (2 for separation + 1 for columns)
+                    min_space = margin_grids + 2  # margin + 2 spaces for columns
                     if available_height < min_space:
                         return columns
                         
@@ -262,17 +263,20 @@ class Room(MapElement):
                         return columns
                         
                     # Calculate column positions with margins
-                    col1 = start_x + margin_grids + 1  # One grid in from margin
-                    col2 = end_x - margin_grids - 1  # One grid in from margin
+                    spacing = (available_width - 2*margin_grids) / 3  # Divide available space into thirds
+                    col1 = start_x + spacing  # First third
+                    col2 = end_x - spacing    # Last third
                     
-                    # Verify minimum separation
-                    if col2 - col1 < 2:
-                        return columns
+                    print(f"Column positions: {col1}, {col2}")
                     
                     # Place columns along each column
                     for y in range(int(start_y), int(end_y + 1)):
                         for x in (col1, col2):
-                            column = Column.create_square(rect.x + x * CELL_SIZE, rect.y + y * CELL_SIZE)
+                            grid_x = x * CELL_SIZE
+                            grid_y = y * CELL_SIZE
+                            draw_x, draw_y = grid_to_drawing(grid_x, grid_y, self._options)
+                            column = Column.create_square(draw_x + rect.x, draw_y + rect.y)
+                            self.add_prop(column)
                             columns.append(column)
                                 
             return columns

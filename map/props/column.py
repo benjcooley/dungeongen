@@ -52,13 +52,22 @@ class Column(Prop):
 
         # Debug visualization
         if layer == Layers.OVERLAY:
+            # Draw boundary shape in red
             debug_paint = skia.Paint(
                 AntiAlias=True,
                 Style=skia.Paint.kStroke_Style,
-                StrokeWidth=1,
+                StrokeWidth=2,
                 Color=skia.Color(255, 0, 0)  # Red
             )
             bounds.draw(canvas, debug_paint)
+            
+            # Draw center point in blue
+            center_paint = skia.Paint(
+                AntiAlias=True,
+                Style=skia.Paint.kFill_Style,
+                Color=skia.Color(0, 0, 255)  # Blue
+            )
+            canvas.drawCircle(bounds.center[0], bounds.center[1], 3, center_paint)
             return
             
         # Get shape based on column type
