@@ -263,8 +263,8 @@ class _RoomArranger:
                     next_y = current_y - spacing - room_offset
                     
             # Sanity check the new position
-            if abs(next_x) > 1000 or abs(next_y) > 1000:
-                print(f"Warning: Room position ({next_x}, {next_y}) exceeds reasonable bounds, retrying...")
+            if abs(next_x) > 3200 or abs(next_y) > 3200:
+                print(f"Warning: Room position ({next_x}, {next_y}) exceeds reasonable bounds (±3200), retrying...")
                 continue
                 
             current_x = next_x
