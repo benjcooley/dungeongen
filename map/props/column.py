@@ -16,8 +16,8 @@ class ColumnType(Enum):
     ROUND = auto()
     SQUARE = auto()
 
-# Size is 1/4 of a cell
-COLUMN_SIZE = CELL_SIZE / 4
+# Size is 1/3 of a cell
+COLUMN_SIZE = CELL_SIZE / 3
 
 # Prop types for each column variant
 ROUND_COLUMN_TYPE = PropType(
@@ -45,10 +45,21 @@ class Column(Prop):
         super().__init__(prop_type, position)
     
     def _draw_content(self, canvas: skia.Canvas, bounds: Rectangle, layer: Layers = Layers.PROPS) -> None:
-        if layer not in (Layers.PROPS, Layers.SHADOW):
+        if layer not in (Layers.PROPS, Layers.SHADOW, Layers.OVERLAY):
             return
             
         print(f"Drawing column at {self.position} for layer {layer}")
+
+        # Debug visualization
+        if layer == Layers.OVERLAY:
+            debug_paint = skia.Paint(
+                AntiAlias=True,
+                Style=skia.Paint.kStroke_Style,
+                StrokeWidth=1,
+                Color=skia.Color(255, 0, 0)  # Red
+            )
+            bounds.draw(canvas, debug_paint)
+            return
             
         # Get shape based on column type
         if self._column_type == ColumnType.ROUND:
