@@ -108,7 +108,11 @@ class _RoomArranger:
         """Create a room at the given grid position."""
         width = random.randint(self.min_size, self.max_size)
         height = random.randint(self.min_size, self.max_size)
+        print(f"\nGenerating room {len(self.rooms) + 1}:")
+        print(f"  Grid position: ({grid_x}, {grid_y})")
+        print(f"  Grid size: {width}x{height}")
         room = self.dungeon_map.add_rectangular_room(grid_x, grid_y, width, height)
+        print(f"  Map bounds: ({room.bounds.x}, {room.bounds.y}) to ({room.bounds.x + room.bounds.width}, {room.bounds.y + room.bounds.height})")
         self.rooms.append(room)
         return room
         

@@ -24,8 +24,9 @@ def main():
     # Create map
     dungeon_map = Map(options)
     
-    # Generate rooms using the linear arrangement strategy
+    print("\nStarting room generation...")
     rooms = arrange_rooms(dungeon_map, ArrangeRoomStyle.LINEAR, min_rooms=2, max_rooms=4)
+    print(f"\nGenerated {len(rooms)} rooms total")
     
     # Add some decorations to the first and last rooms
     if rooms:
