@@ -30,8 +30,6 @@ def main():
     # Since we want grid alignment and center at 0,0, we'll offset by -2,-2
     start_room = dungeon_map.add_rectangular_room(-2, -2, 5, 5)
     
-    # Test vertical row layout
-    from map.props.columnarrangement import ColumnArrangement, RowOrientation
     print("Creating columns in vertical row arrangement")
     columns = start_room.create_columns(ColumnArrangement.ROWS, orientation=RowOrientation.VERTICAL)
     print(f"Created {len(columns)} columns")
