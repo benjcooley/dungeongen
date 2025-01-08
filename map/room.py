@@ -128,13 +128,13 @@ class Room(MapElement):
     def create_columns(self, 
                       arrangement: ColumnArrangement,
                       orientation: RowOrientation = RowOrientation.HORIZONTAL,
-                      margin: float = 0.5) -> List['Prop']:
+                      margin: float = 0) -> List['Prop']:
         """Create columns in this room according to the specified arrangement pattern.
         
         Args:
             arrangement: Pattern to arrange columns in
             orientation: Orientation for ROWS arrangement (default: HORIZONTAL)
-            margin: Margin in grid units from room edges (default: 1.0)
+            margin: Optional margin in grid units from room edges (default: 0)
             
         Returns:
             List of created column props
