@@ -194,19 +194,19 @@ class Room(MapElement):
             
             if arrangement == ColumnArrangement.GRID:
                 # Place columns in a grid pattern with 2-unit spacing
-                for x in range(int(left), int(right) + 1, 2):
-                    for y in range(int(top), int(bottom) + 1, 2):
+                for x in range(int(left), int(right) + 1):
+                    for y in range(int(top), int(bottom) + 1):
                         grid_positions.append((x, y))
                             
             elif arrangement == ColumnArrangement.RECTANGLE:
                 # Place columns around perimeter
                 # Top and bottom rows
-                for x in range(int(left), int(right) + 1, 2):
+                for x in range(int(left), int(right) + 1):
                     grid_positions.append((x, int(top)))  # Top row
                     grid_positions.append((x, int(bottom)))  # Bottom row
                 
                 # Left and right columns (excluding corners)
-                for y in range(int(top) + 2, int(bottom) - 1, 2):
+                for y in range(int(top) + 1, int(bottom)):
                     grid_positions.append((int(left), y))  # Left column
                     grid_positions.append((int(right), y))  # Right column
                             
@@ -221,7 +221,7 @@ class Room(MapElement):
                     row2 = int(top + (2 * usable_height / 3))  # Second row at 2/3
                     
                     # Place columns along both rows with 2-unit spacing
-                    for x in range(int(left), int(right) + 1, 2):
+                    for x in range(int(left), int(right) + 1):
                         grid_positions.append((x, row1))
                         grid_positions.append((x, row2))
                 else:  # VERTICAL
@@ -231,7 +231,7 @@ class Room(MapElement):
                     col2 = int(left + (2 * usable_width / 3))  # Second column at 2/3
                     
                     # Place columns along both columns with 2-unit spacing
-                    for y in range(int(top), int(bottom) + 1, 2):
+                    for y in range(int(top), int(bottom) + 1):
                         grid_positions.append((col1, y))
                         grid_positions.append((col2, y))
 
