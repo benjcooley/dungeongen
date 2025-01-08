@@ -29,6 +29,13 @@ def main():
     # Since we want grid alignment and center at 0,0, we'll offset by -2,-2
     start_room = dungeon_map.add_rectangular_room(-2, -2, 5, 5)
     
+    # Add a test column at room center
+    from map.props.column import Column
+    center_x = start_room.bounds.x + start_room.bounds.width/2
+    center_y = start_room.bounds.y + start_room.bounds.height/2
+    test_column = Column.create_round(center_x, center_y)
+    start_room.add_prop(test_column)
+    
     # Add door to the right of the room (at x=3, centered vertically)
     first_door = Door.from_grid(3, 0, DoorOrientation.HORIZONTAL, dungeon_map, open=True)
     dungeon_map.add_element(first_door)
