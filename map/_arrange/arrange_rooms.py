@@ -127,20 +127,44 @@ class _RoomArranger:
         self.rooms.append(room)
         return room
         
-    def _get_room_connection_point(self, room: Room, orientation: Orientation) -> tuple[float, float]:
-        """Get a point on the room's edge for connecting a passage."""
-        bounds = room.bounds
-        center_x = bounds.x + bounds.width / 2
-        center_y = bounds.y + bounds.height / 2
+    def get_room_grid_connection(self, room: Room, direction: Direction) -> tuple[int, int]:
+        """Get a grid position for connecting to this room from the given direction.
         
-        if orientation == Orientation.HORIZONTAL:
-            # For horizontal connections, use the center height but leftmost/rightmost x
-            x = bounds.x + bounds.width if bounds.x < 0 else bounds.x
-            return (x, center_y)
-        else:  # VERTICAL
-            # For vertical connections, use the center width but top/bottom y
-            y = bounds.y + bounds.height if bounds.y < 0 else bounds.y
-            return (center_x, y)
+        Args:
+            room: The room to connect to
+            direction: Which side of the room to connect from
+            
+        Returns:
+            Tuple of (grid_x, grid_y) for the connection point
+        """
+        # Get room bounds in grid coordinates
+        grid_x = int(room.bounds.x / CELL_SIZE)
+        grid_y = int(room.bounds.y / CELL_SIZE)
+        grid_width = int(room.bounds.width / CELL_SIZE)
+        grid_height = int(room.bounds.height / CELL_SIZE)
+        
+        # Calculate center point
+        center_x = grid_x + grid_width // 2
+        center_y = grid_y + grid_height // 2
+        
+        # Return appropriate edge point based on direction
+        if direction == Direction.NORTH:
+            return (center_x, grid_y)
+        elif direction == Direction.SOUTH:
+            return (center_x, grid_y + grid_height)
+        elif direction == Direction.EAST:
+            return (grid_x + grid_width, center_y)
+        else:  # WEST
+            return (grid_x, center_y)
+
+    def _get_room_connection_point(self, room: Room, orientation: Orientation) -> tuple[float, float]:
+        """Get a map coordinate point on the room's edge for connecting a passage."""
+        # Get grid connection point
+        direction = Direction.EAST if orientation == Orientation.HORIZONTAL else Direction.SOUTH
+        grid_x, grid_y = self.get_room_grid_connection(room, direction)
+        
+        # Convert back to map coordinates
+        return (grid_x * CELL_SIZE, grid_y * CELL_SIZE)
 
     def _create_passage(self, room1: Room, room2: Room, orientation: Orientation) -> None:
         """Create a passage between two rooms with appropriate doors."""
