@@ -1,27 +1,27 @@
 """Map container class definition."""
 
-from typing import List, Iterator, Optional, Generic, Sequence, TypeVar, TYPE_CHECKING, Tuple
-
-import skia
 import math
 import random
+from typing import Generic, Iterator, List, Optional, Sequence, Tuple, TypeVar, TYPE_CHECKING
+
+import skia
+
+from algorithms.shapes import Circle, Rectangle, Shape, ShapeGroup
 from constants import CELL_SIZE
-from map.enums import Direction
-from map.room import Room, RoomType
+from graphics.conversions import grid_to_map
 from graphics.crosshatch import draw_crosshatches
+from map.enums import Direction, Layers
 from map.grid import GridStyle, draw_region_grid
-from map.enums import Layers
+from map.mapelement import MapElement
+from map.occupancy import OccupancyGrid
 from map.region import Region
+from map.room import Room, RoomType
+
 if TYPE_CHECKING:
-    from options import Options
-    from map.room import Room
-    from map.door import Door 
+    from map.door import Door
     from map.passage import Passage
     from map.stairs import Stairs
-from map.occupancy import OccupancyGrid
-from algorithms.shapes import ShapeGroup, Rectangle, Circle, Shape
-from graphics.conversions import grid_to_map
-from map.mapelement import MapElement
+    from options import Options
 
 
 TMapElement = TypeVar('T', bound='MapElement')
@@ -84,17 +84,17 @@ class Map:
         return (elem for elem in self._elements if isinstance(elem, Room))
     
     @property
-    def doors(self) -> Iterator[Door]:
+    def doors(self) -> Iterator['Door']:
         """Returns a new iterable of all doors in the map."""
         return (elem for elem in self._elements if isinstance(elem, Door))
     
     @property
-    def passages(self) -> Iterator[Passage]:
+    def passages(self) -> Iterator['Passage']:
         """Returns a new iterable of all passages in the map."""
         return (elem for elem in self._elements if isinstance(elem, Passage))
     
     @property
-    def stairs(self) -> Iterator[Stairs]:
+    def stairs(self) -> Iterator['Stairs']:
         """Returns a new iterable all stairs in the map."""
         return (elem for elem in self._elements if isinstance(elem, Stairs))
 
