@@ -57,7 +57,8 @@ class Passage(MapElement):
         """
         # Convert both points to map coordinates
         x1, y1 = grid_to_map(start_x, start_y)
-        x2, y2 = grid_to_map(end_x, end_y)
+        # Add 1 to end coordinates to account for grid CELL_SIZE intervals
+        x2, y2 = grid_to_map(end_x + 1, end_y + 1)
         
         # Validate that points form a straight line
         if y1 != y2 and x1 != x2:
