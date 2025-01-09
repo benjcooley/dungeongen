@@ -393,7 +393,8 @@ class Map:
                 door_x = passage_x
                 door_y = passage_y
                 
-            end_door_elem = self.add_element(Door.from_grid(door_x, door_y, door_orientation, open=end_door))
+            end_door_elem = self.add_element(Door.from_grid(door_x, door_y, door_orientation, 
+                                             door_type=DoorType.DEFAULT if end_door else DoorType.NONE))
         
         # Connect everything
         if start_door_elem:
