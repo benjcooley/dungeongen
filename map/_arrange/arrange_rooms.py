@@ -134,13 +134,6 @@ def connect_rooms(
         passage = Passage.from_grid_points(r1_x, r1_y, r2_x - next_x, r2_y - next_y)
         dungeon_map.add_element(passage)
         elements.append(passage)
-            
-        passage = Passage.from_grid_points(curr_x, curr_y, end_x, end_y)
-        dungeon_map.add_element(passage)
-        elements.append(passage)
-        
-        # Update current position to passage end
-        curr_x, curr_y = end_x, end_y
     
     # Add end door if needed
     door2 = None
