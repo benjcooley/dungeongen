@@ -1,12 +1,15 @@
 """Utility functions for converting between grid and drawing coordinates."""
 
 from typing import Tuple, TYPE_CHECKING
+
+from altair import Point
 from constants import CELL_SIZE
+import math
 
 if TYPE_CHECKING:
     from options import Options
 
-def grid_to_drawing(x: float, y: float, options: 'Options') -> Tuple[float, float]:
+def grid_to_map(x: float, y: float) -> Point:
     """Convert grid coordinates to drawing (pixel) coordinates.
     
     Args:
@@ -15,45 +18,20 @@ def grid_to_drawing(x: float, y: float, options: 'Options') -> Tuple[float, floa
         options: Options containing cell_size
         
     Returns:
-        Tuple of (drawing_x, drawing_y) coordinates
+        Tuple of (map_x, map_y) coordinates
     """
     return (x * CELL_SIZE, y * CELL_SIZE)
 
-def drawing_to_grid(x: float, y: float, options: 'Options') -> Tuple[float, float]:
+def map_to_grid(x: float, y: float, options: 'Options') -> Point:
     """Convert drawing (pixel) coordinates to grid coordinates.
     
     Args:
-        x: Drawing x-coordinate
-        y: Drawing y-coordinate
+        x: Map x-coordinate
+        y: Map y-coordinate
         options: Options containing cell_size
         
     Returns:
         Tuple of (grid_x, grid_y) coordinates
     """
-    return (x / CELL_SIZE, y / CELL_SIZE)
+    return (math.floor(x / CELL_SIZE), math.floor(y / CELL_SIZE))
 
-def grid_to_drawing_size(width: float, height: float, options: 'Options') -> Tuple[float, float]:
-    """Convert grid dimensions to drawing (pixel) dimensions.
-    
-    Args:
-        width: Grid width
-        height: Grid height
-        options: Options containing cell_size
-        
-    Returns:
-        Tuple of (drawing_width, drawing_height) dimensions
-    """
-    return (width * CELL_SIZE, height * CELL_SIZE)
-
-def drawing_to_grid_size(width: float, height: float, options: 'Options') -> Tuple[float, float]:
-    """Convert drawing (pixel) dimensions to grid dimensions.
-    
-    Args:
-        width: Drawing width
-        height: Drawing height
-        options: Options containing cell_size
-        
-    Returns:
-        Tuple of (grid_width, grid_height) dimensions
-    """
-    return (width / CELL_SIZE, height / CELL_SIZE)

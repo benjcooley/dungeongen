@@ -3,7 +3,7 @@
 import skia
 from algorithms.shapes import Rectangle, Shape
 from map.mapelement import MapElement
-from graphics.conversions import grid_to_drawing
+from graphics.conversions import grid_to_map
 from map.enums import Layers
 from constants import CELL_SIZE
 from typing import TYPE_CHECKING
@@ -18,39 +18,21 @@ class Stairs(MapElement):
     indicating the steps. They can be rotated in 90-degree increments.
     """
     
-    def __init__(self, x: float, y: float, map_: 'Map', rotation: float = 0.0) -> None:
+    def __init__(self, x: float, y: float, rotation: float = 0.0) -> None:
         """Initialize stairs with position and rotation.
         
         Args:
             x: X coordinate in map units
             y: Y coordinate in map units
-            map_: Parent map instance
             rotation: Rotation angle in radians
         """
         self._x = x
         self._y = y
         self._rotation = rotation
-        size = map_.CELL_SIZE
         
         # Create shape as simple 1x1 rectangle
-        shape = Rectangle(x, y, size, size)
-        super().__init__(shape=shape, map_=map_)
-    
-    @classmethod
-    def from_grid(cls, grid_x: float, grid_y: float, map_: 'Map', rotation: float = 0.0) -> 'Stairs':
-        """Create stairs using grid coordinates.
-        
-        Args:
-            grid_x: X coordinate in grid units
-            grid_y: Y coordinate in grid units
-            map_: Parent map instance
-            rotation: Rotation angle in radians
-            
-        Returns:
-            A new Stairs instance
-        """
-        x, y = grid_to_drawing(grid_x, grid_y, map_.options)
-        return cls(x, y, map_, rotation)
+        shape = Rectangle(x, y, CELL_SIZE, CELL_SIZE)
+        super().__init__(shape)
 
     def draw(self, canvas: skia.Canvas, layer: Layers = Layers.PROPS) -> None:
         """Draw the stairs."""
@@ -85,3 +67,19 @@ class Stairs(MapElement):
                         y,
                         step_paint
                     )
+
+    @classmethod
+    def from_grid(cls, grid_x: float, grid_y: float, map_: 'Map', rotation: float = 0.0) -> 'Stairs':
+        """Create stairs using grid coordinates.
+        
+        Args:
+            grid_x: X coordinate in grid units
+            grid_y: Y coordinate in grid units
+            map_: Parent map instance
+            rotation: Rotation angle in radians
+            
+        Returns:
+            A new Stairs instance
+        """
+        x, y = grid_to_map(grid_x, grid_y)
+        return cls(x, y, map_, rotation)

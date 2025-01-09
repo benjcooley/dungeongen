@@ -6,7 +6,7 @@ import skia
 from algorithms.shapes import Rectangle, ShapeGroup
 from map.mapelement import MapElement
 from algorithms.shapes import Shape
-from graphics.conversions import grid_to_drawing, grid_to_drawing_size
+from graphics.conversions import grid_to_map
 from map.enums import Layers
 from constants import CELL_SIZE
 from typing import TYPE_CHECKING
@@ -33,25 +33,20 @@ class Door(MapElement):
     When open, it forms an I-shaped passage connecting the sides.
     """
     
-    def __init__(self, x: float, y: float, orientation: DoorOrientation, map_: 'Map', open: bool = False) -> None:
+    def __init__(self, x: float, y: float, orientation: DoorOrientation, open: bool = False) -> None:
         """Initialize a door with position and orientation.
         
         Args:
             x: X coordinate in map units
             y: Y coordinate in map units
             orientation: Door orientation (HORIZONTAL or VERTICAL)
-            map_: Parent map instance
             open: Initial open/closed state
         """
-        print(f"\nDoor initialization:")
-        print(f"  Position: ({x}, {y})")
-        print(f"  Orientation: {orientation}")
-        print(f"  Open: {open}")
         
         # Validate position is within reasonable limits
         if abs(x) > 3200 or abs(y) > 3200:
             raise ValueError(f"Door position ({x}, {y}) exceeds reasonable limits (±3200)")
-            
+        
         self._x = x
         self._y = y
         self._width = self._height = CELL_SIZE
@@ -136,19 +131,9 @@ class Door(MapElement):
             )
             self._bottom_group = ShapeGroup(includes=[bottom_side, bottom_middle], excludes=[])
         
-        # Initialize with empty shape if closed, or full I-shape if open
         shape = self._calculate_shape()
-        print("  Shape groups:")
-        if self._orientation == DoorOrientation.HORIZONTAL:
-            print(f"    Left group bounds: {self._left_group.bounds}")
-            print(f"    Right group bounds: {self._right_group.bounds}")
-        else:
-            print(f"    Top group bounds: {self._top_group.bounds}")
-            print(f"    Bottom group bounds: {self._bottom_group.bounds}")
         
-        super().__init__(shape=shape, map_=map_)
-        self._bounds = Rectangle(self._x, self._y, self._width, self._height)
-        print(f"  Final bounds: {self._bounds}")
+        super().__init__(shape)
     
     def _calculate_shape(self) -> Shape:
         """Calculate the current shape based on open/closed state."""
@@ -242,18 +227,17 @@ class Door(MapElement):
             door.draw(canvas, border_paint)
             
     @classmethod
-    def from_grid(cls, grid_x: float, grid_y: float, orientation: DoorOrientation, map_: 'Map', open: bool = False) -> 'Door':
+    def from_grid(cls, grid_x: float, grid_y: float, orientation: DoorOrientation, open: bool = False) -> 'Door':
         """Create a door using grid coordinates.
         
         Args:
             grid_x: X coordinate in grid units
             grid_y: Y coordinate in grid units
             orientation: Door orientation (HORIZONTAL or VERTICAL)
-            map_: Parent map instance
             open: Initial open/closed state
             
         Returns:
             A new Door instance
         """
-        x, y = grid_to_drawing(grid_x, grid_y, map_.options)
-        return cls(x, y, orientation, map_, open)
+        x, y = grid_to_map(grid_x, grid_y)
+        return cls(x, y, orientation, open)

@@ -1,6 +1,6 @@
 """Map container class definition."""
 
-from typing import List, Iterator, Optional, TYPE_CHECKING
+from typing import List, Iterator, Optional, Generic, TypeVar, TYPE_CHECKING
 
 import skia
 import math
@@ -14,13 +14,16 @@ if TYPE_CHECKING:
     from options import Options
 from map.occupancy import OccupancyGrid
 from algorithms.shapes import ShapeGroup, Rectangle, Circle, Shape
-from graphics.conversions import grid_to_drawing, grid_to_drawing_size
+from graphics.conversions import grid_to_map
 from map.mapelement import MapElement
 from map.room import Room
 from map.door import Door
 from map.passage import Passage
+from map.stairs import Stairs
 from constants import CELL_SIZE
 
+
+TMapElement = TypeVar('T', bound='MapElement')
 
 class Map:
     """Container for all map elements with type-specific access."""
@@ -32,17 +35,18 @@ class Map:
         self._bounds_dirty: bool = True
         self._occupancy: OccupancyGrid | None = None
     
-    def add_element(self, element: MapElement) -> None:
+    def add_element(self, element: Generic[TMapElement]) -> TMapElement:
         """Add a map element."""
-        from map._props.prop import Prop
-        if not isinstance(element, Prop):
-            self._elements.append(element)
-            self._bounds_dirty = True
+        element._map = self
+        self._elements.append(element)
+        self._bounds_dirty = True
+        return element
     
-    def remove_element(self, element: MapElement) -> None:
+    def remove_element(self, element: Generic[TMapElement]) -> TMapElement:
         """Remove a map element."""
         if element in self._elements:
             self._elements.remove(element)
+            element._map = None
             self._bounds_dirty = True
     
     @property
@@ -60,6 +64,11 @@ class Map:
         """Get all passages in the map."""
         return (elem for elem in self._elements if isinstance(elem, Passage))
     
+    @property
+    def stairs(self) -> Iterator[Stairs]:
+        """Get all stairs in the map."""
+        return (elem for elem in self._elements if isinstance(elem, Stairs))
+
     def _trace_connected_region(self, 
                               element: MapElement,
                               visited: set[MapElement],
@@ -142,51 +151,6 @@ class Map:
         if idx >= 0:
             return self._elements[idx]
         return None
-
-    def add_rectangular_room(self, grid_x: float, grid_y: float, grid_width: float, grid_height: float) -> Room:
-        """Add a rectangular room using grid coordinates.
-        
-        Args:
-            grid_x: X coordinate in grid units
-            grid_y: Y coordinate in grid units
-            grid_width: Width in grid units
-            grid_height: Height in grid units
-            
-        Returns:
-            A new rectangular Room instance
-        """
-        x, y = grid_to_drawing(grid_x, grid_y, self.options)
-        width, height = grid_to_drawing_size(grid_width, grid_height, self.options)
-        room = Room(x, y, width, height, self)
-        self.add_element(room)
-        return room
-    
-    def add_circular_room(self, grid_x: float, grid_y: float, grid_diameter: float) -> Room:
-        """Add a circular room using grid coordinates.
-        
-        Args:
-            grid_x: Top-left X coordinate in grid units
-            grid_y: Top-left Y coordinate in grid units
-            grid_diameter: Diameter in grid units
-            
-        Returns:
-            A new Room instance with a circular shape
-        """
-        # Convert top-left position to drawing units
-        x, y = grid_to_drawing(grid_x, grid_y, self.options)
-        diameter, _ = grid_to_drawing_size(grid_diameter, 0, self.options)
-        radius = diameter / 2
-        
-        # Calculate center point from top-left position
-        cx = x + radius
-        cy = y + radius
-        
-        # Create a Room with a Circle shape
-        room = Room.__new__(Room)  # Create instance without calling __init__
-        shape = Circle(cx, cy, radius)
-        MapElement.__init__(room, shape=shape, map_=self)
-        self.add_element(room)
-        return room
     
     def get_regions(self) -> list[Region]:
         """Get Regions for each contiguous area of the map.
@@ -235,11 +199,7 @@ class Map:
         bounds = self.bounds
         
         # Convert padding from grid units to drawing units
-        padding_x, padding_y = grid_to_drawing_size(
-            self.options.map_border_cells,
-            self.options.map_border_cells,
-            self.options
-        )
+        padding_x, padding_y = grid_to_map(self.options.map_border_cells, self.options.map_border_cells)
         
         # Add padding to bounds for scale calculation
         padded_width = bounds.width + (2 * padding_x)

@@ -8,7 +8,7 @@ from constants import CELL_SIZE
 if TYPE_CHECKING:
     from options import Options
     from map.mapelement import MapElement
-from graphics.conversions import drawing_to_grid
+from graphics.conversions import map_to_grid
 
 class OccupancyGrid:
     """Tracks which grid spaces are occupied by map elements using a 2D array."""
@@ -62,12 +62,8 @@ class OccupancyGrid:
     def mark_rectangle(self, rect: Rectangle, element_idx: int, options: 'Options') -> None:
         """Mark all grid positions covered by a rectangle as occupied."""
         # Convert rectangle bounds to grid coordinates
-        start_x, start_y = drawing_to_grid(rect.x, rect.y, options)
-        end_x, end_y = drawing_to_grid(
-            rect.x + rect.width,
-            rect.y + rect.height,
-            options
-        )
+        start_x, start_y = map_to_grid(rect.x, rect.y)
+        end_x, end_y = map_to_grid(rect.x + rect.width, rect.y + rect.height)
         
         # Round to integer grid positions
         grid_start_x = int(start_x)
@@ -86,7 +82,7 @@ class OccupancyGrid:
         Only marks grid cells where the circle covers a significant portion of the cell.
         """
         # Convert circle to grid coordinates
-        center_x, center_y = drawing_to_grid(circle.cx, circle.cy, options)
+        center_x, center_y = map_to_grid(circle.cx, circle.cy)
         radius = circle._inflated_radius / CELL_SIZE
         
         # Calculate grid bounds
