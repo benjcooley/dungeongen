@@ -31,49 +31,25 @@ def main():
     DEMO = True
 
     if DEMO:
-
-        rooms: List[MapElement] = []
-
-        # Add central rectangular room (5x5, centered at 0,0)
-        # Since we want grid alignment and center at 0,0, we'll offset by -2,-2
-        start_room0 = dungeon_map.add_element(Room.from_grid(-10, -2, 5, 5))
-        rooms.append(start_room0)
+        # Create first rectangular room
+        start_room0 = dungeon_map.create_rectangular_room(-10, -2, 5, 5)
         
         # Add dais to left side of room0
         dais = Dais((start_room0.bounds.left, start_room0.bounds.top + CELL_SIZE), Rotation.ROT_0)
         start_room0.add_prop(dais)
-        
-        # Add 5-grid long passage
-        passage0 = dungeon_map.add_element(Passage.from_grid(-5, 0, 5, 1))
-        rooms.append(passage0)
 
-        # Add central rectangular room (5x5, centered at 0,0)
-        # Since we want grid alignment and center at 0,0, we'll offset by -2,-2
-        start_room = dungeon_map.add_element(Room.from_grid(-2, -2, 5, 5))
-        
-        # Add door to the right of the room (at x=3, centered vertically)
-        first_door = dungeon_map.add_element(Door.from_grid(3, 0, DoorOrientation.HORIZONTAL, open=True))
-        rooms.append(first_door)
-        
-        # Add 5-grid long passage
-        passage = dungeon_map.add_element(Passage.from_grid(4, 0, 5, 1))
-        rooms.append(passage)
-        
-        # Add closed door at the end of the passage
-        second_door = dungeon_map.add_element(Door.from_grid(9, 0, DoorOrientation.HORIZONTAL, open=False))
-        rooms.append(second_door)
-        
-        # Add circular room (5x5 grid units, 11 units right of start room)
-        end_room = dungeon_map.add_element(Room.from_grid(10, -2, grid_width=5, grid_height=5, room_type=RoomType.CIRCULAR))
-        rooms.append(end_room)
-        
-        # Connect everything together
-        start_room0.connect_to(passage0)
-        passage0.connect_to(start_room)
-        start_room.connect_to(first_door)
-        first_door.connect_to(passage)
-        passage.connect_to(second_door)
-        second_door.connect_to(end_room)
+        # Create second rectangular room connected to first
+        start_room, _, passage0, _ = dungeon_map.create_connected_room(
+            start_room0, Direction.EAST, 5, 5, 5
+        )
+
+        # Create circular end room connected to second room
+        end_room, first_door, passage, second_door = dungeon_map.create_connected_room(
+            start_room, Direction.EAST, 12, 5, 5, 
+            room_type=RoomType.CIRCULAR,
+            start_door=True,
+            end_door=False
+        )
         
         # Add props to rooms and passage
         # Test vertical row layout for columns
