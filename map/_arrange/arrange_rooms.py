@@ -55,6 +55,99 @@ class Orientation(Enum):
     HORIZONTAL = auto()
     VERTICAL = auto()
 
+def connect_rooms(
+    room1: Room,
+    room2: Room,
+    start_door_type: Optional[DoorType] = None,
+    end_door_type: Optional[DoorType] = None,
+    dungeon_map: Optional[Map] = None
+) -> Tuple[Optional[Door], Passage, Optional[Door]]:
+    """Create a passage between two rooms with optional doors.
+    
+    Args:
+        room1: First room to connect
+        room2: Second room to connect 
+        start_door_type: Optional door type at start of passage
+        end_door_type: Optional door type at end of passage
+        dungeon_map: Optional map instance (will use room1's map if not provided)
+        
+    Returns:
+        Tuple of (start_door, passage, end_door) where doors may be None
+    """
+    # Use room1's map if none provided
+    dungeon_map = dungeon_map or room1._map
+    
+    # Get the primary direction between rooms
+    r1_dir = get_room_direction(room1, room2)
+    
+    # Get the opposite direction for room2
+    r2_dir = r1_dir.get_opposite()
+            
+    # Get connection points in grid coordinates
+    r1_x, r1_y = get_room_passage_connection_point(room1, r1_dir)
+    r2_x, r2_y = get_room_passage_connection_point(room2, r2_dir)
+    
+    # Convert to map coordinates
+    x1, y1 = r1_x * CELL_SIZE, r1_y * CELL_SIZE
+    x2, y2 = r2_x * CELL_SIZE, r2_y * CELL_SIZE
+    
+    # Determine passage dimensions and position
+    if abs(x2 - x1) > abs(y2 - y1):  # Horizontal passage
+        passage_x = min(x1, x2)
+        passage_width = abs(x2 - x1)
+        passage_y = (y1 + y2) / 2 - 0.5  # Center between rooms
+        
+        # Convert passage position to grid coordinates
+        grid_passage_x = passage_x / CELL_SIZE
+        grid_passage_y = passage_y / CELL_SIZE
+        grid_passage_width = passage_width / CELL_SIZE
+        
+        # Create passage and doors
+        passage = Passage.from_grid(grid_passage_x, grid_passage_y, grid_passage_width, 1)
+        door1 = Door.from_grid(grid_passage_x, grid_passage_y, DoorOrientation.HORIZONTAL, 
+                             door_type=start_door_type)
+        door2 = Door.from_grid(grid_passage_x + grid_passage_width - 1, grid_passage_y,
+                             DoorOrientation.HORIZONTAL, door_type=end_door_type)
+    else:  # Vertical passage
+        passage_x = (x1 + x2) / 2 - 0.5  # Center between rooms
+        passage_y = min(y1, y2)
+        passage_height = abs(y2 - y1)
+        
+        # Calculate grid coordinates
+        grid_passage_x = round(passage_x / CELL_SIZE)
+        grid_passage_y = round(passage_y / CELL_SIZE)
+        grid_passage_height = round(abs(y2 - y1) / CELL_SIZE)
+        
+        passage = Passage.from_grid(grid_passage_x, grid_passage_y, 1, grid_passage_height)
+        door1 = Door.from_grid(grid_passage_x, grid_passage_y, DoorOrientation.VERTICAL, 
+                             door_type=start_door_type)
+        door2 = Door.from_grid(grid_passage_x, grid_passage_y + grid_passage_height - 1,
+                             DoorOrientation.VERTICAL, door_type=end_door_type)
+    
+    # Add elements to map
+    dungeon_map.add_element(passage)
+    if start_door_type is not None:
+        dungeon_map.add_element(door1)
+    if end_door_type is not None:
+        dungeon_map.add_element(door2)
+    
+    # Connect everything based on which door types were specified
+    if start_door_type is not None:
+        room1.connect_to(door1)
+        door1.connect_to(passage)
+    else:
+        room1.connect_to(passage)
+        door1 = None
+        
+    if end_door_type is not None:
+        passage.connect_to(door2)
+        door2.connect_to(room2)
+    else:
+        passage.connect_to(room2)
+        door2 = None
+        
+    return door1, passage, door2
+
 def arrange_rooms(
     dungeon_map: Map,
     style: ArrangeRoomStyle,

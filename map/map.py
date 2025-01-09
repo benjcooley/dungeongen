@@ -302,8 +302,8 @@ class Map:
             Where doors may be None if not requested
         """
         from map.room import Room, RoomType
-        from map.door import Door, DoorOrientation, DoorType
-        from map.passage import Passage
+        from map.door import DoorType
+        from map._arrange.arrange_rooms import connect_rooms
         
         # Validate inputs
         if distance <= 0:
@@ -320,11 +320,6 @@ class Map:
         dx, dy = direction.get_offset()
         dx *= distance
         dy *= distance
-        
-        # Set door orientation based on direction
-        door_orientation = (DoorOrientation.VERTICAL 
-                          if direction in (Direction.NORTH, Direction.SOUTH)
-                          else DoorOrientation.HORIZONTAL)
             
         # Calculate new room position in grid coordinates
         new_room_x = src_center_x + dx - (room_width // 2)
@@ -340,75 +335,18 @@ class Map:
             room_type=room_type
         ))
         
-        # Create passage
-        if direction in (Direction.EAST, Direction.WEST):
-            # Horizontal passage
-            passage_x = min(src_center_x, src_center_x + dx)
-            passage_y = src_center_y  # Center vertically
-            passage_width = abs(dx)
-            passage_height = 1
-        else:
-            # Vertical passage
-            passage_x = src_center_x  # Center horizontally
-            passage_y = min(src_center_y, src_center_y + dy)
-            passage_width = 1
-            passage_height = abs(dy)
-            
-        passage = self.add_element(Passage.from_grid(passage_x, passage_y, passage_width, passage_height))
+        # Convert bool door flags to door types
+        start_door_type = DoorType.DEFAULT if start_door else DoorType.NONE if start_door is not None else None
+        end_door_type = DoorType.DEFAULT if end_door else DoorType.NONE if end_door is not None else None
         
-        # Add doors if requested
-        start_door_elem = None
-        end_door_elem = None
+        # Connect the rooms using the utility function
+        start_door_elem, passage, end_door_elem = connect_rooms(
+            source_room, new_room,
+            start_door_type=start_door_type,
+            end_door_type=end_door_type,
+            dungeon_map=self
+        )
         
-        if start_door is not None:
-            # Calculate door position in grid coordinates
-            if direction == Direction.NORTH:
-                door_x = passage_x
-                door_y = passage_y + passage_height
-            elif direction == Direction.SOUTH:
-                door_x = passage_x
-                door_y = passage_y
-            elif direction == Direction.EAST:
-                door_x = passage_x
-                door_y = passage_y
-            else:  # WEST
-                door_x = passage_x + passage_width
-                door_y = passage_y
-                
-            start_door_elem = self.add_element(Door.from_grid(door_x, door_y, door_orientation, 
-                                             door_type=DoorType.DEFAULT if start_door else DoorType.NONE))
-            
-        if end_door is not None:
-            # Calculate door position in grid coordinates
-            if direction == Direction.NORTH:
-                door_x = passage_x
-                door_y = passage_y
-            elif direction == Direction.SOUTH:
-                door_x = passage_x
-                door_y = passage_y + passage_height
-            elif direction == Direction.EAST:
-                door_x = passage_x + passage_width
-                door_y = passage_y
-            else:  # WEST
-                door_x = passage_x
-                door_y = passage_y
-                
-            end_door_elem = self.add_element(Door.from_grid(door_x, door_y, door_orientation, 
-                                             door_type=DoorType.DEFAULT if end_door else DoorType.NONE))
-        
-        # Connect everything
-        if start_door_elem:
-            source_room.connect_to(start_door_elem)
-            start_door_elem.connect_to(passage)
-        else:
-            source_room.connect_to(passage)
-            
-        if end_door_elem:
-            passage.connect_to(end_door_elem)
-            end_door_elem.connect_to(new_room)
-        else:
-            passage.connect_to(new_room)
-            
         return new_room, start_door_elem, passage, end_door_elem
 
     def render(self, canvas: skia.Canvas, transform: Optional[skia.Matrix] = None) -> None:
