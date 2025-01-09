@@ -289,8 +289,12 @@ class Map:
     ) -> Tuple['Room', Optional['Door'], 'Passage', Optional['Door']]:
         """Create a new room connected to an existing room via a passage.
         
+        Creates a new Room of the specified type and size, positioned in the given direction
+        and distance from the source room. The rooms are connected by a Passage with optional
+        doors at either end.
+        
         Args:
-            source_room: The room to connect from
+            source_room: The existing room to connect from
             direction: Direction to create the new room
             distance: Grid distance to place the new room (must be > 0)
             room_width: Width of new room in grid units (must be > 0)
@@ -300,8 +304,11 @@ class Map:
             end_door_type: Optional DoorType for end of passage
             
         Returns:
-            Tuple of (new_room, start_door, passage, end_door)
-            Where doors may be None if not requested
+            Tuple of (new_room, start_door, passage, end_door) where:
+            - new_room: The newly created Room instance
+            - start_door: Door at start of passage (None if start_door_type is None)
+            - passage: The connecting Passage instance
+            - end_door: Door at end of passage (None if end_door_type is None)
         """
         from map._arrange.arrange_rooms import connect_rooms
         
