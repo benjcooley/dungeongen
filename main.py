@@ -8,7 +8,7 @@ from graphics.conversions import grid_to_map
 from map.mapelement import MapElement
 from map.room import Room, RoomType
 from map.map import Map
-from map.door import Door, DoorOrientation
+from map.door import Door, DoorOrientation, DoorType
 from map.passage import Passage
 from algorithms.rotation import Rotation
 from constants import CELL_SIZE
@@ -48,8 +48,8 @@ def main():
         end_room, first_door, passage, second_door = dungeon_map.create_connected_room(
             start_room, Direction.EAST, 12, 5, 5, 
             room_type=RoomType.CIRCULAR,
-            start_door=True,
-            end_door=False
+            start_door_type=DoorType.DEFAULT,
+            end_door_type=DoorType.NONE
         )
         
         # Add props to rooms and passage

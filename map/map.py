@@ -281,9 +281,9 @@ class Map:
         distance: int,
         room_width: int,
         room_height: int,
-        room_type: Optional[str] = None,
-        start_door: Optional[bool] = None,
-        end_door: Optional[bool] = None
+        room_type: Optional[str] = None, 
+        start_door_type: Optional[DoorType] = None,
+        end_door_type: Optional[DoorType] = None
     ) -> Tuple['MapElement', Optional['MapElement'], 'MapElement', Optional['MapElement']]:
         """Create a new room connected to an existing room via a passage.
         
@@ -294,8 +294,8 @@ class Map:
             room_width: Width of new room in grid units (must be > 0)
             room_height: Height of new room in grid units (must be > 0)
             room_type: Optional RoomType (defaults to RECTANGULAR)
-            start_door: Optional bool to add door at start of passage
-            end_door: Optional bool to add door at end of passage
+            start_door_type: Optional DoorType for start of passage
+            end_door_type: Optional DoorType for end of passage
             
         Returns:
             Tuple of (new_room, start_door, passage, end_door)
@@ -335,9 +335,6 @@ class Map:
             room_type=room_type
         ))
         
-        # Convert bool door flags to door types
-        start_door_type = DoorType.DEFAULT if start_door else DoorType.NONE if start_door is not None else None
-        end_door_type = DoorType.DEFAULT if end_door else DoorType.NONE if end_door is not None else None
         
         # Connect the rooms using the utility function
         start_door_elem, passage, end_door_elem = connect_rooms(
