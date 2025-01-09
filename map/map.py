@@ -15,11 +15,11 @@ from map.grid import GridStyle, draw_region_grid
 from map.mapelement import MapElement
 from map.occupancy import OccupancyGrid
 from map.region import Region
-from map.room import Room, RoomType
 from map.door import DoorType
 
 if TYPE_CHECKING:
     from map.door import Door
+    from map.room import Room, RoomType
     from map.passage import Passage
     from map.stairs import Stairs
     from options import Options
@@ -302,8 +302,6 @@ class Map:
             Tuple of (new_room, start_door, passage, end_door)
             Where doors may be None if not requested
         """
-        from map.room import Room, RoomType
-        from map.door import DoorType
         from map._arrange.arrange_rooms import connect_rooms
         
         # Validate inputs
