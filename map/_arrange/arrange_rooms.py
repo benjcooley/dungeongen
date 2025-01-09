@@ -157,16 +157,33 @@ class _RoomArranger:
         else:  # WEST
             return (grid_x, center_y)
 
-    def _get_room_connection_point(self, room: Room, orientation: Orientation) -> tuple[float, float]:
-        """Get a map coordinate point on the room's edge for connecting a passage."""
-        # Get grid connection point
-        direction = Direction.EAST if orientation == Orientation.HORIZONTAL else Direction.SOUTH
-        grid_x, grid_y = self.get_room_grid_connection(room, direction)
-        
-        # Convert back to map coordinates
-        return (grid_x * CELL_SIZE, grid_y * CELL_SIZE)
-
     def _create_passage(self, room1: Room, room2: Room, orientation: Orientation) -> None:
+        """Create a passage between two rooms with appropriate doors."""
+        # Determine which sides to connect based on orientation and relative positions
+        if orientation == Orientation.HORIZONTAL:
+            # For horizontal passages, connect east side of leftmost room to west side of rightmost room
+            if room1.bounds.x < room2.bounds.x:
+                r1_dir = Direction.EAST
+                r2_dir = Direction.WEST
+            else:
+                r1_dir = Direction.WEST
+                r2_dir = Direction.EAST
+        else:  # VERTICAL
+            # For vertical passages, connect south side of upper room to north side of lower room
+            if room1.bounds.y < room2.bounds.y:
+                r1_dir = Direction.SOUTH
+                r2_dir = Direction.NORTH
+            else:
+                r1_dir = Direction.NORTH
+                r2_dir = Direction.SOUTH
+                
+        # Get connection points in grid coordinates
+        r1_x, r1_y = self.get_room_grid_connection(room1, r1_dir)
+        r2_x, r2_y = self.get_room_grid_connection(room2, r2_dir)
+        
+        # Convert to map coordinates
+        x1, y1 = r1_x * CELL_SIZE, r1_y * CELL_SIZE
+        x2, y2 = r2_x * CELL_SIZE, r2_y * CELL_SIZE
         """Create a passage between two rooms with appropriate doors."""
         # Get connection points
         x1, y1 = self._get_room_connection_point(room1, orientation)
