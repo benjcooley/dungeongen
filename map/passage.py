@@ -43,8 +43,7 @@ class Passage(MapElement):
         """Create a passage between two grid points.
         
         Creates a passage that connects two points in grid coordinates. The passage
-        will be either horizontal or vertical based on which dimension has the larger
-        difference between points.
+        will be either horizontal or vertical based on which coordinates match.
         
         Args:
             start_x: Starting X coordinate in grid units
@@ -55,25 +54,8 @@ class Passage(MapElement):
         Returns:
             A new Passage instance
         """
-        # Convert both points to map coordinates
-        x1, y1 = grid_to_map(start_x, start_y)
-        # Add 1 to end coordinates to account for grid CELL_SIZE intervals
-        x2, y2 = grid_to_map(end_x + 1, end_y + 1)
+        # Convert grid points to grid-aligned rectangle
+        grid_x, grid_y, grid_width, grid_height = grid_points_to_grid_rect(start_x, start_y, end_x, end_y)
         
-        # Validate that points form a straight line
-        if y1 != y2 and x1 != x2:
-            raise ValueError(f"Passage points ({start_x}, {start_y}) and ({end_x}, {end_y}) must form a horizontal or vertical line")
-            
-        # Create horizontal or vertical passage
-        if y1 == y2:  # Horizontal passage
-            x = min(x1, x2)
-            y = y1  # Use exact y coordinate since they match
-            width = abs(x2 - x1)
-            height = CELL_SIZE  # One grid unit high
-        else:  # x1 == x2, Vertical passage
-            x = x1  # Use exact x coordinate since they match
-            y = min(y1, y2)
-            width = CELL_SIZE   # One grid unit wide
-            height = abs(y2 - y1)
-            
-        return cls(x, y, width, height)
+        # Create passage using grid rectangle
+        return cls.from_grid(grid_x, grid_y, grid_width, grid_height)
