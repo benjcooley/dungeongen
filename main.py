@@ -65,7 +65,7 @@ def main():
         rooms.append(second_door)
         
         # Add circular room (5x5 grid units, 11 units right of start room)
-        end_room = dungeon_map(Room.from_grid(10, -2, diameter=5, room_type=RoomType.CIRCULAR))
+        end_room = dungeon_map.add_element(Room.from_grid(10, -2, diameter=5, room_type=RoomType.CIRCULAR))
         rooms.append(end_room)
         
         # Connect everything together
