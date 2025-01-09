@@ -56,7 +56,7 @@ def main():
         rooms.append(first_door)
         
         # Add 5-grid long passage
-        passage = dungeon_map.add_element(Passage.from_grid(4, 0, 5, 1, dungeon_map))
+        passage = dungeon_map.add_element(Passage.from_grid(4, 0, 5, 1))
         rooms.append(passage)
         
         # Add closed door at the end of the passage
