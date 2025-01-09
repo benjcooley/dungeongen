@@ -23,7 +23,7 @@ from map.map import Map
 from map.room import Room
 from map.passage import Passage
 from constants import CELL_SIZE
-from map.door import Door, DoorOrientation
+from map.door import Door, DoorOrientation, DoorType
 
 class Direction(Enum):
     """Direction to generate rooms."""
@@ -181,8 +181,8 @@ class _RoomArranger:
         self,
         room1: Room,
         room2: Room,
-        start_door_type: Optional[str] = None,
-        end_door_type: Optional[str] = None
+        start_door_type: Optional[DoorType] = None,
+        end_door_type: Optional[DoorType] = None
     ) -> Tuple[Optional[Door], Passage, Optional[Door]]:
         """Create a passage between two rooms with optional doors.
         
@@ -340,7 +340,7 @@ class _RoomArranger:
                 
             # Create and connect new room
             new_room = self.create_room(next_x, next_y)
-            self.connect_rooms(last_room, new_room, start_door_type="default", end_door_type="default")
+            self.connect_rooms(last_room, new_room, start_door_type=DoorType.DEFAULT, end_door_type=DoorType.DEFAULT)
             last_room = new_room  # Update last room
             
         return self.rooms

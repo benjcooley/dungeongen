@@ -20,6 +20,11 @@ class DoorOrientation(Enum):
     HORIZONTAL = auto()
     VERTICAL = auto()
 
+class DoorType(Enum):
+    """Door type enum."""
+    DEFAULT = auto()  # Standard door
+    NONE = auto()    # No door
+
 # Amount to round the door side corners by
 DOOR_SIDE_ROUNDING = 8.0
 # Amount to extend the door sides to ensure proper connection with rooms
@@ -33,7 +38,7 @@ class Door(MapElement):
     When open, it forms an I-shaped passage connecting the sides.
     """
     
-    def __init__(self, x: float, y: float, orientation: DoorOrientation, open: bool = False) -> None:
+    def __init__(self, x: float, y: float, orientation: DoorOrientation, open: bool = False, door_type: DoorType = DoorType.DEFAULT) -> None:
         """Initialize a door with position and orientation.
         
         Args:
