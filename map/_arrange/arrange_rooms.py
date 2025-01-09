@@ -127,7 +127,7 @@ class _RoomArranger:
         self.rooms.append(room)
         return room
         
-    def get_direction_between_rooms(self, room1: Room, room2: Room) -> Direction:
+    def get_direction(self, room1: Room, room2: Room) -> Direction:
         """Determine the primary direction from room1 to room2.
         
         Args:
@@ -147,7 +147,7 @@ class _RoomArranger:
         else:
             return Direction.SOUTH if dy > 0 else Direction.NORTH
             
-    def get_room_grid_connection(self, room: Room, direction: Direction) -> tuple[int, int]:
+    def get_connection(self, room: Room, direction: Direction) -> tuple[int, int]:
         """Get a grid position for connecting to this room from the given direction.
         
         Args:
@@ -196,7 +196,7 @@ class _RoomArranger:
             Tuple of (start_door, passage, end_door) where doors may be None
         """
         # Get the primary direction between rooms
-        r1_dir = self.get_direction_between_rooms(room1, room2)
+        r1_dir = self.get_direction(room1, room2)
         
         # Get the opposite direction for room2
         r2_dir = {
@@ -207,8 +207,8 @@ class _RoomArranger:
         }[r1_dir]
                 
         # Get connection points in grid coordinates
-        r1_x, r1_y = self.get_room_grid_connection(room1, r1_dir)
-        r2_x, r2_y = self.get_room_grid_connection(room2, r2_dir)
+        r1_x, r1_y = self.get_connection(room1, r1_dir)
+        r2_x, r2_y = self.get_connection(room2, r2_dir)
         
         # Convert to map coordinates
         x1, y1 = r1_x * CELL_SIZE, r1_y * CELL_SIZE
