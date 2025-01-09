@@ -1,4 +1,4 @@
-from typing import List, Optional, TYPE_CHECKING, Union
+from typing import List, Optional, TYPE_CHECKING, Sequence, Union
 import random
 import math
 import skia
@@ -29,7 +29,41 @@ class MapElement:
         self._bounds = self._shape.bounds
         self._connections: List['MapElement'] = []
         self._props: List['Prop'] = []
-               
+
+    @property
+    def bounds(self) -> Rectangle:
+        """Get the current rectangular bounding box of this element."""
+        return self._bounds
+    
+    @property
+    def shape(self) -> Shape:
+        """Get the shape of this element."""
+        return self._shape
+    
+    def options(self) -> 'Options':
+        """Get the current options."""
+        return self._options
+
+    @property
+    def connections(self) -> Sequence['MapElement']:
+        """Read only access to element's connections list."""
+        return self._connections
+    
+    @property
+    def connection_count(self) -> int:
+        """Get the number of connections this element has."""
+        return len(self._connections)
+    
+    @property
+    def props(self) -> Sequence['Prop']:
+        """Read only access to element's prop list."""
+        return self._props
+    
+    @property
+    def prop_count(self) -> int:
+        """Get the number of props in this element."""
+        return len(self._props)
+
     def add_prop(self, prop: 'Prop') -> None:
         """Add a prop to this element at its current position.
         
@@ -43,8 +77,9 @@ class MapElement:
             
         prop._container = self
         prop._map = self._map
+        prop._options = self._options
         self._props.append(prop)
-        
+
     def remove_prop(self, prop: 'Prop') -> None:
         """Remove a prop from this element."""
         if prop in self._props:
@@ -56,21 +91,6 @@ class MapElement:
         """Calculate the bounding rectangle that encompasses the shape."""
         self._bounds = self._shape.bounds
         return self._bounds
-    
-    @property
-    def bounds(self) -> Rectangle:
-        """Get the current rectangular bounding box of this element."""
-        return self._bounds
-    
-    @property
-    def shape(self) -> Shape:
-        """Get the shape of this element."""
-        return self._shape
-    
-    @property
-    def connections(self) -> List['MapElement']:
-        """Get all map elements connected to this one."""
-        return self._connections.copy()
     
     def connect_to(self, other: 'MapElement') -> None:
         """Connect this element to another map element.

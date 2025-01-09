@@ -1,6 +1,6 @@
 """Map container class definition."""
 
-from typing import List, Iterator, Optional, Generic, TypeVar, TYPE_CHECKING
+from typing import List, Iterator, Optional, Generic, Sequence, TypeVar, TYPE_CHECKING
 
 import skia
 import math
@@ -30,11 +30,38 @@ class Map:
     
     def __init__(self, options: 'Options') -> None:
         self._elements: List[MapElement] = []
-        self.options = options
+        self._options: Options = options
         self._bounds: Rectangle | None = None
         self._bounds_dirty: bool = True
         self._occupancy: OccupancyGrid | None = None
     
+    @property
+    def elements(self) -> Sequence[MapElement]:
+        """Read only access to map elements."""
+        return self._elements
+    
+    @property
+    def element_count(self) -> int:
+        """Get the number of map elements."""
+        return len(self._elements)
+    
+    @property
+    def occupancy(self) -> OccupancyGrid:
+        """Get the current occupancy grid."""
+        return self._occupancy
+    
+    @property
+    def options(self) -> 'Options':
+        """Get the current options."""
+        return self._options
+    
+    @property 
+    def bounds(self) -> Rectangle:
+        """Get the current bounding rectangle, recalculating if needed."""
+        if self._bounds_dirty or self._bounds is None:
+            self._recalculate_bounds()
+        return self._bounds
+
     def add_element(self, element: Generic[TMapElement]) -> TMapElement:
         """Add a map element."""
         element._map = self
@@ -51,22 +78,22 @@ class Map:
     
     @property
     def rooms(self) -> Iterator[Room]:
-        """Get all rooms in the map."""
+        """Returns a new iteralble of rooms in the map."""
         return (elem for elem in self._elements if isinstance(elem, Room))
     
     @property
     def doors(self) -> Iterator[Door]:
-        """Get all doors in the map."""
+        """Returns a new iterable of all doors in the map."""
         return (elem for elem in self._elements if isinstance(elem, Door))
     
     @property
     def passages(self) -> Iterator[Passage]:
-        """Get all passages in the map."""
+        """Returns a new iterable of all passages in the map."""
         return (elem for elem in self._elements if isinstance(elem, Passage))
     
     @property
     def stairs(self) -> Iterator[Stairs]:
-        """Get all stairs in the map."""
+        """Returns a new iterable all stairs in the map."""
         return (elem for elem in self._elements if isinstance(elem, Stairs))
 
     def _trace_connected_region(self, 
@@ -220,7 +247,6 @@ class Map:
         matrix.postTranslate(translate_x, translate_y)
         return matrix
 
-
     def render(self, canvas: skia.Canvas, transform: Optional[skia.Matrix] = None) -> None:
         """Render the map to a canvas.
         
@@ -340,25 +366,3 @@ class Map:
 
         # Restore canvas state
         canvas.restore()
-
-if __name__ == '__main__':
-    import skia
-    from options import Options
-    
-    # Create a test map
-    options = Options()
-    test_map = Map(options)
-    
-    # Create a test surface and canvas
-    surface = skia.Surface(800, 600)
-    canvas = surface.getCanvas()
-    
-    # Add a test room
-    test_map.add_rectangular_room(1, 1, 3, 2)
-    
-    # Render the map
-    test_map.render(canvas)
-    
-    # Save the output
-    image = surface.makeImageSnapshot()
-    image.save('test_map.png', skia.kPNG)
