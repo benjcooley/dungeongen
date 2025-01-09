@@ -59,18 +59,17 @@ class Passage(MapElement):
         is_horizontal = abs(end_x - start_x) > abs(end_y - start_y)
         
         if is_horizontal:
-            # For horizontal passages, ensure x coordinates are ordered left to right
-            if end_x < start_x:
-                start_x, end_x = end_x, start_x
-                start_y, end_y = end_y, start_y
+            # For horizontal passages, use min/max x and average y
+            grid_x = min(start_x, end_x)
+            grid_width = max(start_x, end_x) - grid_x + 1
+            grid_y = (start_y + end_y) / 2
+            grid_height = 1
         else:
-            # For vertical passages, ensure y coordinates are ordered top to bottom
-            if end_y < start_y:
-                start_x, end_x = end_x, start_x
-                start_y, end_y = end_y, start_y
-                
-        # Convert grid points to grid-aligned rectangle
-        grid_x, grid_y, grid_width, grid_height = grid_points_to_grid_rect(start_x, start_y, end_x, end_y)
+            # For vertical passages, use min/max y and average x
+            grid_y = min(start_y, end_y)
+            grid_height = max(start_y, end_y) - grid_y + 1
+            grid_x = (start_x + end_x) / 2
+            grid_width = 1
         
         # Create passage using grid rectangle
         return cls.from_grid(grid_x, grid_y, grid_width, grid_height)
