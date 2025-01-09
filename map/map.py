@@ -286,7 +286,7 @@ class Map:
         room_type: Optional[RoomType] = None,
         start_door_type: Optional[DoorType] = None,
         end_door_type: Optional[DoorType] = None
-    ) -> Tuple['MapElement', Optional['MapElement'], 'MapElement', Optional['MapElement']]:
+    ) -> Tuple['Room', Optional['Door'], 'Passage', Optional['Door']]:
         """Create a new room connected to an existing room via a passage.
         
         Args:
@@ -326,6 +326,7 @@ class Map:
         new_room_y = src_center_y + dy - (room_height // 2)
             
         # Create the new room
+        from map.room import Room
         room_type = room_type or RoomType.RECTANGULAR
         new_room = self.add_element(Room.from_grid(
             new_room_x,
