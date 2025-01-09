@@ -64,12 +64,12 @@ class Passage(MapElement):
             x = min(x1, x2)
             y = (y1 + y2) / 2
             width = abs(x2 - x1)
-            height = grid_to_map(1)[0]  # One grid unit high
+            height = CELL_SIZE  # One grid unit high
         else:
             # Vertical passage
             x = (x1 + x2) / 2
             y = min(y1, y2)
-            width = grid_to_map(1)[0]   # One grid unit wide
+            width = CELL_SIZE   # One grid unit wide
             height = abs(y2 - y1)
             
         return cls(x, y, width, height)
