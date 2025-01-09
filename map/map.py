@@ -18,10 +18,6 @@ from map.occupancy import OccupancyGrid
 from algorithms.shapes import ShapeGroup, Rectangle, Circle, Shape
 from graphics.conversions import grid_to_map
 from map.mapelement import MapElement
-from map.room import Room
-from map.door import Door
-from map.passage import Passage
-from map.stairs import Stairs
 from constants import CELL_SIZE
 
 
@@ -281,23 +277,23 @@ class Map:
     
     def create_connected_room(
         self,
-        source_room: 'Room',
+        source_room: 'MapElement',
         direction: Direction,
         distance: int,
-        room_width: float,
-        room_height: float,
-        room_type: Optional['RoomType'] = None,
+        room_width: int,
+        room_height: int,
+        room_type: Optional[str] = None,
         start_door: Optional[bool] = None,
         end_door: Optional[bool] = None
-    ) -> Tuple['Room', Optional['Door'], 'Passage', Optional['Door']]:
+    ) -> Tuple['MapElement', Optional['MapElement'], 'MapElement', Optional['MapElement']]:
         """Create a new room connected to an existing room via a passage.
         
         Args:
             source_room: The room to connect from
             direction: Direction to create the new room
-            distance: Grid distance to place the new room
-            room_width: Width of new room in grid units
-            room_height: Height of new room in grid units
+            distance: Grid distance to place the new room (must be > 0)
+            room_width: Width of new room in grid units (must be > 0)
+            room_height: Height of new room in grid units (must be > 0)
             room_type: Optional RoomType (defaults to RECTANGULAR)
             start_door: Optional bool to add door at start of passage
             end_door: Optional bool to add door at end of passage
@@ -310,52 +306,54 @@ class Map:
         from map.door import Door, DoorOrientation
         from map.passage import Passage
         
-        # Calculate new room position
+        # Validate inputs
+        if distance <= 0:
+            raise ValueError("Distance must be positive")
+        if room_width <= 0 or room_height <= 0:
+            raise ValueError("Room dimensions must be positive")
+            
+        # Get source room center in grid coordinates
         src_bounds = source_room.bounds
-        src_center_x = src_bounds.x + (src_bounds.width / 2)
-        src_center_y = src_bounds.y + (src_bounds.height / 2)
+        src_center_x = int((src_bounds.x / CELL_SIZE) + (src_bounds.width / CELL_SIZE / 2))
+        src_center_y = int((src_bounds.y / CELL_SIZE) + (src_bounds.height / CELL_SIZE / 2))
         
-        # Convert direction to offset
-        dx = 0
-        dy = 0
-        door_orientation = DoorOrientation.HORIZONTAL
+        # Get direction offset
+        dx, dy = direction.get_offset()
+        dx *= distance
+        dy *= distance
         
-        if direction == Direction.NORTH:
-            dy = -(distance * CELL_SIZE)
-            door_orientation = DoorOrientation.VERTICAL
-        elif direction == Direction.SOUTH:
-            dy = distance * CELL_SIZE
-            door_orientation = DoorOrientation.VERTICAL
-        elif direction == Direction.EAST:
-            dx = distance * CELL_SIZE
-            door_orientation = DoorOrientation.HORIZONTAL
-        elif direction == Direction.WEST:
-            dx = -(distance * CELL_SIZE)
-            door_orientation = DoorOrientation.HORIZONTAL
+        # Set door orientation based on direction
+        door_orientation = (DoorOrientation.VERTICAL 
+                          if direction in (Direction.NORTH, Direction.SOUTH)
+                          else DoorOrientation.HORIZONTAL)
+            
+        # Calculate new room position in grid coordinates
+        new_room_x = src_center_x + dx - (room_width // 2)
+        new_room_y = src_center_y + dy - (room_height // 2)
             
         # Create the new room
         room_type = room_type or RoomType.RECTANGULAR
         new_room = self.add_element(Room.from_grid(
-            (src_center_x + dx) / CELL_SIZE - (room_width / 2),
-            (src_center_y + dy) / CELL_SIZE - (room_height / 2),
+            new_room_x,
+            new_room_y,
             room_width,
             room_height,
             room_type=room_type
         ))
         
         # Create passage
-        if abs(dx) > 0:
+        if direction in (Direction.EAST, Direction.WEST):
             # Horizontal passage
-            passage_x = min(src_center_x, src_center_x + dx) / CELL_SIZE
-            passage_y = src_center_y / CELL_SIZE - 0.5  # Center vertically
-            passage_width = abs(dx) / CELL_SIZE
+            passage_x = min(src_center_x, src_center_x + dx)
+            passage_y = src_center_y  # Center vertically
+            passage_width = abs(dx)
             passage_height = 1
         else:
             # Vertical passage
-            passage_x = src_center_x / CELL_SIZE - 0.5  # Center horizontally
-            passage_y = min(src_center_y, src_center_y + dy) / CELL_SIZE
+            passage_x = src_center_x  # Center horizontally
+            passage_y = min(src_center_y, src_center_y + dy)
             passage_width = 1
-            passage_height = abs(dy) / CELL_SIZE
+            passage_height = abs(dy)
             
         passage = self.add_element(Passage.from_grid(passage_x, passage_y, passage_width, passage_height))
         
@@ -364,34 +362,36 @@ class Map:
         end_door_elem = None
         
         if start_door is not None:
+            # Calculate door position in grid coordinates
             if direction == Direction.NORTH:
-                door_x = passage_x + 0.5
+                door_x = passage_x
                 door_y = passage_y + passage_height
             elif direction == Direction.SOUTH:
-                door_x = passage_x + 0.5
+                door_x = passage_x
                 door_y = passage_y
             elif direction == Direction.EAST:
                 door_x = passage_x
-                door_y = passage_y + 0.5
+                door_y = passage_y
             else:  # WEST
                 door_x = passage_x + passage_width
-                door_y = passage_y + 0.5
+                door_y = passage_y
                 
             start_door_elem = self.add_element(Door.from_grid(door_x, door_y, door_orientation, open=start_door))
             
         if end_door is not None:
+            # Calculate door position in grid coordinates
             if direction == Direction.NORTH:
-                door_x = passage_x + 0.5
+                door_x = passage_x
                 door_y = passage_y
             elif direction == Direction.SOUTH:
-                door_x = passage_x + 0.5
+                door_x = passage_x
                 door_y = passage_y + passage_height
             elif direction == Direction.EAST:
                 door_x = passage_x + passage_width
-                door_y = passage_y + 0.5
+                door_y = passage_y
             else:  # WEST
                 door_x = passage_x
-                door_y = passage_y + 0.5
+                door_y = passage_y
                 
             end_door_elem = self.add_element(Door.from_grid(door_x, door_y, door_orientation, open=end_door))
         
