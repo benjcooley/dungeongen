@@ -3,6 +3,7 @@
 from algorithms.shapes import Rectangle, Shape
 from map.mapelement import MapElement
 from graphics.conversions import grid_to_map
+from constants import CELL_SIZE
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
