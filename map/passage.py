@@ -44,6 +44,7 @@ class Passage(MapElement):
         
         Creates a passage that connects two points in grid coordinates. The passage
         will be either horizontal or vertical based on which coordinates match.
+        Points will be ordered so the passage is always drawn in a positive direction.
         
         Args:
             start_x: Starting X coordinate in grid units
@@ -54,6 +55,20 @@ class Passage(MapElement):
         Returns:
             A new Passage instance
         """
+        # Determine if passage is horizontal or vertical
+        is_horizontal = abs(end_x - start_x) > abs(end_y - start_y)
+        
+        if is_horizontal:
+            # For horizontal passages, ensure x coordinates are ordered left to right
+            if end_x < start_x:
+                start_x, end_x = end_x, start_x
+                start_y, end_y = end_y, start_y
+        else:
+            # For vertical passages, ensure y coordinates are ordered top to bottom
+            if end_y < start_y:
+                start_x, end_x = end_x, start_x
+                start_y, end_y = end_y, start_y
+                
         # Convert grid points to grid-aligned rectangle
         grid_x, grid_y, grid_width, grid_height = grid_points_to_grid_rect(start_x, start_y, end_x, end_y)
         
