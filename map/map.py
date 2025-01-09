@@ -14,11 +14,14 @@ from map.enums import Layers
 from map.region import Region
 if TYPE_CHECKING:
     from options import Options
+    from map.room import Room
+    from map.door import Door 
+    from map.passage import Passage
+    from map.stairs import Stairs
 from map.occupancy import OccupancyGrid
 from algorithms.shapes import ShapeGroup, Rectangle, Circle, Shape
 from graphics.conversions import grid_to_map
 from map.mapelement import MapElement
-from constants import CELL_SIZE
 
 
 TMapElement = TypeVar('T', bound='MapElement')
