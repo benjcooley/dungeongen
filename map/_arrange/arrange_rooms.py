@@ -90,60 +90,68 @@ def connect_rooms(
     r1_x, r1_y = get_room_passage_connection_point(room1, r1_dir)
     r2_x, r2_y = get_room_passage_connection_point(room2, r2_dir)
     
-    # Calculate grid distance
+    # Calculate initial passage length
     dx = abs(r2_x - r1_x)
     dy = abs(r2_y - r1_y)
-    distance = max(dx, dy)
+    passage_length = max(dx, dy)
     
-    # Count needed door spaces
-    door_spaces = 0
+    # Subtract space for each door
     if start_door_type is not None:
-        door_spaces += 1
+        passage_length -= 1
     if end_door_type is not None:
-        door_spaces += 1
+        passage_length -= 1
         
-    # Check if we have enough space for doors
-    if distance < door_spaces:
-        raise ValueError(f"Not enough space for doors: need {door_spaces} spaces but only have {distance}")
+    # Check if we have enough space
+    if passage_length < 0:
+        raise ValueError(f"Not enough space between rooms for doors")
     
     # Create list to track elements for connecting later
     elements = []
     
-    # Create doors at the connection points
-    is_horizontal = abs(r2_x - r1_x) > abs(r2_y - r1_y)
+    # Determine orientation and direction
+    is_horizontal = dx > dy
     orientation = DoorOrientation.HORIZONTAL if is_horizontal else DoorOrientation.VERTICAL
+    going_positive = r2_x > r1_x if is_horizontal else r2_y > r1_y
     
+    # Track current position
+    curr_x, curr_y = r1_x, r1_y
+    
+    # Add first door if needed
     door1 = None
-    door2 = None
     if start_door_type is not None:
-        door1 = Door.from_grid(r1_x, r1_y, orientation, door_type=start_door_type)
+        door1 = Door.from_grid(curr_x, curr_y, orientation, door_type=start_door_type)
         dungeon_map.add_element(door1)
         elements.append(door1)
+        # Move current position past door
+        if is_horizontal:
+            curr_x += 1 if going_positive else -1
+        else:
+            curr_y += 1 if going_positive else -1
+            
+    # Add passage if we have length remaining
+    passage = None
+    if passage_length > 0:
+        # Calculate passage end point
+        end_x = curr_x
+        end_y = curr_y
+        if is_horizontal:
+            end_x += passage_length * (1 if going_positive else -1)
+        else:
+            end_y += passage_length * (1 if going_positive else -1)
+            
+        passage = Passage.from_grid_points(curr_x, curr_y, end_x, end_y)
+        dungeon_map.add_element(passage)
+        elements.append(passage)
         
+        # Update current position to passage end
+        curr_x, curr_y = end_x, end_y
+    
+    # Add end door if needed
+    door2 = None
     if end_door_type is not None:
         door2 = Door.from_grid(r2_x, r2_y, orientation, door_type=end_door_type)
         dungeon_map.add_element(door2)
         elements.append(door2)
-    
-    # Only create passage if we have space after doors
-    passage = None
-    if distance > door_spaces:
-        # Adjust grid points to account for doors
-        if start_door_type is not None:
-            if is_horizontal:
-                r1_x += 1 if r2_x > r1_x else -1
-            else:
-                r1_y += 1 if r2_y > r1_y else -1
-                
-        if end_door_type is not None:
-            if is_horizontal:
-                r2_x += -1 if r2_x > r1_x else 1
-            else:
-                r2_y += -1 if r2_y > r1_y else 1
-                
-        passage = Passage.from_grid_points(r1_x, r1_y, r2_x, r2_y)
-        dungeon_map.add_element(passage)
-        elements.append(passage)
     
     # Connect all elements in sequence
     elements.insert(0, room1)
