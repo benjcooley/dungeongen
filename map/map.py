@@ -278,7 +278,7 @@ class Map:
     
     def create_connected_room(
         self,
-        source_room: 'MapElement',
+        source_room: 'Room',
         direction: Direction,
         distance: int,
         room_width: int,
@@ -311,7 +311,12 @@ class Map:
         if room_width <= 0 or room_height <= 0:
             raise ValueError("Room dimensions must be positive")
             
-        # Get source room center in grid coordinates
+        # Validate source room type
+        from map.room import Room
+        if not isinstance(source_room, Room):
+            raise TypeError("source_room must be a Room instance")
+            
+        # Get source room center in grid coordinates 
         src_bounds = source_room.bounds
         src_center_x = int((src_bounds.x / CELL_SIZE) + (src_bounds.width / CELL_SIZE / 2))
         src_center_y = int((src_bounds.y / CELL_SIZE) + (src_bounds.height / CELL_SIZE / 2))
