@@ -161,12 +161,20 @@ class _RoomArranger:
         self,
         room1: Room,
         room2: Room,
-        start_door: Optional[bool] = None,
-        end_door: Optional[bool] = None,
         start_door_type: Optional[str] = None,
         end_door_type: Optional[str] = None
     ) -> Tuple[Optional[Door], Passage, Optional[Door]]:
-        """Create a passage between two rooms with appropriate doors."""
+        """Create a passage between two rooms with optional doors.
+        
+        Args:
+            room1: First room to connect
+            room2: Second room to connect 
+            start_door_type: Optional door type at start of passage
+            end_door_type: Optional door type at end of passage
+            
+        Returns:
+            Tuple of (start_door, passage, end_door) where doors may be None
+        """
         # Determine primary axis of connection by comparing distances
         dx = room2.bounds.x - room1.bounds.x
         dy = room2.bounds.y - room1.bounds.y
@@ -244,15 +252,15 @@ class _RoomArranger:
                                  DoorOrientation.VERTICAL, self.dungeon_map, open=True,
                                  door_type=end_door_type)
         
-        # Connect everything based on which doors exist
-        if start_door is not None:
+        # Connect everything based on which door types were specified
+        if start_door_type is not None:
             room1.connect_to(door1)
             door1.connect_to(passage)
         else:
             room1.connect_to(passage)
             door1 = None
             
-        if end_door is not None:
+        if end_door_type is not None:
             passage.connect_to(door2)
             door2.connect_to(room2)
         else:
@@ -323,7 +331,7 @@ class _RoomArranger:
                 
             # Create and connect new room
             new_room = self.create_room(next_x, next_y)
-            self.create_passage(last_room, new_room, start_door=True, end_door=True)
+            self.create_passage(last_room, new_room, start_door_type="default", end_door_type="default")
             last_room = new_room  # Update last room
             
         return self.rooms
