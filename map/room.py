@@ -51,10 +51,11 @@ class Room(MapElement):
                 y: float, \
                 width: float = 0, \
                 height: float = 0, \
-                diameter: float = 0, \
                 room_type: RoomType = RoomType.RECTANGULAR) -> None:
         if room_type == RoomType.CIRCULAR:
-            shape = Circle(x, y, diameter / 2)
+            if width != height:
+                raise ValueError("Circular rooms must have equal width and height.")
+            shape = Circle(x + width / 2, y + width / 2, width / 2)
         else:
             shape = Rectangle(x, y, width, height)
         super().__init__(shape)
@@ -142,7 +143,6 @@ class Room(MapElement):
                 grid_y: float, \
                 grid_width: float = 0, \
                 grid_height: float = 0, \
-                grid_diameter: float = 0, \
                 room_type: RoomType = RoomType.RECTANGULAR) -> 'Room':
         """Create a room using grid coordinates.
         
@@ -158,4 +158,4 @@ class Room(MapElement):
         """
         x, y = grid_to_map(grid_x, grid_y)
         w, h = grid_to_map(grid_width, grid_height)
-        return cls(x, y, width=w, height=h, diameter=grid_diameter * CELL_SIZE, room_type=room_type)
+        return cls(x, y, width=w, height=h, room_type=room_type)
