@@ -113,6 +113,9 @@ def connect_rooms(
     orientation = DoorOrientation.HORIZONTAL if is_horizontal else DoorOrientation.VERTICAL
     going_positive = r2_x > r1_x if is_horizontal else r2_y > r1_y
     
+    # Set up movement tuple based on orientation and direction
+    next_pos = (1 if going_positive else -1, 0) if is_horizontal else (0, 1 if going_positive else -1)
+    
     # Track current position
     curr_x, curr_y = r1_x, r1_y
     
@@ -123,21 +126,15 @@ def connect_rooms(
         dungeon_map.add_element(door1)
         elements.append(door1)
         # Move current position past door
-        if is_horizontal:
-            curr_x += 1 if going_positive else -1
-        else:
-            curr_y += 1 if going_positive else -1
+        curr_x += next_pos[0]
+        curr_y += next_pos[1]
             
     # Add passage if we have length remaining
     passage = None
     if passage_length > 0:
         # Calculate passage end point
-        end_x = curr_x
-        end_y = curr_y
-        if is_horizontal:
-            end_x += passage_length * (1 if going_positive else -1)
-        else:
-            end_y += passage_length * (1 if going_positive else -1)
+        end_x = curr_x + (next_pos[0] * passage_length)
+        end_y = curr_y + (next_pos[1] * passage_length)
             
         passage = Passage.from_grid_points(curr_x, curr_y, end_x, end_y)
         dungeon_map.add_element(passage)
