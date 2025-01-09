@@ -38,8 +38,8 @@ def map_to_grid(x: float, y: float, options: 'Options') -> Point:
 def grid_points_to_grid_rect(start_x: float, start_y: float, end_x: float, end_y: float) -> tuple[float, float, float, float]:
     """Convert two grid points into a proper grid-aligned rectangle.
     
-    Takes into account the "off by one" rule when converting grid points to rectangles.
-    The end coordinates are adjusted to account for grid cell intervals.
+    The x,y coordinates are the minimum values of the start/end points.
+    The width/height are calculated as (max - min + 1) to include both end points.
     
     Args:
         start_x: Starting X coordinate in grid units
@@ -50,17 +50,13 @@ def grid_points_to_grid_rect(start_x: float, start_y: float, end_x: float, end_y
     Returns:
         Tuple of (rect_x, rect_y, rect_width, rect_height) in grid units
     """
-    # Determine if horizontal or vertical based on which coordinates match
-    if start_y == end_y:  # Horizontal
-        x = min(start_x, end_x)
-        width = abs(end_x - start_x) + 1  # Add 1 to include end cell
-        height = 1
-        return (x, start_y, width, height)
-    elif start_x == end_x:  # Vertical  
-        y = min(start_y, end_y)
-        width = 1
-        height = abs(end_y - start_y) + 1  # Add 1 to include end cell
-        return (start_x, y, width, height)
-    else:
-        raise ValueError(f"Points ({start_x}, {start_y}) and ({end_x}, {end_y}) must form a horizontal or vertical line")
+    # Get min x,y for position
+    x = min(start_x, end_x)
+    y = min(start_y, end_y)
+    
+    # Calculate width/height as max - min + 1
+    width = abs(max(start_x, end_x) - x) + 1
+    height = abs(max(start_y, end_y) - y) + 1
+    
+    return (x, y, width, height)
 
