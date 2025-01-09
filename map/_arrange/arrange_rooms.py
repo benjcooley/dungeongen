@@ -128,20 +128,19 @@ class _RoomArranger:
         return room
         
     def _get_room_connection_point(self, room: Room, orientation: Orientation) -> tuple[float, float]:
-        """Get a point on the room's edge for connecting a passage.
-        
-        Uses the center point of the appropriate edge for all room types.
-        """
+        """Get a point on the room's edge for connecting a passage."""
         bounds = room.bounds
+        center_x = bounds.x + bounds.width / 2
+        center_y = bounds.y + bounds.height / 2
         
         if orientation == Orientation.HORIZONTAL:
+            # For horizontal connections, use the center height but leftmost/rightmost x
             x = bounds.x + bounds.width if bounds.x < 0 else bounds.x
-            y = bounds.y + bounds.height / 2
-            return (x, y)
+            return (x, center_y)
         else:  # VERTICAL
-            x = bounds.x + bounds.width / 2
+            # For vertical connections, use the center width but top/bottom y
             y = bounds.y + bounds.height if bounds.y < 0 else bounds.y
-            return (x, y)
+            return (center_x, y)
 
     def _create_passage(self, room1: Room, room2: Room, orientation: Orientation) -> None:
         """Create a passage between two rooms with appropriate doors."""
