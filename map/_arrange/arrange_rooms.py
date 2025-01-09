@@ -238,13 +238,6 @@ class _RoomArranger:
         passage.connect_to(door2)
         door2.connect_to(room2)
 
-    def connect_rooms(self, room1: Room, room2: Room) -> None:
-        """Connect two rooms with a passage and doors."""
-        print(f"\nConnecting rooms:")
-        print(f"  Room1 bounds: ({room1.bounds.x}, {room1.bounds.y}) to ({room1.bounds.x + room1.bounds.width}, {room1.bounds.y + room1.bounds.height})")
-        print(f"  Room2 bounds: ({room2.bounds.x}, {room2.bounds.y}) to ({room2.bounds.x + room2.bounds.width}, {room2.bounds.y + room2.bounds.height})")
-        self._create_passage(room1, room2)
-        
     def arrange_linear(
         self,
         num_rooms: int,
@@ -307,7 +300,7 @@ class _RoomArranger:
                 
             # Create and connect new room
             new_room = self.create_room(next_x, next_y)
-            self.connect_rooms(last_room, new_room)
+            self._create_passage(last_room, new_room)
             last_room = new_room  # Update last room
             
         return self.rooms
