@@ -302,7 +302,7 @@ class Map:
             Where doors may be None if not requested
         """
         from map.room import Room, RoomType
-        from map.door import Door, DoorOrientation
+        from map.door import Door, DoorOrientation, DoorType
         from map.passage import Passage
         
         # Validate inputs
@@ -375,7 +375,8 @@ class Map:
                 door_x = passage_x + passage_width
                 door_y = passage_y
                 
-            start_door_elem = self.add_element(Door.from_grid(door_x, door_y, door_orientation, open=start_door))
+            start_door_elem = self.add_element(Door.from_grid(door_x, door_y, door_orientation, 
+                                             door_type=DoorType.DEFAULT if start_door else DoorType.NONE))
             
         if end_door is not None:
             # Calculate door position in grid coordinates
