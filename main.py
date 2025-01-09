@@ -52,7 +52,7 @@ def main():
         start_room = dungeon_map.add_element(Room.from_grid(-2, -2, 5, 5))
         
         # Add door to the right of the room (at x=3, centered vertically)
-        first_door = dungeon_map.add_element(Door.from_grid(3, 0, DoorOrientation.HORIZONTAL, dungeon_map, open=True))
+        first_door = dungeon_map.add_element(Door.from_grid(3, 0, DoorOrientation.HORIZONTAL, open=True))
         rooms.append(first_door)
         
         # Add 5-grid long passage
@@ -60,7 +60,7 @@ def main():
         rooms.append(passage)
         
         # Add closed door at the end of the passage
-        second_door = dungeon_map.add_element(Door.from_grid(9, 0, DoorOrientation.HORIZONTAL, dungeon_map, open=False))
+        second_door = dungeon_map.add_element(Door.from_grid(9, 0, DoorOrientation.HORIZONTAL, open=False))
         rooms.append(second_door)
         
         # Add circular room (5x5 grid units, 11 units right of start room)
