@@ -80,7 +80,7 @@ class Map:
             self._bounds_dirty = True
     
     @property
-    def rooms(self) -> Iterator[Room]:
+    def rooms(self) -> Iterator['Room']:
         """Returns a new iteralble of rooms in the map."""
         return (elem for elem in self._elements if isinstance(elem, Room))
     
