@@ -38,7 +38,7 @@ class Door(MapElement):
     When open, it forms an I-shaped passage connecting the sides.
     """
     
-    def __init__(self, x: float, y: float, orientation: DoorOrientation, open: bool = False, door_type: DoorType = DoorType.DEFAULT) -> None:
+    def __init__(self, x: float, y: float, orientation: DoorOrientation, door_type: DoorType = DoorType.DEFAULT) -> None:
         """Initialize a door with position and orientation.
         
         Args:
@@ -55,7 +55,7 @@ class Door(MapElement):
         self._x = x
         self._y = y
         self._width = self._height = CELL_SIZE
-        self._open = open
+        self._open = (door_type != DoorType.NONE)
         self._orientation = orientation
         
         # Calculate dimensions for sides and middle
@@ -232,7 +232,7 @@ class Door(MapElement):
             door.draw(canvas, border_paint)
             
     @classmethod
-    def from_grid(cls, grid_x: float, grid_y: float, orientation: DoorOrientation, open: bool = False) -> 'Door':
+    def from_grid(cls, grid_x: float, grid_y: float, orientation: DoorOrientation, door_type: DoorType = DoorType.DEFAULT) -> 'Door':
         """Create a door using grid coordinates.
         
         Args:
@@ -245,4 +245,4 @@ class Door(MapElement):
             A new Door instance
         """
         x, y = grid_to_map(grid_x, grid_y)
-        return cls(x, y, orientation, open)
+        return cls(x, y, orientation, door_type)

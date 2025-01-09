@@ -236,10 +236,9 @@ class _RoomArranger:
             # Create passage and doors
             passage = Passage.from_grid(grid_passage_x, grid_passage_y, grid_passage_width, 1, self.dungeon_map)
             door1 = Door.from_grid(grid_passage_x, grid_passage_y, DoorOrientation.HORIZONTAL, 
-                                 self.dungeon_map, open=True, door_type=start_door_type)
+                                 self.dungeon_map, door_type=start_door_type)
             door2 = Door.from_grid(grid_passage_x + grid_passage_width - 1, grid_passage_y,
-                                 DoorOrientation.HORIZONTAL, self.dungeon_map, open=True, 
-                                 door_type=end_door_type)
+                                 DoorOrientation.HORIZONTAL, self.dungeon_map, door_type=end_door_type)
         else:
             passage_x = (x1 + x2) / 2 - 0.5  # Center between rooms
             passage_y = min(y1, y2)
@@ -256,10 +255,9 @@ class _RoomArranger:
             
             passage = Passage.from_grid(grid_passage_x, grid_passage_y, 1, grid_passage_height, self.dungeon_map)
             door1 = Door.from_grid(grid_passage_x, grid_passage_y, DoorOrientation.VERTICAL, 
-                                 self.dungeon_map, open=True, door_type=start_door_type)
+                                 self.dungeon_map, door_type=start_door_type)
             door2 = Door.from_grid(grid_passage_x, grid_passage_y + grid_passage_height - 1,
-                                 DoorOrientation.VERTICAL, self.dungeon_map, open=True,
-                                 door_type=end_door_type)
+                                 DoorOrientation.VERTICAL, self.dungeon_map, door_type=end_door_type)
         
         # Connect everything based on which door types were specified
         if start_door_type is not None:
