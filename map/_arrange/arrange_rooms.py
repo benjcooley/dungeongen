@@ -127,6 +127,26 @@ class _RoomArranger:
         self.rooms.append(room)
         return room
         
+    def get_direction_between_rooms(self, room1: Room, room2: Room) -> Direction:
+        """Determine the primary direction from room1 to room2.
+        
+        Args:
+            room1: Source room
+            room2: Target room
+            
+        Returns:
+            Direction from room1 to room2 (NORTH, SOUTH, EAST, or WEST)
+        """
+        # Compare center points
+        dx = room2.bounds.x - room1.bounds.x
+        dy = room2.bounds.y - room1.bounds.y
+        
+        # Use the larger distance to determine primary direction
+        if abs(dx) > abs(dy):
+            return Direction.EAST if dx > 0 else Direction.WEST
+        else:
+            return Direction.SOUTH if dy > 0 else Direction.NORTH
+            
     def get_room_grid_connection(self, room: Room, direction: Direction) -> tuple[int, int]:
         """Get a grid position for connecting to this room from the given direction.
         
@@ -175,27 +195,16 @@ class _RoomArranger:
         Returns:
             Tuple of (start_door, passage, end_door) where doors may be None
         """
-        # Determine primary axis of connection by comparing distances
-        dx = room2.bounds.x - room1.bounds.x
-        dy = room2.bounds.y - room1.bounds.y
+        # Get the primary direction between rooms
+        r1_dir = self.get_direction_between_rooms(room1, room2)
         
-        # Use the larger distance to determine orientation
-        if abs(dx) > abs(dy):
-            # Horizontal connection
-            if dx > 0:
-                r1_dir = Direction.EAST
-                r2_dir = Direction.WEST
-            else:
-                r1_dir = Direction.WEST
-                r2_dir = Direction.EAST
-        else:
-            # Vertical connection
-            if dy > 0:
-                r1_dir = Direction.SOUTH
-                r2_dir = Direction.NORTH
-            else:
-                r1_dir = Direction.NORTH
-                r2_dir = Direction.SOUTH
+        # Get the opposite direction for room2
+        r2_dir = {
+            Direction.NORTH: Direction.SOUTH,
+            Direction.SOUTH: Direction.NORTH,
+            Direction.EAST: Direction.WEST,
+            Direction.WEST: Direction.EAST
+        }[r1_dir]
                 
         # Get connection points in grid coordinates
         r1_x, r1_y = self.get_room_grid_connection(room1, r1_dir)
