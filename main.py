@@ -4,9 +4,9 @@ Main entry point for drawing a simple room.
 import math
 import skia
 
-from graphics.conversions import grid_to_drawing, grid_to_drawing_size
+from graphics.conversions import grid_to_map
 from map.mapelement import MapElement
-from map.room import Room
+from map.room import Room, RoomType
 from map.map import Map
 from map.door import Door, DoorOrientation
 from map.passage import Passage
@@ -36,40 +36,36 @@ def main():
 
         # Add central rectangular room (5x5, centered at 0,0)
         # Since we want grid alignment and center at 0,0, we'll offset by -2,-2
-        start_room0 = dungeon_map.add_rectangular_room(-10, -2, 5, 5) 
+        start_room0 = dungeon_map.add_element(Room.from_grid(-10, -2, 5, 5))
         rooms.append(start_room0)
         
         # Add dais to left side of room0
-        dais = Dais((start_room0.bounds.left + CELL_SIZE, start_room0.bounds.center[1]), Rotation.ROT_270)
+        dais = Dais((start_room0.bounds.left, start_room0.bounds.top + CELL_SIZE), Rotation.ROT_0)
         start_room0.add_prop(dais)
         
         # Add 5-grid long passage
-        passage0 = Passage.from_grid(-5, 0, 5, 1, dungeon_map)
+        passage0 = dungeon_map.add_element(Passage.from_grid(-5, 0, 5, 1))
         rooms.append(passage0)
-        dungeon_map.add_element(passage0)
 
         # Add central rectangular room (5x5, centered at 0,0)
         # Since we want grid alignment and center at 0,0, we'll offset by -2,-2
-        start_room = dungeon_map.add_rectangular_room(-2, -2, 5, 5)
-        rooms.append(start_room)
+        start_room = dungeon_map.add_element(Room.from_grid(-2, -2, 5, 5))
+        map.add_element(start_room)
         
         # Add door to the right of the room (at x=3, centered vertically)
-        first_door = Door.from_grid(3, 0, DoorOrientation.HORIZONTAL, dungeon_map, open=True)
+        first_door = dungeon_map.add_element(Door.from_grid(3, 0, DoorOrientation.HORIZONTAL, dungeon_map, open=True))
         rooms.append(first_door)
-        dungeon_map.add_element(first_door)
         
         # Add 5-grid long passage
-        passage = Passage.from_grid(4, 0, 5, 1, dungeon_map)
+        passage = dungeon_map.add_element(Passage.from_grid(4, 0, 5, 1, dungeon_map))
         rooms.append(passage)
-        dungeon_map.add_element(passage)
         
         # Add closed door at the end of the passage
-        second_door = Door.from_grid(9, 0, DoorOrientation.HORIZONTAL, dungeon_map, open=False)
+        second_door = dungeon_map.add_element(Door.from_grid(9, 0, DoorOrientation.HORIZONTAL, dungeon_map, open=False))
         rooms.append(second_door)
-        dungeon_map.add_element(second_door)
         
         # Add circular room (5x5 grid units, 11 units right of start room)
-        end_room = dungeon_map.add_circular_room(10, -2, 5)
+        end_room = dungeon_map(Room.from_grid(10, -2, diameter=5, room_type=RoomType.CIRCULAR))
         rooms.append(end_room)
         
         # Connect everything together

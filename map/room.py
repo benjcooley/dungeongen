@@ -1,5 +1,6 @@
 """Room map element definition."""
 
+from enum import Enum, auto
 import math
 from typing import List, TYPE_CHECKING, Tuple, Optional
 
@@ -8,13 +9,11 @@ import skia
 
 from algorithms.math import Point2D
 from algorithms.shapes import Rectangle, Circle, Shape
-from graphics.conversions import grid_to_drawing, grid_to_drawing_size
+from graphics.conversions import grid_to_map
 from map.enums import Layers
 from map.mapelement import MapElement
 from constants import CELL_SIZE
 
-# Constant to make rooms slightly larger to ensure proper passage connections
-ROOM_OVERLAP_OFFSET = 4.0  # pixels
 # Base corner size as fraction of cell size
 CORNER_SIZE = 0.35
 # How far corners are inset from room edges
@@ -27,13 +26,18 @@ MAX_CORNER_LENGTH = 2.0
 CURVE_CONTROL_SCALE = 0.8  # Increased from 0.5 for more concavity
 
 from map.mapelement import MapElement
-from graphics.conversions import grid_to_drawing, grid_to_drawing_size
+from graphics.conversions import grid_to_map
 from map.enums import Layers
 
 if TYPE_CHECKING:
     from map.map import Map
     from options import Options
     from map._props.prop import Prop
+
+class RoomType(Enum):
+    """Types of column props."""
+    CIRCULAR = auto()
+    RECTANGULAR = auto()
 
 class Room(MapElement):
     """A room in the dungeon.
@@ -42,15 +46,18 @@ class Room(MapElement):
     The room's shape matches its bounds exactly.
     """
     
-    def __init__(self, x: float, y: float, width: float, height: float, map_: 'Map') -> None:
-        # Create slightly larger rectangle to ensure proper passage connections
-        shape = Rectangle(
-            x - ROOM_OVERLAP_OFFSET/2,
-            y - ROOM_OVERLAP_OFFSET/2,
-            width + ROOM_OVERLAP_OFFSET,
-            height + ROOM_OVERLAP_OFFSET
-        )
-        super().__init__(shape=shape, map_=map_)
+    def __init__(self, \
+                x: float, \
+                y: float, \
+                width: float = 0, \
+                height: float = 0, \
+                diameter: float = 0, \
+                room_type: RoomType = RoomType.RECTANGULAR) -> None:
+        if room_type == RoomType.CIRCULAR:
+            shape = Circle(x, y, diameter / 2)
+        else:
+            shape = Rectangle(x, y, width, height)
+        super().__init__(shape)
     
     def _draw_corner(self, canvas: skia.Canvas, corner: Point2D, left: Point2D, right: Point2D) -> None:
         """Draw a single corner decoration.
@@ -128,3 +135,27 @@ class Room(MapElement):
         if layer == Layers.PROPS:
             self.draw_corners(canvas)
         super().draw(canvas, layer)
+
+    @classmethod
+    def from_grid(cls, \
+                grid_x: float, \
+                grid_y: float, \
+                grid_width: float = 0, \
+                grid_height: float = 0, \
+                grid_diameter: float = 0, \
+                room_type: RoomType = RoomType.RECTANGULAR) -> 'Room':
+        """Create a room using grid coordinates.
+        
+        Args:
+            grid_x: X coordinate in grid units
+            grid_y: Y coordinate in grid units
+            grid_width: Width in map units
+            grid_height: Height in map units            
+            grid_diameter: Diameter in map units
+            
+        Returns:
+            A new circular room instance
+        """
+        x, y = grid_to_map(grid_x, grid_y)
+        w, h = grid_to_map(grid_width, grid_height)
+        return cls(room_type, x, y, width=w, height=h, diameter=grid_diameter * CELL_SIZE)
