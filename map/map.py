@@ -5,7 +5,6 @@ from typing import List, Iterator, Optional, Generic, Sequence, TypeVar, TYPE_CH
 import skia
 import math
 import random
-from constants import CELL_SIZE
 from map.enums import Direction
 from map.room import RoomType
 from graphics.crosshatch import draw_crosshatches
@@ -116,12 +115,6 @@ class Map:
                 continue
             self._trace_connected_region(connection, visited, region)
     
-    @property
-    def bounds(self) -> Rectangle:
-        """Get the current bounding rectangle, recalculating if needed."""
-        if self._bounds_dirty or self._bounds is None:
-            self._recalculate_bounds()
-        return self._bounds
 
     def _recalculate_bounds(self) -> None:
         """Recalculate the bounding rectangle that encompasses all map elements."""
