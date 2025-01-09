@@ -65,6 +65,7 @@ class Map:
     def add_element(self, element: Generic[TMapElement]) -> TMapElement:
         """Add a map element."""
         element._map = self
+        element._options = self._options
         self._elements.append(element)
         self._bounds_dirty = True
         return element
