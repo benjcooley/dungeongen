@@ -135,7 +135,7 @@ class _RoomArranger:
             direction: Which side of the room to connect from
             
         Returns:
-            Tuple of (grid_x, grid_y) for the connection point
+            Tuple of (grid_x, grid_y) for the connection point one cell outside the room
         """
         # Get room bounds in grid coordinates
         grid_x = int(room.bounds.x / CELL_SIZE)
@@ -147,15 +147,15 @@ class _RoomArranger:
         center_x = grid_x + grid_width // 2
         center_y = grid_y + grid_height // 2
         
-        # Return appropriate edge point based on direction
+        # Return appropriate connection point one cell outside the room
         if direction == Direction.NORTH:
-            return (center_x, grid_y)
+            return (center_x, grid_y - 1)  # One cell above
         elif direction == Direction.SOUTH:
-            return (center_x, grid_y + grid_height)
+            return (center_x, grid_y + grid_height)  # One cell below
         elif direction == Direction.EAST:
-            return (grid_x + grid_width, center_y)
+            return (grid_x + grid_width, center_y)  # One cell right
         else:  # WEST
-            return (grid_x, center_y)
+            return (grid_x - 1, center_y)  # One cell left
 
     def create_passage(
         self,
