@@ -92,23 +92,20 @@ def connect_rooms(
     x2, y2 = r2_x * CELL_SIZE, r2_y * CELL_SIZE
     
     # Determine passage dimensions and position
+    # Create passage using grid points
+    passage = Passage.from_grid_points(r1_x, r1_y, r2_x, r2_y)
+    
+    # Create doors at the connection points
     if abs(x2 - x1) > abs(y2 - y1):  # Horizontal passage
-        passage_x = min(x1, x2)
-        passage_width = abs(x2 - x1)
-        passage_y = (y1 + y2) / 2 - 0.5  # Center between rooms
-        
-        # Create passage using grid points
-        passage = Passage.from_grid_points(r1_x, r1_y, r2_x, r2_y)
-        door1 = Door.from_grid(grid_passage_x, grid_passage_y, DoorOrientation.HORIZONTAL, 
+        door1 = Door.from_grid(r1_x, r1_y, DoorOrientation.HORIZONTAL, 
                              door_type=start_door_type)
-        door2 = Door.from_grid(grid_passage_x + grid_passage_width - 1, grid_passage_y,
-                             DoorOrientation.HORIZONTAL, door_type=end_door_type)
+        door2 = Door.from_grid(r2_x, r2_y, DoorOrientation.HORIZONTAL,
+                             door_type=end_door_type)
     else:  # Vertical passage
-        passage = Passage.from_grid_points(r1_x, r1_y, r2_x, r2_y)
-        door1 = Door.from_grid(grid_passage_x, grid_passage_y, DoorOrientation.VERTICAL, 
+        door1 = Door.from_grid(r1_x, r1_y, DoorOrientation.VERTICAL,
                              door_type=start_door_type)
-        door2 = Door.from_grid(grid_passage_x, grid_passage_y + grid_passage_height - 1,
-                             DoorOrientation.VERTICAL, door_type=end_door_type)
+        door2 = Door.from_grid(r2_x, r2_y, DoorOrientation.VERTICAL,
+                             door_type=end_door_type)
     
     # Add elements to map
     dungeon_map.add_element(passage)
