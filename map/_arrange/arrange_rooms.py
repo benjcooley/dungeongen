@@ -157,7 +157,7 @@ class _RoomArranger:
         else:  # WEST
             return (grid_x, center_y)
 
-    def _create_passage(self, room1: Room, room2: Room) -> None:
+    def create_passage(self, room1: Room, room2: Room) -> None:
         """Create a passage between two rooms with appropriate doors."""
         # Determine primary axis of connection by comparing distances
         dx = room2.bounds.x - room1.bounds.x
@@ -300,7 +300,7 @@ class _RoomArranger:
                 
             # Create and connect new room
             new_room = self.create_room(next_x, next_y)
-            self._create_passage(last_room, new_room)
+            self.create_passage(last_room, new_room)
             last_room = new_room  # Update last room
             
         return self.rooms
