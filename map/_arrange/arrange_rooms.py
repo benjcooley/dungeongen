@@ -188,17 +188,13 @@ class _RoomArranger:
         # Convert to map coordinates
         x1, y1 = r1_x * CELL_SIZE, r1_y * CELL_SIZE
         x2, y2 = r2_x * CELL_SIZE, r2_y * CELL_SIZE
-        """Create a passage between two rooms with appropriate doors."""
-        # Get connection points
-        x1, y1 = self._get_room_connection_point(room1, orientation)
-        x2, y2 = self._get_room_connection_point(room2, orientation)
         
         print(f"\nCreating passage:")
         print(f"  Room1 connection point: ({x1}, {y1})")
         print(f"  Room2 connection point: ({x2}, {y2})")
         
         # Determine passage dimensions and position
-        if orientation == Orientation.HORIZONTAL:
+        if abs(x2 - x1) > abs(y2 - y1):  # Horizontal passage
             passage_x = min(x1, x2)
             passage_width = abs(x2 - x1)
             passage_y = (y1 + y2) / 2 - 0.5  # Center between rooms
@@ -222,7 +218,6 @@ class _RoomArranger:
             passage_y = min(y1, y2)
             passage_height = abs(y2 - y1)
             
-            # Create passage and doors
             # Calculate grid coordinates
             grid_passage_x = round(passage_x / CELL_SIZE)
             grid_passage_y = round(passage_y / CELL_SIZE)
@@ -232,7 +227,6 @@ class _RoomArranger:
             print(f"    Position: ({grid_passage_x}, {grid_passage_y})")
             print(f"    Height: {grid_passage_height}")
             
-            # Create passage and doors
             passage = Passage.from_grid(grid_passage_x, grid_passage_y, 1, grid_passage_height, self.dungeon_map)
             door1 = Door.from_grid(grid_passage_x, grid_passage_y, DoorOrientation.VERTICAL, self.dungeon_map, open=True)
             door2 = Door.from_grid(grid_passage_x, grid_passage_y + grid_passage_height - 1,
