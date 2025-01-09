@@ -24,7 +24,9 @@ class MapElement:
     
     def __init__(self, shape: Shape) -> None:
         self._shape = shape
-        self._bounds = shape.bounds
+        self._map = None
+        self._options = None
+        self._bounds = self.recalculate_bounds()
         self._connections: List['MapElement'] = []
         self._props: List['Prop'] = []
                
