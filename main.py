@@ -50,7 +50,6 @@ def main():
         # Add central rectangular room (5x5, centered at 0,0)
         # Since we want grid alignment and center at 0,0, we'll offset by -2,-2
         start_room = dungeon_map.add_element(Room.from_grid(-2, -2, 5, 5))
-        map.add_element(start_room)
         
         # Add door to the right of the room (at x=3, centered vertically)
         first_door = dungeon_map.add_element(Door.from_grid(3, 0, DoorOrientation.HORIZONTAL, dungeon_map, open=True))

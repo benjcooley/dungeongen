@@ -158,4 +158,4 @@ class Room(MapElement):
         """
         x, y = grid_to_map(grid_x, grid_y)
         w, h = grid_to_map(grid_width, grid_height)
-        return cls(room_type, x, y, width=w, height=h, diameter=grid_diameter * CELL_SIZE)
+        return cls(x, y, width=w, height=h, diameter=grid_diameter * CELL_SIZE, room_type=room_type)
