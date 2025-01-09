@@ -157,7 +157,13 @@ class _RoomArranger:
         else:  # WEST
             return (grid_x, center_y)
 
-    def create_passage(self, room1: Room, room2: Room) -> None:
+    def create_passage(
+        self,
+        room1: Room,
+        room2: Room,
+        start_door: Optional[bool] = None,
+        end_door: Optional[bool] = None
+    ) -> Tuple[Optional[Door], Passage, Optional[Door]]:
         """Create a passage between two rooms with appropriate doors."""
         # Determine primary axis of connection by comparing distances
         dx = room2.bounds.x - room1.bounds.x
@@ -232,11 +238,22 @@ class _RoomArranger:
             door2 = Door.from_grid(grid_passage_x, grid_passage_y + grid_passage_height - 1,
                                 DoorOrientation.VERTICAL, self.dungeon_map, open=True)
         
-        # Connect everything
-        room1.connect_to(door1)
-        door1.connect_to(passage)
-        passage.connect_to(door2)
-        door2.connect_to(room2)
+        # Connect everything based on which doors exist
+        if start_door is not None:
+            room1.connect_to(door1)
+            door1.connect_to(passage)
+        else:
+            room1.connect_to(passage)
+            door1 = None
+            
+        if end_door is not None:
+            passage.connect_to(door2)
+            door2.connect_to(room2)
+        else:
+            passage.connect_to(room2)
+            door2 = None
+            
+        return door1, passage, door2
 
     def arrange_linear(
         self,
@@ -300,7 +317,7 @@ class _RoomArranger:
                 
             # Create and connect new room
             new_room = self.create_room(next_x, next_y)
-            self.create_passage(last_room, new_room)
+            self.create_passage(last_room, new_room, start_door=True, end_door=True)
             last_room = new_room  # Update last room
             
         return self.rooms
