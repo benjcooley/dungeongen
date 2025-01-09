@@ -390,7 +390,12 @@ class _RoomArranger:
                 
             # Create and connect new room
             new_room = self.create_room(next_x, next_y)
-            self.connect_rooms(last_room, new_room, start_door_type=DoorType.DEFAULT, end_door_type=DoorType.DEFAULT)
+            start_door_elem, passage, end_door_elem = connect_rooms(
+                last_room, new_room,
+                start_door_type=DoorType.DEFAULT,
+                end_door_type=DoorType.DEFAULT,
+                dungeon_map=self.dungeon_map
+            )
             last_room = new_room  # Update last room
             
         return self.rooms
