@@ -7,6 +7,7 @@ import math
 import random
 from constants import CELL_SIZE
 from map.enums import Direction
+from map.room import RoomType
 from graphics.crosshatch import draw_crosshatches
 from map.grid import GridStyle, draw_region_grid
 from map.enums import Layers
