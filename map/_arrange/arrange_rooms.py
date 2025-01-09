@@ -121,35 +121,39 @@ def connect_rooms(
     # Set up movement direction
     next_x, next_y = (1, 0) if is_horizontal else (0, 1)
     
-    # Add first door and move connection point
+    # Create first door and move connection point
     door1 = None
     if start_door_type is not None:
         door1 = Door.from_grid(r1_x, r1_y, orientation, door_type=start_door_type)
-        dungeon_map.add_element(door1)
-        elements.append(door1)
         # Move connection point one grid space into passage
         r1_x, r1_y = r1_x + next_x, r1_y + next_y
             
-    # Add end door and move connection point
+    # Create end door and move connection point
     door2 = None
     if end_door_type is not None:
         door2 = Door.from_grid(r2_x, r2_y, orientation, door_type=end_door_type)
-        dungeon_map.add_element(door2)
-        elements.append(door2)
         # Move connection point one grid space back from passage
         r2_x, r2_y = r2_x - next_x, r2_y - next_y
     
-    # Add passage if we have length remaining
+    # Create passage if we have length remaining
     passage = None
     if passage_length > 0:
         passage = Passage.from_grid_points(r1_x, r1_y, r2_x, r2_y)
-        dungeon_map.add_element(passage)
+
+    # Build ordered list of elements
+    elements = [room1]
+    if door1:
+        elements.append(door1)
+        dungeon_map.add_element(door1)
+    if passage:
         elements.append(passage)
-    
-    # Connect all elements in sequence
-    elements.insert(0, room1)
+        dungeon_map.add_element(passage)
+    if door2:
+        elements.append(door2)
+        dungeon_map.add_element(door2)
     elements.append(room2)
     
+    # Connect elements in sequence
     for i in range(len(elements) - 1):
         elements[i].connect_to(elements[i + 1])
         
