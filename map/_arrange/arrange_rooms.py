@@ -130,32 +130,18 @@ class _RoomArranger:
     def _get_room_connection_point(self, room: Room, orientation: Orientation) -> tuple[float, float]:
         """Get a point on the room's edge for connecting a passage.
         
-        For circular rooms, uses the center point projected to the edge.
-        For rectangular rooms, uses the center of the appropriate side.
+        Uses the center point of the appropriate edge for all room types.
         """
         bounds = room.bounds
-        is_circle = isinstance(room.shape, Circle)
         
-        if is_circle:
-            # For circles, project from center to edge
-            cx = bounds.x + bounds.width / 2
-            cy = bounds.y + bounds.height / 2
-            radius = bounds.width / 2  # Assuming width == height for circles
-            
-            if orientation == Orientation.HORIZONTAL:
-                return (cx + radius if bounds.x < 0 else cx - radius, cy)
-            else:
-                return (cx, cy + radius if bounds.y < 0 else cy - radius)
-        else:
-            # For rectangles, use center of appropriate side
-            if orientation == Orientation.HORIZONTAL:
-                x = bounds.x + bounds.width if bounds.x < 0 else bounds.x
-                y = bounds.y + bounds.height / 2
-                return (x, y)
-            else:
-                x = bounds.x + bounds.width / 2
-                y = bounds.y + bounds.height if bounds.y < 0 else bounds.y
-                return (x, y)
+        if orientation == Orientation.HORIZONTAL:
+            x = bounds.x + bounds.width if bounds.x < 0 else bounds.x
+            y = bounds.y + bounds.height / 2
+            return (x, y)
+        else:  # VERTICAL
+            x = bounds.x + bounds.width / 2
+            y = bounds.y + bounds.height if bounds.y < 0 else bounds.y
+            return (x, y)
 
     def _create_passage(self, room1: Room, room2: Room, orientation: Orientation) -> None:
         """Create a passage between two rooms with appropriate doors."""
