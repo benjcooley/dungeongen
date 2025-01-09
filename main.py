@@ -16,6 +16,7 @@ from map.props import ColumnType, Altar, Coffin, Dais, Rock
 from map.arrange import PropType, arrange_columns, ColumnArrangement, \
     arrange_random_props, arrange_rooms, ArrangeRoomStyle
 from options import Options
+from map.enums import Direction
 from typing import List
 
 def main():
@@ -58,8 +59,8 @@ def main():
         # Add square columns in a circle arrangement
         arrange_columns(end_room, ColumnArrangement.CIRCLE, column_type=ColumnType.SQUARE)
         
-        # Add some rocks
-        for room in rooms:
+        # Add some rocks to all rooms
+        for room in [start_room0, start_room, end_room]:
             arrange_random_props(room, [PropType.SMALL_ROCK], min_count=0, max_count=5)
             arrange_random_props(room, [PropType.MEDIUM_ROCK], min_count=0, max_count=5)
     
