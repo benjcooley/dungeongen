@@ -91,8 +91,8 @@ def connect_rooms(
     r2_x, r2_y = get_room_passage_connection_point(room2, r2_dir)
     
     # Calculate initial passage length
-    dx = abs(r2_x - r1_x)
-    dy = abs(r2_y - r1_y)
+    dx = abs(r2_x - r1_x) + 1
+    dy = abs(r2_y - r1_y) + 1
     passage_length = max(dx, dy)
     
     # Subtract space for each door
