@@ -44,7 +44,7 @@ def main():
         start_room0.add_prop(dais)
         
         # Add 5-grid long passage
-        passage0 = dungeon_map.add_element(Passage.from_grid(-5, 0, 5, 1))
+        passage0 = dungeon_map.add_element(Passage.from_grid(-5, 0, 5, 1, dungeon_map))
         rooms.append(passage0)
 
         # Add central rectangular room (5x5, centered at 0,0)
