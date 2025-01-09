@@ -18,16 +18,14 @@ class MapElement:
     
     A map element has:
     - A shape (which defines its geometry)
-    - A calculated bounding box based on the shape
     - Connections to other map elements
+    - Props (decorations or other elements)
     """
     
-    def __init__(self, shape: Shape, map_: 'Map') -> None:
+    def __init__(self, shape: Shape) -> None:
         self._shape = shape
+        self._bounds = shape.bounds
         self._connections: List['MapElement'] = []
-        self._bounds = self._shape.bounds
-        self._map = map_
-        self._options = map_.options
         self._props: List['Prop'] = []
                
     def add_prop(self, prop: 'Prop') -> None:
