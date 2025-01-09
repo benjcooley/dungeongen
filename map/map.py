@@ -5,6 +5,7 @@ from typing import List, Iterator, Optional, Generic, Sequence, TypeVar, TYPE_CH
 import skia
 import math
 import random
+from constants import CELL_SIZE
 from map.enums import Direction
 from map.room import RoomType
 from graphics.crosshatch import draw_crosshatches
