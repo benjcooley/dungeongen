@@ -119,22 +119,21 @@ def connect_rooms(
     # Track current position
     curr_x, curr_y = r1_x, r1_y
     
-    # Add first door if needed
+    # Add first door if needed, adjusting its position back one cell
     door1 = None
     if start_door_type is not None:
-        door1 = Door.from_grid(curr_x, curr_y, orientation, door_type=start_door_type)
+        start_x = curr_x - next_pos[0]
+        start_y = curr_y - next_pos[1]
+        door1 = Door.from_grid(start_x, start_y, orientation, door_type=start_door_type)
         dungeon_map.add_element(door1)
         elements.append(door1)
-        # Move current position past door
-        curr_x += next_pos[0]
-        curr_y += next_pos[1]
             
     # Add passage if we have length remaining
     passage = None
     if passage_length > 0:
-        # Calculate passage end point
-        end_x = curr_x + (next_pos[0] * passage_length)
-        end_y = curr_y + (next_pos[1] * passage_length)
+        # Calculate passage end point, adjusting for doors
+        end_x = curr_x + (next_pos[0] * (passage_length - 1))
+        end_y = curr_y + (next_pos[1] * (passage_length - 1))
             
         passage = Passage.from_grid_points(curr_x, curr_y, end_x, end_y)
         dungeon_map.add_element(passage)
