@@ -1,11 +1,12 @@
 """Map container class definition."""
 
-from typing import List, Iterator, Optional, Generic, Sequence, TypeVar, TYPE_CHECKING
+from typing import List, Iterator, Optional, Generic, Sequence, TypeVar, TYPE_CHECKING, Tuple
 
 import skia
 import math
 import random
 from constants import CELL_SIZE
+from map.enums import Direction
 from graphics.crosshatch import draw_crosshatches
 from map.grid import GridStyle, draw_region_grid
 from map.enums import Layers
@@ -247,6 +248,166 @@ class Map:
         matrix.setScale(scale, scale)
         matrix.postTranslate(translate_x, translate_y)
         return matrix
+
+    def create_rectangular_room(self, grid_x: float, grid_y: float, grid_width: float, grid_height: float) -> 'Room':
+        """Create a rectangular room at the specified grid position.
+        
+        Args:
+            grid_x: Grid x coordinate
+            grid_y: Grid y coordinate
+            grid_width: Width in grid units
+            grid_height: Height in grid units
+            
+        Returns:
+            The created Room instance
+        """
+        from map.room import Room, RoomType
+        return self.add_element(Room.from_grid(grid_x, grid_y, grid_width, grid_height, room_type=RoomType.RECTANGULAR))
+    
+    def create_circular_room(self, grid_x: float, grid_y: float, grid_diameter: float) -> 'Room':
+        """Create a circular room at the specified grid position.
+        
+        Args:
+            grid_x: Grid x coordinate
+            grid_y: Grid y coordinate
+            grid_diameter: Diameter in grid units
+            
+        Returns:
+            The created Room instance
+        """
+        from map.room import Room, RoomType
+        return self.add_element(Room.from_grid(grid_x, grid_y, grid_diameter, grid_diameter, room_type=RoomType.CIRCULAR))
+    
+    def create_connected_room(
+        self,
+        source_room: 'Room',
+        direction: Direction,
+        distance: int,
+        room_width: float,
+        room_height: float,
+        room_type: Optional['RoomType'] = None,
+        start_door: Optional[bool] = None,
+        end_door: Optional[bool] = None
+    ) -> Tuple['Room', Optional['Door'], 'Passage', Optional['Door']]:
+        """Create a new room connected to an existing room via a passage.
+        
+        Args:
+            source_room: The room to connect from
+            direction: Direction to create the new room
+            distance: Grid distance to place the new room
+            room_width: Width of new room in grid units
+            room_height: Height of new room in grid units
+            room_type: Optional RoomType (defaults to RECTANGULAR)
+            start_door: Optional bool to add door at start of passage
+            end_door: Optional bool to add door at end of passage
+            
+        Returns:
+            Tuple of (new_room, start_door, passage, end_door)
+            Where doors may be None if not requested
+        """
+        from map.room import Room, RoomType
+        from map.door import Door, DoorOrientation
+        from map.passage import Passage
+        
+        # Calculate new room position
+        src_bounds = source_room.bounds
+        src_center_x = src_bounds.x + (src_bounds.width / 2)
+        src_center_y = src_bounds.y + (src_bounds.height / 2)
+        
+        # Convert direction to offset
+        dx = 0
+        dy = 0
+        door_orientation = DoorOrientation.HORIZONTAL
+        
+        if direction == Direction.NORTH:
+            dy = -(distance * CELL_SIZE)
+            door_orientation = DoorOrientation.VERTICAL
+        elif direction == Direction.SOUTH:
+            dy = distance * CELL_SIZE
+            door_orientation = DoorOrientation.VERTICAL
+        elif direction == Direction.EAST:
+            dx = distance * CELL_SIZE
+            door_orientation = DoorOrientation.HORIZONTAL
+        elif direction == Direction.WEST:
+            dx = -(distance * CELL_SIZE)
+            door_orientation = DoorOrientation.HORIZONTAL
+            
+        # Create the new room
+        room_type = room_type or RoomType.RECTANGULAR
+        new_room = self.add_element(Room.from_grid(
+            (src_center_x + dx) / CELL_SIZE - (room_width / 2),
+            (src_center_y + dy) / CELL_SIZE - (room_height / 2),
+            room_width,
+            room_height,
+            room_type=room_type
+        ))
+        
+        # Create passage
+        if abs(dx) > 0:
+            # Horizontal passage
+            passage_x = min(src_center_x, src_center_x + dx) / CELL_SIZE
+            passage_y = src_center_y / CELL_SIZE - 0.5  # Center vertically
+            passage_width = abs(dx) / CELL_SIZE
+            passage_height = 1
+        else:
+            # Vertical passage
+            passage_x = src_center_x / CELL_SIZE - 0.5  # Center horizontally
+            passage_y = min(src_center_y, src_center_y + dy) / CELL_SIZE
+            passage_width = 1
+            passage_height = abs(dy) / CELL_SIZE
+            
+        passage = self.add_element(Passage.from_grid(passage_x, passage_y, passage_width, passage_height))
+        
+        # Add doors if requested
+        start_door_elem = None
+        end_door_elem = None
+        
+        if start_door is not None:
+            if direction == Direction.NORTH:
+                door_x = passage_x + 0.5
+                door_y = passage_y + passage_height
+            elif direction == Direction.SOUTH:
+                door_x = passage_x + 0.5
+                door_y = passage_y
+            elif direction == Direction.EAST:
+                door_x = passage_x
+                door_y = passage_y + 0.5
+            else:  # WEST
+                door_x = passage_x + passage_width
+                door_y = passage_y + 0.5
+                
+            start_door_elem = self.add_element(Door.from_grid(door_x, door_y, door_orientation, open=start_door))
+            
+        if end_door is not None:
+            if direction == Direction.NORTH:
+                door_x = passage_x + 0.5
+                door_y = passage_y
+            elif direction == Direction.SOUTH:
+                door_x = passage_x + 0.5
+                door_y = passage_y + passage_height
+            elif direction == Direction.EAST:
+                door_x = passage_x + passage_width
+                door_y = passage_y + 0.5
+            else:  # WEST
+                door_x = passage_x
+                door_y = passage_y + 0.5
+                
+            end_door_elem = self.add_element(Door.from_grid(door_x, door_y, door_orientation, open=end_door))
+        
+        # Connect everything
+        if start_door_elem:
+            source_room.connect_to(start_door_elem)
+            start_door_elem.connect_to(passage)
+        else:
+            source_room.connect_to(passage)
+            
+        if end_door_elem:
+            passage.connect_to(end_door_elem)
+            end_door_elem.connect_to(new_room)
+        else:
+            passage.connect_to(new_room)
+            
+        return new_room, start_door_elem, passage, end_door_elem
 
     def render(self, canvas: skia.Canvas, transform: Optional[skia.Matrix] = None) -> None:
         """Render the map to a canvas.
