@@ -59,16 +59,18 @@ class Passage(MapElement):
         x1, y1 = grid_to_map(start_x, start_y)
         x2, y2 = grid_to_map(end_x, end_y)
         
-        # Determine if horizontal or vertical based on largest difference
-        if abs(x2 - x1) > abs(y2 - y1):
-            # Horizontal passage
+        # Validate that points form a straight line
+        if y1 != y2 and x1 != x2:
+            raise ValueError(f"Passage points ({start_x}, {start_y}) and ({end_x}, {end_y}) must form a horizontal or vertical line")
+            
+        # Create horizontal or vertical passage
+        if y1 == y2:  # Horizontal passage
             x = min(x1, x2)
-            y = (y1 + y2) / 2
+            y = y1  # Use exact y coordinate since they match
             width = abs(x2 - x1)
             height = CELL_SIZE  # One grid unit high
-        else:
-            # Vertical passage
-            x = (x1 + x2) / 2
+        else:  # x1 == x2, Vertical passage
+            x = x1  # Use exact x coordinate since they match
             y = min(y1, y2)
             width = CELL_SIZE   # One grid unit wide
             height = abs(y2 - y1)
