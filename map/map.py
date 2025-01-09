@@ -103,6 +103,8 @@ class Map:
                               visited: set[MapElement],
                               region: list[MapElement]) -> None:
         """Recursively trace connected elements that aren't separated by closed doors."""
+        from map.door import Door
+        
         if element in visited:
             return
         
