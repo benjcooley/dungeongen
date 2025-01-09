@@ -41,7 +41,8 @@ def main():
 
         # Create second rectangular room connected to first
         start_room, _, passage0, _ = dungeon_map.create_connected_room(
-            start_room0, Direction.EAST, 5, 5, 5
+            start_room0, Direction.EAST, 5, 5, 5,
+            room_type=RoomType.RECTANGULAR
         )
 
         # Create circular end room connected to second room

@@ -16,10 +16,11 @@ from map.mapelement import MapElement
 from map.occupancy import OccupancyGrid
 from map.region import Region
 from map.door import DoorType
+from map.room import RoomType
 
 if TYPE_CHECKING:
     from map.door import Door
-    from map.room import Room, RoomType
+    from map.room import Room
     from map.passage import Passage
     from map.stairs import Stairs
     from options import Options
@@ -282,7 +283,7 @@ class Map:
         distance: int,
         room_width: int,
         room_height: int,
-        room_type: Optional[str] = None, 
+        room_type: Optional[RoomType] = None,
         start_door_type: Optional[DoorType] = None,
         end_door_type: Optional[DoorType] = None
     ) -> Tuple['MapElement', Optional['MapElement'], 'MapElement', Optional['MapElement']]:
