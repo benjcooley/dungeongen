@@ -162,7 +162,9 @@ class _RoomArranger:
         room1: Room,
         room2: Room,
         start_door: Optional[bool] = None,
-        end_door: Optional[bool] = None
+        end_door: Optional[bool] = None,
+        start_door_type: Optional[str] = None,
+        end_door_type: Optional[str] = None
     ) -> Tuple[Optional[Door], Passage, Optional[Door]]:
         """Create a passage between two rooms with appropriate doors."""
         # Determine primary axis of connection by comparing distances
@@ -216,9 +218,11 @@ class _RoomArranger:
             
             # Create passage and doors
             passage = Passage.from_grid(grid_passage_x, grid_passage_y, grid_passage_width, 1, self.dungeon_map)
-            door1 = Door.from_grid(grid_passage_x, grid_passage_y, DoorOrientation.HORIZONTAL, self.dungeon_map, open=True)
+            door1 = Door.from_grid(grid_passage_x, grid_passage_y, DoorOrientation.HORIZONTAL, 
+                                 self.dungeon_map, open=True, door_type=start_door_type)
             door2 = Door.from_grid(grid_passage_x + grid_passage_width - 1, grid_passage_y,
-                                DoorOrientation.HORIZONTAL, self.dungeon_map, open=True)
+                                 DoorOrientation.HORIZONTAL, self.dungeon_map, open=True, 
+                                 door_type=end_door_type)
         else:
             passage_x = (x1 + x2) / 2 - 0.5  # Center between rooms
             passage_y = min(y1, y2)
@@ -234,9 +238,11 @@ class _RoomArranger:
             print(f"    Height: {grid_passage_height}")
             
             passage = Passage.from_grid(grid_passage_x, grid_passage_y, 1, grid_passage_height, self.dungeon_map)
-            door1 = Door.from_grid(grid_passage_x, grid_passage_y, DoorOrientation.VERTICAL, self.dungeon_map, open=True)
+            door1 = Door.from_grid(grid_passage_x, grid_passage_y, DoorOrientation.VERTICAL, 
+                                 self.dungeon_map, open=True, door_type=start_door_type)
             door2 = Door.from_grid(grid_passage_x, grid_passage_y + grid_passage_height - 1,
-                                DoorOrientation.VERTICAL, self.dungeon_map, open=True)
+                                 DoorOrientation.VERTICAL, self.dungeon_map, open=True,
+                                 door_type=end_door_type)
         
         # Connect everything based on which doors exist
         if start_door is not None:
