@@ -69,7 +69,7 @@ def get_room_passage_connection_point(room: Room, direction: Direction) -> Tuple
         return (center_x, grid_y - 1)  # One cell above
     elif direction == Direction.SOUTH:
         return (center_x, grid_y + grid_height)  # One cell below
-    elif direction.EAST:
+    elif direction == Direction.EAST:
         return (grid_x + grid_width, center_y)  # One cell right
     else:  # WEST
         return (grid_x - 1, center_y)  # One cell left
