@@ -36,7 +36,8 @@ def main():
 
         # Add central rectangular room (5x5, centered at 0,0)
         # Since we want grid alignment and center at 0,0, we'll offset by -2,-2
-        start_room0 = dungeon_map.add_element(Room.from_grid(-10, -2, 5, 5))
+        start_room0 = Room.from_grid(-10, -2, 5, 5)
+        start_room0 = dungeon_map.add_element(start_room0)
         rooms.append(start_room0)
         
         # Add dais to left side of room0
