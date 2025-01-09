@@ -61,7 +61,7 @@ def connect_rooms(
     start_door_type: Optional[DoorType] = None,
     end_door_type: Optional[DoorType] = None,
     dungeon_map: Optional[Map] = None
-) -> Tuple[Optional[Door], Passage, Optional[Door]]:
+) -> Tuple[Optional[Door], Optional[Passage], Optional[Door]]:
     """Create a passage between two rooms with optional doors.
     
     Args:
@@ -72,7 +72,10 @@ def connect_rooms(
         dungeon_map: Optional map instance (will use room1's map if not provided)
         
     Returns:
-        Tuple of (start_door, passage, end_door) where doors may be None
+        Tuple of (start_door, passage, end_door) where any element may be None
+        
+    Raises:
+        ValueError: If there isn't enough space for requested doors
     """
     # Use room1's map if none provided
     dungeon_map = dungeon_map or room1._map
@@ -87,47 +90,67 @@ def connect_rooms(
     r1_x, r1_y = get_room_passage_connection_point(room1, r1_dir)
     r2_x, r2_y = get_room_passage_connection_point(room2, r2_dir)
     
-    # Convert to map coordinates
-    x1, y1 = r1_x * CELL_SIZE, r1_y * CELL_SIZE
-    x2, y2 = r2_x * CELL_SIZE, r2_y * CELL_SIZE
+    # Calculate grid distance
+    dx = abs(r2_x - r1_x)
+    dy = abs(r2_y - r1_y)
+    distance = max(dx, dy)
     
-    # Determine passage dimensions and position
-    # Create passage using grid points
-    passage = Passage.from_grid_points(r1_x, r1_y, r2_x, r2_y)
+    # Count needed door spaces
+    door_spaces = 0
+    if start_door_type is not None:
+        door_spaces += 1
+    if end_door_type is not None:
+        door_spaces += 1
+        
+    # Check if we have enough space for doors
+    if distance < door_spaces:
+        raise ValueError(f"Not enough space for doors: need {door_spaces} spaces but only have {distance}")
+    
+    # Create list to track elements for connecting later
+    elements = []
     
     # Create doors at the connection points
-    if abs(x2 - x1) > abs(y2 - y1):  # Horizontal passage
-        door1 = Door.from_grid(r1_x, r1_y, DoorOrientation.HORIZONTAL, 
-                             door_type=start_door_type)
-        door2 = Door.from_grid(r2_x, r2_y, DoorOrientation.HORIZONTAL,
-                             door_type=end_door_type)
-    else:  # Vertical passage
-        door1 = Door.from_grid(r1_x, r1_y, DoorOrientation.VERTICAL,
-                             door_type=start_door_type)
-        door2 = Door.from_grid(r2_x, r2_y, DoorOrientation.VERTICAL,
-                             door_type=end_door_type)
+    is_horizontal = abs(r2_x - r1_x) > abs(r2_y - r1_y)
+    orientation = DoorOrientation.HORIZONTAL if is_horizontal else DoorOrientation.VERTICAL
     
-    # Add elements to map
-    dungeon_map.add_element(passage)
+    door1 = None
+    door2 = None
     if start_door_type is not None:
+        door1 = Door.from_grid(r1_x, r1_y, orientation, door_type=start_door_type)
         dungeon_map.add_element(door1)
-    if end_door_type is not None:
-        dungeon_map.add_element(door2)
-    
-    # Connect everything based on which door types were specified
-    if start_door_type is not None:
-        room1.connect_to(door1)
-        door1.connect_to(passage)
-    else:
-        room1.connect_to(passage)
-        door1 = None
+        elements.append(door1)
         
     if end_door_type is not None:
-        passage.connect_to(door2)
-        door2.connect_to(room2)
-    else:
-        passage.connect_to(room2)
-        door2 = None
+        door2 = Door.from_grid(r2_x, r2_y, orientation, door_type=end_door_type)
+        dungeon_map.add_element(door2)
+        elements.append(door2)
+    
+    # Only create passage if we have space after doors
+    passage = None
+    if distance > door_spaces:
+        # Adjust grid points to account for doors
+        if start_door_type is not None:
+            if is_horizontal:
+                r1_x += 1 if r2_x > r1_x else -1
+            else:
+                r1_y += 1 if r2_y > r1_y else -1
+                
+        if end_door_type is not None:
+            if is_horizontal:
+                r2_x += -1 if r2_x > r1_x else 1
+            else:
+                r2_y += -1 if r2_y > r1_y else 1
+                
+        passage = Passage.from_grid_points(r1_x, r1_y, r2_x, r2_y)
+        dungeon_map.add_element(passage)
+        elements.append(passage)
+    
+    # Connect all elements in sequence
+    elements.insert(0, room1)
+    elements.append(room2)
+    
+    for i in range(len(elements) - 1):
+        elements[i].connect_to(elements[i + 1])
         
     return door1, passage, door2
 
