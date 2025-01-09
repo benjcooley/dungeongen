@@ -59,10 +59,11 @@ def main():
         # Add square columns in a circle arrangement
         arrange_columns(end_room, ColumnArrangement.CIRCLE, column_type=ColumnType.SQUARE)
         
-        # Add some rocks to all rooms
-        for room in [start_room0, start_room, end_room]:
-            arrange_random_props(room, [PropType.SMALL_ROCK], min_count=0, max_count=5)
-            arrange_random_props(room, [PropType.MEDIUM_ROCK], min_count=0, max_count=5)
+        # Add some rocks to all elements
+        for element in dungeon_map.elements:
+            if isinstance(element, Room):
+                arrange_random_props(element, [PropType.SMALL_ROCK], min_count=0, max_count=5)
+                arrange_random_props(element, [PropType.MEDIUM_ROCK], min_count=0, max_count=5)
     
     else:
         arrange_rooms(dungeon_map, ArrangeRoomStyle.LINEAR, min_rooms=5, max_rooms=7, min_size=3, max_size=7)
