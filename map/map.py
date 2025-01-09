@@ -16,6 +16,7 @@ from map.mapelement import MapElement
 from map.occupancy import OccupancyGrid
 from map.region import Region
 from map.room import Room, RoomType
+from map.door import DoorType
 
 if TYPE_CHECKING:
     from map.door import Door
