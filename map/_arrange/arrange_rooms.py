@@ -157,20 +157,24 @@ class _RoomArranger:
         else:  # WEST
             return (grid_x, center_y)
 
-    def _create_passage(self, room1: Room, room2: Room, orientation: Orientation) -> None:
+    def _create_passage(self, room1: Room, room2: Room) -> None:
         """Create a passage between two rooms with appropriate doors."""
-        # Determine which sides to connect based on orientation and relative positions
-        if orientation == Orientation.HORIZONTAL:
-            # For horizontal passages, connect east side of leftmost room to west side of rightmost room
-            if room1.bounds.x < room2.bounds.x:
+        # Determine primary axis of connection by comparing distances
+        dx = room2.bounds.x - room1.bounds.x
+        dy = room2.bounds.y - room1.bounds.y
+        
+        # Use the larger distance to determine orientation
+        if abs(dx) > abs(dy):
+            # Horizontal connection
+            if dx > 0:
                 r1_dir = Direction.EAST
                 r2_dir = Direction.WEST
             else:
                 r1_dir = Direction.WEST
                 r2_dir = Direction.EAST
-        else:  # VERTICAL
-            # For vertical passages, connect south side of upper room to north side of lower room
-            if room1.bounds.y < room2.bounds.y:
+        else:
+            # Vertical connection
+            if dy > 0:
                 r1_dir = Direction.SOUTH
                 r2_dir = Direction.NORTH
             else:
@@ -240,13 +244,12 @@ class _RoomArranger:
         passage.connect_to(door2)
         door2.connect_to(room2)
 
-    def connect_rooms(self, room1: Room, room2: Room, orientation: Orientation) -> None:
+    def connect_rooms(self, room1: Room, room2: Room) -> None:
         """Connect two rooms with a passage and doors."""
         print(f"\nConnecting rooms:")
         print(f"  Room1 bounds: ({room1.bounds.x}, {room1.bounds.y}) to ({room1.bounds.x + room1.bounds.width}, {room1.bounds.y + room1.bounds.height})")
         print(f"  Room2 bounds: ({room2.bounds.x}, {room2.bounds.y}) to ({room2.bounds.x + room2.bounds.width}, {room2.bounds.y + room2.bounds.height})")
-        print(f"  Orientation: {orientation}")
-        self._create_passage(room1, room2, orientation)
+        self._create_passage(room1, room2)
         
     def arrange_linear(
         self,
@@ -310,7 +313,7 @@ class _RoomArranger:
                 
             # Create and connect new room
             new_room = self.create_room(next_x, next_y)
-            self.connect_rooms(last_room, new_room, orientation)
+            self.connect_rooms(last_room, new_room)
             last_room = new_room  # Update last room
             
         return self.rooms
