@@ -25,7 +25,7 @@ from map.passage import Passage
 from constants import CELL_SIZE
 from map.door import Door, DoorOrientation, DoorType
 from map.enums import Direction
-from map._arrange.arrange_utils import get_room_direction, get_room_exit_grid_position
+from map._arrange.arrange_utils import get_room_direction, get_room_exit_grid_position, RoomDirection
 
 class GrowDirection(Enum):
     """Controls which room to grow from when arranging."""
@@ -328,7 +328,7 @@ class _RoomArranger:
         self,
         num_rooms: int,
         start_room: Room,
-        direction: RoomDirection = RoomDirection.EAST,
+        direction: 'RoomDirection' = RoomDirection.EAST,
         grow_direction: GrowDirection = GrowDirection.BOTH,
         max_attempts: int = 100
     ) -> List[Room]:
