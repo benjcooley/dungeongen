@@ -7,7 +7,7 @@ columns, altars, daises and rocks based on element type and size.
 import random
 from typing import TYPE_CHECKING
 
-from map._arrange.arrange_utils import Direction
+from map.enums import Direction
 from map.props import ColumnType, Altar, Dais, Rock
 from map.arrange import ColumnArrangement, arrange_columns, arrange_random_props, PropType
 from algorithms.rotation import Rotation
