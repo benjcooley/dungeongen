@@ -168,6 +168,12 @@ def arrange_rooms(
     num_rooms = random.randint(min_rooms, max_rooms)
     arranger = _RoomArranger(dungeon_map, min_size, max_size)
     
+    # Create start room if none provided
+    if start_room is None:
+        start_room = dungeon_map.create_rectangular_room(0, 0, 
+            random.randint(min_size, max_size),
+            random.randint(min_size, max_size))
+    
     if style == ArrangeRoomStyle.LINEAR:
         return arranger.arrange_linear(num_rooms, start_room)
     elif style == ArrangeRoomStyle.SYMMETRIC:
@@ -315,7 +321,7 @@ class _RoomArranger:
     def arrange_linear(
         self,
         num_rooms: int,
-        start_room: Optional[Room] = None,
+        start_room: Room,
         direction: DirectionType = DirectionType.EAST,
         max_attempts: int = 100
     ) -> List[Room]:
@@ -323,20 +329,15 @@ class _RoomArranger:
         
         Args:
             num_rooms: Number of rooms to generate
-            start_room: Optional starting room
+            start_room: Starting room to build from
             direction: Primary direction to grow in
             max_attempts: Maximum attempts before giving up
             
         Returns:
             List of created rooms
         """
-        # Initialize with start room or create first room
-        if start_room:
-            self.rooms = [start_room]  # Reset rooms list
-            first_room = last_room = start_room
-        else:
-            self.rooms = []  # Reset rooms list
-            first_room = last_room = self.create_room(0, 0)
+        self.rooms = [start_room]  # Reset rooms list
+        first_room = last_room = start_room
             
         attempts = 0
         while len(self.rooms) < num_rooms and attempts < max_attempts:
