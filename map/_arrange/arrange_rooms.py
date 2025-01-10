@@ -24,8 +24,14 @@ from map.room import Room
 from map.passage import Passage
 from constants import CELL_SIZE
 from map.door import Door, DoorOrientation, DoorType
-from map._arrange.arrange_utils import Direction as DirectionType
+from map.enums import Direction
 from map._arrange.arrange_utils import get_room_direction, get_room_exit_grid_position
+
+class GrowDirection(Enum):
+    """Controls which room to grow from when arranging."""
+    FORWARD = auto()   # Only grow from last room
+    BACKWARD = auto()  # Only grow from first room
+    BOTH = auto()      # Grow from either first or last room
 
 class ArrangeRoomStyle(Enum):
     """Room arrangement strategies."""
@@ -322,7 +328,8 @@ class _RoomArranger:
         self,
         num_rooms: int,
         start_room: Room,
-        direction: DirectionType = DirectionType.EAST,
+        direction: Direction = Direction.EAST,
+        grow_direction: GrowDirection = GrowDirection.BOTH,
         max_attempts: int = 100
     ) -> List[Room]:
         """Arrange rooms in a linear sequence.
@@ -331,6 +338,7 @@ class _RoomArranger:
             num_rooms: Number of rooms to generate
             start_room: Starting room to build from
             direction: Primary direction to grow in
+            grow_direction: Controls which room to grow from
             max_attempts: Maximum attempts before giving up
             
         Returns:
@@ -343,8 +351,13 @@ class _RoomArranger:
         while len(self.rooms) < num_rooms and attempts < max_attempts:
             attempts += 1
             
-            # Randomly choose to grow from first or last room
-            grow_from_first = random.choice([True, False])
+            # Determine which room to grow from based on grow_direction
+            if grow_direction == GrowDirection.BOTH:
+                grow_from_first = random.choice([True, False])
+            elif grow_direction == GrowDirection.BACKWARD:
+                grow_from_first = True
+            else:  # FORWARD
+                grow_from_first = False
             
             # Set source room and growth direction
             if grow_from_first:
