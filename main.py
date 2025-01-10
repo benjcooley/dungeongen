@@ -1,22 +1,9 @@
 """
-Main entry point for drawing a simple room.
+Main entry point for dungeon map generation.
 """
-import math
 import skia
-
-from graphics.conversions import grid_to_map
-from map.mapelement import MapElement
-from map.room import Room, RoomType
 from map.map import Map
-from map.door import Door, DoorOrientation, DoorType
-from map.passage import Passage
-from algorithms.rotation import Rotation
-from constants import CELL_SIZE
-from map.arrange import arrange_rooms, ArrangeRoomStyle
-from map._props.decorate_room import decorate_room
 from options import Options
-from map._arrange.arrange_utils import RoomDirection
-from typing import List
 
 def main():
     options = Options()
@@ -28,38 +15,10 @@ def main():
     # Create map
     dungeon_map = Map(options)
 
-    DEMO = True
-
-    if DEMO:
-        # Create first rectangular room
-        start_room0 = dungeon_map.create_rectangular_room(-10, -2, 5, 5)
-        
-        # Create second rectangular room connected to first
-        start_room, _, passage0, _ = dungeon_map.create_connected_room(
-            start_room0, direction=RoomDirection.EAST, distance=4, room_width=5, room_height=5,
-            room_type=RoomType.RECTANGULAR,
-            start_door_type=DoorType.OPEN,
-            end_door_type=DoorType.CLOSED
-        )
-
-        # Create circular end room connected to second room
-        end_room, first_door, passage, second_door = dungeon_map.create_connected_room(
-            start_room, direction=RoomDirection.EAST, distance=5, room_width=5, room_height=5,
-            room_type=RoomType.CIRCULAR,
-            start_door_type=DoorType.OPEN
-        )
-        
-        # Decorate all map elements
-        for element in dungeon_map.elements:
-            decorate_room(element)
+    # Generate random dungeon
+    dungeon_map.generate()
     
-    else:
-        rooms = arrange_rooms(dungeon_map, ArrangeRoomStyle.LINEAR, min_rooms=5, max_rooms=7, min_size=3, max_size=7)
-        # Decorate all map elements
-        for element in dungeon_map.elements:
-            decorate_room(element)
-
-    # Draw the map (which will draw all rooms)
+    # Draw the map
     dungeon_map.render(canvas)
 
     # Save as PNG

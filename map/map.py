@@ -360,6 +360,38 @@ class Map:
         
         return new_room, start_door_elem, passage, end_door_elem
 
+    def generate(self, min_rooms: int = 5, max_rooms: int = 7, min_size: int = 3, max_size: int = 7) -> None:
+        """Generate a random dungeon map.
+        
+        Args:
+            min_rooms: Minimum number of rooms to generate
+            max_rooms: Maximum number of rooms to generate 
+            min_size: Minimum room size in grid units
+            max_size: Maximum room size in grid units
+        """
+        from map._arrange.arrange_rooms import _RoomArranger, GrowDirection
+        from map._props.decorate_room import decorate_room
+        
+        # Create starting room at origin
+        start_room = self.create_rectangular_room(0, 0, 
+            random.randint(min_size, max_size),
+            random.randint(min_size, max_size))
+            
+        # Randomly choose grow direction
+        grow_direction = random.choice(list(GrowDirection))
+        
+        # Create room arranger and generate linear layout
+        arranger = _RoomArranger(self, min_size, max_size)
+        rooms = arranger.arrange_linear(
+            random.randint(min_rooms, max_rooms),
+            start_room,
+            grow_direction=grow_direction
+        )
+        
+        # Decorate all elements
+        for element in self._elements:
+            decorate_room(element)
+    
     def render(self, canvas: skia.Canvas, transform: Optional[skia.Matrix] = None) -> None:
         """Render the map to a canvas.
         
