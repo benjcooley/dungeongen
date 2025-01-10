@@ -316,7 +316,7 @@ class _RoomArranger:
         self,
         num_rooms: int,
         start_room: Optional[Room] = None,
-        direction: GenerateDirection = GenerateDirection.BOTH,
+        direction: DirectionType = DirectionType.EAST,
         max_attempts: int = 100
     ) -> List[Room]:
         """Arrange rooms in a linear sequence.
@@ -324,7 +324,7 @@ class _RoomArranger:
         Args:
             num_rooms: Number of rooms to generate
             start_room: Optional starting room
-            direction: Which direction to generate rooms from
+            direction: Primary direction to grow in
             max_attempts: Maximum attempts before giving up
             
         Returns:
@@ -332,24 +332,28 @@ class _RoomArranger:
         """
         # Initialize with start room or create first room
         if start_room:
-            self.rooms.append(start_room)
+            self.rooms = [start_room]  # Reset rooms list
+            first_room = last_room = start_room
         else:
-            self.create_room(0, 0)
+            self.rooms = []  # Reset rooms list
+            first_room = last_room = self.create_room(0, 0)
             
         attempts = 0
         while len(self.rooms) < num_rooms and attempts < max_attempts:
             attempts += 1
             
-            # Pick which room to connect from based on direction
-            if direction == GenerateDirection.BOTH:
-                source_room = random.choice([self.rooms[0], self.rooms[-1]])
-                connect_dir = random.choice(list(DirectionType))
-            elif direction == GenerateDirection.FORWARD:
-                source_room = self.rooms[0]
-                connect_dir = random.choice(list(DirectionType))
-            else:  # BACKWARD
-                source_room = self.rooms[-1]
-                connect_dir = random.choice(list(DirectionType))
+            # Randomly choose to grow from first or last room
+            grow_from_first = random.choice([True, False])
+            
+            # Set source room and growth direction
+            if grow_from_first:
+                source_room = first_room
+                # Grow in opposite direction when growing from first room
+                connect_dir = direction.get_opposite()
+            else:
+                source_room = last_room
+                # Grow in primary direction when growing from last room
+                connect_dir = direction
                 
             # Random passage length (1-4 cells)
             distance = random.randint(1, 4)
@@ -382,6 +386,13 @@ class _RoomArranger:
                     start_door_type=start_door,
                     end_door_type=end_door
                 )
+                
+                # Update first/last room references based on which end we grew from
+                if grow_from_first:
+                    first_room = new_room
+                else:
+                    last_room = new_room
+                    
                 self.rooms.append(new_room)
                 attempts = 0  # Reset attempts on success
                 
