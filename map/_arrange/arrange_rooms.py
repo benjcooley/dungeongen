@@ -27,33 +27,17 @@ from map.door import Door, DoorOrientation, DoorType
 from map._arrange.arrange_utils import Direction as DirectionType
 from map._arrange.arrange_utils import get_room_direction, get_room_exit_grid_position
 
-class Direction(Enum):
-    """Direction to generate rooms."""
-    BOTH = auto()
-    FORWARD = auto()
-    BACKWARD = auto()
-
-class Orientation(Enum):
-    """Orientation for room generation."""
-    HORIZONTAL = auto()
-    VERTICAL = auto()
-
 class ArrangeRoomStyle(Enum):
     """Room arrangement strategies."""
     SYMMETRIC = auto()  # Arrange rooms symmetrically where possible
     LINEAR = auto()     # Arrange rooms in a roughly linear path
     SPIRAL = auto()     # Arrange rooms in a spiral pattern from center
 
-class Direction(Enum):
-    """Direction to generate rooms."""
-    BOTH = auto()
-    FORWARD = auto()
-    BACKWARD = auto()
-
-class Orientation(Enum):
-    """Orientation for room generation."""
-    HORIZONTAL = auto()
-    VERTICAL = auto()
+class GenerateDirection(Enum):
+    """Direction to generate new rooms from."""
+    BOTH = auto()      # Generate from either first or last room
+    FORWARD = auto()   # Generate only from first room
+    BACKWARD = auto()  # Generate only from last room
 
 def connect_rooms(
     room1: Room,
@@ -332,70 +316,77 @@ class _RoomArranger:
         self,
         num_rooms: int,
         start_room: Optional[Room] = None,
-        direction: Optional[Direction] = None,
-        orientation: Optional[Orientation] = None,
+        direction: GenerateDirection = GenerateDirection.BOTH,
         max_attempts: int = 100
     ) -> List[Room]:
-        """Arrange rooms in a linear sequence."""
+        """Arrange rooms in a linear sequence.
+        
+        Args:
+            num_rooms: Number of rooms to generate
+            start_room: Optional starting room
+            direction: Which direction to generate rooms from
+            max_attempts: Maximum attempts before giving up
+            
+        Returns:
+            List of created rooms
+        """
+        # Initialize with start room or create first room
         if start_room:
             self.rooms.append(start_room)
-            current_x = start_room.bounds.x
-            current_y = start_room.bounds.y
         else:
-            current_x = current_y = 0
-            self.create_room(current_x, current_y)
+            self.create_room(0, 0)
             
-        # Choose random direction and orientation if not specified
-        direction = direction or random.choice(list(Direction))
-        orientation = orientation or random.choice(list(Orientation))
-        
-        # Generate remaining rooms
         attempts = 0
-        last_room = self.rooms[-1]  # Track the last room we added
         while len(self.rooms) < num_rooms and attempts < max_attempts:
             attempts += 1
-            # Choose spacing
-            spacing = random.randint(self.min_spacing, self.max_spacing)
             
-            # Get position of last room
-            current_x = last_room.bounds.x / CELL_SIZE
-            current_y = last_room.bounds.y / CELL_SIZE
+            # Pick which room to connect from based on direction
+            if direction == GenerateDirection.BOTH:
+                source_room = random.choice([self.rooms[0], self.rooms[-1]])
+                connect_dir = random.choice(list(DirectionType))
+            elif direction == GenerateDirection.FORWARD:
+                source_room = self.rooms[0]
+                connect_dir = random.choice(list(DirectionType))
+            else:  # BACKWARD
+                source_room = self.rooms[-1]
+                connect_dir = random.choice(list(DirectionType))
+                
+            # Random passage length (1-4 cells)
+            distance = random.randint(1, 4)
             
-            # Limit maximum spacing between rooms
-            max_allowed_spacing = 3  # Maximum spacing in grid units
-            spacing = min(spacing, max_allowed_spacing)
+            # Random room size
+            width = random.randint(self.min_size, self.max_size)
+            height = random.randint(self.min_size, self.max_size)
             
-            # Calculate room offset based on max size
-            room_offset = min(self.max_size, 5)  # Limit maximum room size contribution
-            
-            # Calculate new position based on orientation
-            next_x = current_x
-            next_y = current_y
-            
-            if orientation == Orientation.HORIZONTAL:
-                if direction == Direction.FORWARD or (direction == Direction.BOTH and len(self.rooms) % 2 == 0):
-                    next_x = current_x + spacing + room_offset
+            # Randomly decide door types based on passage length
+            if distance > 2:
+                start_door = random.choice([None, DoorType.OPEN, DoorType.CLOSED])
+                end_door = random.choice([None, DoorType.OPEN, DoorType.CLOSED])
+            else:
+                # For short passages, only use at most one door
+                if random.random() < 0.5:
+                    start_door = random.choice([DoorType.OPEN, DoorType.CLOSED])
+                    end_door = None
                 else:
-                    next_x = current_x - spacing - room_offset
-            else:  # VERTICAL
-                if direction == Direction.FORWARD or (direction == Direction.BOTH and len(self.rooms) % 2 == 0):
-                    next_y = current_y + spacing + room_offset
-                else:
-                    next_y = current_y - spacing - room_offset
-                    
-            # Sanity check the new position
-            if abs(next_x) > 3200 or abs(next_y) > 3200:
-                print(f"Warning: Room position ({next_x}, {next_y}) exceeds reasonable bounds (±3200), retrying...")
+                    start_door = None
+                    end_door = random.choice([DoorType.OPEN, DoorType.CLOSED])
+            
+            try:
+                # Create connected room
+                new_room, _, _, _ = self.dungeon_map.create_connected_room(
+                    source_room,
+                    connect_dir,
+                    distance,
+                    width,
+                    height,
+                    start_door_type=start_door,
+                    end_door_type=end_door
+                )
+                self.rooms.append(new_room)
+                attempts = 0  # Reset attempts on success
+                
+            except ValueError:
+                # If room creation fails, try again
                 continue
                 
-            # Create and connect new room
-            new_room = self.create_room(next_x, next_y)
-            start_door_elem, passage, end_door_elem = connect_rooms(
-                last_room, new_room,
-                start_door_type=DoorType.OPEN,
-                end_door_type=DoorType.OPEN,
-                dungeon_map=self.dungeon_map
-            )
-            last_room = new_room  # Update last room
-            
         return self.rooms
