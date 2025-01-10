@@ -339,7 +339,7 @@ class Map:
         new_room_y = src_center_y + dy - (room_height // 2)
             
         # Create the new room
-        from map.room import Room
+        from map.room import Room, RoomType
         room_type = room_type or RoomType.RECTANGULAR
         new_room = self.add_element(Room.from_grid(
             new_room_x,
