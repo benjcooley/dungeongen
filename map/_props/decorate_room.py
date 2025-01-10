@@ -29,11 +29,11 @@ def decorate_room(element: 'MapElement') -> None:
             # Pick column arrangement based on room type
             if element.room_type == RoomType.RECTANGULAR:
                 # For rectangular rooms:
-                # - HORIZONTAL: 3/8 chance
-                # - VERTICAL: 3/8 chance  
-                # - CIRCLE: 1/8 chance
-                # - SQUARE: 1/8 chance  
-                weights = [3, 3, 1, 1]
+                # - HORIZONTAL_ROWS: 40% chance
+                # - VERTICAL_ROWS: 40% chance
+                # - CIRCLE: 10% chance
+                # - SQUARE: 10% chance
+                weights = [4, 4, 1, 1]
                 arrangement = random.choices(
                     [ColumnArrangement.HORIZONTAL_ROWS,
                      ColumnArrangement.VERTICAL_ROWS,
@@ -41,8 +41,7 @@ def decorate_room(element: 'MapElement') -> None:
                      ColumnArrangement.SQUARE],
                     weights=weights
                 )[0]
-            elif element.room_type == RoomType.CIRCULAR:
-                # For circular rooms, only use circle arrangement
+            else:  # CIRCULAR rooms must use CIRCLE arrangement
                 arrangement = ColumnArrangement.CIRCLE
                 
             arrange_columns(element, arrangement)
