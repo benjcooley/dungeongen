@@ -25,6 +25,7 @@ if TYPE_CHECKING:
     from map.stairs import Stairs
     from options import Options
 
+REGION_INFLATE = CELL_SIZE * 0.025
 
 TMapElement = TypeVar('T', bound='MapElement')
 
@@ -179,8 +180,8 @@ class Map:
             return self._elements[idx]
         return None
     
-    def get_regions(self) -> list[Region]:
-        """Get Regions for each contiguous area of the map.
+    def _make_regions(self) -> list[Region]:
+        """Make shape regions for each contiguous area of the map.
         
         Returns:
             List of Regions, each containing a ShapeGroup and the MapElements in that region.
@@ -205,7 +206,7 @@ class Map:
                 final_elements = []
                 for item in region_elements:
                     if isinstance(item, MapElement):
-                        shapes.append(item.shape)
+                        shapes.append(item.shape.inflated(REGION_INFLATE))
                         final_elements.append(item)
                     else:  # Rectangle from door side
                         shapes.append(item)
@@ -330,8 +331,8 @@ class Map:
         
         # Get direction offset
         dx, dy = direction.get_offset()
-        dx *= distance
-        dy *= distance
+        dx *= distance + int((src_bounds.width / CELL_SIZE) / 2) + int(room_width / 2)
+        dy *= distance + int((src_bounds.height / CELL_SIZE) / 2) + int(room_height / 2)
             
         # Calculate new room position in grid coordinates
         new_room_x = src_center_x + dx - (room_width // 2)
@@ -384,7 +385,7 @@ class Map:
         )
         
         # Get all regions and create crosshatch shape
-        regions = self.get_regions()
+        regions = self._make_regions()
         crosshatch_shapes = []
         for region in regions:
             # Create inflated version of the region's shape
