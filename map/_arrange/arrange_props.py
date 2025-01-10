@@ -48,7 +48,7 @@ def arrange_prop(elem: MapElement, prop_type: 'PropType') -> Optional['Prop']:
         prop = Rock.create_large()
     elif prop_type == PropType.ALTAR:
         # Create altar with random rotation
-        prop = Altar.create(rotation=random.choice(list(Rotation)))
+        prop = Altar.create(rotation=Rotation.random_cardinal_rotation())
     else:
         raise ValueError(f"Unsupported prop type: {prop_type}")
         
