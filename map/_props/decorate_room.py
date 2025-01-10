@@ -8,7 +8,7 @@ import random
 from typing import TYPE_CHECKING
 
 from map.enums import Direction, RockType
-from map.props import ColumnType, Altar, Dais, Rock, PropType
+from map.props import ColumnType, Altar, Dais, Rock
 from map.arrange import ColumnArrangement, arrange_columns, arrange_random_props, PropType
 from algorithms.rotation import Rotation
 from map.room import Room, RoomType
