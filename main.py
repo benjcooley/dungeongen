@@ -43,16 +43,15 @@ def main():
         start_room, _, passage0, _ = dungeon_map.create_connected_room(
             start_room0, direction=Direction.EAST, distance=4, room_width=5, room_height=5,
             room_type=RoomType.RECTANGULAR,
-            start_door_type=DoorType.DEFAULT,
-            end_door_type=DoorType.DEFAULT
+            start_door_type=DoorType.OPEN,
+            end_door_type=DoorType.CLOSED
         )
 
         # Create circular end room connected to second room
         end_room, first_door, passage, second_door = dungeon_map.create_connected_room(
             start_room, direction=Direction.EAST, distance=5, room_width=5, room_height=5,
             room_type=RoomType.CIRCULAR,
-            start_door_type=DoorType.DEFAULT,
-            end_door_type=DoorType.NONE
+            start_door_type=DoorType.OPEN
         )
         
         # Add props to rooms and passage
