@@ -15,6 +15,7 @@ from constants import CELL_SIZE
 from map.props import ColumnType, Altar, Coffin, Dais, Rock
 from map.arrange import PropType, arrange_columns, ColumnArrangement, \
     arrange_random_props, arrange_rooms, ArrangeRoomStyle
+from map._props.decorate_room import decorate_room
 from options import Options
 from map.enums import Direction
 from typing import List
@@ -35,9 +36,8 @@ def main():
         # Create first rectangular room
         start_room0 = dungeon_map.create_rectangular_room(-10, -2, 5, 5)
         
-        # Add dais to left side of room0
-        dais = Dais((start_room0.bounds.left, start_room0.bounds.top + CELL_SIZE), Rotation.ROT_0)
-        start_room0.add_prop(dais)
+        # Decorate the first room
+        decorate_room(start_room0)
 
         # Create second rectangular room connected to first
         start_room, _, passage0, _ = dungeon_map.create_connected_room(
@@ -54,18 +54,9 @@ def main():
             start_door_type=DoorType.OPEN
         )
         
-        # Add props to rooms and passage
-        # Test vertical row layout for columns
-        arrange_columns(start_room, ColumnArrangement.VERTICAL_ROWS, column_type=ColumnType.SQUARE)
-        
-        # Add square columns in a circle arrangement
-        arrange_columns(end_room, ColumnArrangement.CIRCLE, column_type=ColumnType.SQUARE)
-        
-        # Add some rocks to all elements
-        for element in dungeon_map.elements:
-            if isinstance(element, Room):
-                arrange_random_props(element, [PropType.SMALL_ROCK], min_count=0, max_count=5)
-                arrange_random_props(element, [PropType.MEDIUM_ROCK], min_count=0, max_count=5)
+        # Decorate all rooms
+        decorate_room(start_room)
+        decorate_room(end_room)
     
     else:
         rooms = arrange_rooms(dungeon_map, ArrangeRoomStyle.LINEAR, min_rooms=5, max_rooms=7, min_size=3, max_size=7)
