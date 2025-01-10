@@ -11,17 +11,16 @@ from constants import CELL_SIZE
 from graphics.conversions import grid_to_map
 from graphics.crosshatch import draw_crosshatches
 from map.enums import Layers
-from map._arrange.arrange_utils import RoomDirection
+from typing import Generic, Iterator, List, Optional, Sequence, Tuple, TypeVar, TYPE_CHECKING
 from map.grid import GridStyle, draw_region_grid
 from map.mapelement import MapElement
 from map.occupancy import OccupancyGrid
 from map.region import Region
-from map.door import DoorType
-from map.room import RoomType
 
 if TYPE_CHECKING:
-    from map.door import Door
-    from map.room import Room
+    from map._arrange.arrange_utils import RoomDirection
+    from map.door import Door, DoorType
+    from map.room import Room, RoomType
     from map.passage import Passage
     from map.stairs import Stairs
     from options import Options
@@ -281,13 +280,13 @@ class Map:
     def create_connected_room(
         self,
         source_room: 'Room',
-        direction: RoomDirection,
+        direction: 'RoomDirection',
         distance: int,
         room_width: int,
         room_height: int,
-        room_type: Optional[RoomType] = None,
-        start_door_type: Optional[DoorType] = None,
-        end_door_type: Optional[DoorType] = None
+        room_type: Optional['RoomType'] = None,
+        start_door_type: Optional['DoorType'] = None,
+        end_door_type: Optional['DoorType'] = None
     ) -> Tuple['Room', Optional['Door'], 'Passage', Optional['Door']]:
         """Create a new room connected to an existing room via a passage.
         
@@ -370,8 +369,10 @@ class Map:
             min_size: Minimum room size in grid units
             max_size: Maximum room size in grid units
         """
+        # Import here to avoid circular dependencies
         from map._arrange.arrange_rooms import _RoomArranger, GrowDirection
         from map._props.decorate_room import decorate_room
+        from map.room import RoomType
         
         # Create starting room at origin
         start_room = self.create_rectangular_room(0, 0, 
