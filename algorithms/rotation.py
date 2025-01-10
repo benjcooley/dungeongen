@@ -115,6 +115,16 @@ class Rotation:
             return cls.ROT_180
         else:  # 270
             return cls.ROT_270
+            
+    @classmethod
+    def random_cardinal_rotation(cls) -> 'Rotation':
+        """Get a random cardinal rotation (0, 90, 180, or 270 degrees).
+        
+        Returns:
+            Random cardinal Rotation (ROT_0, ROT_90, ROT_180, or ROT_270)
+        """
+        import random
+        return random.choice([cls.ROT_0, cls.ROT_90, cls.ROT_180, cls.ROT_270])
 
 # Initialize cardinal direction constants
 Rotation.ROT_0 = Rotation(0)
