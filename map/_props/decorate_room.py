@@ -31,14 +31,14 @@ def decorate_room(element: 'MapElement') -> None:
                 # For rectangular rooms:
                 # - HORIZONTAL: 3/8 chance
                 # - VERTICAL: 3/8 chance  
-                # - CORNERS: 1/8 chance
-                # - PERIMETER: 1/8 chance
+                # - CIRCLE: 1/8 chance
+                # - SQUARE: 1/8 chance  
                 weights = [3, 3, 1, 1]
                 arrangement = random.choices(
                     [ColumnArrangement.HORIZONTAL_ROWS,
                      ColumnArrangement.VERTICAL_ROWS,
-                     ColumnArrangement.CORNERS,
-                     ColumnArrangement.PERIMETER],
+                     ColumnArrangement.CIRCLE,
+                     ColumnArrangement.SQUARE],
                     weights=weights
                 )[0]
             elif element.room_type == RoomType.CIRCULAR:
