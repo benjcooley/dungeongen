@@ -352,12 +352,10 @@ class _RoomArranger:
             attempts += 1
             
             # Determine which room to grow from based on grow_direction
-            if grow_direction == GrowDirection.BOTH:
-                grow_from_first = random.choice([True, False])
-            elif grow_direction == GrowDirection.BACKWARD:
-                grow_from_first = True
-            else:  # FORWARD
-                grow_from_first = False
+            grow_from_first = (
+                random.random() < 0.5 if grow_direction == GrowDirection.BOTH
+                else grow_direction == GrowDirection.BACKWARD
+            )
             
             # Set source room and growth direction
             if grow_from_first:
