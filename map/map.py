@@ -10,7 +10,8 @@ from algorithms.shapes import Circle, Rectangle, Shape, ShapeGroup
 from constants import CELL_SIZE
 from graphics.conversions import grid_to_map
 from graphics.crosshatch import draw_crosshatches
-from map.enums import Direction, Layers
+from map.enums import Layers
+from map._arrange.arrange_utils import RoomDirection
 from map.grid import GridStyle, draw_region_grid
 from map.mapelement import MapElement
 from map.occupancy import OccupancyGrid
@@ -280,7 +281,7 @@ class Map:
     def create_connected_room(
         self,
         source_room: 'Room',
-        direction: Direction,
+        direction: RoomDirection,
         distance: int,
         room_width: int,
         room_height: int,
