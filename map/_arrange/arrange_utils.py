@@ -15,6 +15,17 @@ class RoomDirection(Enum):
     def get_opposite(self) -> 'RoomDirection':
         """Get the opposite direction."""
         return OPPOSITE_DIRECTIONS[self]
+        
+    def get_offset(self) -> Tuple[int, int]:
+        """Get the (dx, dy) grid offset for this direction."""
+        if self == RoomDirection.NORTH:
+            return (0, -1)
+        elif self == RoomDirection.SOUTH:
+            return (0, 1)
+        elif self == RoomDirection.EAST:
+            return (1, 0)
+        else:  # WEST
+            return (-1, 0)
 
 # Mapping of directions to their opposites
 OPPOSITE_DIRECTIONS: Dict[RoomDirection, RoomDirection] = {
