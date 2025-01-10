@@ -57,7 +57,7 @@ def decorate_room(element: 'MapElement') -> None:
                 dais = Dais(
                     (element.bounds.left + dx * element.bounds.width,
                      element.bounds.top + dy * element.bounds.height),
-                    Rotation.ROT_0
+                    Rotation.random_cardinal_rotation()
                 )
                 element.add_prop(dais)
         
