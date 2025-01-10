@@ -68,7 +68,11 @@ def main():
                 arrange_random_props(element, [PropType.MEDIUM_ROCK], min_count=0, max_count=5)
     
     else:
-        arrange_rooms(dungeon_map, ArrangeRoomStyle.LINEAR, min_rooms=5, max_rooms=7, min_size=3, max_size=7)
+        rooms = arrange_rooms(dungeon_map, ArrangeRoomStyle.LINEAR, min_rooms=5, max_rooms=7, min_size=3, max_size=7)
+        # Decorate each room
+        from map._props.decorate_room import decorate_room
+        for room in rooms:
+            decorate_room(room)
 
     # Draw the map (which will draw all rooms)
     dungeon_map.render(canvas)
