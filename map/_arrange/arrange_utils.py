@@ -40,9 +40,9 @@ def get_room_direction(room1: Room, room2: Room) -> RoomDirection:
     
     # Use the larger distance to determine primary direction
     if abs(dx) > abs(dy):
-        return Direction.EAST if dx > 0 else Direction.WEST
+        return RoomDirection.EAST if dx > 0 else RoomDirection.WEST
     else:
-        return Direction.SOUTH if dy > 0 else Direction.NORTH
+        return RoomDirection.SOUTH if dy > 0 else RoomDirection.NORTH
 
 def get_room_exit_grid_position(room: Room, direction: RoomDirection, wall_pos: float = 0.5) -> Tuple[int, int]:
     """Get a grid position for exiting this room in the given direction.
@@ -65,11 +65,11 @@ def get_room_exit_grid_position(room: Room, direction: RoomDirection, wall_pos: 
     grid_height = int(room.bounds.height / CELL_SIZE)
     
     # Calculate exit point along the wall
-    if direction == Direction.NORTH:
+    if direction == RoomDirection.NORTH:
         return (grid_x + int((grid_width - 1) * wall_pos), grid_y - 1)  # One cell above
-    elif direction == Direction.SOUTH:
+    elif direction == RoomDirection.SOUTH:
         return (grid_x + int((grid_width - 1) * wall_pos), grid_y + grid_height)  # One cell below
-    elif direction == Direction.EAST:
+    elif direction == RoomDirection.EAST:
         return (grid_x + grid_width, grid_y + int((grid_height - 1) * wall_pos))  # One cell right
     else:  # WEST
         return (grid_x - 1, grid_y + int((grid_height - 1) * wall_pos))  # One cell left
