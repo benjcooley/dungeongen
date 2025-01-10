@@ -12,9 +12,7 @@ from map.door import Door, DoorOrientation, DoorType
 from map.passage import Passage
 from algorithms.rotation import Rotation
 from constants import CELL_SIZE
-from map.props import ColumnType, Altar, Coffin, Dais, Rock
-from map.arrange import PropType, arrange_columns, ColumnArrangement, \
-    arrange_random_props, arrange_rooms, ArrangeRoomStyle
+from map.arrange import arrange_rooms, ArrangeRoomStyle
 from map._props.decorate_room import decorate_room
 from options import Options
 from map.enums import Direction
@@ -36,9 +34,6 @@ def main():
         # Create first rectangular room
         start_room0 = dungeon_map.create_rectangular_room(-10, -2, 5, 5)
         
-        # Decorate the first room
-        decorate_room(start_room0)
-
         # Create second rectangular room connected to first
         start_room, _, passage0, _ = dungeon_map.create_connected_room(
             start_room0, direction=Direction.EAST, distance=4, room_width=5, room_height=5,
@@ -54,16 +49,15 @@ def main():
             start_door_type=DoorType.OPEN
         )
         
-        # Decorate all rooms
-        decorate_room(start_room)
-        decorate_room(end_room)
+        # Decorate all map elements
+        for element in dungeon_map.elements:
+            decorate_room(element)
     
     else:
         rooms = arrange_rooms(dungeon_map, ArrangeRoomStyle.LINEAR, min_rooms=5, max_rooms=7, min_size=3, max_size=7)
-        # Decorate each room
-        from map._props.decorate_room import decorate_room
-        for room in rooms:
-            decorate_room(room)
+        # Decorate all map elements
+        for element in dungeon_map.elements:
+            decorate_room(element)
 
     # Draw the map (which will draw all rooms)
     dungeon_map.render(canvas)
