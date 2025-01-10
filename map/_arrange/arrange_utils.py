@@ -2,7 +2,7 @@
 
 from enum import Enum, auto
 from typing import Dict, Tuple
-from map.room import Room
+from map.room import Room, RoomType
 from constants import CELL_SIZE
 
 class Direction(Enum):
@@ -44,32 +44,32 @@ def get_room_direction(room1: Room, room2: Room) -> Direction:
     else:
         return Direction.SOUTH if dy > 0 else Direction.NORTH
 
-def get_room_passage_connection_point(room: Room, direction: Direction) -> Tuple[int, int]:
-    """Get a grid position for connecting to this room from the given direction.
+def get_room_exit_grid_position(room: Room, direction: Direction, wall_pos: float = 0.5) -> Tuple[int, int]:
+    """Get a grid position for exiting this room in the given direction.
     
     Args:
-        room: The room to connect to
-        direction: Which side of the room to connect from
+        room: The room to exit from
+        direction: Which side of the room to exit from
+        wall_pos: Position along the wall to exit from (0.0 to 1.0)
         
     Returns:
-        Tuple of (grid_x, grid_y) for the connection point one cell outside the room
+        Tuple of (grid_x, grid_y) for the exit point one cell outside the room
     """
+    if room.room_type == RoomType.CIRCULAR:
+        wall_pos = 0.5  # Always exit from center for circular rooms
+
     # Get room bounds in grid coordinates
     grid_x = int(room.bounds.x / CELL_SIZE)
     grid_y = int(room.bounds.y / CELL_SIZE)
     grid_width = int(room.bounds.width / CELL_SIZE)
     grid_height = int(room.bounds.height / CELL_SIZE)
     
-    # Calculate center point
-    center_x = grid_x + grid_width // 2
-    center_y = grid_y + grid_height // 2
-    
-    # Return appropriate connection point one cell outside the room
+    # Calculate exit point along the wall
     if direction == Direction.NORTH:
-        return (center_x, grid_y - 1)  # One cell above
+        return (grid_x + int((grid_width - 1) * wall_pos), grid_y - 1)  # One cell above
     elif direction == Direction.SOUTH:
-        return (center_x, grid_y + grid_height)  # One cell below
+        return (grid_x + int((grid_width - 1) * wall_pos), grid_y + grid_height)  # One cell below
     elif direction == Direction.EAST:
-        return (grid_x + grid_width, center_y)  # One cell right
+        return (grid_x + grid_width, grid_y + int((grid_height - 1) * wall_pos))  # One cell right
     else:  # WEST
-        return (grid_x - 1, center_y)  # One cell left
+        return (grid_x - 1, grid_y + int((grid_height - 1) * wall_pos))  # One cell left
