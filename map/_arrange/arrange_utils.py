@@ -5,26 +5,26 @@ from typing import Dict, Tuple
 from map.room import Room, RoomType
 from constants import CELL_SIZE
 
-class Direction(Enum):
+class RoomDirection(Enum):
     """Direction to generate rooms."""
     NORTH = auto()
     SOUTH = auto()
     EAST = auto()
     WEST = auto()
     
-    def get_opposite(self) -> 'Direction':
+    def get_opposite(self) -> 'RoomDirection':
         """Get the opposite direction."""
         return OPPOSITE_DIRECTIONS[self]
 
 # Mapping of directions to their opposites
-OPPOSITE_DIRECTIONS: Dict[Direction, Direction] = {
-    Direction.NORTH: Direction.SOUTH,
-    Direction.SOUTH: Direction.NORTH,
-    Direction.EAST: Direction.WEST,
-    Direction.WEST: Direction.EAST
+OPPOSITE_DIRECTIONS: Dict[RoomDirection, RoomDirection] = {
+    RoomDirection.NORTH: RoomDirection.SOUTH,
+    RoomDirection.SOUTH: RoomDirection.NORTH,
+    RoomDirection.EAST: RoomDirection.WEST,
+    RoomDirection.WEST: RoomDirection.EAST
 }
 
-def get_room_direction(room1: Room, room2: Room) -> Direction:
+def get_room_direction(room1: Room, room2: Room) -> RoomDirection:
     """Determine the primary direction from room1 to room2.
     
     Args:
@@ -44,7 +44,7 @@ def get_room_direction(room1: Room, room2: Room) -> Direction:
     else:
         return Direction.SOUTH if dy > 0 else Direction.NORTH
 
-def get_room_exit_grid_position(room: Room, direction: Direction, wall_pos: float = 0.5) -> Tuple[int, int]:
+def get_room_exit_grid_position(room: Room, direction: RoomDirection, wall_pos: float = 0.5) -> Tuple[int, int]:
     """Get a grid position for exiting this room in the given direction.
     
     Args:
