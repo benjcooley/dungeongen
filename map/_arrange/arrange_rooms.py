@@ -367,12 +367,16 @@ class _RoomArranger:
                 # Grow in primary direction when growing from last room
                 connect_dir = direction
                 
-            # Random passage length (1-4 cells)
-            distance = random.randint(1, 4)
+            # Random passage length (2-4 cells)
+            distance = random.randint(2, 4)
             
-            # Random room size
-            width = random.randint(self.min_size, self.max_size)
-            height = random.randint(self.min_size, self.max_size)
+            # Random room size (must be odd numbers)
+            if connect_dir in (RoomDirection.EAST, RoomDirection.WEST):
+                width = random.randrange(self.min_size, self.max_size + 1, 2)  # Force odd width
+                height = random.randint(self.min_size, self.max_size)
+            else:  # NORTH/SOUTH
+                width = random.randint(self.min_size, self.max_size)
+                height = random.randrange(self.min_size, self.max_size + 1, 2)  # Force odd height
             
             # Randomly decide door types based on passage length
             if distance > 2:

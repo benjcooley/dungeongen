@@ -398,10 +398,10 @@ class Map:
         from map._props.decorate_room import decorate_room
         from map.room import RoomType
         
-        # Create starting room at origin
+        # Create starting room at origin with odd dimensions
         start_room = self.create_rectangular_room(0, 0, 
-            random.randint(min_size, max_size),
-            random.randint(min_size, max_size))
+            random.randrange(min_size, max_size + 1, 2),  # Force odd width
+            random.randrange(min_size, max_size + 1, 2))  # Force odd height
             
         # Randomly choose grow direction
         grow_direction = random.choice(list(GrowDirection))
