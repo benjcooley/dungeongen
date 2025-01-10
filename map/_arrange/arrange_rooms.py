@@ -25,7 +25,7 @@ from map.passage import Passage
 from constants import CELL_SIZE
 from map.door import Door, DoorOrientation, DoorType
 from map._arrange.arrange_utils import Direction as DirectionType
-from map._arrange.arrange_utils import get_room_direction, get_room_passage_connection_point
+from map._arrange.arrange_utils import get_room_direction, get_room_exit_grid_position
 
 class Direction(Enum):
     """Direction to generate rooms."""
@@ -87,8 +87,8 @@ def connect_rooms(
     r2_dir = r1_dir.get_opposite()
             
     # Get connection points in grid coordinates
-    r1_x, r1_y = get_room_passage_connection_point(room1, r1_dir)
-    r2_x, r2_y = get_room_passage_connection_point(room2, r2_dir)
+    r1_x, r1_y = get_room_exit_grid_position(room1, r1_dir)
+    r2_x, r2_y = get_room_exit_grid_position(room2, r2_dir)
     
     # Calculate initial passage length
     dx = abs(r2_x - r1_x) + 1
@@ -259,8 +259,8 @@ class _RoomArranger:
         r2_dir = r1_dir.get_opposite()
                 
         # Get connection points in grid coordinates
-        r1_x, r1_y = get_room_passage_connection_point(room1, r1_dir)
-        r2_x, r2_y = get_room_passage_connection_point(room2, r2_dir)
+        r1_x, r1_y = get_room_exit_grid_position(room1, r1_dir)
+        r2_x, r2_y = get_room_exit_grid_position(room2, r2_dir)
         
         # Convert to map coordinates
         x1, y1 = r1_x * CELL_SIZE, r1_y * CELL_SIZE
@@ -392,8 +392,8 @@ class _RoomArranger:
             new_room = self.create_room(next_x, next_y)
             start_door_elem, passage, end_door_elem = connect_rooms(
                 last_room, new_room,
-                start_door_type=DoorType.DEFAULT,
-                end_door_type=DoorType.DEFAULT,
+                start_door_type=DoorType.OPEN,
+                end_door_type=DoorType.OPEN,
                 dungeon_map=self.dungeon_map
             )
             last_room = new_room  # Update last room
