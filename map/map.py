@@ -67,7 +67,31 @@ class Map:
         return self._bounds
 
     def add_element(self, element: Generic[TMapElement]) -> TMapElement:
-        """Add a map element."""
+        """Add a map element.
+        
+        Args:
+            element: The map element to add
+            
+        Returns:
+            The added element
+            
+        Raises:
+            ValueError: If the element's bounds exceed reasonable limits
+        """
+        # Validate element bounds
+        bounds = element.bounds
+        MAX_DIMENSION = 100 * CELL_SIZE  # 100 grid cells
+        
+        if (abs(bounds.x) > MAX_DIMENSION or 
+            abs(bounds.y) > MAX_DIMENSION or
+            bounds.width > MAX_DIMENSION or 
+            bounds.height > MAX_DIMENSION):
+            raise ValueError(
+                f"Element bounds exceed reasonable limits (±{MAX_DIMENSION}): "
+                f"pos=({bounds.x}, {bounds.y}), "
+                f"size={bounds.width}x{bounds.height}"
+            )
+            
         element._map = self
         element._options = self._options
         self._elements.append(element)
