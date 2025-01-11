@@ -23,6 +23,7 @@ import random
 from algorithms.math import Point2D
 from algorithms.shapes import Circle
 from constants import CELL_SIZE
+from map._arrange.room_shapes import RoomShape, make_room_shape
 
 from map.door import Door, DoorOrientation, DoorType
 from map.enums import Direction
@@ -140,7 +141,8 @@ def create_connected_room(
     room_depth: int,
     room_type: Optional[RoomType] = None,
     start_door_type: Optional[DoorType] = None,
-    end_door_type: Optional[DoorType] = None
+    end_door_type: Optional[DoorType] = None,
+    breadth_offset: float = 0.0
 ) -> Tuple[Room, Optional[Door], Passage, Optional[Door]]:
     """Create a new room connected to an existing room via a passage.
         
@@ -171,10 +173,13 @@ def create_connected_room(
     if room_breadth * room_depth <= 0:
         raise ValueError("Room dimensions must be positive")
             
+    # Create room shape
+    room_shape = make_room_shape(room_type or RoomType.RECTANGULAR, room_breadth, room_depth)
+    
     # Get room rect in grid coordinates using arrange utils
     new_room_x, new_room_y, new_room_width, new_room_height = get_adjacent_room_rect(
         source_room, direction, distance, room_breadth, room_depth,
-        breadth_offset=room_shape.breadth_offset if room_shape else 0.0,
+        breadth_offset=breadth_offset,
         wall_pos=0.5  # TODO: Make this configurable later
     )
         
@@ -314,7 +319,8 @@ class _RoomArranger:
                     room_shape.depth,
                     room_type=room_shape.room_type,
                     start_door_type=start_door,
-                    end_door_type=end_door
+                    end_door_type=end_door,
+                    breadth_offset=room_shape.breadth_offset
                 )
                 
                 # Update first/last room references based on which end we grew from
