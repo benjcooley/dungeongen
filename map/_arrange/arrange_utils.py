@@ -2,7 +2,8 @@
 
 from enum import Enum, auto
 from typing import Dict, Tuple
-from algorithms.math import Point2D
+import skia
+from algorithms.math import Matrix2D, Point2D
 from algorithms.shapes import Rectangle
 from map.room import Room, RoomType
 from constants import CELL_SIZE
@@ -130,6 +131,41 @@ def get_room_exit_grid_position(room: Room, direction: RoomDirection, wall_pos: 
     else:  # WEST
         return (grid_x - 1, grid_y + int((grid_height - 1) * wall_pos))  # One cell left
 
+def make_room_transform(room: Room, direction: RoomDirection) -> Matrix2D:
+    """Create a transform matrix for positioning relative to a room's exit.
+    
+    The transform creates a coordinate space where:
+    - Origin is at the room's exit point
+    - +X axis points in the forward direction
+    - +Y axis points to the left
+    
+    Args:
+        room: The source room
+        direction: Direction to exit from
+        
+    Returns:
+        Matrix2D configured for the local coordinate space
+    """
+    # Get exit point and direction vectors
+    exit_pos = get_room_exit_grid_position(room, direction)
+    forward = direction.get_forward()
+    left = direction.get_left()
+    
+    # Create transform matrix
+    transform = Matrix2D()
+    
+    # Set forward and left vectors as matrix columns
+    transform.a = forward[0]  # Forward X
+    transform.c = forward[1]  # Forward Y
+    transform.b = left[0]     # Left X
+    transform.d = left[1]     # Left Y
+    
+    # Set translation to exit point
+    transform.tx = exit_pos[0]
+    transform.ty = exit_pos[1]
+    
+    return transform
+
 def get_adjacent_room_rect(room: Room, direction: RoomDirection, grid_dist: int, \
                            grid_breadth: int, grid_depth: int, \
                            breadth_offset: float = False) -> Tuple[int, int, int, int]:
@@ -147,56 +183,41 @@ def get_adjacent_room_rect(room: Room, direction: RoomDirection, grid_dist: int,
     
     Returns:
         Tuple of rect of new room relative to passage start point."""
-    # Calculate positions relative to (0,0)
-    p0 = Point2D(0, 0)  # Start point
+    # Get transform for local coordinate space
+    transform = make_room_transform(room, direction)
+    
     print(f"\nCalculating room position:")
-    print(f"  p0 (start): ({p0.x}, {p0.y})")
+    print(f"  Transform matrix:")
+    print(f"    [{transform.a:.1f} {transform.b:.1f} {transform.tx:.1f}]")
+    print(f"    [{transform.c:.1f} {transform.d:.1f} {transform.ty:.1f}]")
     
-    # Get direction vectors
-    forward_vec = direction.get_forward()
-    left_vec = direction.get_left()
-    print(f"  forward vector: {forward_vec}")
-    print(f"  left vector: {left_vec}")
-    
-    # Go forward to end of passage
-    dist = grid_dist - 1
-    p1 = Point2D(
-        p0.x + forward_vec[0] * dist,
-        p0.y + forward_vec[1] * dist
-    )
-    print(f"  p1 (passage end): ({p1.x}, {p1.y})")
-    
-    # Go one more forward, then room_breadth/2 to the left
+    # Calculate room corners in local space
+    dist = grid_dist - 1  # Distance to passage end
     left_offset = int((grid_breadth - 1) / 2 + breadth_offset)
+    
+    # First corner: forward to passage end + 1, then left offset
+    p1 = Point2D(dist + 1, left_offset)
+    print(f"  p1 (local space): ({p1.x}, {p1.y})")
+    
+    # Second corner: add depth-1 forward, subtract breadth-1 left
     p2 = Point2D(
-        p1.x + forward_vec[0] + left_vec[0] * left_offset,
-        p1.y + forward_vec[1] + left_vec[1] * left_offset
+        p1.x + (grid_depth - 1),
+        p1.y - (grid_breadth - 1)
     )
-    print(f"  p2 (room corner): ({p2.x}, {p2.y})")
-    print(f"    breadth offset calc: {(grid_breadth - 1) / 2 + breadth_offset}")
+    print(f"  p2 (local space): ({p2.x}, {p2.y})")
     
-    # Go room_depth - 1 forward, then room_breadth - 1 to the right
-    depth = grid_depth - 1
-    breadth = grid_breadth - 1
-    p3 = Point2D(
-        p2.x + forward_vec[0] * depth - left_vec[0] * breadth,
-        p2.y + forward_vec[1] * depth - left_vec[1] * breadth
-    )
-    print(f"  p3 (opposite corner): ({p3.x}, {p3.y})")
+    # Transform corners to world space
+    p1_world = transform.transform_point(p1)
+    p2_world = transform.transform_point(p2)
+    print(f"  p1 (world space): ({p1_world.x}, {p1_world.y})")
+    print(f"  p2 (world space): ({p2_world.x}, {p2_world.y})")
     
-    # Get actual start position
-    start_pos = get_room_exit_grid_position(room, direction)
-    
-    # Calculate local space rectangle first
-    local_rect = (min(p2.x, p3.x), min(p2.y, p3.y), abs(p3.x - p2.x) + 1, abs(p3.y - p2.y) + 1)
-    print(f"  local rect: ({local_rect[0]}, {local_rect[1]}, {local_rect[2]}, {local_rect[3]})")
-    
-    # Transform to world space
+    # Calculate final rectangle in world space
     final_rect = (
-        local_rect[0] + start_pos[0],
-        local_rect[1] + start_pos[1],
-        local_rect[2],
-        local_rect[3]
+        int(min(p1_world.x, p2_world.x)),
+        int(min(p1_world.y, p2_world.y)),
+        int(abs(p2_world.x - p1_world.x)) + 1,
+        int(abs(p2_world.y - p1_world.y)) + 1
     )
     print(f"  final rect: ({final_rect[0]}, {final_rect[1]}, {final_rect[2]}, {final_rect[3]})")
     return final_rect
