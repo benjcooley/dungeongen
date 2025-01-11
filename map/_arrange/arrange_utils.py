@@ -147,16 +147,23 @@ def get_adjacent_room_rect(room: Room, direction: RoomDirection, grid_dist: int,
     
     Returns:
         Tuple of rect of new room relative to passage start point."""
-    forward = Point2D(direction.get_forward())
-    left = Point2D(direction.get_left())
-    
     # Calculate positions relative to (0,0)
     p0 = Point2D(0, 0)  # Start point
     print(f"\nCalculating room position:")
     print(f"  p0 (start): ({p0.x}, {p0.y})")
     
+    # Get direction vectors
+    forward_vec = direction.get_forward()
+    left_vec = direction.get_left()
+    print(f"  forward vector: {forward_vec}")
+    print(f"  left vector: {left_vec}")
+    
     # Go forward to end of passage
-    p1 = p0 + forward * (grid_dist - 1)
+    dist = grid_dist - 1
+    p1 = Point2D(
+        p0.x + forward_vec[0] * dist,
+        p0.y + forward_vec[1] * dist
+    )
     print(f"  p1 (passage end): ({p1.x}, {p1.y})")
     
     # Go one more forward, then room_breadth/2 to the left
