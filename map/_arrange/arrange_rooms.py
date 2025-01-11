@@ -6,24 +6,19 @@ Includes functions for:
 - Creating connected rooms with passages and doors
 - Arranging rooms in different patterns (linear, symmetric, spiral)
 - Managing room shapes and sizes
+
+Available arrangement styles:
+- ArrangeSymmetric: Arranges rooms in symmetrical patterns, attempting to maintain
+  left/right balance where possible. Good for formal dungeon layouts like temples.
+- ArrangeLinear: Arranges rooms in a more or less linear fashion, good for
+  dungeons that tell a story or represent a journey from start to finish.
+- ArrangeSpiral: Arranges rooms in a spiral pattern expanding outward from the
+  center. Good for creating maze-like dungeons that loop back on themselves.
 """
 
 from map.room import Room, RoomType
 from map.door import Door, DoorType
 from map.passage import Passage
-
-- ArrangeSymmetric: Arranges rooms in symmetrical patterns, attempting to maintain
-  left/right balance where possible. Good for formal dungeon layouts like temples.
-
-- ArrangeLinear: Arranges rooms in a more or less linear fashion, good for
-  dungeons that tell a story or represent a journey from start to finish.
-
-- ArrangeSpiral: Arranges rooms in a spiral pattern expanding outward from the
-  center. Good for creating maze-like dungeons that loop back on themselves.
-
-  This is a submodule of the arrange.py module. Update this aggregator module
-  when you add new symbols here.
-"""
 
 from enum import Enum, auto
 from typing import List, Optional, Tuple
