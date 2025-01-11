@@ -284,10 +284,19 @@ class _RoomArranger:
                 
             # Get random room shape
             room_shape = get_random_room_shape(last_shape)
+            print(f"\nRoom shape selected:")
+            print(f"  Type: {room_shape.room_type}")
+            print(f"  Breadth: {room_shape.breadth}")
+            print(f"  Depth: {room_shape.depth}")
+            print(f"  Offset: {room_shape.breadth_offset}")
             
             # Get passage configuration using our distribution system
             from map._arrange.passage_distribution import get_random_passage_config
             passage_config = get_random_passage_config()
+            print(f"Passage config:")
+            print(f"  Length: {passage_config.length}")
+            print(f"  Start door: {passage_config.doors.start_door}")
+            print(f"  End door: {passage_config.doors.end_door}")
             
             # Extract configuration
             distance = passage_config.length

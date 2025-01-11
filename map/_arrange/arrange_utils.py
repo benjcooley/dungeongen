@@ -146,15 +146,35 @@ def get_adjacent_room_rect(room: Room, direction: RoomDirection, grid_dist: int,
         breadth_offset: A float shift value to right/left of the new rooms placement (for alternating how room grid positions round)
     
     Returns:
-        Tuple of rect of new room."""
+        Tuple of rect of new room relative to passage start point."""
     forward = Point2D(direction.get_forward())
     left = Point2D(direction.get_left())
-    # Start from the room's exit grid (exit grid cell outside of room)
-    p0 = Point2D(get_room_exit_grid_position(room, direction))
-    # Go forward to grid at end of passage outside the new room
+    
+    # Calculate positions relative to (0,0)
+    p0 = Point2D(0, 0)  # Start point
+    print(f"\nCalculating room position:")
+    print(f"  p0 (start): ({p0.x}, {p0.y})")
+    
+    # Go forward to end of passage
     p1 = p0 + forward * (grid_dist - 1)
-    # Go one grid forward, then room_breadth/2 to the left
+    print(f"  p1 (passage end): ({p1.x}, {p1.y})")
+    
+    # Go one more forward, then room_breadth/2 to the left
     p2 = p1 + forward + left * int((grid_breadth - 1) / 2 + breadth_offset)
+    print(f"  p2 (room corner): ({p2.x}, {p2.y})")
+    print(f"    breadth offset calc: {(grid_breadth - 1) / 2 + breadth_offset}")
+    
     # Go room_depth - 1 forward, then room_breadth - 1 to the right
     p3 = p2 + forward * (grid_depth - 1) + -left * (grid_breadth - 1)
-    return (min(p2.x, p3.x), min(p2.y, p2.y), abs(p3.x - p2.x) + 1, abs(p3.y - p2.y) + 1)
+    print(f"  p3 (opposite corner): ({p3.x}, {p3.y})")
+    
+    # Get actual start position
+    start = Point2D(get_room_exit_grid_position(room, direction))
+    print(f"  actual start pos: ({start.x}, {start.y})")
+    
+    # Calculate final rect and offset by start position
+    rect = (min(p2.x, p3.x), min(p2.y, p3.y), abs(p3.x - p2.x) + 1, abs(p3.y - p2.y) + 1)
+    final_rect = (rect[0] + start.x, rect[1] + start.y, rect[2], rect[3])
+    print(f"  relative rect: ({rect[0]}, {rect[1]}, {rect[2]}, {rect[3]})")
+    print(f"  final rect: ({final_rect[0]}, {final_rect[1]}, {final_rect[2]}, {final_rect[3]})")
+    return final_rect
