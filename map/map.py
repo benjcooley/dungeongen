@@ -367,8 +367,8 @@ class Map:
         new_room = self.add_element(Room.from_grid(
             new_room_x,
             new_room_y,
-            new_room_width,
-            new_room_height,
+            room_width,
+            room_height,
             room_type=room_type
         ))
         

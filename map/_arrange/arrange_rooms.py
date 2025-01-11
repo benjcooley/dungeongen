@@ -181,8 +181,8 @@ def create_connected_room(
     new_room = self.add_element(Room.from_grid(
         new_room_x,
         new_room_y,
-        room_width,
-        room_height,
+        new_room_width,
+        new_room_height,
         room_type=room_type
     ))
     
