@@ -38,7 +38,7 @@ def decorate_room(element: 'MapElement') -> None:
                     [ColumnArrangement.HORIZONTAL_ROWS,
                      ColumnArrangement.VERTICAL_ROWS,
                      ColumnArrangement.CIRCLE,
-                     ColumnArrangement.SQUARE],
+                     ColumnArrangement.GRID],
                     weights=weights
                 )[0]
             else:  # CIRCULAR rooms must use CIRCLE arrangement

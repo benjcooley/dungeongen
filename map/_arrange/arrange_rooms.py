@@ -20,12 +20,15 @@ from typing import List, Optional, Tuple
 import random
 from algorithms.shapes import Circle
 from map.map import Map
+from map.mapelement import MapElement
 from map.room import Room
 from map.passage import Passage
 from constants import CELL_SIZE
 from map.door import Door, DoorOrientation, DoorType
 from map.enums import Direction
-from map._arrange.arrange_utils import get_room_direction, get_room_exit_grid_position, RoomDirection
+from map._arrange.arrange_utils import get_room_direction, get_room_exit_grid_position, \
+    grid_points_to_grid_rect, grid_line_to_grid_deltas, grid_line_dist, get_adjacent_room_rect, \
+    RoomDirection
 
 class GrowDirection(Enum):
     """Controls which room to grow from when arranging."""
@@ -49,8 +52,7 @@ def connect_rooms(
     room1: Room,
     room2: Room,
     start_door_type: Optional[DoorType] = None,
-    end_door_type: Optional[DoorType] = None,
-    dungeon_map: Optional[Map] = None
+    end_door_type: Optional[DoorType] = None
 ) -> Tuple[Optional[Door], Optional[Passage], Optional[Door]]:
     """Create a passage between two rooms with optional doors.
     
@@ -59,17 +61,12 @@ def connect_rooms(
         room2: Second room to connect 
         start_door_type: Optional door type at start of passage
         end_door_type: Optional door type at end of passage
-        dungeon_map: Optional map instance (will use room1's map if not provided)
         
     Returns:
-        Tuple of (start_door, passage, end_door) where any element may be None
-        
-    Raises:
-        ValueError: If there isn't enough space for requested doors
+        Tuple of (start_door, passage, end_door) where doors may be None
     """
-    # Use room1's map if none provided
-    dungeon_map = dungeon_map or room1._map
-    
+    map = room1.map
+
     # Get the primary direction between rooms
     r1_dir = get_room_direction(room1, room2)
     
@@ -78,76 +75,266 @@ def connect_rooms(
             
     # Get connection points in grid coordinates
     r1_x, r1_y = get_room_exit_grid_position(room1, r1_dir)
-    r2_x, r2_y = get_room_exit_grid_position(room2, r2_dir)
-    
-    # Calculate initial passage length
-    dx = abs(r2_x - r1_x) + 1
-    dy = abs(r2_y - r1_y) + 1
-    passage_length = max(dx, dy)
-    
-    # Subtract space for each door
-    if start_door_type is not None:
-        passage_length -= 1
-    if end_door_type is not None:
-        passage_length -= 1
-        
-    # Check if we have enough space
-    if passage_length < 0:
-        raise ValueError(f"Not enough space between rooms for doors")
-    
-    # Create list to track elements for connecting later
-    elements = []
-    
-    # Determine orientation and direction
-    is_horizontal = dx > dy
-    orientation = DoorOrientation.HORIZONTAL if is_horizontal else DoorOrientation.VERTICAL
-    going_positive = r2_x > r1_x if is_horizontal else r2_y > r1_y
-    
-    # Ensure points are ordered correctly
-    if (is_horizontal and r1_x > r2_x) or (not is_horizontal and r1_y > r2_y):
-        r1_x, r2_x = r2_x, r1_x
-        r1_y, r2_y = r2_y, r1_y
+    r2_x, r2_y = get_room_exit_grid_position(room2, r2_dir, grid_origin=(r1_x, r1_y))
 
-    # Set up movement direction
-    next_x, next_y = (1, 0) if is_horizontal else (0, 1)
-    
-    # Create first door and move connection point
-    door1 = None
-    if start_door_type is not None:
-        door1 = Door.from_grid(r1_x, r1_y, orientation, door_type=start_door_type)
-        # Move connection point one grid space into passage
-        r1_x, r1_y = r1_x + next_x, r1_y + next_y
-            
-    # Create end door and move connection point
-    door2 = None
-    if end_door_type is not None:
-        door2 = Door.from_grid(r2_x, r2_y, orientation, door_type=end_door_type)
-        # Move connection point one grid space back from passage
-        r2_x, r2_y = r2_x - next_x, r2_y - next_y
-    
-    # Create passage if we have length remaining
-    passage = None
-    if passage_length > 0:
-        passage = Passage.from_grid_points(r1_x, r1_y, r2_x, r2_y)
+    # Make sure we don't have too many doors
+    dist = grid_line_dist(r1_x, r1_y, r2_x, r2_y)
+    if start_door_type is not None and end_door_type is not None and dist <= 3:
+        raise ValueError("Cannot have two doors in a passage 3 grids or smaller")
 
-    # Build ordered list of elements
-    elements = [room1]
-    if door1:
-        elements.append(door1)
-        dungeon_map.add_element(door1)
-    if passage:
-        elements.append(passage)
-        dungeon_map.add_element(passage)
-    if door2:
-        elements.append(door2)
-        dungeon_map.add_element(door2)
-    elements.append(room2)
+    # Deltas
+    dx, dy = grid_line_to_grid_deltas(r1_x, r1_y, r2_x, r2_y)
+
+    door1: Optional[Door] = None
+    door2: Optional[Door] = None
+    passage: Optional[Passage] = None
+
+    door_orientation = DoorOrientation.HORIZONTAL if dx else DoorOrientation.VERTICAL
+
+    if dist > 0 and start_door_type is not None:
+        door1 = Door.from_grid(r1_x, r1_y, door_orientation, door_type=start_door_type)
+        map.add_element(door1)
+        r1_x += dx
+        r1_y += dy
+        dist -= 1
+
+    if dist > 0 and end_door_type is not None:
+        door2 = Door.from_grid(r2_x, r2_y, door_orientation, door_type=end_door_type)
+        map.add_element(door2)
+        r2_x -= dx
+        r2_y -= dy
+        dist -= 1
+
+    if dist > 0:
+        passage = Passage.from_grid(r1_x, r1_y, abs(r2_x - r1_x) + 1, abs(r2_y - r1_y) + 1)
+        map.add_element(passage)
     
-    # Connect elements in sequence
-    for i in range(len(elements) - 1):
-        elements[i].connect_to(elements[i + 1])
+    # Connect everything based on which door types were specified
+    elems: List[MapElement] = [room1]    
+    if start_door_type is not None:
+        elems.append(door1)
+    if passage is not None:
+        elems.append(passage)
+    if end_door_type is not None:
+        elems.append(door2)
+    elems.append(room2)
+
+    for i in range(len(elems) - 1):
+        elems[i].connect_to(elems[i + 1])
         
     return door1, passage, door2
+
+def create_connected_room(
+    self,
+    source_room: 'Room',
+    direction: 'RoomDirection',
+    distance: int,
+    room_width: int,
+    room_height: int,
+    room_type: Optional['RoomType'] = None,
+    start_door_type: Optional['DoorType'] = None,
+    end_door_type: Optional['DoorType'] = None
+) -> Tuple['Room', Optional['Door'], 'Passage', Optional['Door']]:
+    """Create a new room connected to an existing room via a passage.
+    
+    Creates a new Room of the specified type and size, positioned in the given direction
+    and distance from the source room. The rooms are connected by a Passage with optional
+    doors at either end.
+    
+    Args:
+        source_room: The existing room to connect from
+        direction: Direction to create the new room
+        distance: Grid distance to place the new room (must be > 0)
+        room_width: Width of new room in grid units (must be > 0)
+        room_height: Height of new room in grid units (must be > 0)
+        room_type: Optional RoomType (defaults to RECTANGULAR)
+        start_door_type: Optional DoorType for start of passage
+        end_door_type: Optional DoorType for end of passage
+        
+    Returns:
+        Tuple of (new_room, start_door, passage, end_door) where:
+        - new_room: The newly created Room instance
+        - start_door: Door at start of passage (None if start_door_type is None)
+        - passage: The connecting Passage instance
+        - end_door: Door at end of passage (None if end_door_type is None)
+    """    
+    # Validate inputs
+    if distance <= 0:
+        raise ValueError("Distance must be positive")
+    if room_width * room_height >= 6:
+        raise ValueError("Room dimensions must be positive")
+        
+    # Validate source room type
+    if not isinstance(source_room, Room):
+        raise TypeError("source_room must be a Room instance")
+        
+    # Get source room center in grid coordinates
+    src_bounds = source_room.bounds
+    src_center_x = int((src_bounds.x / CELL_SIZE) + (src_bounds.width / CELL_SIZE / 2))
+    src_center_y = int((src_bounds.y / CELL_SIZE) + (src_bounds.height / CELL_SIZE / 2))
+    
+    # Get direction offset
+    dx, dy = direction.get_forward()
+    dx *= distance + int((src_bounds.width / CELL_SIZE) / 2) + int(room_width / 2)
+    dy *= distance + int((src_bounds.height / CELL_SIZE) / 2) + int(room_height / 2)
+        
+    # Calculate new room position in grid coordinates
+    new_room_x = src_center_x + dx - (room_width // 2)
+    new_room_y = src_center_y + dy - (room_height // 2)
+        
+    # Create the new room
+    from map.room import Room, RoomType
+    room_type = room_type or RoomType.RECTANGULAR
+    new_room = self.add_element(Room.from_grid(
+        new_room_x,
+        new_room_y,
+        room_width,
+        room_height,
+        room_type=room_type
+    ))
+    
+    # Connect the rooms using the utility function
+    start_door_elem, passage, end_door_elem = connect_rooms(
+        source_room, new_room,
+        start_door_type=start_door_type,
+        end_door_type=end_door_type,
+        dungeon_map=self
+    )
+    
+    return new_room, start_door_elem, passage, end_door_elem
+
+
+class _RoomArranger:
+    """Helper class for arranging rooms with shared state."""
+    
+    def __init__(
+        self,
+        dungeon_map: Map,
+        min_size: int,
+        max_size: int,
+        min_spacing: int = 2,
+        max_spacing: int = 4
+    ):
+        self.dungeon_map = dungeon_map
+        self.min_size = min_size
+        self.max_size = max_size
+        self.min_spacing = min_spacing
+        self.max_spacing = max_spacing
+        self.rooms: List[Room] = []
+        
+    def create_room(self, entrance_grid_x: float, entrance_grid_y: float) -> Room:
+        """Create a room at the given grid position."""
+        # Sanity checks for position
+        if abs(grid_x) > 1000 or abs(grid_y) > 1000:
+            raise ValueError(f"Room position ({grid_x}, {grid_y}) is too far from origin")
+        
+        width = height = 0
+        while width * height < 6: # 2x3 minimum room size
+            width = random.randint(self.min_size, self.max_size)
+            height = random.randint(self.min_size, self.max_size)
+        
+        # Sanity checks for dimensions
+        if width > 100 or height > 100:
+            raise ValueError(f"Room dimensions {width}x{height} exceed maximum allowed size")
+        print(f"\nGenerating room {len(self.rooms) + 1}:")
+        print(f"  Grid position: ({grid_x}, {grid_y})")
+        print(f"  Grid size: {width}x{height}")
+
+        room = self.dungeon_map.add_rectangular_room(grid_x, grid_y, width, height)
+        print(f"  Map bounds: ({room.bounds.x}, {room.bounds.y}) to ({room.bounds.x + room.bounds.width}, {room.bounds.y + room.bounds.height})")
+        self.rooms.append(room)
+        return room
+
+    def arrange_linear(
+        self,
+        num_rooms: int,
+        start_room: Room,
+        direction: 'RoomDirection' = RoomDirection.EAST,
+        grow_direction: GrowDirection = GrowDirection.FORWARD,
+        max_attempts: int = 100
+    ) -> List[Room]:
+        """Arrange rooms in a linear sequence.
+        
+        Args:
+            num_rooms: Number of rooms to generate
+            start_room: Starting room to build from
+            direction: Primary direction to grow in
+            grow_direction: Controls which room to grow from
+            max_attempts: Maximum attempts before giving up
+            
+        Returns:
+            List of created rooms
+        """
+        self.rooms = [start_room]  # Reset rooms list
+        first_room = last_room = start_room
+            
+        attempts = 0
+        while len(self.rooms) < num_rooms and attempts < max_attempts:
+            attempts += 1
+            
+            # Determine which room to grow from based on grow_direction
+            grow_from_first = (
+                random.random() < 0.5 if grow_direction == GrowDirection.BOTH
+                else grow_direction == GrowDirection.BACKWARD
+            )
+            
+            # Set source room and growth direction
+            if grow_from_first:
+                source_room = first_room
+                # Grow in opposite direction when growing from first room
+                connect_dir = direction.get_opposite()
+            else:
+                source_room = last_room
+                # Grow in primary direction when growing from last room
+                connect_dir = direction
+                
+            # Random passage length
+            distance = random.randint(1, 8)
+            
+            # Random room size (must be odd numbers)
+            breadth = random.randrange(self.min_size, self.max_size + 1, 2)  # Force odd height
+            depth = random.randint(self.min_size, self.max_size)
+            
+            # Randomly decide door types based on passage length
+            if distance > 1:
+                start_door = random.choice([None, DoorType.OPEN, DoorType.CLOSED])
+                end_door = random.choice([None, DoorType.OPEN, DoorType.CLOSED])
+            else:
+                # For short passages, only use at most one door
+                if random.random() < 0.5:
+                    start_door = random.choice([DoorType.OPEN, DoorType.CLOSED])
+                    end_door = None
+                else:
+                    start_door = None
+                    end_door = random.choice([DoorType.OPEN, DoorType.CLOSED])
+            
+            get_
+            try:
+                # Create connected room
+                new_room, _, _, _ = self.dungeon_map.create_connected_room(
+                    source_room,
+                    connect_dir,
+                    distance,
+                    width,
+                    height,
+                    start_door_type=start_door,
+                    end_door_type=end_door
+                )
+                
+                # Update first/last room references based on which end we grew from
+                if grow_from_first:
+                    first_room = new_room
+                else:
+                    last_room = new_room
+                    
+                self.rooms.append(new_room)
+                attempts = 0  # Reset attempts on success
+                
+            except ValueError:
+                # If room creation fails, try again
+                continue
+                
+        return self.rooms
 
 def arrange_rooms(
     dungeon_map: Map,
@@ -188,232 +375,3 @@ def arrange_rooms(
     else:  # SPIRAL
         # TODO: Implement spiral arrangement
         return []
-
-class _RoomArranger:
-    """Helper class for arranging rooms with shared state."""
-    
-    def __init__(
-        self,
-        dungeon_map: Map,
-        min_size: int,
-        max_size: int,
-        min_spacing: int = 2,
-        max_spacing: int = 4
-    ):
-        self.dungeon_map = dungeon_map
-        self.min_size = min_size
-        self.max_size = max_size
-        self.min_spacing = min_spacing
-        self.max_spacing = max_spacing
-        self.rooms: List[Room] = []
-        
-    def create_room(self, grid_x: float, grid_y: float) -> Room:
-        """Create a room at the given grid position."""
-        # Sanity checks for position
-        if abs(grid_x) > 1000 or abs(grid_y) > 1000:
-            raise ValueError(f"Room position ({grid_x}, {grid_y}) is too far from origin")
-            
-        width = random.randint(self.min_size, self.max_size)
-        height = random.randint(self.min_size, self.max_size)
-        
-        # Sanity checks for dimensions
-        if width < 1 or height < 1:
-            raise ValueError(f"Invalid room dimensions: {width}x{height}")
-        if width > 100 or height > 100:
-            raise ValueError(f"Room dimensions {width}x{height} exceed maximum allowed size")
-        print(f"\nGenerating room {len(self.rooms) + 1}:")
-        print(f"  Grid position: ({grid_x}, {grid_y})")
-        print(f"  Grid size: {width}x{height}")
-        room = self.dungeon_map.add_rectangular_room(grid_x, grid_y, width, height)
-        print(f"  Map bounds: ({room.bounds.x}, {room.bounds.y}) to ({room.bounds.x + room.bounds.width}, {room.bounds.y + room.bounds.height})")
-        self.rooms.append(room)
-        return room
-        
-
-    def connect_rooms(
-        self,
-        room1: Room,
-        room2: Room,
-        start_door_type: Optional[DoorType] = None,
-        end_door_type: Optional[DoorType] = None
-    ) -> Tuple[Optional[Door], Passage, Optional[Door]]:
-        """Create a passage between two rooms with optional doors.
-        
-        Args:
-            room1: First room to connect
-            room2: Second room to connect 
-            start_door_type: Optional door type at start of passage
-            end_door_type: Optional door type at end of passage
-            
-        Returns:
-            Tuple of (start_door, passage, end_door) where doors may be None
-        """
-        # Get the primary direction between rooms
-        r1_dir = get_room_direction(room1, room2)
-        
-        # Get the opposite direction for room2
-        r2_dir = r1_dir.get_opposite()
-                
-        # Get connection points in grid coordinates
-        r1_x, r1_y = get_room_exit_grid_position(room1, r1_dir)
-        r2_x, r2_y = get_room_exit_grid_position(room2, r2_dir)
-        
-        # Convert to map coordinates
-        x1, y1 = r1_x * CELL_SIZE, r1_y * CELL_SIZE
-        x2, y2 = r2_x * CELL_SIZE, r2_y * CELL_SIZE
-        
-        print(f"\nCreating passage:")
-        print(f"  Room1 connection point: ({x1}, {y1})")
-        print(f"  Room2 connection point: ({x2}, {y2})")
-        
-        # Determine passage dimensions and position
-        if abs(x2 - x1) > abs(y2 - y1):  # Horizontal passage
-            passage_x = min(x1, x2)
-            passage_width = abs(x2 - x1)
-            passage_y = (y1 + y2) / 2 - 0.5  # Center between rooms
-            
-            print(f"  Horizontal passage:")
-            print(f"    Position: ({passage_x}, {passage_y})")
-            print(f"    Width: {passage_width}")
-            
-            # Convert passage position to grid coordinates
-            grid_passage_x = passage_x / CELL_SIZE
-            grid_passage_y = passage_y / CELL_SIZE
-            grid_passage_width = passage_width / CELL_SIZE
-            
-            # Create passage and doors
-            passage = Passage.from_grid(grid_passage_x, grid_passage_y, grid_passage_width, 1, self.dungeon_map)
-            door1 = Door.from_grid(grid_passage_x, grid_passage_y, DoorOrientation.HORIZONTAL, 
-                                 self.dungeon_map, door_type=start_door_type)
-            door2 = Door.from_grid(grid_passage_x + grid_passage_width - 1, grid_passage_y,
-                                 DoorOrientation.HORIZONTAL, self.dungeon_map, door_type=end_door_type)
-        else:
-            passage_x = (x1 + x2) / 2 - 0.5  # Center between rooms
-            passage_y = min(y1, y2)
-            passage_height = abs(y2 - y1)
-            
-            # Calculate grid coordinates
-            grid_passage_x = round(passage_x / CELL_SIZE)
-            grid_passage_y = round(passage_y / CELL_SIZE)
-            grid_passage_height = round(abs(y2 - y1) / CELL_SIZE)
-            
-            print(f"  Vertical passage:")
-            print(f"    Position: ({grid_passage_x}, {grid_passage_y})")
-            print(f"    Height: {grid_passage_height}")
-            
-            passage = Passage.from_grid(grid_passage_x, grid_passage_y, 1, grid_passage_height, self.dungeon_map)
-            door1 = Door.from_grid(grid_passage_x, grid_passage_y, DoorOrientation.VERTICAL, 
-                                 self.dungeon_map, door_type=start_door_type)
-            door2 = Door.from_grid(grid_passage_x, grid_passage_y + grid_passage_height - 1,
-                                 DoorOrientation.VERTICAL, self.dungeon_map, door_type=end_door_type)
-        
-        # Connect everything based on which door types were specified
-        if start_door_type is not None:
-            room1.connect_to(door1)
-            door1.connect_to(passage)
-        else:
-            room1.connect_to(passage)
-            door1 = None
-            
-        if end_door_type is not None:
-            passage.connect_to(door2)
-            door2.connect_to(room2)
-        else:
-            passage.connect_to(room2)
-            door2 = None
-            
-        return door1, passage, door2
-
-    def arrange_linear(
-        self,
-        num_rooms: int,
-        start_room: Room,
-        direction: 'RoomDirection' = RoomDirection.EAST,
-        grow_direction: GrowDirection = GrowDirection.BOTH,
-        max_attempts: int = 100
-    ) -> List[Room]:
-        """Arrange rooms in a linear sequence.
-        
-        Args:
-            num_rooms: Number of rooms to generate
-            start_room: Starting room to build from
-            direction: Primary direction to grow in
-            grow_direction: Controls which room to grow from
-            max_attempts: Maximum attempts before giving up
-            
-        Returns:
-            List of created rooms
-        """
-        self.rooms = [start_room]  # Reset rooms list
-        first_room = last_room = start_room
-            
-        attempts = 0
-        while len(self.rooms) < num_rooms and attempts < max_attempts:
-            attempts += 1
-            
-            # Determine which room to grow from based on grow_direction
-            grow_from_first = (
-                random.random() < 0.5 if grow_direction == GrowDirection.BOTH
-                else grow_direction == GrowDirection.BACKWARD
-            )
-            
-            # Set source room and growth direction
-            if grow_from_first:
-                source_room = first_room
-                # Grow in opposite direction when growing from first room
-                connect_dir = direction.get_opposite()
-            else:
-                source_room = last_room
-                # Grow in primary direction when growing from last room
-                connect_dir = direction
-                
-            # Random passage length (2-4 cells)
-            distance = random.randint(2, 4)
-            
-            # Random room size (must be odd numbers)
-            if connect_dir in (RoomDirection.EAST, RoomDirection.WEST):
-                width = random.randrange(self.min_size, self.max_size + 1, 2)  # Force odd width
-                height = random.randint(self.min_size, self.max_size)
-            else:  # NORTH/SOUTH
-                width = random.randint(self.min_size, self.max_size)
-                height = random.randrange(self.min_size, self.max_size + 1, 2)  # Force odd height
-            
-            # Randomly decide door types based on passage length
-            if distance > 2:
-                start_door = random.choice([None, DoorType.OPEN, DoorType.CLOSED])
-                end_door = random.choice([None, DoorType.OPEN, DoorType.CLOSED])
-            else:
-                # For short passages, only use at most one door
-                if random.random() < 0.5:
-                    start_door = random.choice([DoorType.OPEN, DoorType.CLOSED])
-                    end_door = None
-                else:
-                    start_door = None
-                    end_door = random.choice([DoorType.OPEN, DoorType.CLOSED])
-            
-            try:
-                # Create connected room
-                new_room, _, _, _ = self.dungeon_map.create_connected_room(
-                    source_room,
-                    connect_dir,
-                    distance,
-                    width,
-                    height,
-                    start_door_type=start_door,
-                    end_door_type=end_door
-                )
-                
-                # Update first/last room references based on which end we grew from
-                if grow_from_first:
-                    first_room = new_room
-                else:
-                    last_room = new_room
-                    
-                self.rooms.append(new_room)
-                attempts = 0  # Reset attempts on success
-                
-            except ValueError:
-                # If room creation fails, try again
-                continue
-                
-        return self.rooms

@@ -43,6 +43,11 @@ class MapElement:
     def options(self) -> 'Options':
         """Get the current options."""
         return self._options
+    
+    @property
+    def map(self) -> 'Map':
+        """Get the current map element is in."""
+        return self._map
 
     @property
     def connections(self) -> Sequence['MapElement']:

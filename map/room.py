@@ -52,6 +52,7 @@ class Room(MapElement):
                 width: float = 0, \
                 height: float = 0, \
                 room_type: RoomType = RoomType.RECTANGULAR) -> None:
+        self._room_type = room_type
         if room_type == RoomType.CIRCULAR:
             if width != height:
                 raise ValueError("Circular rooms must have equal width and height.")
@@ -60,6 +61,11 @@ class Room(MapElement):
             shape = Rectangle(x, y, width, height)
         super().__init__(shape)
     
+    @property
+    def room_type(self) -> RoomType:
+        """Get the room type."""
+        return self._room_type
+
     def _draw_corner(self, canvas: skia.Canvas, corner: Point2D, left: Point2D, right: Point2D) -> None:
         """Draw a single corner decoration.
         

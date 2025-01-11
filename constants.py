@@ -2,3 +2,4 @@
 
 # Size of a single grid cell in pixels
 CELL_SIZE = 64
+

@@ -354,7 +354,7 @@ class Map:
         src_center_y = int((src_bounds.y / CELL_SIZE) + (src_bounds.height / CELL_SIZE / 2))
         
         # Get direction offset
-        dx, dy = direction.get_offset()
+        dx, dy = direction.get_forward()
         dx *= distance + int((src_bounds.width / CELL_SIZE) / 2) + int(room_width / 2)
         dy *= distance + int((src_bounds.height / CELL_SIZE) / 2) + int(room_height / 2)
             
@@ -379,12 +379,11 @@ class Map:
             source_room, new_room,
             start_door_type=start_door_type,
             end_door_type=end_door_type,
-            dungeon_map=self
         )
         
         return new_room, start_door_elem, passage, end_door_elem
 
-    def generate(self, min_rooms: int = 5, max_rooms: int = 7, min_size: int = 3, max_size: int = 7) -> None:
+    def generate(self, min_rooms: int = 3, max_rooms: int = 3, min_size: int = 3, max_size: int = 5) -> None:
         """Generate a random dungeon map.
         
         Args:
@@ -404,7 +403,7 @@ class Map:
             random.randrange(min_size, max_size + 1, 2))  # Force odd height
             
         # Randomly choose grow direction
-        grow_direction = random.choice(list(GrowDirection))
+        grow_direction = GrowDirection.FORWARD # random.choice(list(GrowDirection))
         
         # Create room arranger and generate linear layout
         arranger = _RoomArranger(self, min_size, max_size)
