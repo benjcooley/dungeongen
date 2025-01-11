@@ -3,7 +3,7 @@
 from dataclasses import dataclass
 from typing import Dict, Any, Tuple, List
 from map.room import RoomType
-from ._arrange.distribution import normalize_distribution, get_from_distribution
+from map._arrange.distribution import normalize_distribution, get_from_distribution
 
 @dataclass
 class RoomShape:
