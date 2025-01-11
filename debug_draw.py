@@ -43,7 +43,7 @@ def debug_draw_grid_point(x: int, y: int, color: str = 'RED', label: str = '') -
     
     # Draw label if provided
     if label:
-        paint.textSize = float(DEBUG_FONT_SIZE)
+        paint.setTextSize(float(DEBUG_FONT_SIZE))
         paint.setTypeface(skia.Typeface(DEBUG_FONT_FAMILY))
         _debug_canvas.drawString(label, px + 5, py + 5, paint)
 
@@ -106,7 +106,7 @@ def debug_draw_grid_label(x: int, y: int, text: str, color: str = 'DARK_BLUE') -
     
     # Draw text
     paint = skia.Paint(Color=DEBUG_COLORS[color])
-    paint.textSize = float(DEBUG_FONT_SIZE)
+    paint.setTextSize(float(DEBUG_FONT_SIZE))
     paint.setTypeface(skia.Typeface(DEBUG_FONT_FAMILY))
     paint.setAntiAlias(True)
     paint.setTextAlign(skia.Paint.kCenter_Align)
@@ -119,7 +119,7 @@ def debug_draw_map_label(x: float, y: float, text: str, color: str = 'DARK_BLUE'
         
     # Draw text
     paint = skia.Paint(Color=DEBUG_COLORS[color])
-    paint.textSize = float(DEBUG_FONT_SIZE)
+    paint.setTextSize(float(DEBUG_FONT_SIZE))
     paint.setTypeface(skia.Typeface(DEBUG_FONT_FAMILY))
     paint.setAntiAlias(True)
     paint.setTextAlign(skia.Paint.kCenter_Align)
