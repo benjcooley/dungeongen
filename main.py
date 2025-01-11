@@ -18,31 +18,11 @@ def main():
     # Create map
     dungeon_map = Map(options)
 
-    # Initialize debug drawing
-    from debug_draw import debug_draw_init, debug_draw_grid_point, debug_draw_grid_line
-    from debug_draw import debug_draw_grid_rect, debug_draw_grid_label, debug_draw_map_label
+    # Generate random dungeon
+    dungeon_map.generate()
     
-    debug_draw_init(canvas)
-    
-    # Test grid points
-    debug_draw_grid_point(0, 0, 'RED', 'Origin')
-    debug_draw_grid_point(2, 2, 'BLUE', 'Point A')
-    debug_draw_grid_point(5, 2, 'GREEN', 'Point B')
-    
-    # Test grid lines and arrows
-    debug_draw_grid_line(2, 2, 5, 2, 'BLUE', arrow=True)
-    debug_draw_grid_line(2, 2, 2, 5, 'RED', arrow=True)
-    
-    # Test rectangles
-    debug_draw_grid_rect(1, 1, 3, 3, 'DARK_GREEN')
-    debug_draw_grid_rect(4, 4, 2, 2, 'PURPLE')
-    
-    # Test labels
-    debug_draw_grid_label(3, 3, "Grid Label")
-    debug_draw_map_label(200, 200, "Map Label")
-    
-    # # Draw the map (empty for now)
-    # dungeon_map.render(canvas)
+    # Draw the map
+    dungeon_map.render(canvas)
 
     # Save as PNG
     image = surface.makeImageSnapshot()
