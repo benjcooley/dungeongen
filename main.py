@@ -12,6 +12,9 @@ def main():
     surface = skia.Surface(options.canvas_width, options.canvas_height)
     canvas = surface.getCanvas()
     
+    # Fill canvas with white background
+    canvas.clear(skia.Color(255, 255, 255))
+    
     # Create map
     dungeon_map = Map(options)
 
