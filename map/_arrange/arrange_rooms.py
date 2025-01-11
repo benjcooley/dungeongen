@@ -16,25 +16,27 @@ Available arrangement styles:
   center. Good for creating maze-like dungeons that loop back on themselves.
 """
 
-from map.room import Room, RoomType
-from map.door import Door, DoorType
-from map.passage import Passage
-
 from enum import Enum, auto
 from typing import List, Optional, Tuple
 import random
+
+from algorithms.math import Point2D
 from algorithms.shapes import Circle
+from constants import CELL_SIZE
+
+from map.door import Door, DoorOrientation, DoorType
+from map.enums import Direction
 from map.map import Map
 from map.mapelement import MapElement
-from map.room import Room, RoomType
 from map.passage import Passage
-from constants import CELL_SIZE
-from map.door import Door, DoorOrientation, DoorType
+from map.room import Room, RoomType
+
+from map._arrange.arrange_utils import (
+    get_room_direction, get_room_exit_grid_position,
+    grid_points_to_grid_rect, grid_line_to_grid_deltas, 
+    grid_line_dist, get_adjacent_room_rect, RoomDirection
+)
 from map._arrange.passage_distribution import PassageConfig
-from map.enums import Direction
-from map._arrange.arrange_utils import get_room_direction, get_room_exit_grid_position, \
-    grid_points_to_grid_rect, grid_line_to_grid_deltas, grid_line_dist, get_adjacent_room_rect, \
-    RoomDirection
 
 class GrowDirection(Enum):
     """Controls which room to grow from when arranging."""
