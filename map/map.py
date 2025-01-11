@@ -383,7 +383,7 @@ class Map:
         
         return new_room, start_door_elem, passage, end_door_elem
 
-    def generate(self, min_rooms: int = 3, max_rooms: int = 3, min_size: int = 3, max_size: int = 5) -> None:
+    def generate(self, min_rooms: int = 3, max_rooms: int = 5, min_size: int = 4, max_size: int = 7) -> None:
         """Generate a random dungeon map.
         
         Args:
