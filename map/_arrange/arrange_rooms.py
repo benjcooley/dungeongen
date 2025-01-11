@@ -265,8 +265,11 @@ class _RoomArranger:
         Returns:
             List of created rooms
         """
+        from map._arrange.room_shapes import get_random_room_shape, RoomShape
+        
         self.rooms = [start_room]  # Reset rooms list
         first_room = last_room = start_room
+        last_shape = None
             
         attempts = 0
         while len(self.rooms) < num_rooms and attempts < max_attempts:
@@ -281,19 +284,14 @@ class _RoomArranger:
             # Set source room and growth direction
             if grow_from_first:
                 source_room = first_room
-                # Grow in opposite direction when growing from first room
-                connect_dir = direction.get_opposite()
+                connect_dir = direction.get_opposite()  # Grow in opposite direction
             else:
                 source_room = last_room
-                # Grow in primary direction when growing from last room
-                connect_dir = direction
+                connect_dir = direction  # Grow in primary direction
                 
-            # Random passage length
+            # Get random room shape and passage properties
+            room_shape = get_random_room_shape(last_shape)
             distance = random.randint(1, 8)
-            
-            # Random room size (must be odd numbers)
-            breadth = random.randrange(self.min_size, self.max_size + 1, 2)  # Force odd height
-            depth = random.randint(self.min_size, self.max_size)
             
             # Randomly decide door types based on passage length
             if distance > 1:
@@ -307,8 +305,6 @@ class _RoomArranger:
                 else:
                     start_door = None
                     end_door = random.choice([DoorType.OPEN, DoorType.CLOSED])
-            
-            passage_rect, room_rect = get_adjacent_room_rect(source_room, connect_dir, distance, breadth, depth)
 
             try:
                 # Create connected room
@@ -316,8 +312,9 @@ class _RoomArranger:
                     source_room,
                     connect_dir,
                     distance,
-                    breadth,
-                    depth,
+                    room_shape.breadth,
+                    room_shape.depth,
+                    room_type=room_shape.room_type,
                     start_door_type=start_door,
                     end_door_type=end_door
                 )
@@ -329,6 +326,7 @@ class _RoomArranger:
                     last_room = new_room
                     
                 self.rooms.append(new_room)
+                last_shape = room_shape
                 attempts = 0  # Reset attempts on success
                 
             except ValueError:
