@@ -38,7 +38,7 @@ def debug_draw_grid_point(x: int, y: int, color: str = 'RED', label: str = '') -
     py = y * CELL_SIZE + CELL_SIZE/2
     
     # Draw point circle
-    paint = skia.Paint(Color=DEBUG_COLORS[color], StrokeWidth=2)
+    paint = skia.Paint(Color=DEBUG_COLORS[color], StrokeWidth=4)
     _debug_canvas.drawCircle(px, py, 3, paint)
     
     # Draw label if provided
@@ -59,7 +59,7 @@ def debug_draw_grid_line(x1: int, y1: int, x2: int, y2: int, color: str = 'BLUE'
     py2 = y2 * CELL_SIZE + CELL_SIZE/2
     
     # Draw line
-    paint = skia.Paint(Color=DEBUG_COLORS[color], StrokeWidth=2)
+    paint = skia.Paint(Color=DEBUG_COLORS[color], StrokeWidth=4)
     _debug_canvas.drawLine(px1, py1, px2, py2, paint)
     
     if arrow:
@@ -91,7 +91,7 @@ def debug_draw_grid_rect(x: int, y: int, width: int, height: int, color: str = '
     pheight = height * CELL_SIZE
     
     # Draw rectangle
-    paint = skia.Paint(Color=DEBUG_COLORS[color], Style=skia.Paint.kStroke_Style, StrokeWidth=2)
+    paint = skia.Paint(Color=DEBUG_COLORS[color], Style=skia.Paint.kStroke_Style, StrokeWidth=4)
     _debug_canvas.drawRect(skia.Rect(px, py, px + pwidth, py + pheight), paint)
 
 def debug_draw_grid_label(x: int, y: int, text: str, color: str = 'DARK_BLUE') -> None:
