@@ -25,6 +25,7 @@ from map.room import Room, RoomType
 from map.passage import Passage
 from constants import CELL_SIZE
 from map.door import Door, DoorOrientation, DoorType
+from map._arrange.passage_distribution import PassageConfig
 from map.enums import Direction
 from map._arrange.arrange_utils import get_room_direction, get_room_exit_grid_position, \
     grid_points_to_grid_rect, grid_line_to_grid_deltas, grid_line_dist, get_adjacent_room_rect, \
@@ -289,22 +290,17 @@ class _RoomArranger:
                 source_room = last_room
                 connect_dir = direction  # Grow in primary direction
                 
-            # Get random room shape and passage properties
+            # Get random room shape
             room_shape = get_random_room_shape(last_shape)
-            distance = random.randint(1, 8)
             
-            # Randomly decide door types based on passage length
-            if distance > 1:
-                start_door = random.choice([None, DoorType.OPEN, DoorType.CLOSED])
-                end_door = random.choice([None, DoorType.OPEN, DoorType.CLOSED])
-            else:
-                # For short passages, only use at most one door
-                if random.random() < 0.5:
-                    start_door = random.choice([DoorType.OPEN, DoorType.CLOSED])
-                    end_door = None
-                else:
-                    start_door = None
-                    end_door = random.choice([DoorType.OPEN, DoorType.CLOSED])
+            # Get passage configuration using our distribution system
+            from map._arrange.passage_distribution import get_random_passage_config
+            passage_config = get_random_passage_config()
+            
+            # Extract configuration
+            distance = passage_config.length
+            start_door = passage_config.doors.start_door
+            end_door = passage_config.doors.end_door
 
             try:
                 # Create connected room
