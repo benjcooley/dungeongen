@@ -126,7 +126,6 @@ def connect_rooms(
     return door1, passage, door2
 
 def create_connected_room(
-    self,
     source_room: 'Room',
     direction: 'RoomDirection',
     distance: int,
@@ -178,7 +177,7 @@ def create_connected_room(
     # Create the new room
     from map.room import Room, RoomType
     room_type = room_type or RoomType.RECTANGULAR
-    new_room = self.add_element(Room.from_grid(
+    new_room = source_room.map.add_element(Room.from_grid(
         new_room_x,
         new_room_y,
         new_room_width,

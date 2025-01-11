@@ -312,68 +312,13 @@ class Map:
         start_door_type: Optional['DoorType'] = None,
         end_door_type: Optional['DoorType'] = None
     ) -> Tuple['Room', Optional['Door'], 'Passage', Optional['Door']]:
-        """Create a new room connected to an existing room via a passage.
-        
-        Creates a new Room of the specified type and size, positioned in the given direction
-        and distance from the source room. The rooms are connected by a Passage with optional
-        doors at either end.
-        
-        Args:
-            source_room: The existing room to connect from
-            direction: Direction to create the new room
-            distance: Grid distance to place the new room (must be > 0)
-            room_width: Width of new room in grid units (must be > 0)
-            room_height: Height of new room in grid units (must be > 0)
-            room_type: Optional RoomType (defaults to RECTANGULAR)
-            start_door_type: Optional DoorType for start of passage
-            end_door_type: Optional DoorType for end of passage
-            
-        Returns:
-            Tuple of (new_room, start_door, passage, end_door) where:
-            - new_room: The newly created Room instance
-            - start_door: Door at start of passage (None if start_door_type is None)
-            - passage: The connecting Passage instance
-            - end_door: Door at end of passage (None if end_door_type is None)
-        """
-        from map._arrange.arrange_rooms import connect_rooms
-        
-        # Validate inputs
-        if distance <= 0:
-            raise ValueError("Distance must be positive")
-        if room_width <= 0 or room_height <= 0:
-            raise ValueError("Room dimensions must be positive")
-            
-        # Validate source room type
-        from map.room import Room
-        if not isinstance(source_room, Room):
-            raise TypeError("source_room must be a Room instance")
-            
-        # Get room rect in grid coordinates using arrange utils
-        from map._arrange.arrange_utils import get_adjacent_room_rect
-        new_room_x, new_room_y, room_width, room_height = get_adjacent_room_rect(
-            source_room, direction, distance, room_width, room_height
+        """Create a new room connected to an existing room via a passage."""
+        from map._arrange.arrange_rooms import create_connected_room
+        return create_connected_room(
+            source_room, direction, distance,
+            room_width, room_height, room_type,
+            start_door_type, end_door_type
         )
-        
-        # Create the new room
-        from map.room import Room, RoomType
-        room_type = room_type or RoomType.RECTANGULAR
-        new_room = self.add_element(Room.from_grid(
-            new_room_x,
-            new_room_y,
-            room_width,
-            room_height,
-            room_type=room_type
-        ))
-        
-        
-        # Connect the rooms using the utility function
-        start_door_elem, passage, end_door_elem = connect_rooms(
-            source_room, new_room,
-            start_door_type=start_door_type,
-            end_door_type=end_door_type,
-        )
-        
-        return new_room, start_door_elem, passage, end_door_elem
 
     def generate(self, min_rooms: int = 3, max_rooms: int = 5, min_size: int = 4, max_size: int = 7) -> None:
         """Generate a random dungeon map.
