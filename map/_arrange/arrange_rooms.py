@@ -174,7 +174,7 @@ def create_connected_room(
     # Get room rect in grid coordinates using arrange utils
     new_room_x, new_room_y, new_room_width, new_room_height = get_adjacent_room_rect(
         source_room, direction, distance, room_breadth, room_depth,
-        breadth_offset=room_type.breadth_offset if room_type else 0.0,
+        breadth_offset=room_shape.breadth_offset if room_shape else 0.0,
         wall_pos=0.5  # TODO: Make this configurable later
     )
         
