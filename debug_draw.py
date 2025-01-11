@@ -4,7 +4,7 @@ import math
 import skia
 from typing import Tuple, Optional
 from algorithms.math import Point2D
-from constants import CELL_SIZE
+from constants import CELL_SIZE, DEBUG_FONT_FAMILY, DEBUG_FONT_SIZE
 
 # Predefined colors for debug visualization with good contrast on white
 DEBUG_COLORS = {
@@ -43,7 +43,8 @@ def debug_draw_grid_point(x: int, y: int, color: str = 'RED', label: str = '') -
     
     # Draw label if provided
     if label:
-        paint.setTextSize(10)
+        paint.setTextSize(DEBUG_FONT_SIZE)
+        paint.setTypeface(skia.Typeface(DEBUG_FONT_FAMILY))
         _debug_canvas.drawString(label, px + 5, py + 5, paint)
 
 def debug_draw_grid_line(x1: int, y1: int, x2: int, y2: int, color: str = 'BLUE',
@@ -105,7 +106,8 @@ def debug_draw_grid_label(x: int, y: int, text: str, color: str = 'DARK_BLUE') -
     
     # Draw text
     paint = skia.Paint(Color=DEBUG_COLORS[color])
-    paint.setTextSize(12)
+    paint.setTextSize(DEBUG_FONT_SIZE)
+    paint.setTypeface(skia.Typeface(DEBUG_FONT_FAMILY))
     paint.setAntiAlias(True)
     paint.setTextAlign(skia.Paint.kCenter_Align)
     _debug_canvas.drawString(text, px, py, paint)
@@ -117,7 +119,8 @@ def debug_draw_map_label(x: float, y: float, text: str, color: str = 'DARK_BLUE'
         
     # Draw text
     paint = skia.Paint(Color=DEBUG_COLORS[color])
-    paint.setTextSize(12)
+    paint.setTextSize(DEBUG_FONT_SIZE)
+    paint.setTypeface(skia.Typeface(DEBUG_FONT_FAMILY))
     paint.setAntiAlias(True)
     paint.setTextAlign(skia.Paint.kCenter_Align)
     _debug_canvas.drawString(text, x, y - 5, paint)  # Offset up slightly
