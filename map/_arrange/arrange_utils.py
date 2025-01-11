@@ -185,12 +185,19 @@ def get_adjacent_room_rect(room: Room, direction: RoomDirection, grid_dist: int,
     print(f"  p3 (opposite corner): ({p3.x}, {p3.y})")
     
     # Get actual start position
-    start = Point2D(get_room_exit_grid_position(room, direction))
-    print(f"  actual start pos: ({start.x}, {start.y})")
+    start_pos = get_room_exit_grid_position(room, direction)
     
-    # Calculate final rect and offset by start position
-    rect = (min(p2.x, p3.x), min(p2.y, p3.y), abs(p3.x - p2.x) + 1, abs(p3.y - p2.y) + 1)
-    final_rect = (rect[0] + start.x, rect[1] + start.y, rect[2], rect[3])
+    # Calculate local space rectangle first
+    local_rect = (min(p2.x, p3.x), min(p2.y, p3.y), abs(p3.x - p2.x) + 1, abs(p3.y - p2.y) + 1)
+    print(f"  local rect: ({local_rect[0]}, {local_rect[1]}, {local_rect[2]}, {local_rect[3]})")
+    
+    # Transform to world space
+    final_rect = (
+        local_rect[0] + start_pos[0],
+        local_rect[1] + start_pos[1],
+        local_rect[2],
+        local_rect[3]
+    )
     print(f"  relative rect: ({rect[0]}, {rect[1]}, {rect[2]}, {rect[3]})")
     print(f"  final rect: ({final_rect[0]}, {final_rect[1]}, {final_rect[2]}, {final_rect[3]})")
     return final_rect
