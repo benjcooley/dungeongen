@@ -38,8 +38,8 @@ def main():
     debug_draw_grid_label(3, 3, "Grid Label")
     debug_draw_map_label(200, 200, "Map Label")
     
-    # Draw the map (empty for now)
-    dungeon_map.render(canvas)
+    # # Draw the map (empty for now)
+    # dungeon_map.render(canvas)
 
     # Save as PNG
     image = surface.makeImageSnapshot()
