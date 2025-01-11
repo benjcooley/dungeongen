@@ -131,7 +131,7 @@ def get_room_exit_grid_position(room: Room, direction: RoomDirection, wall_pos: 
         return (grid_x - 1, grid_y + int((grid_height - 1) * wall_pos))  # One cell left
 
 def get_adjacent_room_rect(room: Room, direction: RoomDirection, grid_dist: int, \
-                           room_breadth: int, room_depth: int) -> Tuple[Rectangle, Rectangle]:
+                           grid_breadth: int, grid_depth: int, align_right: bool = False) -> Tuple[int, int, int, int]:
     """Return the rectangle for a new passage and new room tht is grid_dist in the given direction
     from the existing room, with the breadth (forward diretion width relative width) and depth 
     (forward direction relative lentgth) of the new room.
@@ -144,7 +144,7 @@ def get_adjacent_room_rect(room: Room, direction: RoomDirection, grid_dist: int,
         room_depth: Length of the new room in the forward direction
     
     Returns:
-        Tuple of (passage rect, room)"""  
+        Tuple of rect of new room."""
     forward = Point2D(direction.get_forward())
     left = Point2D(direction.get_left())
     # Start from the room's exit grid (exit grid cell outside of room)
@@ -152,10 +152,7 @@ def get_adjacent_room_rect(room: Room, direction: RoomDirection, grid_dist: int,
     # Go forward to grid at end of passage outside the new room
     p1 = p0 + forward * (grid_dist - 1)
     # Go one grid forward, then room_breadth/2 to the left
-    p2 = p1 + forward + left * int((room_breadth - 1) / 2)
+    p2 = p1 + forward + left * int((grid_breadth - 1) / 2)
     # Go room_depth - 1 forward, then room_breadth - 1 to the right
-    p3 = p2 + forward * (room_depth - 1) + -left * (room_breadth - 1)
-    return ( \
-        Rectangle(min(p2.x, p3.x), min(p2.y, p2.y), abs(p3.x - p2.x) + 1, abs(p3.y - p2.y) + 1), \
-        Rectangle(min(p2.x, p3.x), min(p2.y, p2.y), abs(p3.x - p2.x) + 1, abs(p3.y - p2.y) + 1) \
-        )
+    p3 = p2 + forward * (grid_depth - 1) + -left * (grid_breadth - 1)
+    return (min(p2.x, p3.x), min(p2.y, p2.y), abs(p3.x - p2.x) + 1, abs(p3.y - p2.y) + 1)
