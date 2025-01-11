@@ -11,7 +11,6 @@ from constants import CELL_SIZE
 from graphics.conversions import grid_to_map
 from graphics.crosshatch import draw_crosshatches
 from map.enums import Layers
-from map._arrange.arrange_utils import RoomDirection
 from typing import Generic, Iterator, List, Optional, Sequence, Tuple, TypeVar, TYPE_CHECKING
 from map.grid import GridStyle, draw_region_grid
 from map.mapelement import MapElement
@@ -325,8 +324,7 @@ class Map:
             start_door_type, end_door_type
         )
 
-    def generate(self, min_rooms: int = 3, max_rooms: int = 5, min_size: int = 4, max_size: int = 7, 
-                initial_direction: 'RoomDirection' = None) -> None:
+    def generate(self, min_rooms: int = 3, max_rooms: int = 5, min_size: int = 4, max_size: int = 7) -> None:
         """Generate a random dungeon map.
         
         Args:
@@ -354,14 +352,16 @@ class Map:
             initial_shape.breadth,  # Use breadth for width
             initial_shape.depth)    # Use depth for height
             
-        # Use provided or random initial direction
-        if initial_direction is None:
-            initial_direction = random.choice([
-                RoomDirection.NORTH,
-                RoomDirection.SOUTH, 
-                RoomDirection.EAST,
-                RoomDirection.WEST
-            ])
+        # Import here to avoid circular dependencies
+        from map._arrange.arrange_utils import RoomDirection
+        
+        # Choose random initial direction
+        initial_direction = random.choice([
+            RoomDirection.NORTH,
+            RoomDirection.SOUTH, 
+            RoomDirection.EAST,
+            RoomDirection.WEST
+        ])
         print(f"  Initial direction: {initial_direction}")
         
         # Create room arranger and generate linear layout
