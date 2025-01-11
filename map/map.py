@@ -324,7 +324,8 @@ class Map:
             start_door_type, end_door_type
         )
 
-    def generate(self, min_rooms: int = 3, max_rooms: int = 5, min_size: int = 4, max_size: int = 7) -> None:
+    def generate(self, min_rooms: int = 3, max_rooms: int = 5, min_size: int = 4, max_size: int = 7, 
+                initial_direction: 'RoomDirection' = None) -> None:
         """Generate a random dungeon map.
         
         Args:
@@ -352,15 +353,23 @@ class Map:
             initial_shape.breadth,  # Use breadth for width
             initial_shape.depth)    # Use depth for height
             
-        # Randomly choose grow direction
-        grow_direction = GrowDirection.FORWARD # random.choice(list(GrowDirection))
+        # Use provided or random initial direction
+        if initial_direction is None:
+            initial_direction = random.choice([
+                RoomDirection.NORTH,
+                RoomDirection.SOUTH, 
+                RoomDirection.EAST,
+                RoomDirection.WEST
+            ])
+        print(f"  Initial direction: {initial_direction}")
         
         # Create room arranger and generate linear layout
         arranger = _RoomArranger(self, min_size, max_size)
         rooms = arranger.arrange_linear(
             random.randint(min_rooms, max_rooms),
             start_room,
-            grow_direction=grow_direction
+            direction=initial_direction,
+            grow_direction=GrowDirection.FORWARD
         )
         
         # Decorate all elements

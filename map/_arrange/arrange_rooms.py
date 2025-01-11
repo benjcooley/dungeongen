@@ -248,7 +248,7 @@ class _RoomArranger:
         self,
         num_rooms: int,
         start_room: Room,
-        direction: 'RoomDirection' = RoomDirection.EAST,
+        direction: 'RoomDirection',
         grow_direction: GrowDirection = GrowDirection.FORWARD,
         max_attempts: int = 100
     ) -> List[Room]:
