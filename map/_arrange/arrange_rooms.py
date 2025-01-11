@@ -212,8 +212,8 @@ class _RoomArranger:
         dungeon_map: Map,
         min_size: int,
         max_size: int,
-        min_spacing: int = 2,
-        max_spacing: int = 4
+        min_spacing: int = 3,
+        max_spacing: int = 6
     ):
         self.dungeon_map = dungeon_map
         self.min_size = min_size
