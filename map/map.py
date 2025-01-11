@@ -319,7 +319,7 @@ class Map:
             
         from map._arrange.arrange_rooms import create_connected_room
         return create_connected_room(
-            self, source_room, direction, distance,
+            source_room, direction, distance,
             room_width, room_height, room_type,
             start_door_type, end_door_type
         )
