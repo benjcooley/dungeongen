@@ -93,3 +93,44 @@ def debug_draw_grid_rect(x: int, y: int, width: int, height: int, color: str = '
     # Draw rectangle
     paint = skia.Paint(Color=DEBUG_COLORS[color], Style=skia.Paint.kStroke_Style, StrokeWidth=2)
     _debug_canvas.drawRect(skia.Rect(px, py, px + pwidth, py + pheight), paint)
+
+def debug_draw_grid_label(x: int, y: int, text: str, color: str = 'DARK_BLUE') -> None:
+    """Draw text label above a grid point."""
+    if _debug_canvas is None:
+        return
+        
+    # Convert grid coords to pixels and offset up for label
+    px = x * CELL_SIZE + CELL_SIZE/2
+    py = y * CELL_SIZE - 5  # Position above the grid point
+    
+    # Draw text
+    paint = skia.Paint(Color=DEBUG_COLORS[color])
+    paint.setTextSize(12)
+    paint.setAntiAlias(True)
+    paint.setTextAlign(skia.Paint.kCenter_Align)
+    _debug_canvas.drawString(text, px, py, paint)
+
+def debug_draw_map_label(x: float, y: float, text: str, color: str = 'DARK_BLUE') -> None:
+    """Draw text label at map coordinates."""
+    if _debug_canvas is None:
+        return
+        
+    # Draw text
+    paint = skia.Paint(Color=DEBUG_COLORS[color])
+    paint.setTextSize(12)
+    paint.setAntiAlias(True)
+    paint.setTextAlign(skia.Paint.kCenter_Align)
+    _debug_canvas.drawString(text, x, y - 5, paint)  # Offset up slightly
+    """Draw a rectangle outline at grid coordinates."""
+    if _debug_canvas is None:
+        return
+        
+    # Convert grid coords to pixels
+    px = x * CELL_SIZE
+    py = y * CELL_SIZE
+    pwidth = width * CELL_SIZE
+    pheight = height * CELL_SIZE
+    
+    # Draw rectangle
+    paint = skia.Paint(Color=DEBUG_COLORS[color], Style=skia.Paint.kStroke_Style, StrokeWidth=2)
+    _debug_canvas.drawRect(skia.Rect(px, py, px + pwidth, py + pheight), paint)
