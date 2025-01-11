@@ -313,9 +313,13 @@ class Map:
         end_door_type: Optional['DoorType'] = None
     ) -> Tuple['Room', Optional['Door'], 'Passage', Optional['Door']]:
         """Create a new room connected to an existing room via a passage."""
+        # Verify source room belongs to this map
+        if source_room.map is not self:
+            raise ValueError("Source room must belong to this map")
+            
         from map._arrange.arrange_rooms import create_connected_room
         return create_connected_room(
-            source_room, direction, distance,
+            self, source_room, direction, distance,
             room_width, room_height, room_type,
             start_door_type, end_door_type
         )
