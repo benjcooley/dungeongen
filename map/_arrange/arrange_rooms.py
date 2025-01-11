@@ -130,28 +130,28 @@ def create_connected_room(
     source_room: 'Room',
     direction: 'RoomDirection',
     distance: int,
-    room_width: int,
-    room_height: int,
+    room_breadth: int,
+    room_depth: int,
     room_type: Optional['RoomType'] = None,
     start_door_type: Optional['DoorType'] = None,
     end_door_type: Optional['DoorType'] = None
 ) -> Tuple['Room', Optional['Door'], 'Passage', Optional['Door']]:
     """Create a new room connected to an existing room via a passage.
-    
+        
     Creates a new Room of the specified type and size, positioned in the given direction
     and distance from the source room. The rooms are connected by a Passage with optional
     doors at either end.
-    
+        
     Args:
         source_room: The existing room to connect from
         direction: Direction to create the new room
         distance: Grid distance to place the new room (must be > 0)
-        room_width: Width of new room in grid units (must be > 0)
-        room_height: Height of new room in grid units (must be > 0)
+        room_breadth: Width perpendicular to growth direction (must be > 0)
+        room_depth: Length parallel to growth direction (must be > 0)
         room_type: Optional RoomType (defaults to RECTANGULAR)
         start_door_type: Optional DoorType for start of passage
         end_door_type: Optional DoorType for end of passage
-        
+            
     Returns:
         Tuple of (new_room, start_door, passage, end_door) where:
         - new_room: The newly created Room instance
@@ -162,26 +162,18 @@ def create_connected_room(
     # Validate inputs
     if distance <= 0:
         raise ValueError("Distance must be positive")
-    if room_width * room_height >= 6:
+    if room_breadth * room_depth <= 0:
         raise ValueError("Room dimensions must be positive")
-        
+            
     # Validate source room type
     if not isinstance(source_room, Room):
         raise TypeError("source_room must be a Room instance")
-        
-    # Get source room center in grid coordinates
-    src_bounds = source_room.bounds
-    src_center_x = int((src_bounds.x / CELL_SIZE) + (src_bounds.width / CELL_SIZE / 2))
-    src_center_y = int((src_bounds.y / CELL_SIZE) + (src_bounds.height / CELL_SIZE / 2))
-    
-    # Get direction offset
-    dx, dy = direction.get_forward()
-    dx *= distance + int((src_bounds.width / CELL_SIZE) / 2) + int(room_width / 2)
-    dy *= distance + int((src_bounds.height / CELL_SIZE) / 2) + int(room_height / 2)
-        
-    # Calculate new room position in grid coordinates
-    new_room_x = src_center_x + dx - (room_width // 2)
-    new_room_y = src_center_y + dy - (room_height // 2)
+            
+    # Get room rect in grid coordinates using arrange utils
+    from map._arrange.arrange_utils import get_adjacent_room_rect
+    new_room_x, new_room_y, new_room_width, new_room_height = get_adjacent_room_rect(
+        source_room, direction, distance, room_breadth, room_depth
+    )
         
     # Create the new room
     from map.room import Room, RoomType
