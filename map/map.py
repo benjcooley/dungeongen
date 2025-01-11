@@ -11,6 +11,7 @@ from constants import CELL_SIZE
 from graphics.conversions import grid_to_map
 from graphics.crosshatch import draw_crosshatches
 from map.enums import Layers
+from map._arrange.arrange_utils import RoomDirection
 from typing import Generic, Iterator, List, Optional, Sequence, Tuple, TypeVar, TYPE_CHECKING
 from map.grid import GridStyle, draw_region_grid
 from map.mapelement import MapElement
