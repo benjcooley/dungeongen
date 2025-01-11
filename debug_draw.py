@@ -39,7 +39,7 @@ def debug_draw_grid_point(x: int, y: int, color: str = 'RED', label: str = '') -
     
     # Draw point circle
     paint = skia.Paint(Color=DEBUG_COLORS[color], StrokeWidth=4)
-    _debug_canvas.drawCircle(px, py, 3, paint)
+    _debug_canvas.drawCircle(px, py, 6, paint)
     
     # Draw label if provided
     if label:
@@ -65,7 +65,7 @@ def debug_draw_grid_line(x1: int, y1: int, x2: int, y2: int, color: str = 'BLUE'
     if arrow:
         # Calculate arrow head
         angle = math.atan2(py2 - py1, px2 - px1)
-        arrow_size = 10
+        arrow_size = 20
         arrow1_x = px2 - arrow_size * math.cos(angle + math.pi/6)
         arrow1_y = py2 - arrow_size * math.sin(angle + math.pi/6)
         arrow2_x = px2 - arrow_size * math.cos(angle - math.pi/6)
