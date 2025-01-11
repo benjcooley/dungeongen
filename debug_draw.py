@@ -6,18 +6,18 @@ from typing import Tuple, Optional
 from algorithms.math import Point2D
 from constants import CELL_SIZE
 
-# Predefined colors for debug visualization
+# Predefined colors for debug visualization with good contrast on white
 DEBUG_COLORS = {
-    'red': skia.Color(255, 0, 0),
-    'green': skia.Color(0, 255, 0), 
-    'blue': skia.Color(0, 0, 255),
-    'yellow': skia.Color(255, 255, 0),
-    'cyan': skia.Color(0, 255, 255),
-    'magenta': skia.Color(255, 0, 255),
-    'orange': skia.Color(255, 165, 0),
-    'purple': skia.Color(128, 0, 128),
-    'brown': skia.Color(165, 42, 42),
-    'pink': skia.Color(255, 192, 203)
+    'RED': skia.Color(200, 0, 0),
+    'GREEN': skia.Color(0, 100, 0),
+    'BLUE': skia.Color(0, 0, 200),
+    'MAGENTA': skia.Color(200, 0, 200),
+    'PURPLE': skia.Color(128, 0, 128),
+    'BROWN': skia.Color(139, 69, 19),
+    'NAVY': skia.Color(0, 0, 128),
+    'DARK_GREEN': skia.Color(0, 100, 0),
+    'DARK_RED': skia.Color(139, 0, 0),
+    'DARK_BLUE': skia.Color(0, 0, 139)
 }
 
 # Global canvas reference
@@ -28,7 +28,7 @@ def debug_draw_init(canvas: skia.Canvas) -> None:
     global _debug_canvas
     _debug_canvas = canvas
 
-def debug_draw_grid_point(x: int, y: int, color: str = 'red', label: str = '') -> None:
+def debug_draw_grid_point(x: int, y: int, color: str = 'RED', label: str = '') -> None:
     """Draw a point at grid coordinates with optional label."""
     if _debug_canvas is None:
         return
@@ -46,7 +46,7 @@ def debug_draw_grid_point(x: int, y: int, color: str = 'red', label: str = '') -
         paint.setTextSize(10)
         _debug_canvas.drawString(label, px + 5, py + 5, paint)
 
-def debug_draw_grid_line(x1: int, y1: int, x2: int, y2: int, color: str = 'blue', 
+def debug_draw_grid_line(x1: int, y1: int, x2: int, y2: int, color: str = 'BLUE',
                         arrow: bool = False) -> None:
     """Draw a line between grid points with optional arrow."""
     if _debug_canvas is None:
@@ -79,7 +79,7 @@ def debug_draw_grid_line(x1: int, y1: int, x2: int, y2: int, color: str = 'blue'
         path.close()
         _debug_canvas.drawPath(path, paint)
 
-def debug_draw_grid_rect(x: int, y: int, width: int, height: int, color: str = 'green') -> None:
+def debug_draw_grid_rect(x: int, y: int, width: int, height: int, color: str = 'DARK_GREEN') -> None:
     """Draw a rectangle outline at grid coordinates."""
     if _debug_canvas is None:
         return
