@@ -2,6 +2,16 @@
 
 This module provides different strategies for arranging rooms in a dungeon map:
 
+Includes functions for:
+- Creating connected rooms with passages and doors
+- Arranging rooms in different patterns (linear, symmetric, spiral)
+- Managing room shapes and sizes
+"""
+
+from map.room import Room, RoomType
+from map.door import Door, DoorType
+from map.passage import Passage
+
 - ArrangeSymmetric: Arranges rooms in symmetrical patterns, attempting to maintain
   left/right balance where possible. Good for formal dungeon layouts like temples.
 
@@ -126,15 +136,15 @@ def connect_rooms(
     return door1, passage, door2
 
 def create_connected_room(
-    source_room: 'Room',
-    direction: 'RoomDirection',
+    source_room: Room,
+    direction: RoomDirection,
     distance: int,
     room_breadth: int,
     room_depth: int,
-    room_type: Optional['RoomType'] = None,
-    start_door_type: Optional['DoorType'] = None,
-    end_door_type: Optional['DoorType'] = None
-) -> Tuple['Room', Optional['Door'], 'Passage', Optional['Door']]:
+    room_type: Optional[RoomType] = None,
+    start_door_type: Optional[DoorType] = None,
+    end_door_type: Optional[DoorType] = None
+) -> Tuple[Room, Optional[Door], Passage, Optional[Door]]:
     """Create a new room connected to an existing room via a passage.
         
     Creates a new Room of the specified type and size, positioned in the given direction
@@ -164,18 +174,12 @@ def create_connected_room(
     if room_breadth * room_depth <= 0:
         raise ValueError("Room dimensions must be positive")
             
-    # Validate source room type
-    if not isinstance(source_room, Room):
-        raise TypeError("source_room must be a Room instance")
-            
     # Get room rect in grid coordinates using arrange utils
-    from map._arrange.arrange_utils import get_adjacent_room_rect
     new_room_x, new_room_y, new_room_width, new_room_height = get_adjacent_room_rect(
         source_room, direction, distance, room_breadth, room_depth
     )
         
     # Create the new room
-    from map.room import Room, RoomType
     room_type = room_type or RoomType.RECTANGULAR
     new_room = source_room.map.add_element(Room.from_grid(
         new_room_x,
@@ -303,7 +307,7 @@ class _RoomArranger:
 
             try:
                 # Create connected room
-                new_room, _, _, _ = self.dungeon_map.create_connected_room(
+                new_room, _, _, _ = create_connected_room(
                     source_room,
                     connect_dir,
                     distance,
