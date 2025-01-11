@@ -44,7 +44,7 @@ def debug_draw_grid_point(x: int, y: int, color: str = 'RED', label: str = '') -
     # Draw label if provided
     if label:
         font = skia.Font(skia.Typeface(DEBUG_FONT_FAMILY), DEBUG_FONT_SIZE)
-        _debug_canvas.drawString(label, px + 15, py + 15, font, paint)
+        _debug_canvas.drawString(label, px + 15, py, font, paint)
 
 def debug_draw_grid_line(x1: int, y1: int, x2: int, y2: int, color: str = 'BLUE',
                         arrow: bool = False) -> None:
