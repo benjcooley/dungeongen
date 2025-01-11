@@ -308,15 +308,16 @@ class _RoomArranger:
                     start_door = None
                     end_door = random.choice([DoorType.OPEN, DoorType.CLOSED])
             
-            get_
+            passage_rect, room_rect = get_adjacent_room_rect(source_room, connect_dir, distance, breadth, depth)
+
             try:
                 # Create connected room
                 new_room, _, _, _ = self.dungeon_map.create_connected_room(
                     source_room,
                     connect_dir,
                     distance,
-                    width,
-                    height,
+                    breadth,
+                    depth,
                     start_door_type=start_door,
                     end_door_type=end_door
                 )
