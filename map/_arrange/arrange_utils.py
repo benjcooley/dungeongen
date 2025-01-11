@@ -169,7 +169,7 @@ def make_room_transform(room: Room, direction: RoomDirection, wall_pos: float = 
 
 def get_adjacent_room_rect(room: Room, direction: RoomDirection, grid_dist: int, \
                            grid_breadth: int, grid_depth: int, \
-                           breadth_offset: float = False, wall_pos: float = 0.5) -> Tuple[int, int, int, int]:
+                           breadth_offset: float = 0.0, wall_pos: float = 0.5) -> Tuple[int, int, int, int]:
     """Return the rectangle for a new passage and new room tht is grid_dist in the given direction
     from the existing room, with the breadth (forward diretion width relative width) and depth 
     (forward direction relative lentgth) of the new room.
