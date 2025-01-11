@@ -1,8 +1,10 @@
 """Debug drawing utilities for visualizing room placement and connections."""
 
+import math
 import skia
 from typing import Tuple, Optional
 from algorithms.math import Point2D
+from constants import CELL_SIZE
 
 # Predefined colors for debug visualization
 DEBUG_COLORS = {
