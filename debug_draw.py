@@ -43,9 +43,8 @@ def debug_draw_grid_point(x: int, y: int, color: str = 'RED', label: str = '') -
     
     # Draw label if provided
     if label:
-        paint.setTextSize(float(DEBUG_FONT_SIZE))
-        paint.setTypeface(skia.Typeface(DEBUG_FONT_FAMILY))
-        _debug_canvas.drawString(label, px + 5, py + 5, paint)
+        font = skia.Font(skia.Typeface(DEBUG_FONT_FAMILY), DEBUG_FONT_SIZE)
+        _debug_canvas.drawString(label, px + 5, py + 5, font, paint)
 
 def debug_draw_grid_line(x1: int, y1: int, x2: int, y2: int, color: str = 'BLUE',
                         arrow: bool = False) -> None:
@@ -105,12 +104,10 @@ def debug_draw_grid_label(x: int, y: int, text: str, color: str = 'DARK_BLUE') -
     py = y * CELL_SIZE - 5  # Position above the grid point
     
     # Draw text
-    paint = skia.Paint(Color=DEBUG_COLORS[color])
-    paint.setTextSize(float(DEBUG_FONT_SIZE))
-    paint.setTypeface(skia.Typeface(DEBUG_FONT_FAMILY))
-    paint.setAntiAlias(True)
-    paint.setTextAlign(skia.Paint.kCenter_Align)
-    _debug_canvas.drawString(text, px, py, paint)
+    paint = skia.Paint(Color=DEBUG_COLORS[color], AntiAlias=True)
+    font = skia.Font(skia.Typeface(DEBUG_FONT_FAMILY), DEBUG_FONT_SIZE)
+    font.setEdging(skia.Font.Edging.kAntiAlias)
+    _debug_canvas.drawString(text, px, py, font, paint)
 
 def debug_draw_map_label(x: float, y: float, text: str, color: str = 'DARK_BLUE') -> None:
     """Draw text label at map coordinates."""
@@ -118,9 +115,7 @@ def debug_draw_map_label(x: float, y: float, text: str, color: str = 'DARK_BLUE'
         return
         
     # Draw text
-    paint = skia.Paint(Color=DEBUG_COLORS[color])
-    paint.setTextSize(float(DEBUG_FONT_SIZE))
-    paint.setTypeface(skia.Typeface(DEBUG_FONT_FAMILY))
-    paint.setAntiAlias(True)
-    paint.setTextAlign(skia.Paint.kCenter_Align)
-    _debug_canvas.drawString(text, x, y - 5, paint)  # Offset up slightly
+    paint = skia.Paint(Color=DEBUG_COLORS[color], AntiAlias=True)
+    font = skia.Font(skia.Typeface(DEBUG_FONT_FAMILY), DEBUG_FONT_SIZE)
+    font.setEdging(skia.Font.Edging.kAntiAlias)
+    _debug_canvas.drawString(text, x, y - 5, font, paint)  # Offset up slightly
