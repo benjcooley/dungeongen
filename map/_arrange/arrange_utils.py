@@ -198,6 +198,5 @@ def get_adjacent_room_rect(room: Room, direction: RoomDirection, grid_dist: int,
         local_rect[2],
         local_rect[3]
     )
-    print(f"  relative rect: ({rect[0]}, {rect[1]}, {rect[2]}, {rect[3]})")
     print(f"  final rect: ({final_rect[0]}, {final_rect[1]}, {final_rect[2]}, {final_rect[3]})")
     return final_rect
