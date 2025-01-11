@@ -338,10 +338,19 @@ class Map:
         from map._props.decorate_room import decorate_room
         from map.room import RoomType
         
-        # Create starting room at origin with odd dimensions
-        start_room = self.create_rectangular_room(0, 0, 
-            random.randrange(min_size, max_size + 1, 2),  # Force odd width
-            random.randrange(min_size, max_size + 1, 2))  # Force odd height
+        # Get initial room shape
+        from map._arrange.room_shapes import get_random_room_shape
+        initial_shape = get_random_room_shape()
+        print(f"\nInitial room shape selected:")
+        print(f"  Type: {initial_shape.room_type}")
+        print(f"  Breadth: {initial_shape.breadth}")
+        print(f"  Depth: {initial_shape.depth}")
+        print(f"  Offset: {initial_shape.breadth_offset}")
+        
+        # Create starting room at origin using shape's dimensions
+        start_room = self.create_rectangular_room(0, 0,
+            initial_shape.breadth,  # Use breadth for width
+            initial_shape.depth)    # Use depth for height
             
         # Randomly choose grow direction
         grow_direction = GrowDirection.FORWARD # random.choice(list(GrowDirection))
