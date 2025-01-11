@@ -160,12 +160,21 @@ def get_adjacent_room_rect(room: Room, direction: RoomDirection, grid_dist: int,
     print(f"  p1 (passage end): ({p1.x}, {p1.y})")
     
     # Go one more forward, then room_breadth/2 to the left
-    p2 = p1 + forward + left * int((grid_breadth - 1) / 2 + breadth_offset)
+    left_offset = int((grid_breadth - 1) / 2 + breadth_offset)
+    p2 = Point2D(
+        p1.x + forward_vec[0] + left_vec[0] * left_offset,
+        p1.y + forward_vec[1] + left_vec[1] * left_offset
+    )
     print(f"  p2 (room corner): ({p2.x}, {p2.y})")
     print(f"    breadth offset calc: {(grid_breadth - 1) / 2 + breadth_offset}")
     
     # Go room_depth - 1 forward, then room_breadth - 1 to the right
-    p3 = p2 + forward * (grid_depth - 1) + -left * (grid_breadth - 1)
+    depth = grid_depth - 1
+    breadth = grid_breadth - 1
+    p3 = Point2D(
+        p2.x + forward_vec[0] * depth - left_vec[0] * breadth,
+        p2.y + forward_vec[1] * depth - left_vec[1] * breadth
+    )
     print(f"  p3 (opposite corner): ({p3.x}, {p3.y})")
     
     # Get actual start position
