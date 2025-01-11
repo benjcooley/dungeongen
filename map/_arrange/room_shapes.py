@@ -28,7 +28,7 @@ def generate_large_room(data: Dict[str, Any]) -> RoomShape:
 ROOM_DISTRIBUTION: List[Tuple[float, RoomShape]] = [
     # Common small symmetric rooms
     (1.0, make_room_shape(RoomType.RECTANGULAR, 3, 3)),
-    (0.8, make_room_shape(RoomType.RECTANGULAR, 2, 2)),
+    (0.8, make_room_shape(RoomType.CIRCULAR, 3, 3)),
     
     # Common small asymmetric rooms
     (0.7, make_room_shape(RoomType.RECTANGULAR, 2, 3)),
@@ -41,9 +41,10 @@ ROOM_DISTRIBUTION: List[Tuple[float, RoomShape]] = [
     # Larger rooms (less common)
     (0.3, make_room_shape(RoomType.RECTANGULAR, 3, 5)),
     (0.2, make_room_shape(RoomType.RECTANGULAR, 5, 5)),
+    (0.1, make_room_shape(RoomType.CIRCULAR, 5, 5)),
     
     # Special case generator for very large rooms (rare)
-    (0.1, generate_large_room)
+    (0.05, generate_large_room)
 ]
 
 # Normalize the distribution once at module load
