@@ -189,8 +189,7 @@ def create_connected_room(
     start_door_elem, passage, end_door_elem = connect_rooms(
         source_room, new_room,
         start_door_type=start_door_type,
-        end_door_type=end_door_type,
-        dungeon_map=self
+        end_door_type=end_door_type
     )
     
     return new_room, start_door_elem, passage, end_door_elem
