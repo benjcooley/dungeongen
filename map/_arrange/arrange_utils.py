@@ -131,7 +131,8 @@ def get_room_exit_grid_position(room: Room, direction: RoomDirection, wall_pos: 
         return (grid_x - 1, grid_y + int((grid_height - 1) * wall_pos))  # One cell left
 
 def get_adjacent_room_rect(room: Room, direction: RoomDirection, grid_dist: int, \
-                           grid_breadth: int, grid_depth: int, align_right: bool = False) -> Tuple[int, int, int, int]:
+                           grid_breadth: int, grid_depth: int, \
+                           breadth_offset: float = False) -> Tuple[int, int, int, int]:
     """Return the rectangle for a new passage and new room tht is grid_dist in the given direction
     from the existing room, with the breadth (forward diretion width relative width) and depth 
     (forward direction relative lentgth) of the new room.
@@ -140,8 +141,9 @@ def get_adjacent_room_rect(room: Room, direction: RoomDirection, grid_dist: int,
         room: Existing room
         direction: Direction to create the new room
         grid_dist: Distance to the new room
-        room_breadth: Width of the new room in the forward direction
-        room_depth: Length of the new room in the forward direction
+        grid_breadth: Width of the new room from the prespective of facing forward
+        grid_depth: Length of the new room from the perspective of facing forward
+        breadth_offset: A float shift value to right/left of the new rooms placement (for alternating how room grid positions round)
     
     Returns:
         Tuple of rect of new room."""
@@ -152,7 +154,7 @@ def get_adjacent_room_rect(room: Room, direction: RoomDirection, grid_dist: int,
     # Go forward to grid at end of passage outside the new room
     p1 = p0 + forward * (grid_dist - 1)
     # Go one grid forward, then room_breadth/2 to the left
-    p2 = p1 + forward + left * int((grid_breadth - 1) / 2)
+    p2 = p1 + forward + left * int((grid_breadth - 1) / 2 + breadth_offset)
     # Go room_depth - 1 forward, then room_breadth - 1 to the right
     p3 = p2 + forward * (grid_depth - 1) + -left * (grid_breadth - 1)
     return (min(p2.x, p3.x), min(p2.y, p2.y), abs(p3.x - p2.x) + 1, abs(p3.y - p2.y) + 1)
