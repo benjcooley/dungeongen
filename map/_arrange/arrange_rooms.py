@@ -21,7 +21,7 @@ import random
 from algorithms.shapes import Circle
 from map.map import Map
 from map.mapelement import MapElement
-from map.room import Room
+from map.room import Room, RoomType
 from map.passage import Passage
 from constants import CELL_SIZE
 from map.door import Door, DoorOrientation, DoorType
@@ -225,8 +225,8 @@ class _RoomArranger:
     def create_room(self, entrance_grid_x: float, entrance_grid_y: float) -> Room:
         """Create a room at the given grid position."""
         # Sanity checks for position
-        if abs(grid_x) > 1000 or abs(grid_y) > 1000:
-            raise ValueError(f"Room position ({grid_x}, {grid_y}) is too far from origin")
+        if abs(entrance_grid_x) > 1000 or abs(entrance_grid_y) > 1000:
+            raise ValueError(f"Room position ({entrance_grid_x}, {entrance_grid_y}) is too far from origin")
         
         width = height = 0
         while width * height < 6: # 2x3 minimum room size
@@ -237,10 +237,10 @@ class _RoomArranger:
         if width > 100 or height > 100:
             raise ValueError(f"Room dimensions {width}x{height} exceed maximum allowed size")
         print(f"\nGenerating room {len(self.rooms) + 1}:")
-        print(f"  Grid position: ({grid_x}, {grid_y})")
+        print(f"  Grid position: ({entrance_grid_x}, {entrance_grid_y})")
         print(f"  Grid size: {width}x{height}")
 
-        room = self.dungeon_map.add_rectangular_room(grid_x, grid_y, width, height)
+        room = self.dungeon_map.add_rectangular_room(entrance_grid_x, entrance_grid_y, width, height)
         print(f"  Map bounds: ({room.bounds.x}, {room.bounds.y}) to ({room.bounds.x + room.bounds.width}, {room.bounds.y + room.bounds.height})")
         self.rooms.append(room)
         return room
