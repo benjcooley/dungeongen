@@ -106,6 +106,10 @@ def get_room_exit_grid_position(room: Room, direction: RoomDirection, wall_pos: 
     grid_y = int(room.bounds.y / CELL_SIZE)
     grid_width = int(room.bounds.width / CELL_SIZE)
     grid_height = int(room.bounds.height / CELL_SIZE)
+    
+    print(f"\nCalculating exit position:")
+    print(f"  Room bounds: x={room.bounds.x}, y={room.bounds.y}, w={room.bounds.width}, h={room.bounds.height}")
+    print(f"  Grid bounds: x={grid_x}, y={grid_y}, w={grid_width}, h={grid_height}")
 
     # For circular rooms, always exit from center
     if room.room_type == RoomType.CIRCULAR:
