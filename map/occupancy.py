@@ -242,32 +242,27 @@ class OccupancyGrid:
             element_idx: Index of element being marked
             clip_rect: Optional rectangle to clip rasterization to
         """
-        # Get circle bounds in grid coordinates
-        grid_x1 = math.floor((circle.cx - circle.radius) / CELL_SIZE)
-        grid_y1 = math.floor((circle.cy - circle.radius) / CELL_SIZE)
-        grid_x2 = math.ceil((circle.cx + circle.radius) / CELL_SIZE)
-        grid_y2 = math.ceil((circle.cy + circle.radius) / CELL_SIZE)
+        # Get circle bounds
+        bounds = circle.bounds
         
-        # Clip to grid bounds
-        grid_x1 = max(grid_x1, -self._origin_x)
-        grid_y1 = max(grid_y1, -self._origin_y)
-        grid_x2 = min(grid_x2, self.width - self._origin_x)
-        grid_y2 = min(grid_y2, self.height - self._origin_y)
+        # Convert to grid coordinates and get intersection with grid bounds
+        p1, p2 = map_rect_to_grid_points(bounds.x, bounds.y, bounds.width, bounds.height)
+        grid_rect = Rectangle(p1[0], p1[1], p2[0] - p1[0] + 1, p2[1] - p1[1] + 1)
+        bounds_rect = Rectangle(-self._origin_x, -self._origin_y, 
+                              self.width - self._origin_x, self.height - self._origin_y)
+        grid_rect = grid_rect.intersection(bounds_rect)
         
         # Apply clip rect if specified
         if clip_rect:
-            clip_x1 = math.floor(clip_rect.x / CELL_SIZE)
-            clip_y1 = math.floor(clip_rect.y / CELL_SIZE)
-            clip_x2 = math.ceil((clip_rect.x + clip_rect.width) / CELL_SIZE)
-            clip_y2 = math.ceil((clip_rect.y + clip_rect.height) / CELL_SIZE)
-            
-            grid_x1 = max(grid_x1, clip_x1)
-            grid_y1 = max(grid_y1, clip_y1)
-            grid_x2 = min(grid_x2, clip_x2)
-            grid_y2 = min(grid_y2, clip_y2)
+            clip_p1, clip_p2 = map_rect_to_grid_points(
+                clip_rect.x, clip_rect.y, clip_rect.width, clip_rect.height)
+            clip_rect = Rectangle(clip_p1[0], clip_p1[1],
+                                clip_p2[0] - clip_p1[0] + 1, 
+                                clip_p2[1] - clip_p1[1] + 1)
+            grid_rect = grid_rect.intersection(clip_rect)
             
         # Early out if no valid region
-        if grid_x2 <= grid_x1 or grid_y2 <= grid_y1:
+        if not grid_rect.is_valid:
             return
             
         # Test each cell center against circle
@@ -275,8 +270,8 @@ class OccupancyGrid:
         center_x = circle.cx / CELL_SIZE
         center_y = circle.cy / CELL_SIZE
         
-        for x in range(grid_x1, grid_x2):
-            for y in range(grid_y1, grid_y2):
+        for x in range(int(grid_rect.x), int(grid_rect.x + grid_rect.width)):
+            for y in range(int(grid_rect.y), int(grid_rect.y + grid_rect.height)):
                 dx = (x + 0.5) - center_x
                 dy = (y + 0.5) - center_y
                 if dx * dx + dy * dy <= radius_sq:
