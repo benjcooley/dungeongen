@@ -3,6 +3,7 @@
 from typing import List, Optional, Set, Tuple, TYPE_CHECKING
 from array import array
 from enum import IntFlag, auto
+import skia
 from algorithms.shapes import Rectangle, Circle
 from constants import CELL_SIZE
 
