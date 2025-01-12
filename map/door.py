@@ -12,6 +12,9 @@ from constants import CELL_SIZE
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
+    from map.occupancy import OccupancyGrid
+
+if TYPE_CHECKING:
     from map.map import Map
     from options import Options
 
