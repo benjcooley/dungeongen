@@ -187,12 +187,16 @@ class OccupancyGrid:
                       element_idx: int, clip_rect: Optional[Rectangle] = None) -> None:
         """Mark all grid positions covered by a shape."""
         if isinstance(shape, Circle):
-            # For circles, convert center and radius to grid coordinates
-            grid_x1, grid_y1 = map_to_grid(shape.cx - shape.radius, shape.cy - shape.radius)
-            grid_x2, grid_y2 = map_to_grid(shape.cx + shape.radius, shape.cy + shape.radius)
+            # Convert circle bounds to grid coordinates
+            p1, p2 = map_rect_to_grid_points(
+                shape.cx - shape.radius,
+                shape.cy - shape.radius,
+                shape.radius * 2,
+                shape.radius * 2
+            )
             
             # Create rectangles for bounds checking
-            grid_rect = Rectangle(grid_x1, grid_y1, grid_x2 - grid_x1 + 1, grid_y2 - grid_y1 + 1)
+            grid_rect = Rectangle(p1[0], p1[1], p2[0] - p1[0] + 1, p2[1] - p1[1] + 1)
             bounds_rect = Rectangle(-self._origin_x, -self._origin_y, 
                                  self.width - self._origin_x, self.height - self._origin_y)
             
@@ -234,12 +238,11 @@ class OccupancyGrid:
                     if dx * dx + dy * dy <= (shape.radius / CELL_SIZE) * (shape.radius / CELL_SIZE):
                         self.mark_cell(x, y, element_type, element_idx)
         else:
-            # For rectangles, convert corners to grid coordinates
-            grid_x1, grid_y1 = map_to_grid(shape.x, shape.y)
-            grid_x2, grid_y2 = map_to_grid(shape.x + shape.width, shape.y + shape.height)
+            # Convert rectangle bounds to grid coordinates
+            p1, p2 = map_rect_to_grid_points(shape.x, shape.y, shape.width, shape.height)
             
             # Create rectangles for bounds checking
-            grid_rect = Rectangle(grid_x1, grid_y1, grid_x2 - grid_x1 + 1, grid_y2 - grid_y1 + 1)
+            grid_rect = Rectangle(p1[0], p1[1], p2[0] - p1[0] + 1, p2[1] - p1[1] + 1)
             bounds_rect = Rectangle(-self._origin_x, -self._origin_y, 
                                  self.width - self._origin_x, self.height - self._origin_y)
             
