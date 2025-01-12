@@ -9,32 +9,31 @@ import math
 if TYPE_CHECKING:
     from options import Options
 
-def grid_to_map(x: float, y: float) -> Point:
-    """Convert grid coordinates to drawing (pixel) coordinates.
+def map_from_grid(grid_x: float, grid_y: float) -> Point:
+    """Convert grid coordinates to map (pixel) coordinates.
     
     Args:
-        x: Grid x-coordinate
-        y: Grid y-coordinate
-        options: Options containing cell_size
+        grid_x: Grid x-coordinate
+        grid_y: Grid y-coordinate
         
     Returns:
         Tuple of (map_x, map_y) coordinates
     """
-    return (x * CELL_SIZE, y * CELL_SIZE)
+    return (grid_x * CELL_SIZE, grid_y * CELL_SIZE)
 
-def map_to_grid(x: float, y: float) -> Point:
-    """Convert drawing (pixel) coordinates to grid coordinates.
+def grid_from_map(map_x: float, map_y: float) -> Point:
+    """Convert map (pixel) coordinates to grid coordinates.
     
     Args:
-        x: Map x-coordinate
-        y: Map y-coordinate
+        map_x: Map x-coordinate
+        map_y: Map y-coordinate
         
     Returns:
         Tuple of (grid_x, grid_y) coordinates
     """
-    return (math.floor(x / CELL_SIZE), math.floor(y / CELL_SIZE))
+    return (math.floor(map_x / CELL_SIZE), math.floor(map_y / CELL_SIZE))
 
-def grid_points_to_grid_rect(start_x: float, start_y: float, end_x: float, end_y: float) -> tuple[float, float, float, float]:
+def grid_rect_from_points(start_x: float, start_y: float, end_x: float, end_y: float) -> tuple[float, float, float, float]:
     """Convert two grid points into a proper grid-aligned rectangle.
     
     The x,y coordinates are the minimum values of the start/end points.
