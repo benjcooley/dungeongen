@@ -41,19 +41,19 @@ def generate_long_length(data: Dict[str, Any]) -> int:
 # Format: (weights[small, medium, large], item, requirement_fn)
 LENGTH_DISTRIBUTION: List[Tuple[Tuple[float, float, float], int | Callable, None]] = [
     # Single cell (varies by size)
-    ((1.5, 1.0, 0.5), 1, None),
+    ((2.5, 1.0, 0.5), 1, None),
     
     # Short passages (varies by size)
-    ((1.2, 0.8, 0.4), 2, None),
-    ((1.0, 0.7, 0.3), 3, None),
+    ((0.8, 0.8, 0.4), 2, None),
+    ((0.3, 0.7, 0.3), 3, None),
     
     # Medium passages (varies by size)
-    ((0.2, 0.4, 0.8), 4, None),
-    ((0.1, 0.3, 0.7), 5, None),
-    ((0.1, 0.2, 0.6), 6, None),
+    ((0.0, 0.4, 0.8), 4, None),
+    ((0.0, 0.3, 0.7), 5, None),
+    ((0.0, 0.2, 0.6), 6, None),
     
     # Long passages (varies by size)
-    ((0.01, 0.05, 0.3), generate_long_length, None)
+    ((0.0, 0.05, 0.3), generate_long_length, None)
 ]
 
 # Door configurations for different passage lengths
