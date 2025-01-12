@@ -50,16 +50,20 @@ ROOM_DISTRIBUTION: List[Tuple[Tuple[float], RoomShape | Callable, None]] = [
 # Normalize the distribution once at module load
 NORMALIZED_DISTRIBUTION = normalize_distribution(ROOM_DISTRIBUTION)
 
-def get_random_room_shape(last_shape: RoomShape = None) -> RoomShape:
-    """Get a random room shape based on weighted probabilities.
+def get_random_room_shape(last_shape: RoomShape = None, options: Optional['Options'] = None) -> RoomShape:
+    """Get a random room shape based on weighted probabilities and map size.
     
     Args:
         last_shape: The previous room shape, used to alternate breadth_offset
+        options: Options containing map size tags
         
     Returns:
         A new RoomShape instance with randomized properties
     """
-    shape = get_from_distribution(NORMALIZED_DISTRIBUTION)
+    # Get the appropriate weight index based on map size tags
+    weight_idx = get_size_index_from_tags(options.tags) if options else 1  # Default to medium if no options
+    
+    shape = get_from_distribution(NORMALIZED_DISTRIBUTION, weight_idx)
     
     # Alternate breadth_offset if we have a previous shape
     if last_shape is not None:

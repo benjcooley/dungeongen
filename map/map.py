@@ -338,9 +338,9 @@ class Map:
         # from map._props.decorate_room import decorate_room
         from map.room import RoomType
         
-        # Get initial room shape
+        # Get initial room shape using options
         from map._arrange.room_shapes import get_random_room_shape
-        initial_shape = get_random_room_shape()
+        initial_shape = get_random_room_shape(options=self.options)
         print(f"\nInitial room shape selected:")
         print(f"  Type: {initial_shape.room_type}")
         print(f"  Breadth: {initial_shape.breadth}")

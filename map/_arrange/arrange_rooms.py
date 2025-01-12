@@ -313,8 +313,8 @@ class _RoomArranger:
                 source_room = last_room
                 connect_dir = direction  # Grow in primary direction
                 
-            # Get random room shape
-            room_shape = get_random_room_shape(last_shape)
+            # Get random room shape using map options
+            room_shape = get_random_room_shape(last_shape, options=source_room.map.options)
             print(f"\nRoom shape selected:")
             print(f"  Type: {room_shape.room_type}")
             print(f"  Breadth: {room_shape.breadth}")
