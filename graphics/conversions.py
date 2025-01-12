@@ -48,7 +48,7 @@ def map_rect_to_grid_points(rect_x: float, rect_y: float, rect_width: float, rec
     """
     p1 = grid_from_map(rect_x, rect_y)
     p2 = grid_from_map(rect_x + rect_width, rect_y + rect_height)
-    p2 = (p2[0] - 1, p2[1] - 1)  # Subtract 1 from end grid coordinates
+    p2 = (p2[0] - 1, p2[1] - 1)  # Subtract 1 from end grid coordinates to get inclusive range
     return (p1, p2)
 
 def grid_points_to_map_rect(grid_x1: float, grid_y1: float, grid_x2: float, grid_y2: float) -> tuple[float, float, float, float]:
@@ -65,7 +65,7 @@ def grid_points_to_map_rect(grid_x1: float, grid_y1: float, grid_x2: float, grid
         Grid points define corners, so width/height will be (grid_points + 1) * CELL_SIZE.
     """
     p1 = map_from_grid(grid_x1, grid_y1)
-    p2 = map_from_grid(grid_x2 + 1, grid_y2 + 1)  # Add 1 to end grid coordinates
+    p2 = map_from_grid(grid_x2 + 1, grid_y2 + 1)  # Add 1 to end grid coordinates to get exclusive range
     return (p1[0], p1[1], p2[0] - p1[0], p2[1] - p1[1])
 
 def grid_rect_from_points(start_x: float, start_y: float, end_x: float, end_y: float) -> tuple[float, float, float, float]:
