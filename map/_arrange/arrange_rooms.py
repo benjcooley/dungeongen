@@ -194,7 +194,8 @@ def create_connected_room(
     new_room_x, new_room_y, new_room_width, new_room_height = get_adjacent_room_rect(
         source_room, direction, distance, room_breadth, room_depth,
         breadth_offset=breadth_offset,
-        wall_pos=0.5  # TODO: Make this configurable later
+        wall_pos=0.5,
+        align_to=align_to
     )
         
     # Create the new room
