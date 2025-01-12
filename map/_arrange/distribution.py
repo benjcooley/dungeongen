@@ -39,6 +39,50 @@ def normalize_distribution(dist: Distribution[T]) -> List[Tuple[WeightTuple, Dis
         
     return normalized
 
+def get_from_distribution_no_requirements(
+    dist: Distribution[T],
+    weight_index: int = 0,
+    gen_data: Dict[str, Any] = None
+) -> T:
+    """Get a random item from a normalized distribution, failing if requirements exist.
+    
+    Args:
+        dist: List of (weights, item, requirement_fn) tuples
+        weight_index: Which weight column to use (default 0)
+        gen_data: Optional dictionary passed to generator functions
+        
+    Returns:
+        Selected item, calling generator function if needed
+        
+    Raises:
+        ValueError: If any items have requirement functions
+    """
+    gen_data = gen_data or {}
+    
+    # Check no requirements exist
+    for weights, item, req_fn in dist:
+        if req_fn is not None:
+            raise ValueError("Distribution contains requirement functions but requirements are not allowed")
+    
+    # Generate random value between 0 and 1
+    r = random.random()
+    
+    # Find the selected item using specified weight column
+    cumulative = 0.0
+    for weights, item, _ in dist:
+        cumulative += weights[weight_index]
+        if r <= cumulative:
+            # If item is callable, it's a generator function
+            if callable(item):
+                return item(gen_data)
+            return item
+            
+    # Fallback to last item (handles floating point imprecision)
+    last_item = dist[-1][1]
+    if callable(last_item):
+        return last_item(gen_data)
+    return last_item
+
 def get_from_distribution(
     dist: Distribution[T],
     weight_index: int = 0,
