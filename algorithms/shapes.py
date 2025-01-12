@@ -905,7 +905,7 @@ def rect_rect_intersect(rect1: 'Rectangle', rect2: 'Rectangle') -> bool:
             rect1.y < rect2.y + rect2.height and
             rect1.y + rect1.height > rect2.y)
 
-def rect_rect_intersection(rect1: 'Rectangle', rect2: 'Rectangle') -> Optional['Rectangle']:
+def rect_rect_intersection(rect1: 'Rectangle', rect2: 'Rectangle') -> 'Rectangle':
     """Calculate the intersection between two rectangles.
     
     Args:
@@ -913,17 +913,18 @@ def rect_rect_intersection(rect1: 'Rectangle', rect2: 'Rectangle') -> Optional['
         rect2: Second rectangle
         
     Returns:
-        A new rectangle representing the intersection, or None if no intersection
+        A new rectangle representing the intersection, or a zero-sized rectangle at origin if no intersection
     """
     if not rect_rect_intersect(rect1, rect2):
-        return None
+        return Rectangle(0, 0, 0, 0)
         
     x1 = max(rect1.x, rect2.x)
     y1 = max(rect1.y, rect2.y)
     x2 = min(rect1.x + rect1.width, rect2.x + rect2.width) 
     y2 = min(rect1.y + rect1.height, rect2.y + rect2.height)
     
-    return Rectangle(x1, y1, x2 - x1, y2 - y1)
+    result = Rectangle(x1, y1, x2 - x1, y2 - y1)
+    return result if result.is_valid else Rectangle(0, 0, 0, 0)
 
 def circle_circle_intersect(circle1: 'Circle', circle2: 'Circle') -> bool:
     """Test intersection between two circles."""
