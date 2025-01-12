@@ -637,6 +637,35 @@ class Rectangle:
             self.x + self.width / 2,
             self.y + self.height / 2
         )
+
+    @property
+    def grid_x(self) -> float:
+        """Get the x-coordinate in grid units."""
+        return self.x / CELL_SIZE
+
+    @property
+    def grid_y(self) -> float:
+        """Get the y-coordinate in grid units."""
+        return self.y / CELL_SIZE
+
+    @property
+    def grid_width(self) -> float:
+        """Get the width in grid units."""
+        return self.width / CELL_SIZE
+
+    @property
+    def grid_height(self) -> float:
+        """Get the height in grid units."""
+        return self.height / CELL_SIZE
+
+    @property
+    def grid_position(self) -> tuple[float, float]:
+        """Get the position in grid units.
+        
+        Returns:
+            Tuple of (grid_x, grid_y) coordinates
+        """
+        return (self.grid_x, self.grid_y)
         
     def _bounds_intersect(self, other: 'Rectangle') -> bool:
         """Test if this rectangle's bounds intersect another rectangle."""
@@ -785,6 +814,30 @@ class Circle:
     def make_copy(self) -> 'Circle':
         """Return a new copy of this circle."""
         return Circle(self.cx, self.cy, self.radius, self._inflate)
+
+    @property
+    def grid_x(self) -> float:
+        """Get the x-coordinate in grid units."""
+        return self.cx / CELL_SIZE
+
+    @property
+    def grid_y(self) -> float:
+        """Get the y-coordinate in grid units."""
+        return self.cy / CELL_SIZE
+
+    @property
+    def grid_radius(self) -> float:
+        """Get the radius in grid units."""
+        return self.radius / CELL_SIZE
+
+    @property
+    def grid_position(self) -> tuple[float, float]:
+        """Get the position in grid units.
+        
+        Returns:
+            Tuple of (grid_x, grid_y) coordinates
+        """
+        return (self.grid_x, self.grid_y)
         
     def make_rotated(self, rotation: 'Rotation') -> 'Circle':
         """Return a new circle rotated by the given 90-degree increment."""
