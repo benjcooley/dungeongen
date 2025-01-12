@@ -10,11 +10,10 @@ from tags import Tags
 
 def main():
     # Get seed from environment variable or use default
-    seed = int(os.getenv('SEED', '44444'))
-    
-    # Set random seed
-    random.seed(seed)
+    seed = random.randint(1, 400000) # int(os.getenv('SEED', '44444'))
     print(f"Using random seed: {seed}")
+    random.seed(seed)
+
     options = Options()
     options.tags.add(str(Tags.SMALL))  # Generate small-sized dungeons
     

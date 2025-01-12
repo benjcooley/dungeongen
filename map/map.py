@@ -335,7 +335,7 @@ class Map:
         """
         # Import here to avoid circular dependencies
         from map._arrange.arrange_rooms import _RoomArranger, GrowDirection
-        # from map._props.decorate_room import decorate_room
+        from map._props.decorate_room import decorate_room
         from map.room import RoomType
         
         # Get initial room shape using options
@@ -375,8 +375,8 @@ class Map:
         )
         
         # Decorate all elements
-        # for element in self._elements:
-        #     decorate_room(element)
+        for element in self._elements:
+            decorate_room(element)
     
     def render(self, canvas: skia.Canvas, transform: Optional[skia.Matrix] = None) -> None:
         """Render the map to a canvas.
