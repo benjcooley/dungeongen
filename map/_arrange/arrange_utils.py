@@ -201,7 +201,7 @@ def get_adjacent_room_rect(room: Room, direction: RoomDirection, grid_dist: int,
     p2 = Point2D(grid_dist - 1, 0)      # End grid of passage
 
     # Calculate room corners in local space
-    r1 = p2 + Point2D(1, -(grid_breadth - 1) / 2 + breadth_offset))  # Near left grid corner of room
+    r1 = p2 + Point2D(1, -(grid_breadth - 1) / 2 + breadth_offset)  # Near left grid corner of room
     r2 = r1 + Point2D(grid_depth - 1, grid_breadth - 1) # Far right grid corner of room
 
     print(f"  Local points:")
@@ -216,14 +216,20 @@ def get_adjacent_room_rect(room: Room, direction: RoomDirection, grid_dist: int,
     print(f"    Room: r1({w[2].x}, {w[2].y}), r2({w[3].x}, {w[3].y})")
     
     # Calculate final rectangle in both spaces
-    local_rect = {
-        # Fix me AI! should be p3 and p4
+    local_rect = (
+        int(min(r1.x, r2.x)),
+        int(min(r1.y, r2.y)),
+        int(abs(r2.x - r1.x)) + 1,
+        int(abs(r2.y - r1.y)) + 1
     )
-    print(f"  Local rect: ()") # Fix me AI!
+    print(f"  Local rect: ({local_rect[0]}, {local_rect[1]}, {local_rect[2]}, {local_rect[3]})")
     
     # Calculate final rectangle in world space
     final_rect = (
-        # Fix me AI! should be w[2] an w[3]
+        int(min(w[2].x, w[3].x)),
+        int(min(w[2].y, w[3].y)), 
+        int(abs(w[3].x - w[2].x)) + 1,
+        int(abs(w[3].y - w[2].y)) + 1
     )
     print(f"  World rect: ({final_rect[0]}, {final_rect[1]}, {final_rect[2]}, {final_rect[3]})")
     return final_rect
