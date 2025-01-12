@@ -59,3 +59,31 @@ def grid_points_to_grid_rect(start_x: float, start_y: float, end_x: float, end_y
     
     return (x, y, width, height)
 
+def grid_rect_points(rect_x: float, rect_y: float, rect_width: float, rect_height: float) -> tuple[tuple[float, float], tuple[float, float]]:
+    """Convert a grid rectangle into its corner points.
+    
+    Args:
+        rect_x: Rectangle X coordinate in grid units
+        rect_y: Rectangle Y coordinate in grid units
+        rect_width: Rectangle width in grid units
+        rect_height: Rectangle height in grid units
+        
+    Returns:
+        Tuple of ((x1,y1), (x2,y2)) representing top-left and bottom-right points
+    """
+    return ((rect_x, rect_y), (rect_x + rect_width - 1, rect_y + rect_height - 1))
+
+def map_rect_points(rect_x: float, rect_y: float, rect_width: float, rect_height: float) -> tuple[tuple[float, float], tuple[float, float]]:
+    """Convert a map rectangle into its corner points.
+    
+    Args:
+        rect_x: Rectangle X coordinate in map units
+        rect_y: Rectangle Y coordinate in map units
+        rect_width: Rectangle width in map units
+        rect_height: Rectangle height in map units
+        
+    Returns:
+        Tuple of ((x1,y1), (x2,y2)) representing top-left and bottom-right points
+    """
+    return ((rect_x, rect_y), (rect_x + rect_width, rect_y + rect_height))
+
