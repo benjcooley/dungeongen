@@ -322,9 +322,9 @@ class _RoomArranger:
             end_door = passage_config.doors.end_door
 
             try:
-                # For the last room, adjust the distance to prevent overlap
-                if len(self.rooms) == num_rooms - 1:
-                    distance += room_shape.depth  # Add room depth to ensure separation
+                # Ensure proper spacing between rooms
+                if len(self.rooms) > 0:
+                    distance += 1  # Add one grid cell of spacing
 
                 # Create connected room
                 new_room, _, _, _ = create_connected_room(
