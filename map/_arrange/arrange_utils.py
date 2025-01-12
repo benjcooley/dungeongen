@@ -192,42 +192,51 @@ def get_adjacent_room_rect(room: Room, direction: RoomDirection, grid_dist: int,
     print(f"    [{transform.a:.1f} {transform.b:.1f} {transform.tx:.1f}]")
     print(f"    [{transform.c:.1f} {transform.d:.1f} {transform.ty:.1f}]")
     
-    # Calculate room corners in local space
+    # Calculate passage end points in local space
     dist = grid_dist - 1  # Distance to passage end
     left_offset = int((grid_breadth - 1) / 2 + breadth_offset)
     
-    # First corner: forward to passage end + 1, then left offset
-    p1 = Point2D(dist + 1, left_offset)
-    # Calculate all corners in local space
-    p1 = Point2D(dist + 1, left_offset)
-    p2 = Point2D(p1.x + (grid_depth - 1), p1.y)  # Top edge
-    p3 = Point2D(p1.x, p1.y - (grid_breadth - 1))  # Left edge 
-    p4 = Point2D(p2.x, p3.y)  # Remaining corner
-
-    print(f"  Local corners: p1({p1.x}, {p1.y}), p2({p2.x}, {p2.y}), p3({p3.x}, {p3.y}), p4({p4.x}, {p4.y})")
+    # Calculate passage points
+    p1 = Point2D(dist, 0)  # Start of passage
+    p2 = Point2D(dist + 1, 0)  # End of passage
     
-    # Transform all corners to world space
+    # Calculate room corners in local space
+    r1 = Point2D(p2.x, left_offset)  # Top-left corner
+    r2 = Point2D(r1.x + (grid_depth - 1), r1.y)  # Top-right corner
+    r3 = Point2D(r1.x, r1.y - (grid_breadth - 1))  # Bottom-left corner
+    r4 = Point2D(r2.x, r3.y)  # Bottom-right corner
+
+    print(f"  Local points:")
+    print(f"    Passage: p1({p1.x}, {p1.y}), p2({p2.x}, {p2.y})")
+    print(f"    Room: r1({r1.x}, {r1.y}), r2({r2.x}, {r2.y}), r3({r3.x}, {r3.y}), r4({r4.x}, {r4.y})")
+    
+    # Transform all points to world space
     p1_world = transform.transform_point(p1)
     p2_world = transform.transform_point(p2)
-    p3_world = transform.transform_point(p3)
-    p4_world = transform.transform_point(p4)
-    print(f"  World corners: p1({p1_world.x}, {p1_world.y}), p2({p2_world.x}, {p2_world.y}), p3({p3_world.x}, {p3_world.y}), p4({p4_world.x}, {p4_world.y})")
+    r1_world = transform.transform_point(r1)
+    r2_world = transform.transform_point(r2)
+    r3_world = transform.transform_point(r3)
+    r4_world = transform.transform_point(r4)
+    
+    print(f"  World points:")
+    print(f"    Passage: p1({p1_world.x}, {p1_world.y}), p2({p2_world.x}, {p2_world.y})")
+    print(f"    Room: r1({r1_world.x}, {r1_world.y}), r2({r2_world.x}, {r2_world.y}), r3({r3_world.x}, {r3_world.y}), r4({r4_world.x}, {r4_world.y})")
     
     # Calculate final rectangle in both spaces
     local_rect = (
-        int(min(p1.x, p2.x, p3.x, p4.x)),
-        int(min(p1.y, p2.y, p3.y, p4.y)),
-        int(max(p1.x, p2.x, p3.x, p4.x) - min(p1.x, p2.x, p3.x, p4.x)) + 1,
-        int(max(p1.y, p2.y, p3.y, p4.y) - min(p1.y, p2.y, p3.y, p4.y)) + 1
+        int(min(r1.x, r2.x, r3.x, r4.x)),
+        int(min(r1.y, r2.y, r3.y, r4.y)),
+        int(max(r1.x, r2.x, r3.x, r4.x) - min(r1.x, r2.x, r3.x, r4.x)) + 1,
+        int(max(r1.y, r2.y, r3.y, r4.y) - min(r1.y, r2.y, r3.y, r4.y)) + 1
     )
     print(f"  Local rect: ({local_rect[0]}, {local_rect[1]}, {local_rect[2]}, {local_rect[3]})")
     
     # Calculate final rectangle in world space
     final_rect = (
-        int(min(p1_world.x, p2_world.x, p3_world.x, p4_world.x)),
-        int(min(p1_world.y, p2_world.y, p3_world.y, p4_world.y)),
-        int(max(p1_world.x, p2_world.x, p3_world.x, p4_world.x) - min(p1_world.x, p2_world.x, p3_world.x, p4_world.x)) + 1,
-        int(max(p1_world.y, p2_world.y, p3_world.y, p4_world.y) - min(p1_world.y, p2_world.y, p3_world.y, p4_world.y)) + 1
+        int(min(r1_world.x, r2_world.x, r3_world.x, r4_world.x)),
+        int(min(r1_world.y, r2_world.y, r3_world.y, r4_world.y)),
+        int(max(r1_world.x, r2_world.x, r3_world.x, r4_world.x) - min(r1_world.x, r2_world.x, r3_world.x, r4_world.x)) + 1,
+        int(max(r1_world.y, r2_world.y, r3_world.y, r4_world.y) - min(r1_world.y, r2_world.y, r3_world.y, r4_world.y)) + 1
     )
     print(f"  World rect: ({final_rect[0]}, {final_rect[1]}, {final_rect[2]}, {final_rect[3]})")
     return final_rect
