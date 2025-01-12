@@ -1,7 +1,7 @@
 """Utility functions for room arrangement."""
 
 from enum import Enum, auto
-from typing import Dict, Tuple
+from typing import Dict, Optional, Tuple
 import skia
 from algorithms.math import Matrix2D, Point2D
 from algorithms.shapes import Rectangle
