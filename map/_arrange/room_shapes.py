@@ -32,17 +32,17 @@ ROOM_DISTRIBUTION: List[Tuple[Tuple[float, float, float], RoomShape | Callable, 
     ((2.0, 1.0, 0.5), make_room_shape(RoomType.RECTANGULAR, 3, 3), None),
     ((1.5, 0.8, 0.4), make_room_shape(RoomType.CIRCULAR, 3, 3), None),
     
-    # Small asymmetric rooms (very rare in all sizes)
-    ((0.1, 0.05, 0.02), make_room_shape(RoomType.RECTANGULAR, 2, 3), None),
+    # Small asymmetric rooms (very rare in all sizes, prefer odd breadth)
+    ((0.02, 0.01, 0.005), make_room_shape(RoomType.RECTANGULAR, 2, 3), None),
     ((0.1, 0.05, 0.02), make_room_shape(RoomType.RECTANGULAR, 3, 2), None),
     
-    # Medium rooms (balanced in medium maps, prefer odd breadth)
-    ((0.6, 1.2, 0.9), make_room_shape(RoomType.RECTANGULAR, 3, 4), None),
-    ((0.2, 0.4, 0.3), make_room_shape(RoomType.RECTANGULAR, 4, 3), None),
+    # Medium rooms (balanced in medium maps, strongly prefer odd breadth)
+    ((0.8, 1.4, 1.0), make_room_shape(RoomType.RECTANGULAR, 3, 4), None),
+    ((0.1, 0.2, 0.15), make_room_shape(RoomType.RECTANGULAR, 4, 3), None),
     
-    # Larger rooms (more common in large maps, prefer odd breadth)
-    ((0.2, 0.6, 1.0), make_room_shape(RoomType.RECTANGULAR, 3, 5), None),
-    ((0.05, 0.1, 0.2), make_room_shape(RoomType.RECTANGULAR, 4, 4), None)
+    # Larger rooms (more common in large maps, strongly prefer odd breadth)
+    ((0.3, 0.8, 1.2), make_room_shape(RoomType.RECTANGULAR, 3, 5), None),
+    ((0.02, 0.05, 0.1), make_room_shape(RoomType.RECTANGULAR, 4, 4), None)
 ]
 
 # Normalize the distribution once at module load
