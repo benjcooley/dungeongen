@@ -127,16 +127,6 @@ def debug_draw_grid_cell(x: int, y: int, fill_color: int, outline_color: Optiona
             StrokeWidth=2
         )
         _debug_canvas.drawRect(skia.Rect(px, py, px + CELL_SIZE, py + CELL_SIZE), outline_paint)
-        
-    # Convert grid coords to pixels and offset up for label
-    px = x * CELL_SIZE + CELL_SIZE/2
-    py = y * CELL_SIZE - 5  # Position above the grid point
-    
-    # Draw text
-    paint = skia.Paint(Color=DEBUG_COLORS[color], AntiAlias=True)
-    font = skia.Font(skia.Typeface(DEBUG_FONT_FAMILY), DEBUG_FONT_SIZE)
-    font.setEdging(skia.Font.Edging.kAntiAlias)
-    _debug_canvas.drawString(text, px, py, font, paint)
 
 def debug_draw_map_label(x: float, y: float, text: str, color: str = 'DARK_BLUE') -> None:
     """Draw text label at map coordinates."""

@@ -222,6 +222,7 @@ class OccupancyGrid:
         
     def draw_debug(self, canvas: 'skia.Canvas') -> None:
         """Draw debug visualization of occupied grid cells."""
+        import skia
         from debug_draw import debug_draw_init, debug_draw_grid_cell
         
         # Initialize debug drawing
@@ -248,42 +249,3 @@ class OccupancyGrid:
                     # Draw cell with red outline if blocked
                     outline_color = skia.Color(255, 0, 0) if blocked else None
                     debug_draw_grid_cell(grid_x, grid_y, fill_color, outline_color)
-        # Convert circle to grid coordinates
-        center_x, center_y = map_to_grid(circle.cx, circle.cy)
-        radius = circle._inflated_radius / CELL_SIZE
-        
-        # Calculate grid bounds
-        grid_start_x = int(center_x - radius - 0.5)
-        grid_start_y = int(center_y - radius - 0.5)
-        grid_end_x = int(center_x + radius + 1.5)
-        grid_end_y = int(center_y + radius + 1.5)
-        
-        # Apply clipping if specified
-        if clip_rect:
-            clip_start_x, clip_start_y = map_to_grid(clip_rect.x, clip_rect.y)
-            clip_end_x, clip_end_y = map_to_grid(
-                clip_rect.x + clip_rect.width,
-                clip_rect.y + clip_rect.height
-            )
-            grid_start_x = max(grid_start_x, int(clip_start_x))
-            grid_start_y = max(grid_start_y, int(clip_start_y))
-            grid_end_x = min(grid_end_x, int(clip_end_x + 0.5))
-            grid_end_y = min(grid_end_y, int(clip_end_y + 0.5))
-        
-        # Check each cell in the bounding box
-        for x in range(grid_start_x, grid_end_x):
-            for y in range(grid_start_y, grid_end_y):
-                # Check if any corner is inside the circle
-                corners = [
-                    (x, y),
-                    (x + 1, y),
-                    (x, y + 1),
-                    (x + 1, y + 1)
-                ]
-                
-                for corner_x, corner_y in corners:
-                    dx = corner_x - center_x
-                    dy = corner_y - center_y
-                    if dx * dx + dy * dy <= radius * radius:
-                        self.mark_cell(x, y, element_type, element_idx)
-                        break
