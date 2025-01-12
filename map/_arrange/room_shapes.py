@@ -1,7 +1,7 @@
 """Room shape generation with controlled size distributions."""
 
 from dataclasses import dataclass
-from typing import Dict, Any, Tuple, List
+from typing import Dict, Any, Callable, Tuple, List
 from map.room import RoomType
 from map._arrange.distribution import normalize_distribution, get_from_distribution
 
