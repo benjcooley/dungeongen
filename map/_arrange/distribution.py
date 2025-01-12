@@ -39,7 +39,7 @@ def normalize_distribution(dist: Distribution[T]) -> List[Tuple[WeightTuple, Dis
         
     return normalized
 
-def get_from_distribution_no_requirements(
+def try_get_from_distribution(
     dist: Distribution[T],
     weight_index: int = 0,
     gen_data: Dict[str, Any] = None

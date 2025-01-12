@@ -110,9 +110,9 @@ def get_door_distribution(length: int) -> List[Tuple[float, DoorConfig]]:
 def get_random_passage_config() -> PassageConfig:
     """Get a random passage configuration based on weighted probabilities."""
     # First get the length
-    length = get_from_distribution(NORMALIZED_LENGTH_DIST)
+    length = try_get_from_distribution(NORMALIZED_LENGTH_DIST)
     
     # Then get appropriate doors for that length
-    doors = get_from_distribution(get_door_distribution(length))
+    doors = try_get_from_distribution(get_door_distribution(length))
     
     return PassageConfig(length, doors)

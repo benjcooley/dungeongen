@@ -59,7 +59,7 @@ def get_random_room_shape(last_shape: RoomShape = None) -> RoomShape:
     Returns:
         A new RoomShape instance with randomized properties
     """
-    shape = get_from_distribution_no_requirements(NORMALIZED_DISTRIBUTION)
+    shape = get_from_distribution(NORMALIZED_DISTRIBUTION)
     
     # Alternate breadth_offset if we have a previous shape
     if last_shape is not None:
