@@ -61,9 +61,9 @@ LENGTH_DISTRIBUTION: List[Tuple[Tuple[float, float, float], int | Callable, None
 
 # Single cell passages (1 cell)
 SINGLE_CELL_DOORS: List[Tuple[Tuple[float], DoorConfig, None]] = [
-    ((0.7,), make_door_config(None, None), None),              # No doors
-    ((0.3,), make_door_config(DoorType.OPEN, None), None),     # One open door
-    ((0.2,), make_door_config(None, DoorType.OPEN), None)      # One open door
+    ((0.9,), make_door_config(None, None), None),              # No doors
+    ((0.1,), make_door_config(DoorType.OPEN, None), None),     # One open door
+    ((0.1,), make_door_config(None, DoorType.OPEN), None)      # One open door
 ]
 
 # Short passages (2-3 cells)
