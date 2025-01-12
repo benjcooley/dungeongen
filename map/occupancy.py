@@ -88,6 +88,8 @@ class OccupancyGrid:
         new_grid = array('L', [0] * (new_grid_width * new_grid_height))
         new_grid_origin_x = new_grid_width // 2
         new_grid_origin_y = new_grid_height // 2
+        old_width = self.width
+        old_height = self.height
         
         # Copy existing contents
         for grid_y in range(self.height):
