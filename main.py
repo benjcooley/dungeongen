@@ -16,7 +16,7 @@ def main():
     random.seed(seed)
     print(f"Using random seed: {seed}")
     options = Options()
-    options.tags.add(str(Tags.MEDIUM))  # Default to medium-sized dungeons
+    options.tags.add(str(Tags.SMALL))  # Test with small-sized dungeons
     
     # Initialize Skia canvas
     surface = skia.Surface(options.canvas_width, options.canvas_height)
@@ -34,9 +34,10 @@ def main():
     # Draw the map
     dungeon_map.render(canvas)
 
-    # Save as PNG
+    # Save as PNG with size tag in filename
+    size_tag = next((tag for tag in options.tags if tag in ('small', 'medium', 'large')), 'medium')
     image = surface.makeImageSnapshot()
-    image.save('map_output.png', skia.kPNG)
+    image.save(f'{size_tag}_map.png', skia.kPNG)
     
     # # Save as PDF
     # stream = skia.FILEWStream('map_output.pdf')
