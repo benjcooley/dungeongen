@@ -10,7 +10,9 @@ from tags import Tags
 
 def main():
     # Get seed from environment variable or use default
-    seed = random.randint(1, 400000) # int(os.getenv('SEED', '44444'))
+    # seed = random.randint(1, 400000) 
+    # int(os.getenv('SEED', '44444'))
+    seed = 122652
     print(f"Using random seed: {seed}")
     random.seed(seed)
 
