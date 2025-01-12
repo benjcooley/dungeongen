@@ -84,8 +84,8 @@ def connect_rooms(
     r2_dir = r1_dir.get_opposite()
             
     # Get connection points in grid coordinates
-    r1_x, r1_y = get_room_exit_grid_position(room1, r1_dir, grid_origin=align_to)
-    r2_x, r2_y = get_room_exit_grid_position(room2, r2_dir, grid_origin=(r1_x, r1_y))
+    r1_x, r1_y = get_room_exit_grid_position(room1, r1_dir, align_to=align_to)
+    r2_x, r2_y = get_room_exit_grid_position(room2, r2_dir, align_to=(r1_x, r1_y))
 
     # Make sure we don't have too many doors
     dist = grid_line_dist(r1_x, r1_y, r2_x, r2_y)
