@@ -55,29 +55,29 @@ class OccupancyGrid:
         self._origin_x = width // 2  # Center point
         self._origin_y = height // 2
         
-    def _ensure_contains(self, x: int, y: int) -> None:
-        """Resize grid if needed to contain the given coordinates."""
-        min_x = -self._origin_x
-        min_y = -self._origin_y
-        max_x = self.width - self._origin_x
-        max_y = self.height - self._origin_y
+    def _ensure_contains(self, grid_x: int, grid_y: int) -> None:
+        """Resize grid if needed to contain the given grid coordinates."""
+        min_grid_x = -self._origin_x
+        min_grid_y = -self._origin_y
+        max_grid_x = self.width - self._origin_x
+        max_grid_y = self.height - self._origin_y
         
         needs_resize = False
         new_width = self.width
         new_height = self.height
         
         # Check if we need to expand
-        while x < min_x or x >= max_x:
+        while grid_x < min_grid_x or grid_x >= max_grid_x:
             new_width *= 2
             needs_resize = True
-            min_x = -(new_width // 2)
-            max_x = new_width - (new_width // 2)
+            min_grid_x = -(new_width // 2)
+            max_grid_x = new_width - (new_width // 2)
             
-        while y < min_y or y >= max_y:
+        while grid_y < min_grid_y or grid_y >= max_grid_y:
             new_height *= 2
             needs_resize = True
-            min_y = -(new_height // 2)
-            max_y = new_height - (new_height // 2)
+            min_grid_y = -(new_height // 2)
+            max_grid_y = new_height - (new_height // 2)
             
         if needs_resize:
             self._resize(new_width, new_height)
