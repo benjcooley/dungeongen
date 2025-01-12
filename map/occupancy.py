@@ -242,11 +242,8 @@ class OccupancyGrid:
             bounds_rect = Rectangle(-self._origin_x, -self._origin_y, 
                                  self.width - self._origin_x, self.height - self._origin_y)
             
-            # Early out if outside grid bounds
-            if not grid_rect.intersects(bounds_rect):
-                return
-
-            # Apply clip rect if specified
+            # Get clipped rectangle
+            clipped_rect = grid_rect.intersection(bounds_rect)
             if clip_rect:
                 clip_grid_x1, clip_grid_y1 = map_to_grid(clip_rect.x, clip_rect.y)
                 clip_grid_x2, clip_grid_y2 = map_to_grid(clip_rect.x + clip_rect.width, 
@@ -254,25 +251,15 @@ class OccupancyGrid:
                 clip_rect = Rectangle(clip_grid_x1, clip_grid_y1,
                                     clip_grid_x2 - clip_grid_x1 + 1,
                                     clip_grid_y2 - clip_grid_y1 + 1)
-                
-                if not grid_rect.intersects(clip_rect):
-                    return
-                    
-                # Get intersection of grid rect with clip rect
-                grid_rect = grid_rect.intersection(clip_rect)
-            
-            # Clamp to grid bounds
-            grid_rect = grid_rect.intersection(bounds_rect)
-            
-            # Extract clamped coordinates
-            grid_x1 = grid_rect.x
-            grid_y1 = grid_rect.y
-            grid_x2 = grid_rect.x + grid_rect.width - 1
-            grid_y2 = grid_rect.y + grid_rect.height - 1
+                clipped_rect = clipped_rect.intersection(clip_rect)
 
-            # Simple rectangle fill
-            for x in range(grid_x1, grid_x2 + 1):
-                for y in range(grid_y1, grid_y2 + 1):
+            # Early out if no valid intersection
+            if not clipped_rect.is_valid:
+                return
+
+            # Fill the clipped rectangle
+            for x in range(int(clipped_rect.x), int(clipped_rect.x + clipped_rect.width)):
+                for y in range(int(clipped_rect.y), int(clipped_rect.y + clipped_rect.height)):
                     self.mark_cell(x, y, element_type, element_idx)
     
     def mark_circle(self, circle: Circle, element_type: ElementType,
