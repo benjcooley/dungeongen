@@ -33,32 +33,37 @@ def grid_from_map(map_x: float, map_y: float) -> Point:
     """
     return (math.floor(map_x / CELL_SIZE), math.floor(map_y / CELL_SIZE))
 
-def map_size_from_grid(grid_width: float, grid_height: float) -> tuple[float, float]:
-    """Convert grid dimensions to map dimensions.
+def map_rect_to_grid_points(rect_x: float, rect_y: float, rect_width: float, rect_height: float) -> tuple[tuple[float, float], tuple[float, float]]:
+    """Convert a map rectangle into grid space corner points.
     
     Args:
-        grid_width: Width in grid units
-        grid_height: Height in grid units
+        rect_x: Rectangle X coordinate in map units
+        rect_y: Rectangle Y coordinate in map units
+        rect_width: Rectangle width in map units
+        rect_height: Rectangle height in map units
         
     Returns:
-        Tuple of (map_width, map_height)
+        Tuple of ((grid_x1,grid_y1), (grid_x2,grid_y2)) representing corners in grid space
     """
-    return (grid_width * CELL_SIZE, grid_height * CELL_SIZE)
+    p1 = grid_from_map(rect_x, rect_y)
+    p2 = grid_from_map(rect_x + rect_width, rect_y + rect_height)
+    return (p1, p2)
 
-def grid_size_from_map(map_width: float, map_height: float) -> tuple[float, float]:
-    """Convert map dimensions to grid dimensions.
-    
-    Note: This adds 1 to include the ending grid cell, since map coordinates
-    represent the full extent of the shape.
+def grid_points_to_map_rect(grid_x1: float, grid_y1: float, grid_x2: float, grid_y2: float) -> tuple[float, float, float, float]:
+    """Convert two grid points into a map space rectangle.
     
     Args:
-        map_width: Width in map units
-        map_height: Height in map units
+        grid_x1: First X coordinate in grid units
+        grid_y1: First Y coordinate in grid units
+        grid_x2: Second X coordinate in grid units
+        grid_y2: Second Y coordinate in grid units
         
     Returns:
-        Tuple of (grid_width, grid_height) 
+        Tuple of (rect_x, rect_y, rect_width, rect_height) in map units
     """
-    return (math.ceil(map_width / CELL_SIZE), math.ceil(map_height / CELL_SIZE))
+    p1 = map_from_grid(grid_x1, grid_y1)
+    p2 = map_from_grid(grid_x2, grid_y2)
+    return (p1[0], p1[1], p2[0] - p1[0], p2[1] - p1[1])
 
 def grid_rect_from_points(start_x: float, start_y: float, end_x: float, end_y: float) -> tuple[float, float, float, float]:
     """Convert two grid points into a proper grid-aligned rectangle.
