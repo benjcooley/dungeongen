@@ -233,66 +233,49 @@ class OccupancyGrid:
     
     def mark_circle(self, circle: Circle, element_type: ElementType,
                    element_idx: int, clip_rect: Optional[Rectangle] = None) -> None:
-        """Mark all grid positions covered by a circle.
-        
-        Uses a fast integer-based circle rasterization algorithm.
+        """Mark grid cells covered by a circle.
         
         Args:
-            circle: The circle to rasterize in map coordinates
+            circle: The circle to rasterize
             element_type: Type of element being marked
             element_idx: Index of element being marked
             clip_rect: Optional rectangle to clip rasterization to
         """
-        # Convert circle bounds to grid coordinates
-        p1, p2 = map_rect_to_grid_points(
-            circle.cx - circle.radius,
-            circle.cy - circle.radius,
-            circle.radius * 2,
-            circle.radius * 2
-        )
+        # Get circle bounds in grid coordinates
+        grid_x1 = math.floor((circle.cx - circle.radius) / CELL_SIZE)
+        grid_y1 = math.floor((circle.cy - circle.radius) / CELL_SIZE)
+        grid_x2 = math.ceil((circle.cx + circle.radius) / CELL_SIZE)
+        grid_y2 = math.ceil((circle.cy + circle.radius) / CELL_SIZE)
         
-        # Create rectangles for bounds checking
-        grid_rect = Rectangle(p1[0], p1[1], p2[0] - p1[0] + 1, p2[1] - p1[1] + 1)
-        bounds_rect = Rectangle(-self._origin_x, -self._origin_y, 
-                             self.width - self._origin_x, self.height - self._origin_y)
+        # Clip to grid bounds
+        grid_x1 = max(grid_x1, -self._origin_x)
+        grid_y1 = max(grid_y1, -self._origin_y)
+        grid_x2 = min(grid_x2, self.width - self._origin_x)
+        grid_y2 = min(grid_y2, self.height - self._origin_y)
         
-        # Early out if outside grid bounds
-        if not grid_rect.intersects(bounds_rect):
-            return
-
         # Apply clip rect if specified
         if clip_rect:
-            # Convert clip rect to grid coordinates
-            clip_grid_x1, clip_grid_y1 = map_to_grid(clip_rect.x, clip_rect.y)
-            clip_grid_x2, clip_grid_y2 = map_to_grid(clip_rect.x + clip_rect.width - 0.001, 
-                                                    clip_rect.y + clip_rect.height - 0.001)
-            clip_rect = Rectangle(clip_grid_x1, clip_grid_y1,
-                                clip_grid_x2 - clip_grid_x1 + 1,
-                                clip_grid_y2 - clip_grid_y1 + 1)
+            clip_x1 = math.floor(clip_rect.x / CELL_SIZE)
+            clip_y1 = math.floor(clip_rect.y / CELL_SIZE)
+            clip_x2 = math.ceil((clip_rect.x + clip_rect.width) / CELL_SIZE)
+            clip_y2 = math.ceil((clip_rect.y + clip_rect.height) / CELL_SIZE)
             
-            if not grid_rect.intersects(clip_rect):
-                return
-                
-            # Get intersection of grid rect with clip rect
-            grid_rect = grid_rect.intersection(clip_rect)
-        
-        # Clamp to grid bounds
-        grid_rect = grid_rect.intersection(bounds_rect)
-        
-        # Extract clamped coordinates
-        grid_x1 = int(grid_rect.x)
-        grid_y1 = int(grid_rect.y)
-        grid_x2 = int(grid_rect.x + grid_rect.width - 1)
-        grid_y2 = int(grid_rect.y + grid_rect.height - 1)
-
-        # Rasterize circle using midpoint algorithm
+            grid_x1 = max(grid_x1, clip_x1)
+            grid_y1 = max(grid_y1, clip_y1)
+            grid_x2 = min(grid_x2, clip_x2)
+            grid_y2 = min(grid_y2, clip_y2)
+            
+        # Early out if no valid region
+        if grid_x2 <= grid_x1 or grid_y2 <= grid_y1:
+            return
+            
+        # Test each cell center against circle
         radius_sq = (circle.radius / CELL_SIZE) * (circle.radius / CELL_SIZE)
         center_x = circle.cx / CELL_SIZE
         center_y = circle.cy / CELL_SIZE
         
-        for x in range(grid_x1, grid_x2 + 1):
-            for y in range(grid_y1, grid_y2 + 1):
-                # Test if cell center is inside circle
+        for x in range(grid_x1, grid_x2):
+            for y in range(grid_y1, grid_y2):
                 dx = (x + 0.5) - center_x
                 dy = (y + 0.5) - center_y
                 if dx * dx + dy * dy <= radius_sq:
