@@ -21,6 +21,7 @@ from typing import List, Optional, Tuple
 import random
 
 from algorithms.math import Point2D
+from options import Options
 from algorithms.shapes import Circle
 from constants import CELL_SIZE
 from map._arrange.room_shapes import RoomShape, make_room_shape
