@@ -211,9 +211,9 @@ class OccupancyGrid:
             grid_end_x = min(grid_end_x, int(clip_end_x + 0.5))
             grid_end_y = min(grid_end_y, int(clip_end_y + 0.5))
         
-        # Mark all covered grid positions
-        for x in range(grid_start_x, grid_end_x):
-            for y in range(grid_start_y, grid_end_y):
+        # Mark all covered grid positions with bounds checking
+        for x in range(max(grid_start_x, -self._origin_x), min(grid_end_x, self.width - self._origin_x)):
+            for y in range(max(grid_start_y, -self._origin_y), min(grid_end_y, self.height - self._origin_y)):
                 self.mark_cell(x, y, element_type, element_idx)
     
     def mark_circle(self, circle: Circle, element_type: ElementType,
