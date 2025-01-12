@@ -322,10 +322,6 @@ class _RoomArranger:
             end_door = passage_config.doors.end_door
 
             try:
-                # Ensure proper spacing between rooms
-                if len(self.rooms) > 0:
-                    distance += 1  # Add one grid cell of spacing
-
                 # Create connected room
                 new_room, _, _, _ = create_connected_room(
                     source_room,
