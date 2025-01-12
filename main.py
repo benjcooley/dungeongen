@@ -34,6 +34,9 @@ def main():
     
     # Draw the map
     dungeon_map.render(canvas)
+    
+    # Debug draw the occupancy grid
+    dungeon_map._occupancy.draw_debug(canvas)
 
     # Save as PNG with size tag in filename
     size_tag = next((tag for tag in options.tags if tag in ('small', 'medium', 'large')), 'medium')

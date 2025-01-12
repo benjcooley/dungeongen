@@ -219,6 +219,35 @@ class OccupancyGrid:
         
         Converts the circle's map coordinates to grid coordinates before marking cells.
         """
+        
+    def draw_debug(self, canvas: 'skia.Canvas') -> None:
+        """Draw debug visualization of occupied grid cells."""
+        from debug_draw import debug_draw_init, debug_draw_grid_cell
+        
+        # Initialize debug drawing
+        debug_draw_init(canvas)
+        
+        # Define colors for different element types
+        type_colors = {
+            ElementType.ROOM: skia.Color(255, 200, 200),     # Light red
+            ElementType.PASSAGE: skia.Color(200, 255, 200),  # Light green
+            ElementType.DOOR: skia.Color(200, 200, 255),     # Light blue
+            ElementType.STAIRS: skia.Color(255, 255, 200),   # Light yellow
+        }
+        
+        # Draw each occupied cell
+        for grid_y in range(-self._origin_y, self.height - self._origin_y):
+            for grid_x in range(-self._origin_x, self.width - self._origin_x):
+                if self.is_occupied(grid_x, grid_y):
+                    # Get cell info
+                    element_type, _, blocked = self.get_cell_info(grid_x, grid_y)
+                    
+                    # Get fill color based on element type
+                    fill_color = type_colors.get(element_type, skia.Color(220, 220, 220))
+                    
+                    # Draw cell with red outline if blocked
+                    outline_color = skia.Color(255, 0, 0) if blocked else None
+                    debug_draw_grid_cell(grid_x, grid_y, fill_color, outline_color)
         # Convert circle to grid coordinates
         center_x, center_y = map_to_grid(circle.cx, circle.cy)
         radius = circle._inflated_radius / CELL_SIZE

@@ -98,6 +98,35 @@ def debug_draw_grid_label(x: int, y: int, text: str, color: str = 'DARK_BLUE') -
     """Draw text label above a grid point."""
     if _debug_canvas is None:
         return
+
+def debug_draw_grid_cell(x: int, y: int, fill_color: int, outline_color: Optional[int] = None) -> None:
+    """Draw a filled grid cell with optional outline.
+    
+    Args:
+        x: Grid x coordinate
+        y: Grid y coordinate
+        fill_color: Skia color for cell fill
+        outline_color: Optional Skia color for cell outline
+    """
+    if _debug_canvas is None:
+        return
+        
+    # Convert grid coords to pixels
+    px = x * CELL_SIZE
+    py = y * CELL_SIZE
+    
+    # Draw filled cell
+    fill_paint = skia.Paint(Color=fill_color, Style=skia.Paint.kFill_Style)
+    _debug_canvas.drawRect(skia.Rect(px, py, px + CELL_SIZE, py + CELL_SIZE), fill_paint)
+    
+    # Draw outline if specified
+    if outline_color is not None:
+        outline_paint = skia.Paint(
+            Color=outline_color,
+            Style=skia.Paint.kStroke_Style,
+            StrokeWidth=2
+        )
+        _debug_canvas.drawRect(skia.Rect(px, py, px + CELL_SIZE, py + CELL_SIZE), outline_paint)
         
     # Convert grid coords to pixels and offset up for label
     px = x * CELL_SIZE + CELL_SIZE/2
