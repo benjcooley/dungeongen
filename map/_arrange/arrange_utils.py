@@ -19,8 +19,8 @@ def grid_points_to_grid_rect(grid_x1: int, grid_y1: int, grid_x2: int, grid_y2: 
 
 def grid_line_to_grid_deltas(grid_x1: int, grid_y1: int, grid_x2: int, grid_y2: int) -> Tuple[int, int]:
     """Gets a delta direction for a line between two grid points."""
-    dx = grid_x2 - grid_x1 / abs(grid_x2 - grid_x1) if grid_x2 != grid_x1 else 0
-    dy = grid_y2 - grid_y1 / abs(grid_y2 - grid_y1) if grid_y2 != grid_y1 else 0
+    dx = (grid_x2 - grid_x1) // abs(grid_x2 - grid_x1) if grid_x2 != grid_x1 else 0
+    dy = (grid_y2 - grid_y1) // abs(grid_y2 - grid_y1) if grid_y2 != grid_y1 else 0
     return dx, dy
 
 # Assumes a vertical or horizontal line
