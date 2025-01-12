@@ -188,6 +188,7 @@ def get_adjacent_room_rect(room: Room, direction: RoomDirection, grid_dist: int,
     transform = make_room_transform(room, direction, wall_pos)
     
     print(f"\nCalculating room position:")
+    print(f"  Direction: {direction}")
     print(f"  Transform matrix:")
     print(f"    [{transform.a:.1f} {transform.b:.1f} {transform.tx:.1f}]")
     print(f"    [{transform.c:.1f} {transform.d:.1f} {transform.ty:.1f}]")
