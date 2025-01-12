@@ -1,7 +1,8 @@
 """Configuration options for the crosshatch pattern generator."""
 
 import math
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from typing import Set
 from map.enums import GridStyle
 
 @dataclass
@@ -11,6 +12,9 @@ class Options:
     # Canvas dimensions
     canvas_width: int = 2000
     canvas_height: int = 2000
+    
+    # Generation tags that influence random distributions
+    tags: Set[str] = field(default_factory=set)
     
     # Crosshatch stroke appearance
     crosshatch_stroke_width: float = 1.5
