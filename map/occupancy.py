@@ -82,31 +82,31 @@ class OccupancyGrid:
         if needs_resize:
             self._resize(new_width, new_height)
             
-    def _resize(self, new_width: int, new_height: int) -> None:
+    def _resize(self, new_grid_width: int, new_grid_height: int) -> None:
         """Resize the grid, preserving existing contents."""
-        new_grid = array('L', [0] * (new_width * new_height))
-        new_origin_x = new_width // 2
-        new_origin_y = new_height // 2
+        new_grid = array('L', [0] * (new_grid_width * new_grid_height))
+        new_grid_origin_x = new_grid_width // 2
+        new_grid_origin_y = new_grid_height // 2
         
         # Copy existing contents
-        for y in range(self.height):
-            for x in range(self.width):
-                old_idx = y * self.width + x
+        for grid_y in range(self.height):
+            for grid_x in range(self.width):
+                old_idx = grid_y * self.width + grid_x
                 old_value = self._grid[old_idx]
                 
-                # Convert to new coordinates
-                new_x = x - self._origin_x + new_origin_x
-                new_y = y - self._origin_y + new_origin_y
-                new_idx = new_y * new_width + new_x
+                # Convert to new grid coordinates
+                new_grid_x = grid_x - self._origin_x + new_grid_origin_x
+                new_grid_y = grid_y - self._origin_y + new_grid_origin_y
+                new_idx = new_grid_y * new_grid_width + new_grid_x
                 
-                if 0 <= new_x < new_width and 0 <= new_y < new_height:
+                if 0 <= new_grid_x < new_grid_width and 0 <= new_grid_y < new_grid_height:
                     new_grid[new_idx] = old_value
                     
         self._grid = new_grid
-        self.width = new_width
-        self.height = new_height
-        self._origin_x = new_origin_x
-        self._origin_y = new_origin_y
+        self.width = new_grid_width
+        self.height = new_grid_height
+        self._origin_x = new_grid_origin_x
+        self._origin_y = new_grid_origin_y
     
     def _to_grid_index(self, grid_x: int, grid_y: int) -> Optional[int]:
         """Convert grid coordinates to array index."""
