@@ -35,23 +35,23 @@ def generate_long_length(data: Dict[str, Any]) -> int:
     import random
     return random.randint(7, 10)
 
-# Distribution for passage lengths
-# Format: (weights, item, requirement_fn)
-LENGTH_DISTRIBUTION: List[Tuple[Tuple[float], int | Callable, None]] = [
-    # Single cell (very common)
-    ((1.0,), 1, None),
+# Distribution for passage lengths based on map size
+# Format: (weights[small, medium, large], item, requirement_fn)
+LENGTH_DISTRIBUTION: List[Tuple[Tuple[float, float, float], int | Callable, None]] = [
+    # Single cell (varies by size)
+    ((1.5, 1.0, 0.5), 1, None),
     
-    # Short passages (common)
-    ((0.8,), 2, None),
-    ((0.7,), 3, None),
+    # Short passages (varies by size)
+    ((1.2, 0.8, 0.4), 2, None),
+    ((1.0, 0.7, 0.3), 3, None),
     
-    # Medium passages (less common)
-    ((0.4,), 4, None),
-    ((0.3,), 5, None),
-    ((0.2,), 6, None),
+    # Medium passages (varies by size)
+    ((0.2, 0.4, 0.8), 4, None),
+    ((0.1, 0.3, 0.7), 5, None),
+    ((0.1, 0.2, 0.6), 6, None),
     
-    # Long passages (rare)
-    ((0.05,), generate_long_length, None)
+    # Long passages (varies by size)
+    ((0.01, 0.05, 0.3), generate_long_length, None)
 ]
 
 # Door configurations for different passage lengths
@@ -107,10 +107,21 @@ def get_door_distribution(length: int) -> List[Tuple[float, DoorConfig]]:
     else:
         return NORMALIZED_LONG_DOORS
 
-def get_random_passage_config() -> PassageConfig:
-    """Get a random passage configuration based on weighted probabilities."""
-    # First get the length
-    length = get_from_distribution(NORMALIZED_LENGTH_DIST)
+def get_random_passage_config(options: 'Options') -> PassageConfig:
+    """Get a random passage configuration based on weighted probabilities and map size.
+    
+    Args:
+        options: Options containing map size tags
+    """
+    # Determine weight index based on map size
+    weight_idx = 1  # Default to medium
+    if 'small' in options.tags:
+        weight_idx = 0
+    elif 'large' in options.tags:
+        weight_idx = 2
+    
+    # Get the length using the appropriate weight column
+    length = get_from_distribution(NORMALIZED_LENGTH_DIST, weight_idx)
     
     # Then get appropriate doors for that length
     doors = get_from_distribution(get_door_distribution(length))
