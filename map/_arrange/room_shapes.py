@@ -70,10 +70,11 @@ ROOM_DISTRIBUTION: List[Tuple[Tuple[float, float, float], RoomShape | Callable, 
     ((1.5, 1.0, 0.5), make_room_shape(RoomType.RECTANGULAR, 4, 3), None),
     
     # Medium rectangular rooms (balanced distribution)
-    ((1.0, 2.0, 1.2), make_room_shape(RoomType.RECTANGULAR, 3, 5), None),
-    ((0.5, 1.5, 1.0), make_room_shape(RoomType.RECTANGULAR, 3, 7), None),
-    ((0.2, 1.2, 0.8), make_room_shape(RoomType.RECTANGULAR, 5, 5), None),
-    ((0.1, 1.0, 0.7), make_room_shape(RoomType.RECTANGULAR, 5, 7), None),
+    ((2.5, 2.0, 1.2), make_room_shape(RoomType.RECTANGULAR, 3, 4), None),
+    ((2.0, 2.0, 1.2), make_room_shape(RoomType.RECTANGULAR, 3, 5), None),
+    ((0.2, 1.5, 1.0), make_room_shape(RoomType.RECTANGULAR, 3, 7), None),
+    ((0.1, 1.2, 0.8), make_room_shape(RoomType.RECTANGULAR, 5, 5), None),
+    ((0.0, 1.0, 0.7), make_room_shape(RoomType.RECTANGULAR, 5, 7), None),
 
     # Larger fixed rooms (more common in larger maps)
     ((0.0, 0.8, 1.2), make_room_shape(RoomType.RECTANGULAR, 7, 7), None),
