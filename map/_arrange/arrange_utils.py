@@ -138,7 +138,8 @@ def get_room_exit_grid_position(room: Room, direction: RoomDirection, wall_pos: 
             
     return (x, y)
 
-def make_room_transform(room: Room, direction: RoomDirection, wall_pos: float = 0.5) -> Matrix2D:
+def make_room_transform(room: Room, direction: RoomDirection, wall_pos: float = 0.5,
+                       passage_point: Optional[Tuple[int, int]] = None) -> Matrix2D:
     """Create a transform matrix for positioning relative to a room's exit.
     
     The transform creates a coordinate space where:
@@ -155,7 +156,7 @@ def make_room_transform(room: Room, direction: RoomDirection, wall_pos: float = 
         Matrix2D configured for the local coordinate space
     """
     # Get exit point and direction vectors
-    exit_pos = get_room_exit_grid_position(room, direction, wall_pos)
+    exit_pos = passage_point if passage_point else get_room_exit_grid_position(room, direction, wall_pos)
     forward = direction.get_forward()
     left = direction.get_left()
     
@@ -176,7 +177,8 @@ def make_room_transform(room: Room, direction: RoomDirection, wall_pos: float = 
 
 def get_adjacent_room_rect(room: Room, direction: RoomDirection, grid_dist: int, \
                            grid_breadth: int, grid_depth: int, \
-                           breadth_offset: float = 0.0, wall_pos: float = 0.5) -> Tuple[int, int, int, int]:
+                           breadth_offset: float = 0.0, wall_pos: float = 0.5, \
+                           passage_point: Optional[Tuple[int, int]] = None) -> Tuple[int, int, int, int]:
     """Return the rectangle for a new passage and new room tht is grid_dist in the given direction
     from the existing room, with the breadth (forward diretion width relative width) and depth 
     (forward direction relative lentgth) of the new room.
@@ -192,7 +194,7 @@ def get_adjacent_room_rect(room: Room, direction: RoomDirection, grid_dist: int,
     Returns:
         Tuple of rect of new room relative to passage start point."""
     # Get transform for local coordinate space
-    transform = make_room_transform(room, direction, wall_pos)
+    transform = make_room_transform(room, direction, wall_pos, passage_point)
     
     print(f"\nCalculating room position: dir={direction}, dist={grid_dist}, breadth={grid_breadth}, depth={grid_depth}")
     print(f"Transform matrix: [{transform.a:.1f} {transform.b:.1f} {transform.tx:.1f}] [{transform.c:.1f} {transform.d:.1f} {transform.ty:.1f}]")

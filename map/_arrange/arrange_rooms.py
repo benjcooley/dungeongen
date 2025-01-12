@@ -154,7 +154,8 @@ def create_connected_room(
     room_type: Optional[RoomType] = None,
     start_door_type: Optional[DoorType] = None,
     end_door_type: Optional[DoorType] = None,
-    breadth_offset: float = 0.0
+    breadth_offset: float = 0.0,
+    passage_point: Optional[Tuple[int, int]] = None
 ) -> Tuple[Room, Optional[Door], Passage, Optional[Door]]:
     """Create a new room connected to an existing room via a passage.
         
@@ -281,6 +282,13 @@ class _RoomArranger:
         self.rooms = [start_room]  # Reset rooms list
         first_room = last_room = start_room
         last_shape = None
+        
+        # Calculate initial passage point from first room
+        initial_passage_point = get_room_exit_grid_position(
+            start_room,
+            direction,
+            wall_pos=0.5
+        )
             
         attempts = 0
         while len(self.rooms) < num_rooms and attempts < max_attempts:
@@ -321,7 +329,7 @@ class _RoomArranger:
             start_door = passage_config.doors.start_door
             end_door = passage_config.doors.end_door
 
-            # Create connected room
+            # Create connected room using consistent passage point
             new_room, _, _, _ = create_connected_room(
                 source_room,
                 connect_dir,
@@ -331,7 +339,8 @@ class _RoomArranger:
                 room_type=room_shape.room_type,
                 start_door_type=start_door,
                 end_door_type=end_door,
-                breadth_offset=room_shape.breadth_offset
+                breadth_offset=room_shape.breadth_offset,
+                passage_point=initial_passage_point
             )
             
             # Update first/last room references based on which end we grew from
