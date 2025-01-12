@@ -2,7 +2,7 @@
 
 import math
 import skia
-from typing import List, Protocol, Sequence, TypeAlias
+from typing import List, Optional, Protocol, Sequence, TypeAlias
 from algorithms.types import Point
 from algorithms.math import Matrix2D
 from algorithms.rotation import Rotation
