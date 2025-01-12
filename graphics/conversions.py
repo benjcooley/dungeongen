@@ -130,8 +130,8 @@ def grid_to_map_rect(rect: Rectangle | tuple[float, float, float, float]) -> tup
         
     map_x = x * CELL_SIZE
     map_y = y * CELL_SIZE
-    map_width = width * CELL_SIZE
-    map_height = height * CELL_SIZE
+    map_width = (width + 1) * CELL_SIZE  # Add 1 to include end cell
+    map_height = (height + 1) * CELL_SIZE  # Add 1 to include end cell
     return (map_x, map_y, map_width, map_height)
 
 def grid_rect_points(rect_x: float, rect_y: float, rect_width: float, rect_height: float) -> tuple[tuple[float, float], tuple[float, float]]:
