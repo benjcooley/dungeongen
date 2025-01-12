@@ -10,7 +10,7 @@ from constants import CELL_SIZE
 if TYPE_CHECKING:
     from options import Options
     from map.mapelement import MapElement
-from graphics.conversions import map_to_grid
+from graphics.conversions import map_to_grid, map_rect_to_grid_points
 
 class ElementType(IntFlag):
     """Bit flags for element types in occupancy grid."""
