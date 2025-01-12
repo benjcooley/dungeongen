@@ -30,13 +30,13 @@ ROOM_DISTRIBUTION: List[Tuple[Tuple[float], RoomShape | Callable, None]] = [
     ((1.0,), make_room_shape(RoomType.RECTANGULAR, 3, 3), None),
     ((0.8,), make_room_shape(RoomType.CIRCULAR, 3, 3), None),
     
-    # Less common small asymmetric rooms
-    ((0.2,), make_room_shape(RoomType.RECTANGULAR, 2, 3), None),
-    ((0.2,), make_room_shape(RoomType.RECTANGULAR, 3, 2), None),
+    # Rare small asymmetric rooms
+    ((0.1,), make_room_shape(RoomType.RECTANGULAR, 2, 3), None),
+    ((0.1,), make_room_shape(RoomType.RECTANGULAR, 3, 2), None),
     
-    # Medium rooms (more common now)
-    ((0.7,), make_room_shape(RoomType.RECTANGULAR, 3, 4), None),
-    ((0.7,), make_room_shape(RoomType.RECTANGULAR, 4, 3), None),
+    # Medium rooms (most common)
+    ((0.8,), make_room_shape(RoomType.RECTANGULAR, 3, 4), None),
+    ((0.8,), make_room_shape(RoomType.RECTANGULAR, 4, 3), None),
     
     # Larger rooms (less common)
     ((0.3,), make_room_shape(RoomType.RECTANGULAR, 3, 5), None),
