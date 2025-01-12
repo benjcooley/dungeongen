@@ -61,7 +61,8 @@ def connect_rooms(
     room1: Room,
     room2: Room,
     start_door_type: Optional[DoorType] = None,
-    end_door_type: Optional[DoorType] = None
+    end_door_type: Optional[DoorType] = None,
+    align_to: Optional[Tuple[int, int]] = None
 ) -> Tuple[Optional[Door], Optional[Passage], Optional[Door]]:
     """Create a passage between two rooms with optional doors.
     
@@ -83,7 +84,7 @@ def connect_rooms(
     r2_dir = r1_dir.get_opposite()
             
     # Get connection points in grid coordinates
-    r1_x, r1_y = get_room_exit_grid_position(room1, r1_dir)
+    r1_x, r1_y = get_room_exit_grid_position(room1, r1_dir, grid_origin=align_to)
     r2_x, r2_y = get_room_exit_grid_position(room2, r2_dir, grid_origin=(r1_x, r1_y))
 
     # Make sure we don't have too many doors
@@ -210,7 +211,8 @@ def create_connected_room(
     start_door_elem, passage, end_door_elem = connect_rooms(
         source_room, new_room,
         start_door_type=start_door_type,
-        end_door_type=end_door_type
+        end_door_type=end_door_type,
+        align_to=align_to
     )
     
     return new_room, start_door_elem, passage, end_door_elem
