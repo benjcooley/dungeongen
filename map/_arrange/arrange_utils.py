@@ -208,7 +208,7 @@ def get_adjacent_room_rect(room: Room, direction: RoomDirection, grid_dist: int,
     print(f"    Passage: p1({p1.x}, {p1.y}), p2({p2.x}, {p2.y})")
     print(f"    Room: r1({r1.x}, {r1.y}), r2({r2.x}, {r2.y})")
     
-    # Transform all points to world space Fix me AI! - Add this point list transform method AI!
+    # Transform all points to world space
     w = transform.transform_points([p1, p2, r1, r2])
     
     print(f"  World points:")
