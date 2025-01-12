@@ -42,7 +42,8 @@ def normalize_distribution(dist: Distribution[T]) -> List[Tuple[WeightTuple, Dis
 def get_from_distribution(
     dist: Distribution[T],
     weight_index: int = 0,
-    gen_data: Dict[str, Any] = None
+    gen_data: Dict[str, Any] = None,
+    max_attempts: int = 100
 ) -> T:
     """Get a random item from a normalized distribution using specified weight column.
     
@@ -50,39 +51,43 @@ def get_from_distribution(
         dist: List of (weights, item, requirement_fn) tuples
         weight_index: Which weight column to use (default 0)
         gen_data: Optional dictionary passed to generator/requirement functions
+        max_attempts: Maximum number of selection attempts before giving up
         
     Returns:
         Selected item, calling generator function if needed
         
     Raises:
-        ValueError: If no items meet requirements
+        ValueError: If no valid item could be selected after max_attempts
     """
     gen_data = gen_data or {}
+    attempts = 0
     
-    # Filter items by requirements
-    valid_items = [
-        (weights, item) for weights, item, req_fn in dist
-        if req_fn is None or req_fn(gen_data, dist, weight_index)
-    ]
-    
-    if not valid_items:
-        raise ValueError("No items in distribution meet requirements")
-    
-    # Generate random value between 0 and 1
-    r = random.random()
-    
-    # Find the selected item using specified weight column
-    cumulative = 0.0
-    for weights, item in valid_items:
-        cumulative += weights[weight_index]
-        if r <= cumulative:
-            # If item is callable, it's a generator function
-            if callable(item):
-                return item(gen_data)
-            return item
+    while attempts < max_attempts:
+        attempts += 1
+        
+        # Generate random value between 0 and 1
+        r = random.random()
+        
+        # Find the selected item using specified weight column
+        cumulative = 0.0
+        for weights, item, req_fn in dist:
+            cumulative += weights[weight_index]
+            if r <= cumulative:
+                # Check requirements if present
+                if req_fn is None or req_fn(gen_data, dist, weight_index):
+                    # If item is callable, it's a generator function
+                    if callable(item):
+                        return item(gen_data)
+                    return item
+                # Requirements failed, try again
+                break
+                
+        # If we get here, either requirements failed or we had floating point imprecision
+        # Try the last item if it meets requirements
+        last_weights, last_item, last_req_fn = dist[-1]
+        if last_req_fn is None or last_req_fn(gen_data, dist, weight_index):
+            if callable(last_item):
+                return last_item(gen_data)
+            return last_item
             
-    # Fallback to last item (handles floating point imprecision)
-    last_item = valid_items[-1][1]
-    if callable(last_item):
-        return last_item(gen_data)
-    return last_item
+    raise ValueError(f"Could not find valid distribution item after {max_attempts} attempts")
