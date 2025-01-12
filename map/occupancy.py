@@ -237,30 +237,38 @@ class OccupancyGrid:
             grid_x1, grid_y1 = map_to_grid(shape.x, shape.y)
             grid_x2, grid_y2 = map_to_grid(shape.x + shape.width, shape.y + shape.height)
             
+            # Create rectangles for bounds checking
+            grid_rect = Rectangle(grid_x1, grid_y1, grid_x2 - grid_x1 + 1, grid_y2 - grid_y1 + 1)
+            bounds_rect = Rectangle(-self._origin_x, -self._origin_y, 
+                                 self.width - self._origin_x, self.height - self._origin_y)
+            
             # Early out if outside grid bounds
-            if (grid_x1 >= self.width - self._origin_x or 
-                grid_x2 < -self._origin_x or
-                grid_y1 >= self.height - self._origin_y or 
-                grid_y2 < -self._origin_y):
+            if not grid_rect.intersects(bounds_rect):
                 return
 
             # Apply clip rect if specified
             if clip_rect:
-                clip_x1, clip_y1 = map_to_grid(clip_rect.x, clip_rect.y)
-                clip_x2, clip_y2 = map_to_grid(clip_rect.x + clip_rect.width, clip_rect.y + clip_rect.height)
-                if (grid_x1 >= clip_x2 or grid_x2 < clip_x1 or
-                    grid_y1 >= clip_y2 or grid_y2 < clip_y1):
+                clip_grid_x1, clip_grid_y1 = map_to_grid(clip_rect.x, clip_rect.y)
+                clip_grid_x2, clip_grid_y2 = map_to_grid(clip_rect.x + clip_rect.width, 
+                                                        clip_rect.y + clip_rect.height)
+                clip_rect = Rectangle(clip_grid_x1, clip_grid_y1,
+                                    clip_grid_x2 - clip_grid_x1 + 1,
+                                    clip_grid_y2 - clip_grid_y1 + 1)
+                
+                if not grid_rect.intersects(clip_rect):
                     return
-                grid_x1 = max(grid_x1, clip_x1)
-                grid_y1 = max(grid_y1, clip_y1)
-                grid_x2 = min(grid_x2, clip_x2)
-                grid_y2 = min(grid_y2, clip_y2)
-
+                    
+                # Get intersection of grid rect with clip rect
+                grid_rect = grid_rect.intersection(clip_rect)
+            
             # Clamp to grid bounds
-            grid_x1 = max(grid_x1, -self._origin_x)
-            grid_y1 = max(grid_y1, -self._origin_y)
-            grid_x2 = min(grid_x2, self.width - self._origin_x)
-            grid_y2 = min(grid_y2, self.height - self._origin_y)
+            grid_rect = grid_rect.intersection(bounds_rect)
+            
+            # Extract clamped coordinates
+            grid_x1 = grid_rect.x
+            grid_y1 = grid_rect.y
+            grid_x2 = grid_rect.x + grid_rect.width - 1
+            grid_y2 = grid_rect.y + grid_rect.height - 1
 
             # Simple rectangle fill
             for x in range(grid_x1, grid_x2 + 1):
