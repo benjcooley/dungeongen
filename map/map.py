@@ -59,11 +59,6 @@ class Map:
         """Get the current options."""
         return self._options
     
-    @options.setter
-    def options(self, value: 'Options') -> None:
-        """Set new options."""
-        self._options = value
-    
     @property 
     def bounds(self) -> Rectangle:
         """Get the current bounding rectangle, recalculating if needed."""
