@@ -222,8 +222,9 @@ def get_adjacent_room_rect(room: Room, direction: RoomDirection, grid_dist: int,
     p1 = Point2D(0, 0)                  # Start gridi of passage
     p2 = Point2D(grid_dist - 1, 0)      # End grid of passage
 
-    # Calculate room corners in local space
-    r1 = p2 + Point2D(1, -(grid_breadth - 1) / 2 + breadth_offset)  # Near left grid corner of room
+    # Calculate room corners in local space, ensuring integer grid positions
+    breadth_center = (grid_breadth - 1) // 2  # Integer division for center
+    r1 = p2 + Point2D(1, -breadth_center + int(breadth_offset))  # Near left grid corner of room
     r2 = r1 + Point2D(grid_depth - 1, grid_breadth - 1) # Far right grid corner of room
 
     print(f"Local points: passage=p1({p1.x}, {p1.y}), p2({p2.x}, {p2.y}), room=r1({r1.x}, {r1.y}), r2({r2.x}, {r2.y})")
