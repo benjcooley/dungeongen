@@ -48,7 +48,7 @@ LENGTH_DISTRIBUTION: List[Tuple[Tuple[float, float, float], int | Callable, None
     ((0.3, 0.7, 0.3), 3, None),
     
     # Medium passages (varies by size)
-    ((0.0, 0.4, 0.8), 4, None),
+    ((0.1, 0.4, 0.8), 4, None),  # Allow 4-grid passages in small maps with low weight
     ((0.0, 0.3, 0.7), 5, None),
     ((0.0, 0.2, 0.6), 6, None),
     
