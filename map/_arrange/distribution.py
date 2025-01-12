@@ -39,12 +39,15 @@ def normalize_distribution(dist: Distribution[T]) -> List[Tuple[WeightTuple, Dis
         
     return normalized
 
-def try_get_from_distribution(
+def get_from_distribution(
     dist: Distribution[T],
     weight_index: int = 0,
     gen_data: Dict[str, Any] = None
 ) -> T:
-    """Get a random item from a normalized distribution, failing if requirements exist.
+    """Get a random item from a normalized distribution, for simple distributions without requirements.
+    
+    This is the simpler version that does not handle requirement functions. Use try_get_from_distribution()
+    if you need support for requirements.
     
     Args:
         dist: List of (weights, item, requirement_fn) tuples
@@ -83,12 +86,12 @@ def try_get_from_distribution(
         return last_item(gen_data)
     return last_item
 
-def get_from_distribution(
+def try_get_from_distribution(
     dist: Distribution[T],
     weight_index: int = 0,
     gen_data: Dict[str, Any] = None,
     max_attempts: int = 100
-) -> T:
+) -> Optional[T]:
     """Try to get a random item from a normalized distribution, handling requirements.
     
     This is the more complex version that supports requirement functions and will retry
