@@ -100,7 +100,12 @@ def connect_rooms(
     door2: Optional[Door] = None
     passage: Optional[Passage] = None
 
-    door_orientation = DoorOrientation.HORIZONTAL if dx else DoorOrientation.VERTICAL
+    # Set door orientation based on room direction
+    door_orientation = (
+        DoorOrientation.HORIZONTAL 
+        if r1_dir in (RoomDirection.EAST, RoomDirection.WEST)
+        else DoorOrientation.VERTICAL
+    )
 
     if dist > 0 and start_door_type is not None:
         door1 = Door.from_grid(r1_x, r1_y, door_orientation, door_type=start_door_type)
