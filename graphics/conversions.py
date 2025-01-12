@@ -93,25 +93,27 @@ def grid_rect_from_points(start_x: float, start_y: float, end_x: float, end_y: f
     
     return (x, y, width, height)
 
-def map_to_grid_rect(rect_x: float, rect_y: float, rect_width: float, rect_height: float) -> tuple[float, float, float, float]:
+def map_to_grid_rect(rect: Rectangle | tuple[float, float, float, float]) -> tuple[float, float, float, float]:
     """Convert a map rectangle to grid coordinates.
     
     Args:
-        rect_x: Rectangle X coordinate in map units
-        rect_y: Rectangle Y coordinate in map units
-        rect_width: Rectangle width in map units
-        rect_height: Rectangle height in map units
+        rect: Rectangle or tuple of (x, y, width, height) in map units
         
     Returns:
         Tuple of (grid_x, grid_y, grid_width, grid_height)
     """
-    grid_x = math.floor(rect_x / CELL_SIZE)
-    grid_y = math.floor(rect_y / CELL_SIZE)
-    grid_width = math.ceil((rect_x + rect_width) / CELL_SIZE) - grid_x
-    grid_height = math.ceil((rect_y + rect_height) / CELL_SIZE) - grid_y
+    if isinstance(rect, Rectangle):
+        x, y, width, height = rect.x, rect.y, rect.width, rect.height
+    else:
+        x, y, width, height = rect
+        
+    grid_x = math.floor(x / CELL_SIZE)
+    grid_y = math.floor(y / CELL_SIZE)
+    grid_width = math.ceil((x + width) / CELL_SIZE) - grid_x
+    grid_height = math.ceil((y + height) / CELL_SIZE) - grid_y
     return (grid_x, grid_y, grid_width, grid_height)
 
-def grid_to_map_rect(grid_x: float, grid_y: float, grid_width: float, grid_height: float) -> tuple[float, float, float, float]:
+def grid_to_map_rect(rect: Rectangle | tuple[float, float, float, float]) -> tuple[float, float, float, float]:
     """Convert a grid rectangle to map coordinates.
     
     Args:

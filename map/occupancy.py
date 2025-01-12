@@ -199,13 +199,11 @@ class OccupancyGrid:
             return
             
         # Convert rectangle to grid coordinates
-        grid_x, grid_y, grid_width, grid_height = map_to_grid_rect(
-            shape.x, shape.y, shape.width, shape.height)
+        grid_x, grid_y, grid_width, grid_height = map_to_grid_rect(shape)
             
         # Apply clip rect if specified
         if clip_rect:
-            clip_x, clip_y, clip_width, clip_height = map_to_grid_rect(
-                clip_rect.x, clip_rect.y, clip_rect.width, clip_rect.height)
+            clip_x, clip_y, clip_width, clip_height = map_to_grid_rect(clip_rect)
             # Get intersection
             x1 = max(grid_x, clip_x)
             y1 = max(grid_y, clip_y)
