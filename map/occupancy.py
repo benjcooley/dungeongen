@@ -184,15 +184,14 @@ class OccupancyGrid:
         return element_idx
     
     def mark_rectangle(self, rect: Rectangle, element_type: ElementType,
-                      element_idx: int, options: 'Options',
-                      clip_rect: Optional[Rectangle] = None) -> None:
+                      element_idx: int, clip_rect: Optional[Rectangle] = None) -> None:
         """Mark all grid positions covered by a rectangle.
         
         Converts the rectangle's map coordinates to grid coordinates before marking cells.
         """
         # Convert rectangle bounds to grid coordinates
-        start_x, start_y = map_to_grid(rect.x, rect.y, options)
-        end_x, end_y = map_to_grid(rect.x + rect.width, rect.y + rect.height, options)
+        start_x, start_y = map_to_grid(rect.x, rect.y)
+        end_x, end_y = map_to_grid(rect.x + rect.width, rect.y + rect.height)
         
         # Round to integer grid positions
         grid_start_x = int(start_x)
@@ -202,11 +201,10 @@ class OccupancyGrid:
         
         # Apply clipping if specified
         if clip_rect:
-            clip_start_x, clip_start_y = map_to_grid(clip_rect.x, clip_rect.y, options)
+            clip_start_x, clip_start_y = map_to_grid(clip_rect.x, clip_rect.y)
             clip_end_x, clip_end_y = map_to_grid(
                 clip_rect.x + clip_rect.width,
-                clip_rect.y + clip_rect.height,
-                options
+                clip_rect.y + clip_rect.height
             )
             grid_start_x = max(grid_start_x, int(clip_start_x))
             grid_start_y = max(grid_start_y, int(clip_start_y))

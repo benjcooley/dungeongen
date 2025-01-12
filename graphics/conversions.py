@@ -22,13 +22,12 @@ def grid_to_map(x: float, y: float) -> Point:
     """
     return (x * CELL_SIZE, y * CELL_SIZE)
 
-def map_to_grid(x: float, y: float, options: 'Options') -> Point:
+def map_to_grid(x: float, y: float) -> Point:
     """Convert drawing (pixel) coordinates to grid coordinates.
     
     Args:
         x: Map x-coordinate
         y: Map y-coordinate
-        options: Options containing cell_size
         
     Returns:
         Tuple of (grid_x, grid_y) coordinates
