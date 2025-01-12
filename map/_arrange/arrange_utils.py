@@ -101,14 +101,23 @@ def get_room_exit_grid_position(room: Room, direction: RoomDirection, wall_pos: 
     Returns:
         Tuple of (grid_x, grid_y) for the exit point one cell outside the room
     """
-    if room.room_type == RoomType.CIRCULAR:
-        wall_pos = 0.5  # Always exit from center for circular rooms
-
     # Get room bounds in grid coordinates
     grid_x = int(room.bounds.x / CELL_SIZE)
     grid_y = int(room.bounds.y / CELL_SIZE)
     grid_width = int(room.bounds.width / CELL_SIZE)
     grid_height = int(room.bounds.height / CELL_SIZE)
+
+    if room.room_type == RoomType.CIRCULAR:
+        wall_pos = 0.5  # Always exit from center for circular rooms
+        # For circular rooms, adjust the exit point based on direction
+        if direction == RoomDirection.NORTH:
+            return (grid_x + grid_width // 2, grid_y - 1)
+        elif direction == RoomDirection.SOUTH:
+            return (grid_x + grid_width // 2, grid_y + grid_height)
+        elif direction == RoomDirection.EAST:
+            return (grid_x + grid_width, grid_y + grid_height // 2)
+        else:  # WEST
+            return (grid_x - 1, grid_y + grid_height // 2)
 
     # If we have an origin grid point for the passage, 
     if grid_origin is not None: 
