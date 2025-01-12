@@ -204,14 +204,12 @@ class OccupancyGrid:
         # Apply clip rect if specified
         if clip_rect:
             clip_x, clip_y, clip_width, clip_height = map_to_grid_rect(clip_rect)
-            # Get intersection
-            x1 = max(grid_x, clip_x)
-            y1 = max(grid_y, clip_y)
-            x2 = min(grid_x + grid_width, clip_x + clip_width)
-            y2 = min(grid_y + grid_height, clip_y + clip_height)
-            grid_x, grid_y = x1, y1
-            grid_width = max(0, x2 - x1)
-            grid_height = max(0, y2 - y1)
+            # Get intersection using Rectangle utility
+            grid_rect = Rectangle(grid_x, grid_y, grid_width, grid_height)
+            clip_rect = Rectangle(clip_x, clip_y, clip_width, clip_height)
+            intersection = grid_rect.intersection(clip_rect)
+            grid_x, grid_y = intersection.x, intersection.y
+            grid_width, grid_height = intersection.width, intersection.height
             
         # Early out if no valid region
         if grid_width <= 0 or grid_height <= 0:
