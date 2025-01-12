@@ -1,6 +1,6 @@
 """Generic distribution system for weighted random selection with generator functions."""
 
-from typing import Any, Callable, Dict, List, Sequence, Tuple, TypeVar, Union
+from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple, TypeVar, Union
 import random
 
 T = TypeVar('T')
