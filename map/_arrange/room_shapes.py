@@ -1,7 +1,8 @@
 """Room shape generation with controlled size distributions."""
 
 from dataclasses import dataclass
-from typing import Dict, Any, Callable, Tuple, List
+from typing import Dict, Any, Callable, Optional, Tuple, List
+from map._arrange.arrange_utils import get_size_index_from_tags
 from map.room import RoomType
 from map._arrange.distribution import normalize_distribution, get_from_distribution
 
@@ -47,7 +48,7 @@ ROOM_DISTRIBUTION: List[Tuple[Tuple[float, float, float], RoomShape | Callable, 
 # Normalize the distribution once at module load
 NORMALIZED_DISTRIBUTION = normalize_distribution(ROOM_DISTRIBUTION)
 
-def get_random_room_shape(last_shape: RoomShape = None, options: Optional['Options'] = None) -> RoomShape:
+def get_random_room_shape(last_shape: RoomShape = None, options: 'Options' = None) -> RoomShape:
     """Get a random room shape based on weighted probabilities and map size.
     
     Args:
