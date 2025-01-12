@@ -201,8 +201,17 @@ def get_adjacent_room_rect(room: Room, direction: RoomDirection, grid_dist: int,
     # Calculate all corners in local space
     p1 = Point2D(dist + 1, left_offset)
     p2 = Point2D(p1.x + (grid_depth - 1), p1.y)  # Top edge
-    p3 = Point2D(p1.x, p1.y - (grid_breadth - 1))  # Left edge
+    p3 = Point2D(p1.x, p1.y - (grid_breadth - 1))  # Left edge 
     p4 = Point2D(p2.x, p3.y)  # Remaining corner
+
+    # For circular rooms, adjust position to be centered
+    if isinstance(room, Room) and room.room_type == RoomType.CIRCULAR:
+        # Adjust all points to center the circle
+        center_offset = Point2D(grid_depth/2, -grid_breadth/2)
+        p1 = Point2D(dist + 1 + center_offset.x, center_offset.y)
+        p2 = Point2D(p1.x + (grid_depth - 1), p1.y)
+        p3 = Point2D(p1.x, p1.y - (grid_breadth - 1))
+        p4 = Point2D(p2.x, p3.y)
     print(f"  Local corners: p1({p1.x}, {p1.y}), p2({p2.x}, {p2.y}), p3({p3.x}, {p3.y}), p4({p4.x}, {p4.y})")
     
     # Transform all corners to world space
