@@ -29,15 +29,23 @@ class OccupancyGrid:
     - Blocked flag (1 bit)
     """
     
-    # Bit masks for grid values
-    TYPE_MASK = 0x1F  # 5 bits for element type
-    INDEX_MASK = 0x3FFFFFF  # 26 bits for element index
-    BLOCKED_MASK = 0x80000000  # 1 bit for blocked flag
+    # Bit layout:
+    # [31]     = BLOCKED flag
+    # [30-26]  = Element type (5 bits)
+    # [25-16]  = Reserved
+    # [15-0]   = Element index (16 bits)
+    # Note: Index 0 is marked as occupied by setting bit 16
+    
+    # Bit masks
+    BLOCKED_MASK = 0x80000000  # Bit 31
+    TYPE_MASK   = 0x7C000000  # Bits 30-26
+    OCCUPIED_BIT = 0x00010000  # Bit 16
+    INDEX_MASK  = 0x0000FFFF  # Bits 15-0
     
     # Bit shifts
-    TYPE_SHIFT = 0
-    INDEX_SHIFT = 5
     BLOCKED_SHIFT = 31
+    TYPE_SHIFT = 26
+    INDEX_SHIFT = 0
     
     def __init__(self, width: int = 32, height: int = 32) -> None:
         """Initialize an empty occupancy grid with default size."""
@@ -113,39 +121,62 @@ class OccupancyGrid:
         for i in range(len(self._grid)):
             self._grid[i] = 0
             
+    def _encode_cell(self, element_type: ElementType, element_idx: int, blocked: bool = False) -> int:
+        """Encode cell information into a single integer."""
+        if element_idx < 0 or element_idx > 0xFFFF:
+            raise ValueError(f"Element index {element_idx} out of valid range (0-65535)")
+            
+        value = element_idx & self.INDEX_MASK
+        value |= self.OCCUPIED_BIT  # Always set occupied bit
+        value |= (element_type.value << self.TYPE_SHIFT) & self.TYPE_MASK
+        if blocked:
+            value |= self.BLOCKED_MASK
+        return value
+    
+    def _decode_cell(self, value: int) -> Tuple[ElementType, int, bool]:
+        """Decode cell information from an integer."""
+        if not value & self.OCCUPIED_BIT:
+            return ElementType.NONE, -1, False
+            
+        element_type = ElementType((value & self.TYPE_MASK) >> self.TYPE_SHIFT)
+        element_idx = value & self.INDEX_MASK
+        blocked = bool(value & self.BLOCKED_MASK)
+        return element_type, element_idx, blocked
+    
     def mark_cell(self, x: int, y: int, element_type: ElementType, 
                   element_idx: int, blocked: bool = False) -> None:
         """Mark a grid cell with element info."""
         self._ensure_contains(x, y)
         idx = self._to_grid_index(x, y)
         if idx is not None:
-            value = (
-                ((element_type & self.TYPE_MASK) << self.TYPE_SHIFT) |
-                ((element_idx & self.INDEX_MASK) << self.INDEX_SHIFT) |
-                ((1 if blocked else 0) << self.BLOCKED_SHIFT)
-            )
-            self._grid[idx] = value
+            self._grid[idx] = self._encode_cell(element_type, element_idx, blocked)
             
     def get_cell_info(self, x: int, y: int) -> Tuple[ElementType, int, bool]:
         """Get element type, index and blocked status at grid position."""
         idx = self._to_grid_index(x, y)
         if idx is not None:
-            value = self._grid[idx]
-            element_type = ElementType(value & self.TYPE_MASK)
-            element_idx = (value >> self.INDEX_SHIFT) & self.INDEX_MASK
-            blocked = bool(value & self.BLOCKED_MASK)
-            return element_type, element_idx, blocked
+            return self._decode_cell(self._grid[idx])
         return ElementType.NONE, -1, False
     
     def is_occupied(self, x: int, y: int) -> bool:
         """Check if a grid position is occupied."""
-        element_type, _, _ = self.get_cell_info(x, y)
-        return element_type != ElementType.NONE
+        idx = self._to_grid_index(x, y)
+        return idx is not None and bool(self._grid[idx] & self.OCCUPIED_BIT)
     
     def is_blocked(self, x: int, y: int) -> bool:
         """Check if a grid position is blocked (can't place props)."""
-        _, _, blocked = self.get_cell_info(x, y)
-        return blocked
+        idx = self._to_grid_index(x, y)
+        return idx is not None and bool(self._grid[idx] & self.BLOCKED_MASK)
+    
+    def get_element_type(self, x: int, y: int) -> ElementType:
+        """Get the element type at a grid position."""
+        element_type, _, _ = self.get_cell_info(x, y)
+        return element_type
+    
+    def get_element_index(self, x: int, y: int) -> int:
+        """Get the element index at a grid position."""
+        _, element_idx, _ = self.get_cell_info(x, y)
+        return element_idx
     
     def mark_rectangle(self, rect: Rectangle, element_type: ElementType,
                       element_idx: int, options: 'Options',
