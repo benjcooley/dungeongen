@@ -153,12 +153,13 @@ def make_room_transform(room: Room, direction: RoomDirection, wall_pos: float = 
         room: The source room
         direction: Direction to exit from
         wall_pos: Position along wall (0.0 to 1.0, 0.5 is center)
+        align_to: Optional coordinate to snap to
         
     Returns:
         Matrix2D configured for the local coordinate space
     """
     # Get exit point and direction vectors
-    exit_pos = align_to if align_to else get_room_exit_grid_position(room, direction, wall_pos)
+    exit_pos = get_room_exit_grid_position(room, direction, wall_pos, align_to=align_to)
     forward = direction.get_forward()
     left = direction.get_left()
     
