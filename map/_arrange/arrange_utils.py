@@ -111,22 +111,28 @@ def get_room_exit_grid_position(room: Room, direction: RoomDirection, wall_pos: 
     if room.room_type == RoomType.CIRCULAR:
         wall_pos = 0.5
 
+    # Calculate exit point along the wall
+    if direction == RoomDirection.NORTH:
+        x = grid_x + int((grid_width - 1) * wall_pos)
+        y = grid_y - 1
+    elif direction == RoomDirection.SOUTH:
+        x = grid_x + int((grid_width - 1) * wall_pos)
+        y = grid_y + grid_height
+    elif direction == RoomDirection.EAST:
+        x = grid_x + grid_width
+        y = grid_y + int((grid_height - 1) * wall_pos)
+    else:  # WEST
+        x = grid_x - 1
+        y = grid_y + int((grid_height - 1) * wall_pos)
+
     # If we have an origin point, use its coordinate for the appropriate axis
     if grid_origin is not None:
         if direction in (RoomDirection.NORTH, RoomDirection.SOUTH):
-            grid_x = grid_origin[0]
+            x = grid_origin[0]
         else:  # EAST, WEST
-            grid_y = grid_origin[1]
-
-    # Calculate exit point along the wall
-    if direction == RoomDirection.NORTH:
-        return (grid_x + int((grid_width - 1) * wall_pos), grid_y - 1)  # One cell above
-    elif direction == RoomDirection.SOUTH:
-        return (grid_x + int((grid_width - 1) * wall_pos), grid_y + grid_height)  # One cell below
-    elif direction == RoomDirection.EAST:
-        return (grid_x + grid_width, grid_y + int((grid_height - 1) * wall_pos))  # One cell right
-    else:  # WEST
-        return (grid_x - 1, grid_y + int((grid_height - 1) * wall_pos))  # One cell left
+            y = grid_origin[1]
+            
+    return (x, y)
 
 def make_room_transform(room: Room, direction: RoomDirection, wall_pos: float = 0.5) -> Matrix2D:
     """Create a transform matrix for positioning relative to a room's exit.
