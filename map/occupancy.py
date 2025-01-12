@@ -17,6 +17,7 @@ class ElementType(IntFlag):
     ROOM = auto()
     PASSAGE = auto()
     DOOR = auto()
+    STAIRS = auto()
     BLOCKED = auto()  # For doorway areas that can't have props
 
 class OccupancyGrid:
