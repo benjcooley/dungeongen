@@ -143,39 +143,39 @@ class OccupancyGrid:
         blocked = bool(value & self.BLOCKED_MASK)
         return element_type, element_idx, blocked
     
-    def mark_cell(self, x: int, y: int, element_type: ElementType, 
+    def mark_cell(self, grid_x: int, grid_y: int, element_type: ElementType, 
                   element_idx: int, blocked: bool = False) -> None:
         """Mark a grid cell with element info."""
-        self._ensure_contains(x, y)
-        idx = self._to_grid_index(x, y)
+        self._ensure_contains(grid_x, grid_y)
+        idx = self._to_grid_index(grid_x, grid_y)
         if idx is not None:
             self._grid[idx] = self._encode_cell(element_type, element_idx, blocked)
             
-    def get_cell_info(self, x: int, y: int) -> Tuple[ElementType, int, bool]:
+    def get_cell_info(self, grid_x: int, grid_y: int) -> Tuple[ElementType, int, bool]:
         """Get element type, index and blocked status at grid position."""
-        idx = self._to_grid_index(x, y)
+        idx = self._to_grid_index(grid_x, grid_y)
         if idx is not None:
             return self._decode_cell(self._grid[idx])
         return ElementType.NONE, -1, False
     
-    def is_occupied(self, x: int, y: int) -> bool:
+    def is_occupied(self, grid_x: int, grid_y: int) -> bool:
         """Check if a grid position is occupied."""
-        idx = self._to_grid_index(x, y)
+        idx = self._to_grid_index(grid_x, grid_y)
         return idx is not None and bool(self._grid[idx] & self.OCCUPIED_BIT)
     
-    def is_blocked(self, x: int, y: int) -> bool:
+    def is_blocked(self, grid_x: int, grid_y: int) -> bool:
         """Check if a grid position is blocked (can't place props)."""
-        idx = self._to_grid_index(x, y)
+        idx = self._to_grid_index(grid_x, grid_y)
         return idx is not None and bool(self._grid[idx] & self.BLOCKED_MASK)
     
-    def get_element_type(self, x: int, y: int) -> ElementType:
+    def get_element_type(self, grid_x: int, grid_y: int) -> ElementType:
         """Get the element type at a grid position."""
-        element_type, _, _ = self.get_cell_info(x, y)
+        element_type, _, _ = self.get_cell_info(grid_x, grid_y)
         return element_type
     
-    def get_element_index(self, x: int, y: int) -> int:
+    def get_element_index(self, grid_x: int, grid_y: int) -> int:
         """Get the element index at a grid position."""
-        _, element_idx, _ = self.get_cell_info(x, y)
+        _, element_idx, _ = self.get_cell_info(grid_x, grid_y)
         return element_idx
     
     def mark_rectangle(self, rect: Rectangle, element_type: ElementType,
