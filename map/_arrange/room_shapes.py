@@ -23,28 +23,25 @@ def generate_large_room(data: Dict[str, Any]) -> RoomShape:
     # Example special case generation - could be expanded
     return make_room_shape(RoomType.RECTANGULAR, 5, 7)
 
-# Define room shape distribution with weights
-# Format: (weights, item, requirement_fn)
-ROOM_DISTRIBUTION: List[Tuple[Tuple[float], RoomShape | Callable, None]] = [
-    # Common small symmetric rooms
-    ((1.0,), make_room_shape(RoomType.RECTANGULAR, 3, 3), None),
-    ((0.8,), make_room_shape(RoomType.CIRCULAR, 3, 3), None),
+# Define room shape distribution with weights for different map sizes
+# Format: (weights[small, medium, large], item, requirement_fn)
+ROOM_DISTRIBUTION: List[Tuple[Tuple[float, float, float], RoomShape | Callable, None]] = [
+    # Common small symmetric rooms (more common in small maps)
+    ((2.0, 1.0, 0.5), make_room_shape(RoomType.RECTANGULAR, 3, 3), None),
+    ((1.5, 0.8, 0.4), make_room_shape(RoomType.CIRCULAR, 3, 3), None),
     
-    # Rare small asymmetric rooms
-    ((0.1,), make_room_shape(RoomType.RECTANGULAR, 2, 3), None),
-    ((0.1,), make_room_shape(RoomType.RECTANGULAR, 3, 2), None),
+    # Small asymmetric rooms (rare in all sizes)
+    ((0.2, 0.1, 0.05), make_room_shape(RoomType.RECTANGULAR, 2, 3), None),
+    ((0.2, 0.1, 0.05), make_room_shape(RoomType.RECTANGULAR, 3, 2), None),
     
-    # Medium rooms (most common)
-    ((0.8,), make_room_shape(RoomType.RECTANGULAR, 3, 4), None),
-    ((0.8,), make_room_shape(RoomType.RECTANGULAR, 4, 3), None),
+    # Medium rooms (balanced in medium maps)
+    ((0.4, 1.0, 0.8), make_room_shape(RoomType.RECTANGULAR, 3, 4), None),
+    ((0.4, 1.0, 0.8), make_room_shape(RoomType.RECTANGULAR, 4, 3), None),
     
-    # Larger rooms (less common)
-    ((0.3,), make_room_shape(RoomType.RECTANGULAR, 3, 5), None),
-    ((0.2,), make_room_shape(RoomType.RECTANGULAR, 5, 5), None),
-    ((0.1,), make_room_shape(RoomType.CIRCULAR, 5, 5), None),
-    
-    # Special case generator for very large rooms (rare)
-    ((0.05,), generate_large_room, None)
+    # Larger rooms (more common in large maps)
+    ((0.1, 0.4, 0.8), make_room_shape(RoomType.RECTANGULAR, 3, 5), None),
+    ((0.1, 0.3, 0.6), make_room_shape(RoomType.RECTANGULAR, 4, 4), None),
+    ((0.05, 0.2, 0.4), make_room_shape(RoomType.CIRCULAR, 4, 4), None)
 ]
 
 # Normalize the distribution once at module load
