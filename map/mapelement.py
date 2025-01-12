@@ -261,6 +261,5 @@ class MapElement:
         if isinstance(self._shape, Circle):
             grid.mark_circle(self._shape, element_idx, self._options)
         else:
-            # For rectangles and other shapes, use bounds
-            bounds = self._shape.recalculate_bounds()
-            grid.mark_rectangle(bounds, element_idx, self._options)
+            # For rectangles and other shapes, use existing bounds
+            grid.mark_rectangle(self._bounds, element_idx, self._options)
