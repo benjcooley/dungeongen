@@ -6,6 +6,7 @@ from typing import List, Protocol, Sequence, TypeAlias
 from algorithms.types import Point
 from algorithms.math import Matrix2D
 from algorithms.rotation import Rotation
+from constants import CELL_SIZE
 
 # Forward declaration of Rectangle type
 Rectangle: TypeAlias = 'Rectangle'
