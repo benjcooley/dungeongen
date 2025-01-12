@@ -88,8 +88,8 @@ def connect_rooms(
 
     # Make sure we don't have too many doors
     dist = grid_line_dist(r1_x, r1_y, r2_x, r2_y)
-    if start_door_type is not None and end_door_type is not None and dist <= 3:
-        raise ValueError("Cannot have two doors in a passage 3 grids or smaller")
+    if start_door_type is not None and end_door_type is not None and dist <= 2:
+        raise ValueError("Cannot have two doors in a passage 2 grids or smaller")
 
     # Deltas
     dx, dy = grid_line_to_grid_deltas(r1_x, r1_y, r2_x, r2_y)
@@ -321,33 +321,28 @@ class _RoomArranger:
             start_door = passage_config.doors.start_door
             end_door = passage_config.doors.end_door
 
-            try:
-                # Create connected room
-                new_room, _, _, _ = create_connected_room(
-                    source_room,
-                    connect_dir,
-                    distance,
-                    room_shape.breadth,
-                    room_shape.depth,
-                    room_type=room_shape.room_type,
-                    start_door_type=start_door,
-                    end_door_type=end_door,
-                    breadth_offset=room_shape.breadth_offset
-                )
+            # Create connected room
+            new_room, _, _, _ = create_connected_room(
+                source_room,
+                connect_dir,
+                distance,
+                room_shape.breadth,
+                room_shape.depth,
+                room_type=room_shape.room_type,
+                start_door_type=start_door,
+                end_door_type=end_door,
+                breadth_offset=room_shape.breadth_offset
+            )
+            
+            # Update first/last room references based on which end we grew from
+            if grow_from_first:
+                first_room = new_room
+            else:
+                last_room = new_room
                 
-                # Update first/last room references based on which end we grew from
-                if grow_from_first:
-                    first_room = new_room
-                else:
-                    last_room = new_room
-                    
-                self.rooms.append(new_room)
-                last_shape = room_shape
-                attempts = 0  # Reset attempts on success
-                
-            except ValueError:
-                # If room creation fails, try again
-                continue
+            self.rooms.append(new_room)
+            last_shape = room_shape
+            attempts = 0  # Reset attempts on success
                 
         return self.rooms
 
