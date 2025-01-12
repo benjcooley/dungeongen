@@ -10,6 +10,7 @@ from graphics.conversions import grid_to_map
 from map.enums import Layers
 from constants import CELL_SIZE
 from typing import TYPE_CHECKING
+from map.occupancy import ElementType
 
 if TYPE_CHECKING:
     from map.occupancy import OccupancyGrid
@@ -260,16 +261,16 @@ class Door(MapElement):
         # Mark the door cell itself
         grid_x = int(self._x / CELL_SIZE)
         grid_y = int(self._y / CELL_SIZE)
-        grid.mark_cell(grid_x, grid_y, grid.ElementType.DOOR, element_idx)
+        grid.mark_cell(grid_x, grid_y, ElementType.DOOR, element_idx)
         
         # Mark blocked areas on both sides of door
         if self._orientation == DoorOrientation.HORIZONTAL:
             # Mark 3 cells before and after horizontally
             for dx in range(-3, 4):
                 if dx != 0:  # Skip the door cell itself
-                    grid.mark_cell(grid_x + dx, grid_y, grid.ElementType.BLOCKED, element_idx, blocked=True)
+                    grid.mark_cell(grid_x + dx, grid_y, ElementType.BLOCKED, element_idx, blocked=True)
         else:  # VERTICAL
             # Mark 3 cells before and after vertically
             for dy in range(-3, 4):
                 if dy != 0:  # Skip the door cell itself
-                    grid.mark_cell(grid_x, grid_y + dy, grid.ElementType.BLOCKED, element_idx, blocked=True)
+                    grid.mark_cell(grid_x, grid_y + dy, ElementType.BLOCKED, element_idx, blocked=True)
