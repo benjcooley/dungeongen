@@ -5,6 +5,7 @@ from typing import Tuple, TYPE_CHECKING
 from altair import Point
 from constants import CELL_SIZE
 import math
+from algorithms.shapes import Rectangle
 
 if TYPE_CHECKING:
     from options import Options
@@ -117,18 +118,20 @@ def grid_to_map_rect(rect: Rectangle | tuple[float, float, float, float]) -> tup
     """Convert a grid rectangle to map coordinates.
     
     Args:
-        grid_x: Rectangle X coordinate in grid units
-        grid_y: Rectangle Y coordinate in grid units
-        grid_width: Rectangle width in grid units
-        grid_height: Rectangle height in grid units
+        rect: Rectangle or tuple of (x, y, width, height) in grid units
         
     Returns:
         Tuple of (map_x, map_y, map_width, map_height)
     """
-    map_x = grid_x * CELL_SIZE
-    map_y = grid_y * CELL_SIZE
-    map_width = grid_width * CELL_SIZE
-    map_height = grid_height * CELL_SIZE
+    if isinstance(rect, Rectangle):
+        x, y, width, height = rect.x, rect.y, rect.width, rect.height
+    else:
+        x, y, width, height = rect
+        
+    map_x = x * CELL_SIZE
+    map_y = y * CELL_SIZE
+    map_width = width * CELL_SIZE
+    map_height = height * CELL_SIZE
     return (map_x, map_y, map_width, map_height)
 
 def grid_rect_points(rect_x: float, rect_y: float, rect_width: float, rect_height: float) -> tuple[tuple[float, float], tuple[float, float]]:

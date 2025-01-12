@@ -7,11 +7,11 @@ import math
 import skia
 from algorithms.shapes import Rectangle, Circle
 from constants import CELL_SIZE
+from graphics.conversions import map_to_grid, map_rect_to_grid_points, map_to_grid_rect
 
 if TYPE_CHECKING:
     from options import Options
     from map.mapelement import MapElement
-from graphics.conversions import map_to_grid, map_rect_to_grid_points
 
 class ElementType(IntFlag):
     """Bit flags for element types in occupancy grid."""
