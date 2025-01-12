@@ -268,9 +268,10 @@ class _RoomArranger:
         start_room: Room,
         direction: 'RoomDirection',
         grow_direction: GrowDirection = GrowDirection.FORWARD,
-        max_attempts: int = 100
+        max_attempts: int = 100,
+        branch_chance: float = 0.4
     ) -> List[Room]:
-        """Arrange rooms in a linear sequence.
+        """Arrange rooms in a branching sequence.
         
         Args:
             num_rooms: Number of rooms to generate
@@ -278,6 +279,7 @@ class _RoomArranger:
             direction: Primary direction to grow in
             grow_direction: Controls which room to grow from
             max_attempts: Maximum attempts before giving up
+            branch_chance: Chance (0-1) to start a new branch each room
             
         Returns:
             List of created rooms
@@ -299,7 +301,36 @@ class _RoomArranger:
         while len(self.rooms) < num_rooms and attempts < max_attempts:
             attempts += 1
             
-            # Determine which room to grow from based on grow_direction
+            # Possibly start a new branch
+            if random.random() < branch_chance and len(self.rooms) < num_rooms - 1:
+                # Pick a random room to branch from
+                source_room = random.choice(self.rooms)
+                
+                # Pick a new random direction excluding current
+                possible_dirs = [
+                    RoomDirection.NORTH, RoomDirection.SOUTH,
+                    RoomDirection.EAST, RoomDirection.WEST
+                ]
+                possible_dirs.remove(direction)
+                new_direction = random.choice(possible_dirs)
+                
+                # Pick a random grow mode
+                new_grow_mode = random.choice(list(GrowDirection))
+                
+                # Recursively arrange a new branch
+                remaining_rooms = num_rooms - len(self.rooms)
+                if remaining_rooms > 1:
+                    branch_size = random.randint(1, remaining_rooms - 1)
+                    self.arrange_linear(
+                        branch_size,
+                        source_room,
+                        new_direction,
+                        new_grow_mode,
+                        max_attempts,
+                        branch_chance * 0.5  # Reduce branch chance for sub-branches
+                    )
+                    
+            # Continue main sequence
             grow_from_first = (
                 random.random() < 0.5 if grow_direction == GrowDirection.BOTH
                 else grow_direction == GrowDirection.BACKWARD
@@ -308,10 +339,10 @@ class _RoomArranger:
             # Set source room and growth direction
             if grow_from_first:
                 source_room = first_room
-                connect_dir = direction.get_opposite()  # Grow in opposite direction
+                connect_dir = direction.get_opposite()
             else:
                 source_room = last_room
-                connect_dir = direction  # Grow in primary direction
+                connect_dir = direction
                 
             # Get random room shape using map options
             room_shape = get_random_room_shape(last_shape, options=source_room.map.options)

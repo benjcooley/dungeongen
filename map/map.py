@@ -370,7 +370,8 @@ class Map:
             random.randint(min_rooms, max_rooms),
             start_room,
             direction=initial_direction,
-            grow_direction=GrowDirection.FORWARD
+            grow_direction=GrowDirection.FORWARD,
+            branch_chance=0.4
         )
         
         # Decorate all elements
