@@ -108,10 +108,10 @@ class OccupancyGrid:
         self._origin_x = new_origin_x
         self._origin_y = new_origin_y
     
-    def _to_grid_index(self, x: int, y: int) -> Optional[int]:
-        """Convert world coordinates to grid array index."""
-        grid_x = x + self._origin_x
-        grid_y = y + self._origin_y
+    def _to_grid_index(self, grid_x: int, grid_y: int) -> Optional[int]:
+        """Convert grid coordinates to array index."""
+        array_x = grid_x + self._origin_x
+        array_y = grid_y + self._origin_y
         if 0 <= grid_x < self.width and 0 <= grid_y < self.height:
             return grid_y * self.width + grid_x
         return None
@@ -181,7 +181,10 @@ class OccupancyGrid:
     def mark_rectangle(self, rect: Rectangle, element_type: ElementType,
                       element_idx: int, options: 'Options',
                       clip_rect: Optional[Rectangle] = None) -> None:
-        """Mark all grid positions covered by a rectangle."""
+        """Mark all grid positions covered by a rectangle.
+        
+        Converts the rectangle's map coordinates to grid coordinates before marking cells.
+        """
         # Convert rectangle bounds to grid coordinates
         start_x, start_y = map_to_grid(rect.x, rect.y)
         end_x, end_y = map_to_grid(rect.x + rect.width, rect.y + rect.height)
@@ -212,7 +215,10 @@ class OccupancyGrid:
     def mark_circle(self, circle: Circle, element_type: ElementType,
                    element_idx: int, options: 'Options',
                    clip_rect: Optional[Rectangle] = None) -> None:
-        """Mark all grid positions covered by a circle."""
+        """Mark all grid positions covered by a circle.
+        
+        Converts the circle's map coordinates to grid coordinates before marking cells.
+        """
         # Convert circle to grid coordinates
         center_x, center_y = map_to_grid(circle.cx, circle.cy)
         radius = circle._inflated_radius / CELL_SIZE
