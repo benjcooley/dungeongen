@@ -228,13 +228,15 @@ class _RoomArranger:
         min_size: int,
         max_size: int,
         min_spacing: int = 3,
-        max_spacing: int = 6
+        max_spacing: int = 6,
+        options: 'Options' = None
     ):
         self.dungeon_map = dungeon_map
         self.min_size = min_size
         self.max_size = max_size
         self.min_spacing = min_spacing
         self.max_spacing = max_spacing
+        self.options = options or dungeon_map.options
         self.rooms: List[Room] = []
         
     def create_room(self, entrance_grid_x: float, entrance_grid_y: float) -> Room:
@@ -365,7 +367,8 @@ def arrange_rooms(
     max_rooms: int = 7,
     min_size: int = 3,
     max_size: int = 7,
-    start_room: Optional[Room] = None
+    start_room: Optional[Room] = None,
+    options: Optional['Options'] = None
 ) -> List[Room]:
     """Arrange rooms according to the specified style.
     
@@ -381,7 +384,8 @@ def arrange_rooms(
         List of created Room instances
     """
     num_rooms = random.randint(min_rooms, max_rooms)
-    arranger = _RoomArranger(dungeon_map, min_size, max_size)
+    options = options or dungeon_map.options
+    arranger = _RoomArranger(dungeon_map, min_size, max_size, options=options)
     
     # Create start room if none provided
     if start_room is None:
