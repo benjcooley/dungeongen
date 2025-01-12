@@ -33,6 +33,7 @@ if TYPE_CHECKING:
     from map.map import Map
     from options import Options
     from map._props.prop import Prop
+    from map.occupancy import OccupancyGrid
 
 class RoomType(Enum):
     """Types of column props."""
