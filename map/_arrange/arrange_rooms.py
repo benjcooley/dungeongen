@@ -155,7 +155,7 @@ def create_connected_room(
     start_door_type: Optional[DoorType] = None,
     end_door_type: Optional[DoorType] = None,
     breadth_offset: float = 0.0,
-    passage_point: Optional[Tuple[int, int]] = None
+    align_to: Optional[Tuple[int, int]] = None
 ) -> Tuple[Room, Optional[Door], Passage, Optional[Door]]:
     """Create a new room connected to an existing room via a passage.
         
@@ -340,7 +340,7 @@ class _RoomArranger:
                 start_door_type=start_door,
                 end_door_type=end_door,
                 breadth_offset=room_shape.breadth_offset,
-                passage_point=initial_passage_point
+                align_to=initial_passage_point
             )
             
             # Update first/last room references based on which end we grew from
