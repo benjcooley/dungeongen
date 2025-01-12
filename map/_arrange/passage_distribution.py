@@ -3,6 +3,7 @@
 from dataclasses import dataclass
 from enum import Enum, auto
 from typing import Dict, Any, Callable, List, Optional, Tuple
+from options import Options
 from map._arrange.distribution import normalize_distribution, get_from_distribution
 from map.door import DoorType
 
