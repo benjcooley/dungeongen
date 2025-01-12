@@ -198,26 +198,20 @@ class OccupancyGrid:
             self.mark_circle(shape, element_type, element_idx, clip_rect)
             return
             
-        # Convert rectangle to grid coordinates
-        grid_x, grid_y, grid_width, grid_height = map_to_grid_rect(shape)
+        # Convert to grid rectangle
+        grid_rect = Rectangle(*map_to_grid_rect(shape))
             
         # Apply clip rect if specified
         if clip_rect:
-            clip_x, clip_y, clip_width, clip_height = map_to_grid_rect(clip_rect)
-            # Get intersection using Rectangle utility
-            grid_rect = Rectangle(grid_x, grid_y, grid_width, grid_height)
-            clip_rect = Rectangle(clip_x, clip_y, clip_width, clip_height)
-            intersection = grid_rect.intersection(clip_rect)
-            grid_x, grid_y = intersection.x, intersection.y
-            grid_width, grid_height = intersection.width, intersection.height
+            grid_rect = grid_rect.intersection(Rectangle(*map_to_grid_rect(clip_rect)))
             
         # Early out if no valid region
-        if grid_width <= 0 or grid_height <= 0:
+        if not grid_rect.is_valid:
             return
             
         # Fill the grid rectangle
-        for x in range(int(grid_x), int(grid_x + grid_width)):
-            for y in range(int(grid_y), int(grid_y + grid_height)):
+        for x in range(int(grid_rect.x), int(grid_rect.x + grid_rect.width)):
+            for y in range(int(grid_rect.y), int(grid_rect.y + grid_rect.height)):
                 self.mark_cell(x, y, element_type, element_idx)
     
     def mark_circle(self, circle: Circle, element_type: ElementType,
@@ -230,24 +224,12 @@ class OccupancyGrid:
             element_idx: Index of element being marked
             clip_rect: Optional rectangle to clip rasterization to
         """
-        # Get circle bounds
-        bounds = circle.bounds
-        
-        # Convert to grid coordinates and get intersection with grid bounds
-        p1, p2 = map_rect_to_grid_points(bounds.x, bounds.y, bounds.width, bounds.height)
-        grid_rect = Rectangle(p1[0], p1[1], p2[0] - p1[0] + 1, p2[1] - p1[1] + 1)
-        bounds_rect = Rectangle(-self._origin_x, -self._origin_y, 
-                              self.width - self._origin_x, self.height - self._origin_y)
-        grid_rect = grid_rect.intersection(bounds_rect)
+        # Convert circle bounds to grid coordinates
+        grid_rect = Rectangle(*map_to_grid_rect(circle.bounds))
         
         # Apply clip rect if specified
         if clip_rect:
-            clip_p1, clip_p2 = map_rect_to_grid_points(
-                clip_rect.x, clip_rect.y, clip_rect.width, clip_rect.height)
-            clip_rect = Rectangle(clip_p1[0], clip_p1[1],
-                                clip_p2[0] - clip_p1[0] + 1, 
-                                clip_p2[1] - clip_p1[1] + 1)
-            grid_rect = grid_rect.intersection(clip_rect)
+            grid_rect = grid_rect.intersection(Rectangle(*map_to_grid_rect(clip_rect)))
             
         # Early out if no valid region
         if not grid_rect.is_valid:
