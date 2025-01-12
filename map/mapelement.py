@@ -1,3 +1,4 @@
+from abc import abstractmethod
 from typing import List, Optional, TYPE_CHECKING, Sequence, Union
 import random
 import math
@@ -250,6 +251,7 @@ class MapElement:
         return (self._bounds.x + (grid_x * CELL_SIZE), 
                 self._bounds.y + (grid_y * CELL_SIZE))
 
+    @abstractmethod
     def draw_occupied(self, grid: 'OccupancyGrid', element_idx: int) -> None:
         """Draw this element's shape into the occupancy grid.
             
@@ -257,9 +259,4 @@ class MapElement:
             grid: The occupancy grid to mark
             element_idx: Index of this element in the map
         """
-        # Handle circles differently from rectangles
-        if isinstance(self._shape, Circle):
-            grid.mark_circle(self._shape, element_idx, self._options)
-        else:
-            # For rectangles and other shapes, use existing bounds
-            grid.mark_rectangle(self._bounds, element_idx, self._options)
+        pass
