@@ -16,7 +16,7 @@ def main():
     random.seed(seed)
     print(f"Using random seed: {seed}")
     options = Options()
-    options.tags.add(str(Tags.SMALL))  # Test with small-sized dungeons
+    options.tags.add(str(Tags.SMALL))  # Generate small-sized dungeons
     
     # Initialize Skia canvas
     surface = skia.Surface(options.canvas_width, options.canvas_height)
