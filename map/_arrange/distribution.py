@@ -89,7 +89,11 @@ def get_from_distribution(
     gen_data: Dict[str, Any] = None,
     max_attempts: int = 100
 ) -> T:
-    """Get a random item from a normalized distribution using specified weight column.
+    """Try to get a random item from a normalized distribution, handling requirements.
+    
+    This is the more complex version that supports requirement functions and will retry
+    multiple times if requirements aren't met. Use get_from_distribution() if you don't
+    need requirement handling.
     
     Args:
         dist: List of (weights, item, requirement_fn) tuples
@@ -98,10 +102,7 @@ def get_from_distribution(
         max_attempts: Maximum number of selection attempts before giving up
         
     Returns:
-        Selected item, calling generator function if needed
-        
-    Raises:
-        ValueError: If no valid item could be selected after max_attempts
+        Selected item if found, None if no valid item could be selected after max_attempts
     """
     gen_data = gen_data or {}
     attempts = 0
