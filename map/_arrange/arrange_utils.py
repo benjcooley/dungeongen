@@ -2,6 +2,7 @@
 
 from enum import Enum, auto
 from typing import Dict, Optional, Tuple
+from tags import Tags
 import skia
 from algorithms.math import Matrix2D, Point2D
 from algorithms.shapes import Rectangle
