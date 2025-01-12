@@ -187,14 +187,8 @@ def get_adjacent_room_rect(room: Room, direction: RoomDirection, grid_dist: int,
     # Get transform for local coordinate space
     transform = make_room_transform(room, direction, wall_pos)
     
-    print(f"\nCalculating room position:")
-    print(f"  Direction: {direction}")
-    print(f"  Distance: {grid_dist}")
-    print(f"  Breadth: {grid_breadth}")
-    print(f"  Depth: {grid_depth}")
-    print(f"  Transform matrix:")
-    print(f"    [{transform.a:.1f} {transform.b:.1f} {transform.tx:.1f}]")
-    print(f"    [{transform.c:.1f} {transform.d:.1f} {transform.ty:.1f}]")
+    print(f"\nCalculating room position: dir={direction}, dist={grid_dist}, breadth={grid_breadth}, depth={grid_depth}")
+    print(f"Transform matrix: [{transform.a:.1f} {transform.b:.1f} {transform.tx:.1f}] [{transform.c:.1f} {transform.d:.1f} {transform.ty:.1f}]")
     
     # Calculate passage points. We step from the room exit to the far room's exit.
     # Then we step into the room one grid, and go to the near left corner grid, then we move
@@ -208,9 +202,7 @@ def get_adjacent_room_rect(room: Room, direction: RoomDirection, grid_dist: int,
     r1 = p2 + Point2D(1, -(grid_breadth - 1) / 2 + breadth_offset)  # Near left grid corner of room
     r2 = r1 + Point2D(grid_depth - 1, grid_breadth - 1) # Far right grid corner of room
 
-    print(f"  Local points:")
-    print(f"    Passage: p1({p1.x}, {p1.y}), p2({p2.x}, {p2.y})")
-    print(f"    Room: r1({r1.x}, {r1.y}), r2({r2.x}, {r2.y})")
+    print(f"Local points: passage=p1({p1.x}, {p1.y}), p2({p2.x}, {p2.y}), room=r1({r1.x}, {r1.y}), r2({r2.x}, {r2.y})")
     
     # Transform points to world space
     w_p1 = transform.transform_point(p1)
@@ -218,9 +210,7 @@ def get_adjacent_room_rect(room: Room, direction: RoomDirection, grid_dist: int,
     w_r1 = transform.transform_point(r1)
     w_r2 = transform.transform_point(r2)
     
-    print(f"  World points:")
-    print(f"    Passage: p1({w_p1.x:.1f}, {w_p1.y:.1f}), p2({w_p2.x:.1f}, {w_p2.y:.1f})")
-    print(f"    Room: r1({w_r1.x:.1f}, {w_r1.y:.1f}), r2({w_r2.x:.1f}, {w_r2.y:.1f})")
+    print(f"World points: passage=p1({w_p1.x:.1f}, {w_p1.y:.1f}), p2({w_p2.x:.1f}, {w_p2.y:.1f}), room=r1({w_r1.x:.1f}, {w_r1.y:.1f}), r2({w_r2.x:.1f}, {w_r2.y:.1f})")
     
     # Calculate final rectangle in both spaces
     local_rect = (
@@ -229,14 +219,5 @@ def get_adjacent_room_rect(room: Room, direction: RoomDirection, grid_dist: int,
         int(abs(r2.x - r1.x)) + 1,
         int(abs(r2.y - r1.y)) + 1
     )
-    print(f"  Local rect: ({local_rect[0]}, {local_rect[1]}, {local_rect[2]}, {local_rect[3]})")
-    
-    # Calculate final rectangle in world space
-    final_rect = (
-        int(min(w_r1.x, w_r2.x)),
-        int(min(w_r1.y, w_r2.y)), 
-        int(abs(w_r2.x - w_r1.x)) + 1,
-        int(abs(w_r2.y - w_r1.y)) + 1
-    )
-    print(f"  World rect: ({final_rect[0]}, {final_rect[1]}, {final_rect[2]}, {final_rect[3]})")
+    print(f"Rects: local=({local_rect[0]}, {local_rect[1]}, {local_rect[2]}, {local_rect[3]}), world=({final_rect[0]}, {final_rect[1]}, {final_rect[2]}, {final_rect[3]})")
     return final_rect
