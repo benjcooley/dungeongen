@@ -56,7 +56,7 @@ def generate_large_room(data: Dict[str, Any]) -> RoomShape:
 ROOM_DISTRIBUTION: List[Tuple[Tuple[float, float, float], RoomShape | Callable, None]] = [
     # Circular rooms (common in small maps, less so in larger ones)
     ((3.0, 1.5, 0.8), make_room_shape(RoomType.CIRCULAR, 3, 3), None),
-    ((1.0, 1.2, 0.7), make_room_shape(RoomType.CIRCULAR, 5, 5), None),
+    ((2.0, 2.4, 1.4), make_room_shape(RoomType.CIRCULAR, 5, 5), None),  # Doubled weights for 5x5 circular
     ((0.2, 0.8, 0.5), make_room_shape(RoomType.CIRCULAR, 7, 7), None),
     ((0.0, 0.4, 0.3), make_room_shape(RoomType.CIRCULAR, 9, 9), None),
 
@@ -73,7 +73,7 @@ ROOM_DISTRIBUTION: List[Tuple[Tuple[float, float, float], RoomShape | Callable, 
     ((2.5, 2.0, 1.2), make_room_shape(RoomType.RECTANGULAR, 3, 4), None),
     ((2.0, 2.0, 1.2), make_room_shape(RoomType.RECTANGULAR, 3, 5), None),
     ((0.2, 1.5, 1.0), make_room_shape(RoomType.RECTANGULAR, 3, 7), None),
-    ((0.1, 1.2, 0.8), make_room_shape(RoomType.RECTANGULAR, 5, 5), None),
+    ((0.2, 1.8, 1.2), make_room_shape(RoomType.RECTANGULAR, 5, 5), None),  # Increased weights for 5x5 rectangular
     ((0.0, 1.0, 0.7), make_room_shape(RoomType.RECTANGULAR, 5, 7), None),
 
     # Larger fixed rooms (more common in larger maps)
