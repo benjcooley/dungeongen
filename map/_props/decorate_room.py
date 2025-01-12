@@ -7,6 +7,7 @@ columns, altars, daises and rocks based on element type and size.
 import random
 from typing import TYPE_CHECKING
 
+from constants import CELL_SIZE
 from map.enums import Direction, RockType
 from map.props import ColumnType, Altar, Dais, Rock
 from map.arrange import ColumnArrangement, arrange_columns, arrange_random_props, PropType
@@ -22,10 +23,15 @@ def decorate_room(element: 'MapElement') -> None:
     Args:
         element: The map element to decorate
     """
-    # Only add larger props to actual Room instances
+    # Only add larger props to actual Room instances that are large enough
     if isinstance(element, Room):
-        # 1 in 5 chance to add columns
-        if random.random() < 0.2:
+        # Calculate room area in grid cells
+        room_width = int(element.bounds.width / CELL_SIZE)
+        room_height = int(element.bounds.height / CELL_SIZE)
+        room_area = room_width * room_height
+        
+        # 1 in 5 chance to add columns for rooms larger than 3x3
+        if random.random() < 0.2 and room_area > 9:
             # Pick column arrangement based on room type
             if element.room_type == RoomType.RECTANGULAR:
                 # For rectangular rooms:
