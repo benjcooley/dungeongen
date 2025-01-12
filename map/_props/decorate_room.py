@@ -30,9 +30,12 @@ def decorate_room(element: 'MapElement') -> None:
         room_height = int(element.bounds.height / CELL_SIZE)
         room_area = room_width * room_height
         
-        # 1 in 5 chance to add columns for rooms larger than 3x3
-        if random.random() < 0.2 and room_area > 9:
-            # Pick column arrangement based on room type
+        # Add columns for rooms larger than 3x3
+        # - 40% chance for round rooms
+        # - 20% chance for rectangular rooms
+        column_chance = 0.4 if element.room_type != RoomType.RECTANGULAR else 0.2
+        if random.random() < column_chance and room_area > 9:
+            # Pick column arrangement based on room type 
             if element.room_type == RoomType.RECTANGULAR:
                 # For rectangular rooms:
                 # - HORIZONTAL_ROWS: 40% chance
