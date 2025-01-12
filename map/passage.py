@@ -5,10 +5,12 @@ from map.mapelement import MapElement
 from graphics.conversions import grid_to_map, grid_points_to_grid_rect
 from constants import CELL_SIZE
 from typing import TYPE_CHECKING
+from map.occupancy import ElementType
 
 if TYPE_CHECKING:
     from map.map import Map
     from options import Options
+    from map.occupancy import OccupancyGrid
 
 class Passage(MapElement):
     """A passage connecting two map elements.
@@ -73,3 +75,12 @@ class Passage(MapElement):
         
         # Create passage using grid rectangle
         return cls.from_grid(grid_x, grid_y, grid_width, grid_height)
+        
+    def draw_occupied(self, grid: 'OccupancyGrid', element_idx: int) -> None:
+        """Draw this element's shape into the occupancy grid.
+            
+        Args:
+            grid: The occupancy grid to mark
+            element_idx: Index of this element in the map
+        """
+        grid.mark_rectangle(self._bounds, ElementType.PASSAGE, element_idx, self._options)

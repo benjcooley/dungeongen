@@ -3,9 +3,9 @@
 from enum import Enum, auto
 import math
 from typing import List, TYPE_CHECKING, Tuple, Optional
-
 import random
 import skia
+from map.occupancy import ElementType
 
 from algorithms.math import Point2D
 from algorithms.shapes import Rectangle, Circle, Shape
@@ -169,3 +169,15 @@ class Room(MapElement):
         x, y = grid_to_map(grid_x, grid_y)
         w, h = grid_to_map(grid_width, grid_height)
         return cls(x, y, width=w, height=h, room_type=room_type)
+        
+    def draw_occupied(self, grid: 'OccupancyGrid', element_idx: int) -> None:
+        """Draw this element's shape into the occupancy grid.
+            
+        Args:
+            grid: The occupancy grid to mark
+            element_idx: Index of this element in the map
+        """
+        if self._room_type == RoomType.CIRCULAR:
+            grid.mark_circle(self._shape, ElementType.ROOM, element_idx, self._options)
+        else:
+            grid.mark_rectangle(self._bounds, ElementType.ROOM, element_idx, self._options)
