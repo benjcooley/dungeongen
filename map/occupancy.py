@@ -202,9 +202,10 @@ class OccupancyGrid:
 
             # Apply clip rect if specified
             if clip_rect:
+                # Convert clip rect to grid coordinates, being careful not to include the edge
                 clip_grid_x1, clip_grid_y1 = map_to_grid(clip_rect.x, clip_rect.y)
-                clip_grid_x2, clip_grid_y2 = map_to_grid(clip_rect.x + clip_rect.width, 
-                                                        clip_rect.y + clip_rect.height)
+                clip_grid_x2, clip_grid_y2 = map_to_grid(clip_rect.x + clip_rect.width - 0.001, 
+                                                        clip_rect.y + clip_rect.height - 0.001)
                 clip_rect = Rectangle(clip_grid_x1, clip_grid_y1,
                                     clip_grid_x2 - clip_grid_x1 + 1,
                                     clip_grid_y2 - clip_grid_y1 + 1)
