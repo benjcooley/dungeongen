@@ -183,38 +183,77 @@ class OccupancyGrid:
         _, element_idx, _ = self.get_cell_info(grid_x, grid_y)
         return element_idx
     
-    def mark_rectangle(self, rect: Rectangle, element_type: ElementType,
+    def mark_rectangle(self, shape: Rectangle | Circle, element_type: ElementType,
                       element_idx: int, clip_rect: Optional[Rectangle] = None) -> None:
-        """Mark all grid positions covered by a rectangle.
-        
-        Converts the rectangle's map coordinates to grid coordinates before marking cells.
-        """
-        # Convert rectangle bounds to grid coordinates
-        start_x, start_y = map_to_grid(rect.x, rect.y)
-        end_x, end_y = map_to_grid(rect.x + rect.width, rect.y + rect.height)
-        
-        # Round to integer grid positions
-        grid_start_x = int(start_x)
-        grid_start_y = int(start_y)
-        grid_end_x = int(end_x + 0.5)  # Round up
-        grid_end_y = int(end_y + 0.5)  # Round up
-        
-        # Apply clipping if specified
-        if clip_rect:
-            clip_start_x, clip_start_y = map_to_grid(clip_rect.x, clip_rect.y)
-            clip_end_x, clip_end_y = map_to_grid(
-                clip_rect.x + clip_rect.width,
-                clip_rect.y + clip_rect.height
-            )
-            grid_start_x = max(grid_start_x, int(clip_start_x))
-            grid_start_y = max(grid_start_y, int(clip_start_y))
-            grid_end_x = min(grid_end_x, int(clip_end_x + 0.5))
-            grid_end_y = min(grid_end_y, int(clip_end_y + 0.5))
-        
-        # Mark all covered grid positions with bounds checking
-        for x in range(max(grid_start_x, -self._origin_x), min(grid_end_x, self.width - self._origin_x)):
-            for y in range(max(grid_start_y, -self._origin_y), min(grid_end_y, self.height - self._origin_y)):
-                self.mark_cell(x, y, element_type, element_idx)
+        """Mark all grid positions covered by a shape."""
+        if isinstance(shape, Circle):
+            # For circles, get integer grid bounds
+            grid_x = int(shape.cx - shape.radius) 
+            grid_y = int(shape.cy - shape.radius)
+            grid_w = int(shape.radius * 2)
+            grid_h = grid_w
+            
+            # Early out if outside grid bounds
+            if (grid_x >= self.width - self._origin_x or 
+                grid_x + grid_w < -self._origin_x or
+                grid_y >= self.height - self._origin_y or 
+                grid_y + grid_h < -self._origin_y):
+                return
+
+            # Apply clip rect if specified
+            if clip_rect:
+                clip_x = int(clip_rect.x)
+                clip_y = int(clip_rect.y)
+                if (grid_x >= clip_x + clip_rect.width or
+                    grid_x + grid_w < clip_x or
+                    grid_y >= clip_y + clip_rect.height or
+                    grid_y + grid_h < clip_y):
+                    return
+                grid_x = max(grid_x, clip_x)
+                grid_y = max(grid_y, clip_y)
+                grid_w = min(grid_x + grid_w, clip_x + clip_rect.width) - grid_x
+                grid_h = min(grid_y + grid_h, clip_y + clip_rect.height) - grid_y
+
+            # Rasterize circle
+            radius_sq = shape.radius * shape.radius
+            for x in range(grid_x, grid_x + grid_w):
+                for y in range(grid_y, grid_y + grid_h):
+                    dx = (x + 0.5) - shape.cx
+                    dy = (y + 0.5) - shape.cy
+                    if dx * dx + dy * dy <= radius_sq:
+                        self.mark_cell(x, y, element_type, element_idx)
+        else:
+            # For rectangles, work directly with integer grid coordinates
+            grid_x = int(shape.x)
+            grid_y = int(shape.y)
+            grid_w = int(shape.width)
+            grid_h = int(shape.height)
+            
+            # Early out if outside grid bounds
+            if (grid_x >= self.width - self._origin_x or 
+                grid_x + grid_w < -self._origin_x or
+                grid_y >= self.height - self._origin_y or 
+                grid_y + grid_h < -self._origin_y):
+                return
+
+            # Apply clip rect if specified
+            if clip_rect:
+                clip_x = int(clip_rect.x)
+                clip_y = int(clip_rect.y)
+                if (grid_x >= clip_x + clip_rect.width or
+                    grid_x + grid_w < clip_x or
+                    grid_y >= clip_y + clip_rect.height or
+                    grid_y + grid_h < clip_y):
+                    return
+                grid_x = max(grid_x, clip_x)
+                grid_y = max(grid_y, clip_y)
+                grid_w = min(grid_x + grid_w, clip_x + clip_rect.width) - grid_x
+                grid_h = min(grid_y + grid_h, clip_y + clip_rect.height) - grid_y
+
+            # Simple rectangle fill
+            for x in range(grid_x, grid_x + grid_w):
+                for y in range(grid_y, grid_y + grid_h):
+                    self.mark_cell(x, y, element_type, element_idx)
     
     def mark_circle(self, circle: Circle, element_type: ElementType,
                    element_idx: int, options: 'Options',
