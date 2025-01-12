@@ -113,8 +113,8 @@ class OccupancyGrid:
         """Convert grid coordinates to array index."""
         array_x = grid_x + self._origin_x
         array_y = grid_y + self._origin_y
-        if 0 <= grid_x < self.width and 0 <= grid_y < self.height:
-            return grid_y * self.width + grid_x
+        if 0 <= array_x < self.width and 0 <= array_y < self.height:
+            return array_y * self.width + array_x
         return None
     
     def clear(self) -> None:
