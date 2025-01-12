@@ -99,14 +99,15 @@ def debug_draw_grid_label(x: int, y: int, text: str, color: str = 'DARK_BLUE') -
     if _debug_canvas is None:
         return
 
-def debug_draw_grid_cell(x: int, y: int, fill_color: int, outline_color: Optional[int] = None) -> None:
-    """Draw a filled grid cell with optional outline.
+def debug_draw_grid_cell(x: int, y: int, fill_color: int, outline_color: Optional[int] = None, blocked: bool = False) -> None:
+    """Draw a filled grid cell with optional outline and blocked marker.
     
     Args:
         x: Grid x coordinate
         y: Grid y coordinate
         fill_color: Skia color for cell fill
         outline_color: Optional Skia color for cell outline
+        blocked: Whether to draw an X marking the cell as blocked
     """
     if _debug_canvas is None:
         return
@@ -127,6 +128,18 @@ def debug_draw_grid_cell(x: int, y: int, fill_color: int, outline_color: Optiona
             StrokeWidth=2
         )
         _debug_canvas.drawRect(skia.Rect(px, py, px + CELL_SIZE, py + CELL_SIZE), outline_paint)
+    
+    # Draw X if blocked
+    if blocked:
+        x_paint = skia.Paint(
+            Color=skia.Color(255, 0, 0),  # Red
+            Style=skia.Paint.kStroke_Style,
+            StrokeWidth=2,
+            AntiAlias=True
+        )
+        # Draw X from corner to corner
+        _debug_canvas.drawLine(px + 4, py + 4, px + CELL_SIZE - 4, py + CELL_SIZE - 4, x_paint)
+        _debug_canvas.drawLine(px + CELL_SIZE - 4, py + 4, px + 4, py + CELL_SIZE - 4, x_paint)
 
 def debug_draw_map_label(x: float, y: float, text: str, color: str = 'DARK_BLUE') -> None:
     """Draw text label at map coordinates."""

@@ -249,4 +249,4 @@ class OccupancyGrid:
                     
                     # Draw cell with red outline if blocked
                     outline_color = skia.Color(255, 0, 0) if blocked else None
-                    debug_draw_grid_cell(grid_x, grid_y, fill_color, outline_color)
+                    debug_draw_grid_cell(grid_x, grid_y, fill_color, outline_color, blocked)
