@@ -111,16 +111,14 @@ def get_room_exit_grid_position(room: Room, direction: RoomDirection, wall_pos: 
     if room.room_type == RoomType.CIRCULAR:
         wall_pos = 0.5
 
-    # If we have an origin grid point for the passage,
-    if grid_origin is not None: 
+    # If we have an origin grid point for the passage, constrain to that point
+    if grid_origin is not None:
         if direction == RoomDirection.NORTH or direction == RoomDirection.SOUTH:
-            wall_pos = (grid_origin[0] - grid_x) / (grid_width - 1)
+            # For N/S, use origin's X coordinate
+            return (grid_origin[0], grid_y - 1 if direction == RoomDirection.NORTH else grid_y + grid_height)
         else:
-            wall_pos = (grid_origin[1] - grid_y) / (grid_height - 1)
-        if wall_pos < 0.0:
-            wall_pos = 0.0
-        elif wall_pos > 1.0:
-            wall_pos = 1.0
+            # For E/W, use origin's Y coordinate
+            return (grid_x - 1 if direction == RoomDirection.WEST else grid_x + grid_width, grid_origin[1])
 
     # Calculate exit point along the wall
     if direction == RoomDirection.NORTH:
