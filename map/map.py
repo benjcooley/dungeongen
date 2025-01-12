@@ -54,10 +54,15 @@ class Map:
         """Get the current occupancy grid."""
         return self._occupancy
     
-    @property
+    @property 
     def options(self) -> 'Options':
         """Get the current options."""
         return self._options
+    
+    @options.setter
+    def options(self, value: 'Options') -> None:
+        """Set new options."""
+        self._options = value
     
     @property 
     def bounds(self) -> Rectangle:
