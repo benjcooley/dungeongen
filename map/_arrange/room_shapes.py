@@ -3,6 +3,7 @@
 from dataclasses import dataclass
 from typing import Dict, Any, Callable, Optional, Tuple, List
 from map._arrange.arrange_utils import get_size_index_from_tags
+from options import Options
 from map.room import RoomType
 from map._arrange.distribution import normalize_distribution, get_from_distribution
 
