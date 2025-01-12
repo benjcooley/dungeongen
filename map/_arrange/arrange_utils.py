@@ -1,7 +1,7 @@
 """Utility functions for room arrangement."""
 
 from enum import Enum, auto
-from typing import Dict, Optional, Tuple
+from typing import Dict, Optional, Set, Tuple
 from tags import Tags
 import skia
 from algorithms.math import Matrix2D, Point2D
@@ -178,6 +178,17 @@ def make_room_transform(room: Room, direction: RoomDirection, wall_pos: float = 
     transform.ty = exit_pos[1]
     
     return transform
+
+def get_size_index_from_tags(tags: Set[str]) -> int:
+    """Get the size index (0=small, 1=medium, 2=large) from a set of tags.
+    
+    Uses the largest size tag present, defaults to small (0) if no size tags.
+    """
+    if str(Tags.LARGE) in tags:
+        return 2
+    elif str(Tags.MEDIUM) in tags:
+        return 1
+    return 0  # Default to small
 
 def get_adjacent_room_rect(room: Room, direction: RoomDirection, grid_dist: int, \
                            grid_breadth: int, grid_depth: int, \

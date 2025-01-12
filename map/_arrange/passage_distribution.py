@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from enum import Enum, auto
 from typing import Dict, Any, Callable, List, Optional, Tuple
 from options import Options
+from map._arrange.arrange_utils import get_size_index_from_tags
 from map._arrange.distribution import normalize_distribution, get_from_distribution
 from map.door import DoorType
 
@@ -114,12 +115,8 @@ def get_random_passage_config(options: 'Options') -> PassageConfig:
     Args:
         options: Options containing map size tags
     """
-    # Determine weight index based on map size
-    weight_idx = 1  # Default to medium
-    if 'small' in options.tags:
-        weight_idx = 0
-    elif 'large' in options.tags:
-        weight_idx = 2
+    # Get the appropriate weight index based on map size tags
+    weight_idx = get_size_index_from_tags(options.tags)
     
     # Get the length using the appropriate weight column
     length = get_from_distribution(NORMALIZED_LENGTH_DIST, weight_idx)
