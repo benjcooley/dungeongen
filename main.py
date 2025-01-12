@@ -1,22 +1,19 @@
 """
 Main entry point for dungeon map generation.
 """
-import argparse
+import os
 import random
 import skia
 from map.map import Map
 from options import Options
 
 def main():
-    # Parse command line arguments
-    parser = argparse.ArgumentParser(description='Generate a dungeon map')
-    parser.add_argument('--seed', type=int, default=12345,
-                      help='Random seed for map generation (default: 12345)')
-    args = parser.parse_args()
+    # Get seed from environment variable or use default
+    seed = int(os.getenv('SEED', '12345'))
     
     # Set random seed
-    random.seed(args.seed)
-    print(f"Using random seed: {args.seed}")
+    random.seed(seed)
+    print(f"Using random seed: {seed}")
     options = Options()
     
     # Initialize Skia canvas
