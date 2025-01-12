@@ -115,7 +115,13 @@ def connect_rooms(
         dist -= 1
 
     if dist > 0:
-        passage = Passage.from_grid(r1_x, r1_y, abs(r2_x - r1_x) + 1, abs(r2_y - r1_y) + 1)
+        passage_width = abs(r2_x - r1_x) + 1
+        passage_height = abs(r2_y - r1_y) + 1
+        print(f"\nPassage dimensions:")
+        print(f"  Start point: ({r1_x}, {r1_y})")
+        print(f"  End point: ({r2_x}, {r2_y})")
+        print(f"  Size: {passage_width}x{passage_height}")
+        passage = Passage.from_grid(r1_x, r1_y, passage_width, passage_height)
         map.add_element(passage)
     
     # Connect everything based on which door types were specified
