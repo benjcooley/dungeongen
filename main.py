@@ -38,7 +38,7 @@ def main():
     # Draw the map with transform
     dungeon_map.render(canvas, transform)
     
-    # Debug draw the occupancy grid with same transform
+    # Debug draw the occupancy grid with same transform 
     canvas.save()
     canvas.concat(transform)
     dungeon_map._occupancy.draw_debug(canvas)
