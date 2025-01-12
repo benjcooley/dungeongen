@@ -187,72 +187,76 @@ class OccupancyGrid:
                       element_idx: int, clip_rect: Optional[Rectangle] = None) -> None:
         """Mark all grid positions covered by a shape."""
         if isinstance(shape, Circle):
-            # For circles, get integer grid bounds
-            grid_x = int(shape.cx - shape.radius) 
-            grid_y = int(shape.cy - shape.radius)
-            grid_w = int(shape.radius * 2)
-            grid_h = grid_w
+            # For circles, convert center and radius to grid coordinates
+            grid_x1, grid_y1 = map_to_grid(shape.cx - shape.radius, shape.cy - shape.radius)
+            grid_x2, grid_y2 = map_to_grid(shape.cx + shape.radius, shape.cy + shape.radius)
             
             # Early out if outside grid bounds
-            if (grid_x >= self.width - self._origin_x or 
-                grid_x + grid_w < -self._origin_x or
-                grid_y >= self.height - self._origin_y or 
-                grid_y + grid_h < -self._origin_y):
+            if (grid_x1 >= self.width - self._origin_x or 
+                grid_x2 < -self._origin_x or
+                grid_y1 >= self.height - self._origin_y or 
+                grid_y2 < -self._origin_y):
                 return
 
             # Apply clip rect if specified
             if clip_rect:
-                clip_x = int(clip_rect.x)
-                clip_y = int(clip_rect.y)
-                if (grid_x >= clip_x + clip_rect.width or
-                    grid_x + grid_w < clip_x or
-                    grid_y >= clip_y + clip_rect.height or
-                    grid_y + grid_h < clip_y):
+                clip_x1, clip_y1 = map_to_grid(clip_rect.x, clip_rect.y)
+                clip_x2, clip_y2 = map_to_grid(clip_rect.x + clip_rect.width, clip_rect.y + clip_rect.height)
+                if (grid_x1 >= clip_x2 or grid_x2 < clip_x1 or
+                    grid_y1 >= clip_y2 or grid_y2 < clip_y1):
                     return
-                grid_x = max(grid_x, clip_x)
-                grid_y = max(grid_y, clip_y)
-                grid_w = min(grid_x + grid_w, clip_x + clip_rect.width) - grid_x
-                grid_h = min(grid_y + grid_h, clip_y + clip_rect.height) - grid_y
+                grid_x1 = max(grid_x1, clip_x1)
+                grid_y1 = max(grid_y1, clip_y1)
+                grid_x2 = min(grid_x2, clip_x2)
+                grid_y2 = min(grid_y2, clip_y2)
+
+            # Clamp to grid bounds
+            grid_x1 = max(grid_x1, -self._origin_x)
+            grid_y1 = max(grid_y1, -self._origin_y)
+            grid_x2 = min(grid_x2, self.width - self._origin_x)
+            grid_y2 = min(grid_y2, self.height - self._origin_y)
 
             # Rasterize circle
             radius_sq = shape.radius * shape.radius
-            for x in range(grid_x, grid_x + grid_w):
-                for y in range(grid_y, grid_y + grid_h):
-                    dx = (x + 0.5) - shape.cx
-                    dy = (y + 0.5) - shape.cy
-                    if dx * dx + dy * dy <= radius_sq:
+            for x in range(grid_x1, grid_x2 + 1):
+                for y in range(grid_y1, grid_y2 + 1):
+                    dx = (x + 0.5) - shape.cx / CELL_SIZE
+                    dy = (y + 0.5) - shape.cy / CELL_SIZE
+                    if dx * dx + dy * dy <= (shape.radius / CELL_SIZE) * (shape.radius / CELL_SIZE):
                         self.mark_cell(x, y, element_type, element_idx)
         else:
-            # For rectangles, work directly with integer grid coordinates
-            grid_x = int(shape.x)
-            grid_y = int(shape.y)
-            grid_w = int(shape.width)
-            grid_h = int(shape.height)
+            # For rectangles, convert corners to grid coordinates
+            grid_x1, grid_y1 = map_to_grid(shape.x, shape.y)
+            grid_x2, grid_y2 = map_to_grid(shape.x + shape.width, shape.y + shape.height)
             
             # Early out if outside grid bounds
-            if (grid_x >= self.width - self._origin_x or 
-                grid_x + grid_w < -self._origin_x or
-                grid_y >= self.height - self._origin_y or 
-                grid_y + grid_h < -self._origin_y):
+            if (grid_x1 >= self.width - self._origin_x or 
+                grid_x2 < -self._origin_x or
+                grid_y1 >= self.height - self._origin_y or 
+                grid_y2 < -self._origin_y):
                 return
 
             # Apply clip rect if specified
             if clip_rect:
-                clip_x = int(clip_rect.x)
-                clip_y = int(clip_rect.y)
-                if (grid_x >= clip_x + clip_rect.width or
-                    grid_x + grid_w < clip_x or
-                    grid_y >= clip_y + clip_rect.height or
-                    grid_y + grid_h < clip_y):
+                clip_x1, clip_y1 = map_to_grid(clip_rect.x, clip_rect.y)
+                clip_x2, clip_y2 = map_to_grid(clip_rect.x + clip_rect.width, clip_rect.y + clip_rect.height)
+                if (grid_x1 >= clip_x2 or grid_x2 < clip_x1 or
+                    grid_y1 >= clip_y2 or grid_y2 < clip_y1):
                     return
-                grid_x = max(grid_x, clip_x)
-                grid_y = max(grid_y, clip_y)
-                grid_w = min(grid_x + grid_w, clip_x + clip_rect.width) - grid_x
-                grid_h = min(grid_y + grid_h, clip_y + clip_rect.height) - grid_y
+                grid_x1 = max(grid_x1, clip_x1)
+                grid_y1 = max(grid_y1, clip_y1)
+                grid_x2 = min(grid_x2, clip_x2)
+                grid_y2 = min(grid_y2, clip_y2)
+
+            # Clamp to grid bounds
+            grid_x1 = max(grid_x1, -self._origin_x)
+            grid_y1 = max(grid_y1, -self._origin_y)
+            grid_x2 = min(grid_x2, self.width - self._origin_x)
+            grid_y2 = min(grid_y2, self.height - self._origin_y)
 
             # Simple rectangle fill
-            for x in range(grid_x, grid_x + grid_w):
-                for y in range(grid_y, grid_y + grid_h):
+            for x in range(grid_x1, grid_x2 + 1):
+                for y in range(grid_y1, grid_y2 + 1):
                     self.mark_cell(x, y, element_type, element_idx)
     
     def mark_circle(self, circle: Circle, element_type: ElementType,
