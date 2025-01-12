@@ -208,12 +208,15 @@ def get_adjacent_room_rect(room: Room, direction: RoomDirection, grid_dist: int,
     print(f"    Passage: p1({p1.x}, {p1.y}), p2({p2.x}, {p2.y})")
     print(f"    Room: r1({r1.x}, {r1.y}), r2({r2.x}, {r2.y})")
     
-    # Transform all points to world space
-    w = transform.transform_points([p1, p2, r1, r2])
+    # Transform points to world space
+    w_p1 = transform.transform_point(p1)
+    w_p2 = transform.transform_point(p2)
+    w_r1 = transform.transform_point(r1)
+    w_r2 = transform.transform_point(r2)
     
     print(f"  World points:")
-    print(f"    Passage: p1({w[0].x}, {w[0].y}), p2({w[1].x}, {w[1].y})")
-    print(f"    Room: r1({w[2].x}, {w[2].y}), r2({w[3].x}, {w[3].y})")
+    print(f"    Passage: p1({w_p1.x:.1f}, {w_p1.y:.1f}), p2({w_p2.x:.1f}, {w_p2.y:.1f})")
+    print(f"    Room: r1({w_r1.x:.1f}, {w_r1.y:.1f}), r2({w_r2.x:.1f}, {w_r2.y:.1f})")
     
     # Calculate final rectangle in both spaces
     local_rect = (
@@ -226,10 +229,10 @@ def get_adjacent_room_rect(room: Room, direction: RoomDirection, grid_dist: int,
     
     # Calculate final rectangle in world space
     final_rect = (
-        int(min(w[2].x, w[3].x)),
-        int(min(w[2].y, w[3].y)), 
-        int(abs(w[3].x - w[2].x)) + 1,
-        int(abs(w[3].y - w[2].y)) + 1
+        int(min(w_r1.x, w_r2.x)),
+        int(min(w_r1.y, w_r2.y)), 
+        int(abs(w_r2.x - w_r1.x)) + 1,
+        int(abs(w_r2.y - w_r1.y)) + 1
     )
     print(f"  World rect: ({final_rect[0]}, {final_rect[1]}, {final_rect[2]}, {final_rect[3]})")
     return final_rect
