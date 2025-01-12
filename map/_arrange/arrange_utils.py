@@ -89,14 +89,16 @@ def get_room_direction(room1: Room, room2: Room) -> RoomDirection:
     else:
         return RoomDirection.SOUTH if dy > 0 else RoomDirection.NORTH
 
-def get_room_exit_grid_position(room: Room, direction: RoomDirection, wall_pos: float = 0.5, grid_origin: Point = None) -> Tuple[int, int]:
+def get_room_exit_grid_position(room: Room, direction: RoomDirection, wall_pos: float = 0.5, align_to: Point = None) -> Tuple[int, int]:
     """Get a grid position for exiting this room in the given direction.
     
     Args:
         room: The room to exit from
         direction: Which side of the room to exit from
         wall_pos: Position along the wall to exit from (0.0 to 1.0)
-        origin: Optional passage origin grid position to use to set wall_pos
+        align_to: Optional coordinate to snap to. For vertical passages (NORTH/SOUTH),
+                 uses the x-coordinate. For horizontal passages (EAST/WEST), uses
+                 the y-coordinate.
         
     Returns:
         Tuple of (grid_x, grid_y) for the exit point one cell outside the room
@@ -129,12 +131,12 @@ def get_room_exit_grid_position(room: Room, direction: RoomDirection, wall_pos: 
         x = grid_x - 1
         y = grid_y + int((grid_height - 1) * wall_pos)
 
-    # If we have an origin point, use its coordinate for the appropriate axis
-    if grid_origin is not None:
+    # If we have an align_to point, snap to its coordinate based on passage direction
+    if align_to is not None:
         if direction in (RoomDirection.NORTH, RoomDirection.SOUTH):
-            x = grid_origin[0]
+            x = align_to[0]  # Vertical passages snap to x coordinate
         else:  # EAST, WEST
-            y = grid_origin[1]
+            y = align_to[1]  # Horizontal passages snap to y coordinate
             
     return (x, y)
 
