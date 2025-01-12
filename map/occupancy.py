@@ -198,38 +198,30 @@ class OccupancyGrid:
             self.mark_circle(shape, element_type, element_idx, clip_rect)
             return
             
-        # Convert rectangle bounds to grid coordinates
-        p1, p2 = map_rect_to_grid_points(shape.x, shape.y, shape.width, shape.height)
-        
-        # Create rectangles for bounds checking
-        grid_rect = Rectangle(p1[0], p1[1], p2[0] - p1[0] + 1, p2[1] - p1[1] + 1)
-        bounds_rect = Rectangle(-self._origin_x, -self._origin_y, 
-                             self.width - self._origin_x, self.height - self._origin_y)
-        
-        # Get clipped rectangle
-        clipped_rect = grid_rect.intersection(bounds_rect)
+        # Convert rectangle to grid coordinates
+        grid_x, grid_y, grid_width, grid_height = map_to_grid_rect(
+            shape.x, shape.y, shape.width, shape.height)
+            
+        # Apply clip rect if specified
         if clip_rect:
-            # Convert clip rect to grid coordinates
-            clip_grid_x1, clip_grid_y1 = map_to_grid(clip_rect.x, clip_rect.y)
-            clip_grid_x2, clip_grid_y2 = map_to_grid(clip_rect.x + clip_rect.width - 0.001, 
-                                                    clip_rect.y + clip_rect.height - 0.001)
-            clip_rect = Rectangle(clip_grid_x1, clip_grid_y1,
-                                clip_grid_x2 - clip_grid_x1 + 1,
-                                clip_grid_y2 - clip_grid_y1 + 1)
-            clipped_rect = clipped_rect.intersection(clip_rect)
-
-        # Early out if no valid intersection
-        if not clipped_rect.is_valid:
+            clip_x, clip_y, clip_width, clip_height = map_to_grid_rect(
+                clip_rect.x, clip_rect.y, clip_rect.width, clip_rect.height)
+            # Get intersection
+            x1 = max(grid_x, clip_x)
+            y1 = max(grid_y, clip_y)
+            x2 = min(grid_x + grid_width, clip_x + clip_width)
+            y2 = min(grid_y + grid_height, clip_y + clip_height)
+            grid_x, grid_y = x1, y1
+            grid_width = max(0, x2 - x1)
+            grid_height = max(0, y2 - y1)
+            
+        # Early out if no valid region
+        if grid_width <= 0 or grid_height <= 0:
             return
-
-        # Fill the clipped rectangle
-        x1 = int(clipped_rect.x)
-        y1 = int(clipped_rect.y)
-        x2 = int(clipped_rect.x + clipped_rect.width)
-        y2 = int(clipped_rect.y + clipped_rect.height)
-        
-        for x in range(x1, x2):
-            for y in range(y1, y2):
+            
+        # Fill the grid rectangle
+        for x in range(int(grid_x), int(grid_x + grid_width)):
+            for y in range(int(grid_y), int(grid_y + grid_height)):
                 self.mark_cell(x, y, element_type, element_idx)
     
     def mark_circle(self, circle: Circle, element_type: ElementType,

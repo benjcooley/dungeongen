@@ -93,21 +93,43 @@ def grid_rect_from_points(start_x: float, start_y: float, end_x: float, end_y: f
     
     return (x, y, width, height)
 
-def grid_rect_points(rect_x: float, rect_y: float, rect_width: float, rect_height: float) -> tuple[tuple[float, float], tuple[float, float]]:
-    """Convert a grid rectangle into its corner points.
+def map_to_grid_rect(rect_x: float, rect_y: float, rect_width: float, rect_height: float) -> tuple[float, float, float, float]:
+    """Convert a map rectangle to grid coordinates.
     
     Args:
-        rect_x: Rectangle X coordinate in grid units
-        rect_y: Rectangle Y coordinate in grid units
-        rect_width: Rectangle width in grid units
-        rect_height: Rectangle height in grid units
+        rect_x: Rectangle X coordinate in map units
+        rect_y: Rectangle Y coordinate in map units
+        rect_width: Rectangle width in map units
+        rect_height: Rectangle height in map units
         
     Returns:
-        Tuple of ((x1,y1), (x2,y2)) representing top-left and bottom-right points
+        Tuple of (grid_x, grid_y, grid_width, grid_height)
     """
-    return ((rect_x, rect_y), (rect_x + rect_width - 1, rect_y + rect_height - 1))
+    grid_x = math.floor(rect_x / CELL_SIZE)
+    grid_y = math.floor(rect_y / CELL_SIZE)
+    grid_width = math.ceil((rect_x + rect_width) / CELL_SIZE) - grid_x
+    grid_height = math.ceil((rect_y + rect_height) / CELL_SIZE) - grid_y
+    return (grid_x, grid_y, grid_width, grid_height)
 
-def map_rect_points(rect_x: float, rect_y: float, rect_width: float, rect_height: float) -> tuple[tuple[float, float], tuple[float, float]]:
+def grid_to_map_rect(grid_x: float, grid_y: float, grid_width: float, grid_height: float) -> tuple[float, float, float, float]:
+    """Convert a grid rectangle to map coordinates.
+    
+    Args:
+        grid_x: Rectangle X coordinate in grid units
+        grid_y: Rectangle Y coordinate in grid units
+        grid_width: Rectangle width in grid units
+        grid_height: Rectangle height in grid units
+        
+    Returns:
+        Tuple of (map_x, map_y, map_width, map_height)
+    """
+    map_x = grid_x * CELL_SIZE
+    map_y = grid_y * CELL_SIZE
+    map_width = grid_width * CELL_SIZE
+    map_height = grid_height * CELL_SIZE
+    return (map_x, map_y, map_width, map_height)
+
+def grid_rect_points(rect_x: float, rect_y: float, rect_width: float, rect_height: float) -> tuple[tuple[float, float], tuple[float, float]]:
     """Convert a map rectangle into its corner points.
     
     Args:
