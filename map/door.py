@@ -246,3 +246,27 @@ class Door(MapElement):
         """
         x, y = grid_to_map(grid_x, grid_y)
         return cls(x, y, orientation, door_type)
+        
+    def draw_occupied(self, grid: 'OccupancyGrid', element_idx: int) -> None:
+        """Draw this element's shape and blocked areas into the occupancy grid.
+            
+        Args:
+            grid: The occupancy grid to mark
+            element_idx: Index of this element in the map
+        """
+        # Mark the door cell itself
+        grid_x = int(self._x / CELL_SIZE)
+        grid_y = int(self._y / CELL_SIZE)
+        grid.mark_cell(grid_x, grid_y, grid.ElementType.DOOR, element_idx)
+        
+        # Mark blocked areas on both sides of door
+        if self._orientation == DoorOrientation.HORIZONTAL:
+            # Mark 3 cells before and after horizontally
+            for dx in range(-3, 4):
+                if dx != 0:  # Skip the door cell itself
+                    grid.mark_cell(grid_x + dx, grid_y, grid.ElementType.BLOCKED, element_idx, blocked=True)
+        else:  # VERTICAL
+            # Mark 3 cells before and after vertically
+            for dy in range(-3, 4):
+                if dy != 0:  # Skip the door cell itself
+                    grid.mark_cell(grid_x, grid_y + dy, grid.ElementType.BLOCKED, element_idx, blocked=True)
