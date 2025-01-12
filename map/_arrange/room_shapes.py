@@ -42,8 +42,7 @@ ROOM_DISTRIBUTION: List[Tuple[Tuple[float, float, float], RoomShape | Callable, 
     
     # Larger rooms (more common in large maps)
     ((0.1, 0.4, 0.8), make_room_shape(RoomType.RECTANGULAR, 3, 5), None),
-    ((0.1, 0.3, 0.6), make_room_shape(RoomType.RECTANGULAR, 4, 4), None),
-    ((0.05, 0.2, 0.4), make_room_shape(RoomType.CIRCULAR, 4, 4), None)
+    ((0.1, 0.3, 0.6), make_room_shape(RoomType.RECTANGULAR, 4, 4), None)
 ]
 
 # Normalize the distribution once at module load
