@@ -95,9 +95,11 @@ class OccupancyGrid:
                 old_idx = grid_y * self.width + grid_x
                 old_value = self._grid[old_idx]
                 
-                # Convert to new grid coordinates
-                new_grid_x = grid_x - self._origin_x + new_grid_origin_x
-                new_grid_y = grid_y - self._origin_y + new_grid_origin_y
+                # Convert array coordinates to grid coordinates and back to new array coordinates
+                grid_x_pos = grid_x - self._origin_x  # Convert to grid coordinates
+                grid_y_pos = grid_y - self._origin_y
+                new_grid_x = grid_x_pos + new_grid_origin_x  # Convert to new array coordinates  
+                new_grid_y = grid_y_pos + new_grid_origin_y
                 new_idx = new_grid_y * new_grid_width + new_grid_x
                 
                 if 0 <= new_grid_x < new_grid_width and 0 <= new_grid_y < new_grid_height:
