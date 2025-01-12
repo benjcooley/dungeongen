@@ -36,57 +36,57 @@ def generate_long_length(data: Dict[str, Any]) -> int:
     return random.randint(7, 10)
 
 # Distribution for passage lengths
-# Format: (unnormalized_weight, length or generator)
-LENGTH_DISTRIBUTION: List[Tuple[float, int]] = [
+# Format: (weights, item, requirement_fn)
+LENGTH_DISTRIBUTION: List[Tuple[Tuple[float], int | Callable, None]] = [
     # Single cell (very common)
-    (1.0, 1),
+    ((1.0,), 1, None),
     
     # Short passages (common)
-    (0.8, 2),
-    (0.7, 3),
+    ((0.8,), 2, None),
+    ((0.7,), 3, None),
     
     # Medium passages (less common)
-    (0.4, 4),
-    (0.3, 5),
-    (0.2, 6),
+    ((0.4,), 4, None),
+    ((0.3,), 5, None),
+    ((0.2,), 6, None),
     
     # Long passages (rare)
-    (0.05, generate_long_length)
+    ((0.05,), generate_long_length, None)
 ]
 
 # Door configurations for different passage lengths
 # Format: (unnormalized_weight, door_config)
 
 # Single cell passages (1 cell)
-SINGLE_CELL_DOORS: List[Tuple[float, DoorConfig]] = [
-    (0.7, make_door_config(None, None)),              # No doors
-    (0.3, make_door_config(DoorType.OPEN, None)),     # One open door
-    (0.2, make_door_config(None, DoorType.OPEN))      # One open door
+SINGLE_CELL_DOORS: List[Tuple[Tuple[float], DoorConfig, None]] = [
+    ((0.7,), make_door_config(None, None), None),              # No doors
+    ((0.3,), make_door_config(DoorType.OPEN, None), None),     # One open door
+    ((0.2,), make_door_config(None, DoorType.OPEN), None)      # One open door
 ]
 
 # Short passages (2-3 cells)
-SHORT_DOORS: List[Tuple[float, DoorConfig]] = [
-    (0.6, make_door_config(DoorType.OPEN, None)),
-    (0.6, make_door_config(None, DoorType.OPEN)),
-    (0.4, make_door_config(DoorType.OPEN, DoorType.OPEN)),
-    (0.2, make_door_config(DoorType.CLOSED, None)),
-    (0.2, make_door_config(None, DoorType.CLOSED))
+SHORT_DOORS: List[Tuple[Tuple[float], DoorConfig, None]] = [
+    ((0.6,), make_door_config(DoorType.OPEN, None), None),
+    ((0.6,), make_door_config(None, DoorType.OPEN), None),
+    ((0.4,), make_door_config(DoorType.OPEN, DoorType.OPEN), None),
+    ((0.2,), make_door_config(DoorType.CLOSED, None), None),
+    ((0.2,), make_door_config(None, DoorType.CLOSED), None)
 ]
 
 # Medium passages (4-6 cells)
-MEDIUM_DOORS: List[Tuple[float, DoorConfig]] = [
-    (0.5, make_door_config(DoorType.OPEN, DoorType.CLOSED)),
-    (0.5, make_door_config(DoorType.CLOSED, DoorType.OPEN)),
-    (0.3, make_door_config(DoorType.CLOSED, DoorType.CLOSED)),
-    (0.2, make_door_config(DoorType.OPEN, DoorType.OPEN))
+MEDIUM_DOORS: List[Tuple[Tuple[float], DoorConfig, None]] = [
+    ((0.5,), make_door_config(DoorType.OPEN, DoorType.CLOSED), None),
+    ((0.5,), make_door_config(DoorType.CLOSED, DoorType.OPEN), None),
+    ((0.3,), make_door_config(DoorType.CLOSED, DoorType.CLOSED), None),
+    ((0.2,), make_door_config(DoorType.OPEN, DoorType.OPEN), None)
 ]
 
 # Long passages (7+ cells)
-LONG_DOORS: List[Tuple[float, DoorConfig]] = [
-    (0.7, make_door_config(DoorType.CLOSED, DoorType.CLOSED)),
-    (0.2, make_door_config(DoorType.CLOSED, DoorType.OPEN)),
-    (0.2, make_door_config(DoorType.OPEN, DoorType.CLOSED)),
-    (0.1, make_door_config(DoorType.OPEN, DoorType.OPEN))
+LONG_DOORS: List[Tuple[Tuple[float], DoorConfig, None]] = [
+    ((0.7,), make_door_config(DoorType.CLOSED, DoorType.CLOSED), None),
+    ((0.2,), make_door_config(DoorType.CLOSED, DoorType.OPEN), None),
+    ((0.2,), make_door_config(DoorType.OPEN, DoorType.CLOSED), None),
+    ((0.1,), make_door_config(DoorType.OPEN, DoorType.OPEN), None)
 ]
 
 # Normalize all distributions
