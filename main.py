@@ -32,11 +32,17 @@ def main():
     # Generate random dungeon
     dungeon_map.generate()
     
-    # Draw the map
-    dungeon_map.render(canvas)
+    # Calculate transform once
+    transform = dungeon_map._calculate_default_transform(options.canvas_width, options.canvas_height)
     
-    # Debug draw the occupancy grid
+    # Draw the map with transform
+    dungeon_map.render(canvas, transform)
+    
+    # Debug draw the occupancy grid with same transform
+    canvas.save()
+    canvas.concat(transform)
     dungeon_map._occupancy.draw_debug(canvas)
+    canvas.restore()
 
     # Save as PNG with size tag in filename
     size_tag = next((tag for tag in options.tags if tag in ('small', 'medium', 'large')), 'medium')

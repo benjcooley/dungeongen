@@ -386,6 +386,8 @@ class Map:
             transform: Optional Skia Matrix transform.
                       If None, calculates a transform to fit the map in the canvas.
         """
+        # Ensure occupancy grid is up to date
+        self.recalculate_occupied()
         # Get canvas dimensions
         canvas_width = canvas.imageInfo().width()
         canvas_height = canvas.imageInfo().height()
