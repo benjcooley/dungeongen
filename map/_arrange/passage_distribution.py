@@ -70,17 +70,18 @@ SINGLE_CELL_DOORS: List[Tuple[Tuple[float], DoorConfig, None]] = [
 SHORT_DOORS: List[Tuple[Tuple[float], DoorConfig, None]] = [
     ((0.6,), make_door_config(DoorType.OPEN, None), None),
     ((0.6,), make_door_config(None, DoorType.OPEN), None),
-    ((0.4,), make_door_config(DoorType.OPEN, DoorType.OPEN), None),
     ((0.2,), make_door_config(DoorType.CLOSED, None), None),
     ((0.2,), make_door_config(None, DoorType.CLOSED), None)
 ]
 
 # Medium passages (4-6 cells)
 MEDIUM_DOORS: List[Tuple[Tuple[float], DoorConfig, None]] = [
-    ((0.5,), make_door_config(DoorType.OPEN, DoorType.CLOSED), None),
-    ((0.5,), make_door_config(DoorType.CLOSED, DoorType.OPEN), None),
-    ((0.3,), make_door_config(DoorType.CLOSED, DoorType.CLOSED), None),
-    ((0.2,), make_door_config(DoorType.OPEN, DoorType.OPEN), None)
+    ((0.4,), make_door_config(DoorType.OPEN, None), None),
+    ((0.4,), make_door_config(None, DoorType.OPEN), None),
+    ((0.3,), make_door_config(DoorType.CLOSED, None), None),
+    ((0.3,), make_door_config(None, DoorType.CLOSED), None),
+    ((0.2,), make_door_config(DoorType.OPEN, DoorType.OPEN), None),
+    ((0.2,), make_door_config(DoorType.CLOSED, DoorType.CLOSED), None)
 ]
 
 # Long passages (7+ cells)
