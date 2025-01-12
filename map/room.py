@@ -56,10 +56,14 @@ class Room(MapElement):
         if room_type == RoomType.CIRCULAR:
             if width != height:
                 raise ValueError("Circular rooms must have equal width and height.")
+            print(f"\nCreating circular room:")
+            print(f"  Input dimensions: x={x}, y={y}, width={width}, height={height}")
             shape = Circle(x + width / 2, y + width / 2, width / 2)
+            print(f"  Circle params: center=({x + width/2}, {y + width/2}), radius={width/2}")
         else:
             shape = Rectangle(x, y, width, height)
         super().__init__(shape)
+        print(f"  Final bounds: x={self.bounds.x}, y={self.bounds.y}, w={self.bounds.width}, h={self.bounds.height}")
     
     @property
     def room_type(self) -> RoomType:
