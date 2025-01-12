@@ -219,5 +219,14 @@ def get_adjacent_room_rect(room: Room, direction: RoomDirection, grid_dist: int,
         int(abs(r2.x - r1.x)) + 1,
         int(abs(r2.y - r1.y)) + 1
     )
+    
+    # Calculate final rectangle in world space
+    final_rect = (
+        int(min(w_r1.x, w_r2.x)),
+        int(min(w_r1.y, w_r2.y)), 
+        int(abs(w_r2.x - w_r1.x)) + 1,
+        int(abs(w_r2.y - w_r1.y)) + 1
+    )
+    
     print(f"Rects: local=({local_rect[0]}, {local_rect[1]}, {local_rect[2]}, {local_rect[3]}), world=({final_rect[0]}, {final_rect[1]}, {final_rect[2]}, {final_rect[3]})")
     return final_rect
