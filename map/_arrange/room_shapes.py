@@ -24,27 +24,27 @@ def generate_large_room(data: Dict[str, Any]) -> RoomShape:
     return make_room_shape(RoomType.RECTANGULAR, 5, 7)
 
 # Define room shape distribution with weights
-# Format: (unnormalized_weight, shape_or_generator)
-ROOM_DISTRIBUTION: List[Tuple[float, RoomShape]] = [
+# Format: (weights, item, requirement_fn)
+ROOM_DISTRIBUTION: List[Tuple[Tuple[float], RoomShape | Callable, None]] = [
     # Common small symmetric rooms
-    (1.0, make_room_shape(RoomType.RECTANGULAR, 3, 3)),
-    (0.8, make_room_shape(RoomType.CIRCULAR, 3, 3)),
+    ((1.0,), make_room_shape(RoomType.RECTANGULAR, 3, 3), None),
+    ((0.8,), make_room_shape(RoomType.CIRCULAR, 3, 3), None),
     
     # Common small asymmetric rooms
-    (0.7, make_room_shape(RoomType.RECTANGULAR, 2, 3)),
-    (0.7, make_room_shape(RoomType.RECTANGULAR, 3, 2)),
+    ((0.7,), make_room_shape(RoomType.RECTANGULAR, 2, 3), None),
+    ((0.7,), make_room_shape(RoomType.RECTANGULAR, 3, 2), None),
     
     # Medium rooms
-    (0.5, make_room_shape(RoomType.RECTANGULAR, 3, 4)),
-    (0.5, make_room_shape(RoomType.RECTANGULAR, 4, 3)),
+    ((0.5,), make_room_shape(RoomType.RECTANGULAR, 3, 4), None),
+    ((0.5,), make_room_shape(RoomType.RECTANGULAR, 4, 3), None),
     
     # Larger rooms (less common)
-    (0.3, make_room_shape(RoomType.RECTANGULAR, 3, 5)),
-    (0.2, make_room_shape(RoomType.RECTANGULAR, 5, 5)),
-    (0.1, make_room_shape(RoomType.CIRCULAR, 5, 5)),
+    ((0.3,), make_room_shape(RoomType.RECTANGULAR, 3, 5), None),
+    ((0.2,), make_room_shape(RoomType.RECTANGULAR, 5, 5), None),
+    ((0.1,), make_room_shape(RoomType.CIRCULAR, 5, 5), None),
     
     # Special case generator for very large rooms (rare)
-    (0.05, generate_large_room)
+    ((0.05,), generate_large_room, None)
 ]
 
 # Normalize the distribution once at module load
