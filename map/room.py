@@ -178,5 +178,4 @@ class Room(MapElement):
             grid: The occupancy grid to mark
             element_idx: Index of this element in the map
         """
-        # Always use bounds for grid marking since it's always rectangular
-        grid.mark_rectangle(self._bounds, ElementType.ROOM, element_idx, self._options)
+        grid.mark_rectangle(self._shape, ElementType.ROOM, element_idx, self._options)
