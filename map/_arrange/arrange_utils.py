@@ -192,51 +192,38 @@ def get_adjacent_room_rect(room: Room, direction: RoomDirection, grid_dist: int,
     print(f"    [{transform.a:.1f} {transform.b:.1f} {transform.tx:.1f}]")
     print(f"    [{transform.c:.1f} {transform.d:.1f} {transform.ty:.1f}]")
     
-    # Calculate passage end points in local space
-    dist = grid_dist - 1  # Distance to passage end
-    left_offset = int((grid_breadth - 1) / 2 + breadth_offset)
-    
-    # Calculate passage points
-    p1 = Point2D(dist, 0)  # Start of passage
-    p2 = Point2D(dist + 1, 0)  # End of passage
-    
+    # Calculate passage points. We step from the room exit to the far room's exit.
+    # Then we step into the room one grid, and go to the near left corner grid, then we move
+    # from there to the far right corener grid. This gives us all the key points we 
+    # need to calculate the passage and room rectangles.
+
+    p1 = Point2D(0, 0)                  # Start gridi of passage
+    p2 = Point2D(grid_dist - 1, 0)      # End grid of passage
+
     # Calculate room corners in local space
-    r1 = Point2D(p2.x, left_offset)  # Top-left corner
-    r2 = Point2D(r1.x + (grid_depth - 1), r1.y)  # Top-right corner
-    r3 = Point2D(r1.x, r1.y - (grid_breadth - 1))  # Bottom-left corner
-    r4 = Point2D(r2.x, r3.y)  # Bottom-right corner
+    r1 = p2 + Point2D(1, -(grid_breadth - 1) / 2 + breadth_offset))  # Near left grid corner of room
+    r2 = r1 + Point2D(grid_depth - 1, grid_breadth - 1) # Far right grid corner of room
 
     print(f"  Local points:")
     print(f"    Passage: p1({p1.x}, {p1.y}), p2({p2.x}, {p2.y})")
-    print(f"    Room: r1({r1.x}, {r1.y}), r2({r2.x}, {r2.y}), r3({r3.x}, {r3.y}), r4({r4.x}, {r4.y})")
+    print(f"    Room: r1({r1.x}, {r1.y}), r2({r2.x}, {r2.y})")
     
-    # Transform all points to world space
-    p1_world = transform.transform_point(p1)
-    p2_world = transform.transform_point(p2)
-    r1_world = transform.transform_point(r1)
-    r2_world = transform.transform_point(r2)
-    r3_world = transform.transform_point(r3)
-    r4_world = transform.transform_point(r4)
+    # Transform all points to world space Fix me AI! - Add this point list transform method AI!
+    w = transform.transform_points([p1, p2, r1, r2])
     
     print(f"  World points:")
-    print(f"    Passage: p1({p1_world.x}, {p1_world.y}), p2({p2_world.x}, {p2_world.y})")
-    print(f"    Room: r1({r1_world.x}, {r1_world.y}), r2({r2_world.x}, {r2_world.y}), r3({r3_world.x}, {r3_world.y}), r4({r4_world.x}, {r4_world.y})")
+    print(f"    Passage: p1({w[0].x}, {w[0].y}), p2({w[1].x}, {w[1].y})")
+    print(f"    Room: r1({w[2].x}, {w[2].y}), r2({w[3].x}, {w[3].y})")
     
     # Calculate final rectangle in both spaces
-    local_rect = (
-        int(min(r1.x, r2.x, r3.x, r4.x)),
-        int(min(r1.y, r2.y, r3.y, r4.y)),
-        int(max(r1.x, r2.x, r3.x, r4.x) - min(r1.x, r2.x, r3.x, r4.x)) + 1,
-        int(max(r1.y, r2.y, r3.y, r4.y) - min(r1.y, r2.y, r3.y, r4.y)) + 1
+    local_rect = {
+        # Fix me AI! should be p3 and p4
     )
-    print(f"  Local rect: ({local_rect[0]}, {local_rect[1]}, {local_rect[2]}, {local_rect[3]})")
+    print(f"  Local rect: ()") # Fix me AI!
     
     # Calculate final rectangle in world space
     final_rect = (
-        int(min(r1_world.x, r2_world.x, r3_world.x, r4_world.x)),
-        int(min(r1_world.y, r2_world.y, r3_world.y, r4_world.y)),
-        int(max(r1_world.x, r2_world.x, r3_world.x, r4_world.x) - min(r1_world.x, r2_world.x, r3_world.x, r4_world.x)) + 1,
-        int(max(r1_world.y, r2_world.y, r3_world.y, r4_world.y) - min(r1_world.y, r2_world.y, r3_world.y, r4_world.y)) + 1
+        # Fix me AI! should be w[2] an w[3]
     )
     print(f"  World rect: ({final_rect[0]}, {final_rect[1]}, {final_rect[2]}, {final_rect[3]})")
     return final_rect
