@@ -323,7 +323,7 @@ class _RoomArranger:
             
             # Get passage configuration using our distribution system
             from map._arrange.passage_distribution import get_random_passage_config
-            passage_config = get_random_passage_config()
+            passage_config = get_random_passage_config(self.options)
             print(f"Passage config:")
             print(f"  Length: {passage_config.length}")
             print(f"  Start door: {passage_config.doors.start_door}")
