@@ -30,7 +30,7 @@ def generate_large_room(data: Dict[str, Any]) -> RoomShape:
 ROOM_DISTRIBUTION: List[Tuple[Tuple[float, float, float], RoomShape | Callable, None]] = [
     # Common small symmetric rooms (more common in small maps)
     ((2.0, 1.0, 0.5), make_room_shape(RoomType.RECTANGULAR, 3, 3), None),
-    ((1.5, 0.8, 0.4), make_room_shape(RoomType.CIRCULAR, 3, 3), None),
+    ((2.5, 1.2, 0.6), make_room_shape(RoomType.CIRCULAR, 3, 3), None),
     
     # Small asymmetric rooms (very rare in all sizes, prefer odd breadth)
     ((0.02, 0.01, 0.005), make_room_shape(RoomType.RECTANGULAR, 2, 3), None),
@@ -38,6 +38,7 @@ ROOM_DISTRIBUTION: List[Tuple[Tuple[float, float, float], RoomShape | Callable, 
     
     # Medium rooms (balanced in medium maps, strongly prefer odd breadth)
     ((0.8, 1.4, 1.0), make_room_shape(RoomType.RECTANGULAR, 3, 4), None),
+    ((0.6, 0.8, 0.6), make_room_shape(RoomType.CIRCULAR, 3, 4), None),
     ((0.1, 0.2, 0.15), make_room_shape(RoomType.RECTANGULAR, 4, 3), None),
     
     # Larger rooms (more common in large maps, strongly prefer odd breadth)
