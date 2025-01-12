@@ -6,6 +6,7 @@ import random
 import skia
 from map.map import Map
 from options import Options
+from tags import Tags
 
 def main():
     # Get seed from environment variable or use default
