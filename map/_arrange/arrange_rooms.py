@@ -291,7 +291,7 @@ class _RoomArranger:
         Returns:
             List of created rooms
         """
-        from map._arrange.room_shapes import get_random_room_shape, RoomShape
+        from map._arrange.room_distribution import get_random_room_shape, RoomShape
         
         self.rooms = [start_room]  # Reset rooms list
         first_room = last_room = start_room
