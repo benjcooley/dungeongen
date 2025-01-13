@@ -87,10 +87,7 @@ class Passage(MapElement):
         grid.mark_rectangle(self._shape, ElementType.PASSAGE, element_idx)
         
         # Get grid coordinates of passage ends
-        grid_x = int(self._bounds.x / CELL_SIZE)
-        grid_y = int(self._bounds.y / CELL_SIZE)
-        grid_width = int(self._bounds.width / CELL_SIZE)
-        grid_height = int(self._bounds.height / CELL_SIZE)
+        grid_x, grid_y, grid_width, grid_height = map_to_grid_rect(self._bounds)
         
         # Mark blocked cells at passage ends
         if grid_width > grid_height:  # Horizontal passage
