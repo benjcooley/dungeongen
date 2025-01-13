@@ -37,7 +37,7 @@ class Map:
         self._options: Options = options
         self._bounds: Rectangle | None = None
         self._bounds_dirty: bool = True
-        self._occupancy: OccupancyGrid | None = None
+        self._occupancy = OccupancyGrid()  # Initialize with default size
     
     @property
     def elements(self) -> Sequence[MapElement]:
@@ -78,6 +78,8 @@ class Map:
         Raises:
             ValueError: If the element's bounds exceed reasonable limits
         """
+        # Update occupancy grid before adding new element
+        self.recalculate_occupied()
         # Validate element bounds
         bounds = element.bounds
         MAX_DIMENSION = 100 * CELL_SIZE  # 100 grid cells
