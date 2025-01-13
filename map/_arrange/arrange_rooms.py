@@ -443,62 +443,36 @@ def arrange_rooms(
             random.randint(min_size, max_size),
             random.randint(min_size, max_size))
     
-    # Define strategy distribution
-    strategies = [
-        # Small linear sequences
-        (StrategyType.LINEAR_SMALL, StrategyParams(
-            min_rooms=1, max_rooms=2,
-            min_spacing=2, max_spacing=3,
-            branch_chance=0.2
-        ), 3),  # weight
-        
-        # Medium linear sequences
-        (StrategyType.LINEAR_MEDIUM, StrategyParams(
-            min_rooms=2, max_rooms=3,
-            min_spacing=3, max_spacing=4,
-            branch_chance=0.3
-        ), 2),
-        
-        # Large linear sequences
-        (StrategyType.LINEAR_LARGE, StrategyParams(
-            min_rooms=3, max_rooms=4,
-            min_spacing=3, max_spacing=5,
-            branch_chance=0.4
-        ), 1)
-    ]
+    from map._arrange.distribution import get_from_distribution
+    from map._arrange.strategy_distribution import STRATEGY_DISTRIBUTION, StrategyConfig
     
     # Initialize
     total_rooms = random.randint(min_rooms, max_rooms)
     rooms_left = total_rooms - 1  # Subtract start room
-    current_rooms = [start_room]
+    grow_list = [start_room]  # List of rooms to grow from
     all_rooms = [start_room]
     
     # Keep growing until we hit target room count
-    while rooms_left > 0 and current_rooms:
+    while rooms_left > 0 and grow_list:
         next_rooms = []
         
-        # Process each current room
-        for room in current_rooms:
-            # Select random strategy
-            total_weight = sum(weight for _, _, weight in strategies)
-            r = random.uniform(0, total_weight)
+        # Process each room we can grow from
+        for room in grow_list:
+            # Get random strategy from distribution
+            strategy_config = get_from_distribution(STRATEGY_DISTRIBUTION)
             
-            for strategy_type, params, weight in strategies:
-                r -= weight
-                if r <= 0:
-                    # Create and execute strategy
-                    if strategy_type in (
-                        StrategyType.LINEAR_SMALL,
-                        StrategyType.LINEAR_MEDIUM,
-                        StrategyType.LINEAR_LARGE
-                    ):
-                        strategy = LinearStrategy(dungeon_map, params)
-                    
-                    new_rooms = strategy.execute(rooms_left, room)
-                    next_rooms.extend(new_rooms)
-                    all_rooms.extend(new_rooms)
-                    rooms_left -= len(new_rooms)
-                    break
+            # Create and execute strategy
+            if strategy_config.strategy_type in (
+                StrategyType.LINEAR_SMALL,
+                StrategyType.LINEAR_MEDIUM,
+                StrategyType.LINEAR_LARGE
+            ):
+                strategy = LinearStrategy(dungeon_map, strategy_config.params)
+                
+            new_rooms = strategy.execute(rooms_left, room)
+            next_rooms.extend(new_rooms)
+            all_rooms.extend(new_rooms)
+            rooms_left -= len(new_rooms)
         
         current_rooms = next_rooms
         
