@@ -152,7 +152,7 @@ def connect_rooms(
         
     return door1, passage, door2
 
-def create_connected_room(
+def try_create_connected_room(
     source_room: Room,
     direction: RoomDirection,
     distance: int,
@@ -164,11 +164,11 @@ def create_connected_room(
     breadth_offset: float = 0.0,
     align_to: Optional[Tuple[int, int]] = None
 ) -> Tuple[Room, Optional[Door], Passage, Optional[Door]]:
-    """Create a new room connected to an existing room via a passage.
+    """Attempt to create a new room connected to an existing room via a passage.
         
     Creates a new Room of the specified type and size, positioned in the given direction
     and distance from the source room. The rooms are connected by a Passage with optional
-    doors at either end.
+    doors at either end. The room will only be created if the space is unoccupied.
         
     Args:
         source_room: The existing room to connect from
@@ -181,11 +181,8 @@ def create_connected_room(
         end_door_type: Optional DoorType for end of passage
             
     Returns:
-        Tuple of (new_room, start_door, passage, end_door) where:
-        - new_room: The newly created Room instance
-        - start_door: Door at start of passage (None if start_door_type is None)
-        - passage: The connecting Passage instance
-        - end_door: Door at end of passage (None if end_door_type is None)
+        Tuple of (new_room, start_door, passage, end_door) where all elements will be None
+        if the room cannot be placed in the desired location.
     """    
     # Validate inputs
     if distance <= 0:
@@ -375,8 +372,13 @@ class _RoomArranger:
             start_door = passage_config.doors.start_door
             end_door = passage_config.doors.end_door
 
-            # Try to create connected room
-            new_room, start_door, passage, end_door = create_connected_room(
+            # Try to create connected room with retries for different shapes/positions
+            new_room = None
+            retry_count = 0
+            max_shape_retries = 3
+            
+            while new_room is None and retry_count < max_shape_retries:
+                new_room, start_door, passage, end_door = try_create_connected_room(
                 source_room,
                 connect_dir,
                 distance,
@@ -390,18 +392,27 @@ class _RoomArranger:
             )
             
             if new_room is not None:
-                # Update first/last room references based on which end we grew from
-                if grow_from_first:
-                    first_room = new_room
-                else:
-                    last_room = new_room
-                    
-                self.rooms.append(new_room)
-                last_shape = room_shape
-                attempts = 0  # Reset attempts on success
-                continue
-            last_shape = room_shape
-            attempts = 0  # Reset attempts on success
+                )
+                
+                if new_room is not None:
+                    # Successfully placed room
+                    if grow_from_first:
+                        first_room = new_room
+                    else:
+                        last_room = new_room
+                        
+                    self.rooms.append(new_room)
+                    last_shape = room_shape
+                    attempts = 0  # Reset attempts on success
+                    break
+                
+                # Failed to place room, try a different shape
+                retry_count += 1
+                room_shape = get_random_room_shape(last_shape, options=source_room.map.options)
+                
+            if new_room is None:
+                # Failed all retries
+                attempts += 1
                 
         return self.rooms
 
