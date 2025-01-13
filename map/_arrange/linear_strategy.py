@@ -5,7 +5,7 @@ from typing import List, Optional
 
 from map.room import Room
 from map._arrange.strategy import Strategy, StrategyParams
-from map._arrange.room_shapes import get_random_room_shape
+from map._arrange.room_distribution import get_random_room_shape
 from map._arrange.arrange_utils import RoomDirection, get_room_exit_grid_position
 from map._arrange.passage_distribution import get_random_passage_config
 
