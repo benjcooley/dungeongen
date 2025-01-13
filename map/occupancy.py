@@ -214,6 +214,61 @@ class OccupancyGrid:
             for y in range(int(grid_rect.y), int(grid_rect.y + grid_rect.height)):
                 self.mark_cell(x, y, element_type, element_idx)
     
+    def check_rectangle(self, rect: Rectangle, ignore_passages: bool = False) -> bool:
+        """Check if a rectangle area is unoccupied.
+        
+        Args:
+            rect: Rectangle to check
+            ignore_passages: If True, allow overlapping with passages
+            
+        Returns:
+            True if area is valid (unoccupied), False otherwise
+        """
+        # Convert to grid rectangle
+        grid_rect = Rectangle(*map_to_grid_rect(rect))
+        
+        # Check each cell
+        for x in range(int(grid_rect.x), int(grid_rect.x + grid_rect.width)):
+            for y in range(int(grid_rect.y), int(grid_rect.y + grid_rect.height)):
+                idx = self._to_grid_index(x, y)
+                if idx is not None:  # Inside current grid bounds
+                    elem_type, _, _ = self._decode_cell(self._grid[idx])
+                    if elem_type != ElementType.NONE:
+                        if not ignore_passages or elem_type != ElementType.PASSAGE:
+                            return False
+        return True
+        
+    def check_circle(self, circle: Circle, ignore_passages: bool = False) -> bool:
+        """Check if a circle area is unoccupied.
+        
+        Args:
+            circle: Circle to check
+            ignore_passages: If True, allow overlapping with passages
+            
+        Returns:
+            True if area is valid (unoccupied), False otherwise
+        """
+        # Convert circle bounds to grid coordinates
+        grid_rect = Rectangle(*map_to_grid_rect(circle.bounds))
+        
+        # Test each cell center against circle
+        radius_sq = (circle.radius / CELL_SIZE) * (circle.radius / CELL_SIZE)
+        center_x = circle.cx / CELL_SIZE
+        center_y = circle.cy / CELL_SIZE
+        
+        for x in range(int(grid_rect.x), int(grid_rect.x + grid_rect.width)):
+            for y in range(int(grid_rect.y), int(grid_rect.y + grid_rect.height)):
+                dx = (x + 0.5) - center_x
+                dy = (y + 0.5) - center_y
+                if dx * dx + dy * dy <= radius_sq:
+                    idx = self._to_grid_index(x, y)
+                    if idx is not None:  # Inside current grid bounds
+                        elem_type, _, _ = self._decode_cell(self._grid[idx])
+                        if elem_type != ElementType.NONE:
+                            if not ignore_passages or elem_type != ElementType.PASSAGE:
+                                return False
+        return True
+
     def mark_circle(self, circle: Circle, element_type: ElementType,
                    element_idx: int, clip_rect: Optional[Rectangle] = None) -> None:
         """Mark grid cells covered by a circle.
