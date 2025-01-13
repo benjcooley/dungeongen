@@ -415,40 +415,91 @@ class _RoomArranger:
 
 def arrange_rooms(
     dungeon_map: Map,
-    style: ArrangeRoomStyle,
     min_rooms: int = 3,
     max_rooms: int = 7,
     min_size: int = 3,
     max_size: int = 7,
     start_room: Optional[Room] = None
 ) -> List[Room]:
-    """Arrange rooms according to the specified style.
+    """Arrange rooms using a mix of strategies.
     
     Args:
         dungeon_map: The map to add rooms to
-        style: The arrangement strategy to use
         min_rooms: Minimum number of rooms to create
         max_rooms: Maximum number of rooms to create
         min_size: Minimum room size in grid units
         max_size: Maximum room size in grid units
+        start_room: Optional starting room
         
     Returns:
         List of created Room instances
     """
-    num_rooms = random.randint(min_rooms, max_rooms)
-    arranger = _RoomArranger(dungeon_map, min_size, max_size)
+    from map._arrange.strategy import StrategyType, StrategyParams
+    from map._arrange.linear_strategy import LinearStrategy
     
     # Create start room if none provided
     if start_room is None:
-        start_room = dungeon_map.create_rectangular_room(0, 0, 
+        start_room = dungeon_map.create_rectangular_room(0, 0,
             random.randint(min_size, max_size),
             random.randint(min_size, max_size))
     
-    if style == ArrangeRoomStyle.LINEAR:
-        return arranger.arrange_linear(num_rooms, start_room)
-    elif style == ArrangeRoomStyle.SYMMETRIC:
-        # TODO: Implement symmetric arrangement
-        return []
-    else:  # SPIRAL
-        # TODO: Implement spiral arrangement
-        return []
+    # Define strategy distribution
+    strategies = [
+        # Small linear sequences
+        (StrategyType.LINEAR_SMALL, StrategyParams(
+            min_rooms=1, max_rooms=2,
+            min_spacing=2, max_spacing=3,
+            branch_chance=0.2
+        ), 3),  # weight
+        
+        # Medium linear sequences
+        (StrategyType.LINEAR_MEDIUM, StrategyParams(
+            min_rooms=2, max_rooms=3,
+            min_spacing=3, max_spacing=4,
+            branch_chance=0.3
+        ), 2),
+        
+        # Large linear sequences
+        (StrategyType.LINEAR_LARGE, StrategyParams(
+            min_rooms=3, max_rooms=4,
+            min_spacing=3, max_spacing=5,
+            branch_chance=0.4
+        ), 1)
+    ]
+    
+    # Initialize
+    total_rooms = random.randint(min_rooms, max_rooms)
+    rooms_left = total_rooms - 1  # Subtract start room
+    current_rooms = [start_room]
+    all_rooms = [start_room]
+    
+    # Keep growing until we hit target room count
+    while rooms_left > 0 and current_rooms:
+        next_rooms = []
+        
+        # Process each current room
+        for room in current_rooms:
+            # Select random strategy
+            total_weight = sum(weight for _, _, weight in strategies)
+            r = random.uniform(0, total_weight)
+            
+            for strategy_type, params, weight in strategies:
+                r -= weight
+                if r <= 0:
+                    # Create and execute strategy
+                    if strategy_type in (
+                        StrategyType.LINEAR_SMALL,
+                        StrategyType.LINEAR_MEDIUM,
+                        StrategyType.LINEAR_LARGE
+                    ):
+                        strategy = LinearStrategy(dungeon_map, params)
+                    
+                    new_rooms = strategy.execute(rooms_left, room)
+                    next_rooms.extend(new_rooms)
+                    all_rooms.extend(new_rooms)
+                    rooms_left -= len(new_rooms)
+                    break
+        
+        current_rooms = next_rooms
+        
+    return all_rooms
