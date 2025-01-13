@@ -35,9 +35,10 @@ class Map:
     def __init__(self, options: 'Options') -> None:
         self._elements: List[MapElement] = []
         self._options: Options = options
-        self._bounds: Rectangle | None = None
+        self._bounds = Rectangle(0, 0, CELL_SIZE, CELL_SIZE)  # Default to single cell at origin
         self._bounds_dirty: bool = True
-        self.occupancy = OccupancyGrid()  # Initialize with default size
+        # Initialize with large default size centered on origin (-100 to +100)
+        self.occupancy = OccupancyGrid(201, 201)  # Initialize with default size
     
     @property
     def elements(self) -> Sequence[MapElement]:
@@ -146,8 +147,8 @@ class Map:
     def _recalculate_bounds(self) -> None:
         """Recalculate the bounding rectangle that encompasses all map elements."""
         if not self._elements:
-            # Default to single cell at origin if empty
-            return Rectangle(0, 0, CELL_SIZE, CELL_SIZE)
+            # Keep existing bounds if empty
+            return
         
         # Start with first element's bounds
         bounds = self._elements[0].bounds
