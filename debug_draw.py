@@ -116,9 +116,10 @@ def debug_draw_grid_cell(x: int, y: int, fill_color: int, outline_color: Optiona
     px = x * CELL_SIZE
     py = y * CELL_SIZE
     
-    # Draw filled cell
-    fill_paint = skia.Paint(Color=fill_color, Style=skia.Paint.kFill_Style)
-    _debug_canvas.drawRect(skia.Rect(px, py, px + CELL_SIZE, py + CELL_SIZE), fill_paint)
+    # Draw filled cell if fill color provided
+    if fill_color is not None:
+        fill_paint = skia.Paint(Color=fill_color, Style=skia.Paint.kFill_Style)
+        _debug_canvas.drawRect(skia.Rect(px, py, px + CELL_SIZE, py + CELL_SIZE), fill_paint)
     
     # Draw outline if specified
     if outline_color is not None:
