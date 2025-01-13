@@ -1,10 +1,13 @@
 """Linear room arrangement strategy."""
-from typing import List, Optional
+from dataclasses import dataclass
 import random
+from typing import List, Optional
 
 from map.room import Room
-from dataclasses import dataclass
 from map._arrange.strategy import Strategy, StrategyParams
+from map._arrange.room_shapes import get_random_room_shape
+from map._arrange.arrange_utils import RoomDirection, get_room_exit_grid_position
+from map._arrange.passage_distribution import get_random_passage_config
 
 @dataclass
 class LinearStrategyParams(StrategyParams):
@@ -12,9 +15,6 @@ class LinearStrategyParams(StrategyParams):
     min_spacing: int = 2
     max_spacing: int = 4
     branch_chance: float = 0.3
-from map._arrange.room_shapes import get_random_room_shape
-from map._arrange.arrange_utils import RoomDirection, get_room_exit_grid_position
-from map._arrange.passage_distribution import get_random_passage_config
 
 class LinearStrategy(Strategy):
     """Arranges rooms in a linear sequence."""
