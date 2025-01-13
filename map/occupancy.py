@@ -218,19 +218,23 @@ class OccupancyGrid:
         """Check if a rectangle area is unoccupied.
         
         Args:
-            rect: Rectangle to check
+            rect: Rectangle to check in map coordinates
             
         Returns:
             True if area is valid (unoccupied), False otherwise
         """
-        # Convert to grid rectangle
+        # Convert to grid coordinates
         grid_rect = Rectangle(*map_to_grid_rect(rect))
-        
-        # Check each cell
-        for x in range(int(grid_rect.x), int(grid_rect.x + grid_rect.width)):
-            for y in range(int(grid_rect.y), int(grid_rect.y + grid_rect.height)):
-                idx = self._to_grid_index(x, y)
-                if idx is not None and self._grid[idx] != 0:  # Inside grid bounds and occupied
+            
+        # Early out if no valid region
+        if not grid_rect.is_valid:
+            return False
+            
+        # Check each cell in grid coordinates
+        for grid_x in range(int(grid_rect.x), int(grid_rect.x + grid_rect.width)):
+            for grid_y in range(int(grid_rect.y), int(grid_rect.y + grid_rect.height)):
+                idx = self._to_grid_index(grid_x, grid_y)
+                if idx is not None and self._grid[idx] != 0:
                     return False
         return True
         
@@ -238,26 +242,32 @@ class OccupancyGrid:
         """Check if a circle area is unoccupied.
         
         Args:
-            circle: Circle to check
+            circle: Circle to check in map coordinates
             
         Returns:
             True if area is valid (unoccupied), False otherwise
         """
-        # Convert circle bounds to grid coordinates
+        # Convert to grid coordinates
         grid_rect = Rectangle(*map_to_grid_rect(circle.bounds))
+            
+        # Early out if no valid region
+        if not grid_rect.is_valid:
+            return False
+            
+        # Calculate grid-space circle parameters
+        grid_radius_sq = (circle.radius / CELL_SIZE) * (circle.radius / CELL_SIZE)
+        grid_center_x = circle.cx / CELL_SIZE
+        grid_center_y = circle.cy / CELL_SIZE
         
-        # Test each cell center against circle
-        radius_sq = (circle.radius / CELL_SIZE) * (circle.radius / CELL_SIZE)
-        center_x = circle.cx / CELL_SIZE
-        center_y = circle.cy / CELL_SIZE
-        
-        for x in range(int(grid_rect.x), int(grid_rect.x + grid_rect.width)):
-            for y in range(int(grid_rect.y), int(grid_rect.y + grid_rect.height)):
-                dx = (x + 0.5) - center_x
-                dy = (y + 0.5) - center_y
-                if dx * dx + dy * dy <= radius_sq:
-                    idx = self._to_grid_index(x, y)
-                    if idx is not None and self._grid[idx] != 0:  # Inside grid bounds and occupied
+        # Check each cell in grid coordinates
+        for grid_x in range(int(grid_rect.x), int(grid_rect.x + grid_rect.width)):
+            for grid_y in range(int(grid_rect.y), int(grid_rect.y + grid_rect.height)):
+                # Test cell center against circle
+                dx = (grid_x + 0.5) - grid_center_x
+                dy = (grid_y + 0.5) - grid_center_y
+                if dx * dx + dy * dy <= grid_radius_sq:
+                    idx = self._to_grid_index(grid_x, grid_y)
+                    if idx is not None and self._grid[idx] != 0:
                         return False
         return True
 
