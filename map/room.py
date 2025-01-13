@@ -9,7 +9,7 @@ from map.occupancy import ElementType
 
 from algorithms.math import Point2D
 from algorithms.shapes import Rectangle, Circle, Shape
-from graphics.conversions import grid_to_map
+from graphics.conversions import grid_to_map, map_to_grid_rect
 from map.enums import Layers
 from map.mapelement import MapElement
 from constants import CELL_SIZE
