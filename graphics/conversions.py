@@ -10,7 +10,7 @@ from algorithms.shapes import Rectangle
 if TYPE_CHECKING:
     from options import Options
 
-def map_from_grid(grid_x: float, grid_y: float) -> Point:
+def grid_to_map(grid_x: float, grid_y: float) -> Point:
     """Convert grid coordinates to map (pixel) coordinates.
     
     Args:
@@ -22,7 +22,7 @@ def map_from_grid(grid_x: float, grid_y: float) -> Point:
     """
     return (grid_x * CELL_SIZE, grid_y * CELL_SIZE)
 
-def grid_from_map(map_x: float, map_y: float) -> Point:
+def map_to_grid(map_x: float, map_y: float) -> Point:
     """Convert map (pixel) coordinates to grid coordinates.
     
     Args:
