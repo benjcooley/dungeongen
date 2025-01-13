@@ -204,15 +204,20 @@ def create_connected_room(
         align_to=align_to
     )
         
-    # Create the new room
-    room_type = room_type or RoomType.RECTANGULAR
-    new_room = source_room.map.add_element(Room.from_grid(
+    # Check if position is valid using occupancy grid
+    test_room = Room.from_grid(
         new_room_x,
-        new_room_y,
+        new_room_y, 
         new_room_width,
         new_room_height,
-        room_type=room_type
-    ))
+        room_type=room_type or RoomType.RECTANGULAR
+    )
+    
+    if not source_room.map._occupancy.check_rectangle(test_room.bounds):
+        return None, None, None, None
+        
+    # Create the new room
+    new_room = source_room.map.add_element(test_room)
     
     # Connect the rooms using the utility function
     start_door_elem, passage, end_door_elem = connect_rooms(
@@ -370,8 +375,8 @@ class _RoomArranger:
             start_door = passage_config.doors.start_door
             end_door = passage_config.doors.end_door
 
-            # Create connected room using consistent passage point
-            new_room, _, _, _ = create_connected_room(
+            # Try to create connected room
+            new_room, start_door, passage, end_door = create_connected_room(
                 source_room,
                 connect_dir,
                 distance,
@@ -384,13 +389,17 @@ class _RoomArranger:
                 align_to=initial_passage_point
             )
             
-            # Update first/last room references based on which end we grew from
-            if grow_from_first:
-                first_room = new_room
-            else:
-                last_room = new_room
-                
-            self.rooms.append(new_room)
+            if new_room is not None:
+                # Update first/last room references based on which end we grew from
+                if grow_from_first:
+                    first_room = new_room
+                else:
+                    last_room = new_room
+                    
+                self.rooms.append(new_room)
+                last_shape = room_shape
+                attempts = 0  # Reset attempts on success
+                continue
             last_shape = room_shape
             attempts = 0  # Reset attempts on success
                 
