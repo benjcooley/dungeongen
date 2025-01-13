@@ -2,7 +2,7 @@
 from typing import List, Tuple
 from dataclasses import dataclass
 
-from map._arrange.strategy import StrategyType
+from map._arrange.strategy import StrategyType, StrategyParams
 from map._arrange.linear_strategy import LinearStrategyParams
 from map._arrange.distribution import Distribution, DistributionItem, WeightTuple
 
