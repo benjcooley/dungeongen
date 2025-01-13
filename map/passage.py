@@ -2,7 +2,7 @@
 
 from algorithms.shapes import Rectangle, Shape
 from map.mapelement import MapElement
-from graphics.conversions import grid_to_map, grid_points_to_grid_rect
+from graphics.conversions import grid_to_map, grid_points_to_map_rect
 from constants import CELL_SIZE
 from typing import TYPE_CHECKING
 from map.occupancy import ElementType
