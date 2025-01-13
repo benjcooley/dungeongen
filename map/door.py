@@ -263,14 +263,12 @@ class Door(MapElement):
         grid_y = int(self._y / CELL_SIZE)
         grid.mark_cell(grid_x, grid_y, ElementType.DOOR, element_idx)
         
-        # Mark blocked areas on both sides of door
+        # Mark one blocked cell on each side of the door
         if self._orientation == DoorOrientation.HORIZONTAL:
-            # Mark 3 cells before and after horizontally
-            for dx in range(-3, 4):
-                if dx != 0:  # Skip the door cell itself
-                    grid.mark_cell(grid_x + dx, grid_y, ElementType.BLOCKED, element_idx, blocked=True)
+            # Mark one cell before and after horizontally
+            grid.mark_cell(grid_x - 1, grid_y, ElementType.BLOCKED, element_idx, blocked=True)
+            grid.mark_cell(grid_x + 1, grid_y, ElementType.BLOCKED, element_idx, blocked=True)
         else:  # VERTICAL
-            # Mark 3 cells before and after vertically
-            for dy in range(-3, 4):
-                if dy != 0:  # Skip the door cell itself
-                    grid.mark_cell(grid_x, grid_y + dy, ElementType.BLOCKED, element_idx, blocked=True)
+            # Mark one cell before and after vertically
+            grid.mark_cell(grid_x, grid_y - 1, ElementType.BLOCKED, element_idx, blocked=True)
+            grid.mark_cell(grid_x, grid_y + 1, ElementType.BLOCKED, element_idx, blocked=True)
