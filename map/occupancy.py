@@ -273,6 +273,8 @@ class OccupancyGrid:
                     # Get fill color based on element type
                     fill_color = type_colors.get(element_type, skia.Color(220, 220, 220))
                     
-                    # Draw cell with red outline if blocked
-                    outline_color = skia.Color(255, 0, 0) if blocked else None
-                    debug_draw_grid_cell(grid_x, grid_y, fill_color, outline_color, blocked)
+                    # For blocked cells, only draw outline in red
+                    if blocked:
+                        debug_draw_grid_cell(grid_x, grid_y, None, skia.Color(255, 0, 0), blocked)
+                    else:
+                        debug_draw_grid_cell(grid_x, grid_y, fill_color, None, blocked)
