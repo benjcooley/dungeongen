@@ -214,12 +214,11 @@ class OccupancyGrid:
             for y in range(int(grid_rect.y), int(grid_rect.y + grid_rect.height)):
                 self.mark_cell(x, y, element_type, element_idx)
     
-    def check_rectangle(self, rect: Rectangle, ignore_passages: bool = False) -> bool:
+    def check_rectangle(self, rect: Rectangle) -> bool:
         """Check if a rectangle area is unoccupied.
         
         Args:
             rect: Rectangle to check
-            ignore_passages: If True, allow overlapping with passages
             
         Returns:
             True if area is valid (unoccupied), False otherwise
@@ -235,12 +234,11 @@ class OccupancyGrid:
                     return False
         return True
         
-    def check_circle(self, circle: Circle, ignore_passages: bool = False) -> bool:
+    def check_circle(self, circle: Circle) -> bool:
         """Check if a circle area is unoccupied.
         
         Args:
             circle: Circle to check
-            ignore_passages: If True, allow overlapping with passages
             
         Returns:
             True if area is valid (unoccupied), False otherwise
