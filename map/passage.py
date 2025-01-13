@@ -77,10 +77,31 @@ class Passage(MapElement):
         return cls.from_grid(grid_x, grid_y, grid_width, grid_height)
         
     def draw_occupied(self, grid: 'OccupancyGrid', element_idx: int) -> None:
-        """Draw this element's shape into the occupancy grid.
+        """Draw this element's shape and blocked areas into the occupancy grid.
             
         Args:
             grid: The occupancy grid to mark
             element_idx: Index of this element in the map
         """
+        # Mark the passage itself
         grid.mark_rectangle(self._shape, ElementType.PASSAGE, element_idx)
+        
+        # Get grid coordinates of passage ends
+        grid_x = int(self._bounds.x / CELL_SIZE)
+        grid_y = int(self._bounds.y / CELL_SIZE)
+        grid_width = int(self._bounds.width / CELL_SIZE)
+        grid_height = int(self._bounds.height / CELL_SIZE)
+        
+        # Mark blocked cells at passage ends
+        if grid_width > grid_height:  # Horizontal passage
+            # Mark cells above and below at each end
+            grid.mark_cell(grid_x, grid_y - 1, ElementType.BLOCKED, element_idx, blocked=True)
+            grid.mark_cell(grid_x, grid_y + 1, ElementType.BLOCKED, element_idx, blocked=True)
+            grid.mark_cell(grid_x + grid_width - 1, grid_y - 1, ElementType.BLOCKED, element_idx, blocked=True)
+            grid.mark_cell(grid_x + grid_width - 1, grid_y + 1, ElementType.BLOCKED, element_idx, blocked=True)
+        else:  # Vertical passage
+            # Mark cells left and right at each end
+            grid.mark_cell(grid_x - 1, grid_y, ElementType.BLOCKED, element_idx, blocked=True)
+            grid.mark_cell(grid_x + 1, grid_y, ElementType.BLOCKED, element_idx, blocked=True)
+            grid.mark_cell(grid_x - 1, grid_y + grid_height - 1, ElementType.BLOCKED, element_idx, blocked=True)
+            grid.mark_cell(grid_x + 1, grid_y + grid_height - 1, ElementType.BLOCKED, element_idx, blocked=True)
