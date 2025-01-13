@@ -181,7 +181,7 @@ class Map:
         
         # Mark occupied spaces
         for idx, element in enumerate(self._elements):
-            element.draw_occupied(self._occupancy, idx)
+            element.draw_occupied(self.occupancy, idx)
     
     def is_occupied(self, x: int, y: int) -> bool:
         """Check if a grid position is occupied by any map element."""
