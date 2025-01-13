@@ -12,12 +12,9 @@ class StrategyType(Enum):
 
 @dataclass
 class StrategyParams:
-    """Parameters that can be tuned for strategies."""
+    """Base parameters for all strategies."""
     min_rooms: int = 1
     max_rooms: int = 3
-    min_spacing: int = 2
-    max_spacing: int = 4
-    branch_chance: float = 0.3
     
 class Strategy:
     """Base class for room arrangement strategies."""

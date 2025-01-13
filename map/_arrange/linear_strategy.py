@@ -3,7 +3,15 @@ from typing import List, Optional
 import random
 
 from map.room import Room
+from dataclasses import dataclass
 from map._arrange.strategy import Strategy, StrategyParams
+
+@dataclass
+class LinearStrategyParams(StrategyParams):
+    """Parameters specific to linear room arrangement."""
+    min_spacing: int = 2
+    max_spacing: int = 4
+    branch_chance: float = 0.3
 from map._arrange.room_shapes import get_random_room_shape
 from map._arrange.arrange_utils import RoomDirection, get_room_exit_grid_position
 from map._arrange.passage_distribution import get_random_passage_config
