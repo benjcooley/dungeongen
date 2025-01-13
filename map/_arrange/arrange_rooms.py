@@ -392,19 +392,16 @@ class _RoomArranger:
             )
             
             if new_room is not None:
-                )
-                
-                if new_room is not None:
-                    # Successfully placed room
-                    if grow_from_first:
-                        first_room = new_room
-                    else:
-                        last_room = new_room
-                        
-                    self.rooms.append(new_room)
-                    last_shape = room_shape
-                    attempts = 0  # Reset attempts on success
-                    break
+                # Successfully placed room
+                if grow_from_first:
+                    first_room = new_room
+                else:
+                    last_room = new_room
+                    
+                self.rooms.append(new_room)
+                last_shape = room_shape
+                attempts = 0  # Reset attempts on success
+                break
                 
                 # Failed to place room, try a different shape
                 retry_count += 1
