@@ -379,34 +379,34 @@ class _RoomArranger:
             
             while new_room is None and retry_count < max_shape_retries:
                 new_room, start_door, passage, end_door = try_create_connected_room(
-                source_room,
-                connect_dir,
-                distance,
-                room_shape.breadth,
-                room_shape.depth,
-                room_type=room_shape.room_type,
-                start_door_type=start_door,
-                end_door_type=end_door,
-                breadth_offset=room_shape.breadth_offset,
-                align_to=initial_passage_point
-            )
-            
-            if new_room is not None:
-                # Successfully placed room
-                if grow_from_first:
-                    first_room = new_room
-                else:
-                    last_room = new_room
-                    
-                self.rooms.append(new_room)
-                last_shape = room_shape
-                attempts = 0  # Reset attempts on success
-                break
+                    source_room,
+                    connect_dir,
+                    distance,
+                    room_shape.breadth,
+                    room_shape.depth,
+                    room_type=room_shape.room_type,
+                    start_door_type=start_door,
+                    end_door_type=end_door,
+                    breadth_offset=room_shape.breadth_offset,
+                    align_to=initial_passage_point
+                )
+                
+                if new_room is not None:
+                    # Successfully placed room
+                    if grow_from_first:
+                        first_room = new_room
+                    else:
+                        last_room = new_room
+                        
+                    self.rooms.append(new_room)
+                    last_shape = room_shape
+                    attempts = 0  # Reset attempts on success
+                    break
                 
                 # Failed to place room, try a different shape
                 retry_count += 1
                 room_shape = get_random_room_shape(last_shape, options=source_room.map.options)
-                
+            
             if new_room is None:
                 # Failed all retries
                 attempts += 1
