@@ -444,7 +444,7 @@ def arrange_rooms(
             random.randint(min_size, max_size))
     
     from map._arrange.distribution import get_from_distribution
-    from map._arrange.strategy_distribution import STRATEGY_DISTRIBUTION, StrategyConfig
+    from map._arrange.room_distribution import ROOM_DISTRIBUTION, RoomConfig
     
     # Initialize
     total_rooms = random.randint(min_rooms, max_rooms)
@@ -459,7 +459,7 @@ def arrange_rooms(
         # Process each room we can grow from
         for room in grow_list:
             # Get random strategy from distribution
-            strategy_config = get_from_distribution(STRATEGY_DISTRIBUTION)
+            strategy_config = get_from_distribution(ROOM_DISTRIBUTION)
             
             # Create and execute strategy
             if strategy_config.strategy_type == StrategyType.LINEAR:
