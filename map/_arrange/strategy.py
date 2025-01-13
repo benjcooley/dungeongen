@@ -1,4 +1,5 @@
 """Strategy system for room arrangement."""
+from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import Enum, auto
 from typing import List, Optional
@@ -16,13 +17,14 @@ class StrategyParams:
     min_rooms: int = 1
     max_rooms: int = 3
     
-class Strategy:
-    """Base class for room arrangement strategies."""
+class Strategy(ABC):
+    """Abstract base class for room arrangement strategies."""
     
     def __init__(self, dungeon_map: Map, params: StrategyParams):
         self.dungeon_map = dungeon_map
         self.params = params
         
+    @abstractmethod
     def execute(self, rooms_left: int, source_room: Room) -> List[Room]:
         """Execute the strategy.
         
@@ -33,4 +35,4 @@ class Strategy:
         Returns:
             List of newly created rooms
         """
-        raise NotImplementedError
+        pass
