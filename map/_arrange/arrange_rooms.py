@@ -462,11 +462,7 @@ def arrange_rooms(
             strategy_config = get_from_distribution(STRATEGY_DISTRIBUTION)
             
             # Create and execute strategy
-            if strategy_config.strategy_type in (
-                StrategyType.LINEAR_SMALL,
-                StrategyType.LINEAR_MEDIUM,
-                StrategyType.LINEAR_LARGE
-            ):
+            if strategy_config.strategy_type == StrategyType.LINEAR:
                 strategy = LinearStrategy(dungeon_map, strategy_config.params)
                 
             new_rooms = strategy.execute(rooms_left, room)

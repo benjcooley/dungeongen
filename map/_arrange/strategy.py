@@ -8,9 +8,7 @@ from map.map import Map
 
 class StrategyType(Enum):
     """Types of room arrangement strategies."""
-    LINEAR_SMALL = auto()
-    LINEAR_MEDIUM = auto() 
-    LINEAR_LARGE = auto()
+    LINEAR = auto()
 
 @dataclass
 class StrategyParams:

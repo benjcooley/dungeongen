@@ -13,9 +13,9 @@ class StrategyConfig:
 
 # Global strategy distribution
 STRATEGY_DISTRIBUTION: Distribution[StrategyConfig] = [
-    # Small linear sequences - higher weight for more common occurrence
+    # Small linear sequences - higher weight
     ([3], StrategyConfig(
-        StrategyType.LINEAR_SMALL,
+        StrategyType.LINEAR,
         StrategyParams(
             min_rooms=1, max_rooms=2,
             min_spacing=2, max_spacing=3,
@@ -23,9 +23,9 @@ STRATEGY_DISTRIBUTION: Distribution[StrategyConfig] = [
         )
     )),
     
-    # Medium linear sequences - medium weight
+    # Medium linear sequences
     ([2], StrategyConfig(
-        StrategyType.LINEAR_MEDIUM,
+        StrategyType.LINEAR,
         StrategyParams(
             min_rooms=2, max_rooms=3,
             min_spacing=3, max_spacing=4,
@@ -33,9 +33,9 @@ STRATEGY_DISTRIBUTION: Distribution[StrategyConfig] = [
         )
     )),
     
-    # Large linear sequences - lower weight as they consume more space
+    # Large linear sequences - lower weight
     ([1], StrategyConfig(
-        StrategyType.LINEAR_LARGE,
+        StrategyType.LINEAR,
         StrategyParams(
             min_rooms=3, max_rooms=4,
             min_spacing=3, max_spacing=5,
