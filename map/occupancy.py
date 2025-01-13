@@ -231,11 +231,8 @@ class OccupancyGrid:
         for x in range(int(grid_rect.x), int(grid_rect.x + grid_rect.width)):
             for y in range(int(grid_rect.y), int(grid_rect.y + grid_rect.height)):
                 idx = self._to_grid_index(x, y)
-                if idx is not None:  # Inside current grid bounds
-                    elem_type, _, _ = self._decode_cell(self._grid[idx])
-                    if elem_type != ElementType.NONE:
-                        if not ignore_passages or elem_type != ElementType.PASSAGE:
-                            return False
+                if idx is not None and self._grid[idx] != 0:  # Inside grid bounds and occupied
+                    return False
         return True
         
     def check_circle(self, circle: Circle, ignore_passages: bool = False) -> bool:
@@ -262,11 +259,8 @@ class OccupancyGrid:
                 dy = (y + 0.5) - center_y
                 if dx * dx + dy * dy <= radius_sq:
                     idx = self._to_grid_index(x, y)
-                    if idx is not None:  # Inside current grid bounds
-                        elem_type, _, _ = self._decode_cell(self._grid[idx])
-                        if elem_type != ElementType.NONE:
-                            if not ignore_passages or elem_type != ElementType.PASSAGE:
-                                return False
+                    if idx is not None and self._grid[idx] != 0:  # Inside grid bounds and occupied
+                        return False
         return True
 
     def mark_circle(self, circle: Circle, element_type: ElementType,
