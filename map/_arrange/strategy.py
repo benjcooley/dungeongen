@@ -21,8 +21,18 @@ class Strategy(ABC):
     """Abstract base class for room arrangement strategies."""
     
     def __init__(self, dungeon_map: Map, params: StrategyParams):
-        self.dungeon_map = dungeon_map
-        self.params = params
+        self._map = dungeon_map
+        self._params = params
+        
+    @property
+    def map(self) -> Map:
+        """The map being generated."""
+        return self._map
+        
+    @property
+    def params(self) -> StrategyParams:
+        """Strategy parameters."""
+        return self._params
         
     @abstractmethod
     def execute(self, rooms_left: int, source_room: Room) -> List[Room]:

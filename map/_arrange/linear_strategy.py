@@ -56,10 +56,10 @@ class LinearStrategy(Strategy):
         current_room = source_room
         for _ in range(rooms_to_create):
             # Get random room shape
-            room_shape = get_random_room_shape(None, options=self.dungeon_map.options)
+            room_shape = get_random_room_shape(None, options=self.map.options)
             
             # Get passage configuration
-            passage_config = get_random_passage_config(self.dungeon_map.options)
+            passage_config = get_random_passage_config(self.map.options)
             
             # Try to create room
             from map._arrange.arrange_rooms import try_create_connected_room
