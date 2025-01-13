@@ -210,7 +210,7 @@ def try_create_connected_room(
         room_type=room_type or RoomType.RECTANGULAR
     )
     
-    if not source_room.map._occupancy.check_rectangle(test_room.bounds):
+    if not source_room.map.occupancy.check_rectangle(test_room.bounds):
         return None, None, None, None
         
     # Create the new room

@@ -37,7 +37,7 @@ class Map:
         self._options: Options = options
         self._bounds: Rectangle | None = None
         self._bounds_dirty: bool = True
-        self._occupancy = OccupancyGrid()  # Initialize with default size
+        self.occupancy = OccupancyGrid()  # Initialize with default size
     
     @property
     def elements(self) -> Sequence[MapElement]:
@@ -48,11 +48,6 @@ class Map:
     def element_count(self) -> int:
         """Get the number of map elements."""
         return len(self._elements)
-    
-    @property
-    def occupancy(self) -> OccupancyGrid:
-        """Get the current occupancy grid."""
-        return self._occupancy
     
     @property 
     def options(self) -> 'Options':
@@ -178,10 +173,10 @@ class Map:
         grid_height = int(bounds.height / CELL_SIZE) + 1
         
         # Create new grid or clear existing one
-        if self._occupancy is None or (self._occupancy.width != grid_width or self._occupancy.height != grid_height):
-            self._occupancy = OccupancyGrid(grid_width, grid_height)
+        if self.occupancy is None or (self.occupancy.width != grid_width or self.occupancy.height != grid_height):
+            self.occupancy = OccupancyGrid(grid_width, grid_height)
         else:
-            self._occupancy.clear()
+            self.occupancy.clear()
         
         # Mark occupied spaces
         for idx, element in enumerate(self._elements):
