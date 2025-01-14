@@ -40,16 +40,21 @@ class SymmetricalStrategy(Strategy):
         if rooms_left < 2:  # Need at least 2 rooms for symmetry
             return []
             
+        MAX_SPAWNS = 2  # Maximum number of spawn attempts per room pair
+        
         rooms_created: List[Room] = []
-        candidate_rooms: Set[Room] = {source_room}
+        # Track (room1, room2, spawn_count) tuples
+        candidate_pairs: List[Tuple[Room, Room, int]] = [(source_room, source_room, 0)]
         iterations = min(self.params.iterations, rooms_left // 2)
         
         for _ in range(iterations):
-            if not candidate_rooms or rooms_left < 2:
+            if not candidate_pairs or rooms_left < 2:
                 break
                 
-            # Pick random source room and direction
-            current_room = random.choice(list(candidate_rooms))
+            # Pick random room pair and increment its spawn count
+            pair_idx = random.randrange(len(candidate_pairs))
+            current_room, paired_room, spawn_count = candidate_pairs.pop(pair_idx)
+            spawn_count += 1
             direction = random.choice([
                 RoomDirection.NORTH,
                 RoomDirection.SOUTH,
@@ -90,15 +95,21 @@ class SymmetricalStrategy(Strategy):
                 breadth_offset=room_shape.breadth_offset
             )
             
+            # Track new rooms
             if room2 is None:
-                # Keep room1 but don't use it as a candidate for next iteration
+                # Keep room1 even though pair failed
                 rooms_created.append(room1)
                 rooms_left -= 1
             else:
-                # Successfully created a pair, both can be candidates
+                # Successfully created a pair
                 rooms_created.extend([room1, room2])
-                candidate_rooms.add(room1)
-                candidate_rooms.add(room2)
                 rooms_left -= 2
+                # Add new pair as candidate if under max spawns
+                if spawn_count < MAX_SPAWNS:
+                    candidate_pairs.append((room1, room2, spawn_count))
+            
+            # Re-add current pair if under max spawns
+            if spawn_count < MAX_SPAWNS:
+                candidate_pairs.append((current_room, paired_room, spawn_count))
             
         return rooms_created
