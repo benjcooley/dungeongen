@@ -8,6 +8,7 @@ from map._arrange.strategy import Strategy, StrategyParams
 from map._arrange.room_distribution import get_random_room_shape
 from map._arrange.arrange_utils import RoomDirection, get_room_exit_grid_position
 from map._arrange.passage_distribution import get_random_passage_config
+from map._arrange.arrange_rooms import try_create_connected_room
 
 @dataclass
 class LinearStrategyParams(StrategyParams):
@@ -62,8 +63,6 @@ class LinearStrategy(Strategy):
             passage_config = get_random_passage_config(self.map.options)
             
             # Try to create room
-            from map._arrange.arrange_rooms import try_create_connected_room
-            
             new_room = None
             retry_count = 0
             while new_room is None and retry_count < 3:
