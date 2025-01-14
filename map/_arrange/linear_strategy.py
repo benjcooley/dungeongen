@@ -1,4 +1,6 @@
 """Linear room arrangement strategy."""
+
+MAX_SHAPE_RETRIES = 3  # Maximum number of times to retry with different room shapes
 from dataclasses import dataclass
 import random
 from typing import List, Optional, Tuple
@@ -77,18 +79,15 @@ class LinearStrategy(Strategy):
                 source_room = last_room
                 connect_dir = direction
                 
-            # Get random room shape using map options
-            room_shape = get_random_room_shape(last_shape, options=self.map.options)
-            
-            # Get passage configuration using our distribution system
-            passage_config = get_random_passage_config(self.map.options)
-            
             # Try to create connected room with retries for different shapes/positions
             new_room = None
             retry_count = 0
-            max_shape_retries = 3
             
-            while new_room is None and retry_count < max_shape_retries:
+            while new_room is None and retry_count < MAX_SHAPE_RETRIES:
+                # Get random room shape and passage config for each attempt
+                room_shape = get_random_room_shape(last_shape, options=self.map.options)
+                passage_config = get_random_passage_config(self.map.options)
+                
                 new_room, _, _, _ = try_create_connected_room(
                     source_room,
                     connect_dir,
@@ -114,12 +113,10 @@ class LinearStrategy(Strategy):
                     attempts = 0  # Reset attempts on success
                     break
                 
-                # Failed to place room, try a different shape
                 retry_count += 1
-                room_shape = get_random_room_shape(last_shape, options=self.map.options)
             
+            # If all retries failed, increment attempts
             if new_room is None:
-                # Failed all retries
                 attempts += 1
                 
         return rooms
