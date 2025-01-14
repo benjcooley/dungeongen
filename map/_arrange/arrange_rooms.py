@@ -434,8 +434,7 @@ def arrange_rooms(
     Returns:
         List of created Room instances
     """
-    from map._arrange.strategy import StrategyType, StrategyParams
-    from map._arrange.linear_strategy import LinearStrategy
+    from map._arrange.strategy_distribution import get_random_arrange_strategy
     
     # Create start room if none provided
     if start_room is None:
@@ -443,33 +442,31 @@ def arrange_rooms(
             random.randint(min_size, max_size),
             random.randint(min_size, max_size))
     
-    from map._arrange.distribution import get_from_distribution
-    from map._arrange.room_distribution import ROOM_DISTRIBUTION, RoomConfig
-    
     # Initialize
     total_rooms = random.randint(min_rooms, max_rooms)
     rooms_left = total_rooms - 1  # Subtract start room
-    grow_list = [start_room]  # List of rooms to grow from
+    room_queue = [start_room]  # Queue of rooms to grow from
     all_rooms = [start_room]
     
-    # Keep growing until we hit target room count
-    while rooms_left > 0 and grow_list:
-        next_rooms = []
+    # Keep growing until we hit target room count or run out of rooms to grow from
+    while rooms_left > 0 and room_queue:
+        # Get next room to grow from
+        current_room = room_queue.pop(0)
         
-        # Process each room we can grow from
-        for room in grow_list:
-            # Get random strategy from distribution
-            strategy_config = get_from_distribution(ROOM_DISTRIBUTION)
-            
-            # Create and execute strategy
-            if strategy_config.strategy_type == StrategyType.LINEAR:
-                strategy = LinearStrategy(dungeon_map, strategy_config.params)
-                
-            new_rooms = strategy.execute(rooms_left, room)
-            next_rooms.extend(new_rooms)
+        # Get random strategy and its parameters
+        strategy_class, strategy_params = get_random_arrange_strategy(dungeon_map.options)
+        
+        # Limit rooms to generate based on remaining count
+        strategy_params.max_rooms = min(strategy_params.max_rooms, rooms_left)
+        
+        # Create and execute strategy
+        strategy = strategy_class(dungeon_map, strategy_params)
+        new_rooms = strategy.execute(rooms_left, current_room)
+        
+        if new_rooms:
+            # Add new rooms to queue and tracking lists
+            room_queue.extend(new_rooms)
             all_rooms.extend(new_rooms)
             rooms_left -= len(new_rooms)
-        
-        current_rooms = next_rooms
         
     return all_rooms
