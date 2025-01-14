@@ -30,7 +30,6 @@ class LinearStrategy(Strategy):
         Returns:
             List of created rooms
         """
-        created_rooms = []
         rooms_to_create = min(
             rooms_left,
             random.randint(self.params.min_rooms, self.params.max_rooms)
@@ -46,47 +45,13 @@ class LinearStrategy(Strategy):
             RoomDirection.EAST,
             RoomDirection.WEST
         ])
-        
-        # Create rooms using linear arrangement
-        new_rooms = self._arrange_linear(
-            rooms_to_create,
-            source_room,
-            direction,
-            GrowDirection.FORWARD,  # Always grow forward for now
-            max_attempts=30,
-            branch_chance=self.params.branch_chance
-        )
-        
-        return new_rooms
-        
-    def _arrange_linear(
-        self,
-        num_rooms: int,
-        start_room: Room,
-        direction: RoomDirection,
-        grow_direction: GrowDirection = GrowDirection.FORWARD,
-        max_attempts: int = 100
-    ) -> List[Room]:
-        """Arrange rooms in a branching sequence.
-        
-        Args:
-            num_rooms: Number of rooms to generate
-            start_room: Starting room to build from
-            direction: Primary direction to grow in
-            grow_direction: Controls which room to grow from
-            max_attempts: Maximum attempts before giving up
-            branch_chance: Chance (0-1) to start a new branch each room
-            
-        Returns:
-            List of created rooms
-        """
-        rooms = [start_room]  # Track all rooms
-        first_room = last_room = start_room
+        rooms = []  # Track all rooms
+        first_room = last_room = source_room
         last_shape = None
         
-        # Calculate initial passage point from first room
+        # Calculate initial passage point from source room
         initial_passage_point = get_room_exit_grid_position(
-            start_room,
+            source_room,
             direction,
             wall_pos=0.5
         )
