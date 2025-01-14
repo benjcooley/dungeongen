@@ -10,6 +10,7 @@ from map.map import Map
 class StrategyType(Enum):
     """Types of room arrangement strategies."""
     LINEAR = auto()
+    SYMMETRIC = auto()
 
 @dataclass
 class StrategyParams:

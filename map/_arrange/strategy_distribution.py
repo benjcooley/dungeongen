@@ -9,12 +9,21 @@ from dataclasses import dataclass
 
 from map._arrange.strategy import Strategy, StrategyParams, StrategyType
 from map._arrange.linear_strategy import LinearStrategy, LinearStrategyParams
+from map._arrange.symmetrical_strategy import SymmetricalStrategy, SymmetricalStrategyParams
 from map._arrange.distribution import normalize_distribution, get_from_distribution
 from map._arrange.arrange_enums import GrowDirection
 
 # Define strategy distribution with weights for different map sizes
 # Format: (weights[small, medium, large], strategy_class, params)
 _STRATEGY_DISTRIBUTION: List[Tuple[Tuple[float, float, float], Type[Strategy], StrategyParams]] = [
+    # Symmetrical strategies
+    ((1.0, 2.0, 2.5), SymmetricalStrategy, SymmetricalStrategyParams(
+        min_rooms=2, max_rooms=4, iterations=2
+    )),
+    ((0.5, 1.5, 2.0), SymmetricalStrategy, SymmetricalStrategyParams(
+        min_rooms=4, max_rooms=6, iterations=3
+    )),
+    
     # Linear strategies with different parameters
     ((3.0, 2.0, 1.0), LinearStrategy, LinearStrategyParams(
         min_rooms=1, max_rooms=2, min_spacing=2, max_spacing=3,
