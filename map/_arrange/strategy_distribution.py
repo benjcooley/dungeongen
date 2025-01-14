@@ -1,5 +1,8 @@
 """Strategy distribution configuration."""
-from typing import List, Tuple, Type, Optional
+from typing import List, Tuple, Type, Optional, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from options import Options
 from dataclasses import dataclass
 
 from map._arrange.strategy import Strategy, StrategyParams, StrategyType
@@ -24,14 +27,17 @@ _STRATEGY_DISTRIBUTION: List[Tuple[Tuple[float, float, float], Type[Strategy], S
 # Normalize the distribution once at module load
 NORMALIZED_STRATEGY_DISTRIBUTION = normalize_distribution(_STRATEGY_DISTRIBUTION)
 
-def get_random_arrange_strategy() -> Tuple[Type[Strategy], StrategyParams]:
+def get_random_arrange_strategy(options: Optional['Options'] = None) -> Tuple[Type[Strategy], StrategyParams]:
     """Get a random strategy and its parameters based on weighted probabilities.
     
+    Args:
+        options: Options containing map size tags
+        
     Returns:
         Tuple of (StrategyClass, StrategyParams)
     """
-    # For now we use weight index 1 (medium) until we implement size-based selection
-    weight_idx = 1
+    # Get the appropriate weight index based on map size tags
+    weight_idx = get_size_index_from_tags(options.tags) if options else 1  # Default to medium if no options
     
     strategy_class, params = get_from_distribution(NORMALIZED_STRATEGY_DISTRIBUTION, weight_idx)
     return strategy_class, params
