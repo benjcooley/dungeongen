@@ -91,14 +91,14 @@ class SymmetricalStrategy(Strategy):
             )
             
             if room2 is None:
-                # Remove room1 since we couldn't create its pair
-                self.map.remove_element(room1)
-                continue
-                
-            # Successfully created a pair
-            rooms_created.extend([room1, room2])
-            candidate_rooms.add(room1)
-            candidate_rooms.add(room2)
-            rooms_left -= 2
+                # Keep room1 but don't use it as a candidate for next iteration
+                rooms_created.append(room1)
+                rooms_left -= 1
+            else:
+                # Successfully created a pair, both can be candidates
+                rooms_created.extend([room1, room2])
+                candidate_rooms.add(room1)
+                candidate_rooms.add(room2)
+                rooms_left -= 2
             
         return rooms_created
