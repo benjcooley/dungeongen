@@ -10,6 +10,7 @@ from dataclasses import dataclass
 from map._arrange.strategy import Strategy, StrategyParams, StrategyType
 from map._arrange.linear_strategy import LinearStrategy, LinearStrategyParams
 from map._arrange.distribution import normalize_distribution, get_from_distribution
+from map._arrange.arrange_enums import GrowDirection
 
 # Define strategy distribution with weights for different map sizes
 # Format: (weights[small, medium, large], strategy_class, params)
