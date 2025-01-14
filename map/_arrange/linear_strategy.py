@@ -52,8 +52,8 @@ class LinearStrategy(Strategy):
         first_room = last_room = source_room
         last_shape = None
         
-        # Calculate initial passage point from source room
-        initial_passage_point = get_room_exit_grid_position(
+        # Calculate alignment position from source room
+        align_to_pos = get_room_exit_grid_position(
             source_room,
             direction,
             wall_pos=0.5
@@ -98,7 +98,7 @@ class LinearStrategy(Strategy):
                     start_door_type=passage_config.doors.start_door,
                     end_door_type=passage_config.doors.end_door,
                     breadth_offset=room_shape.breadth_offset,
-                    align_to=initial_passage_point
+                    align_to=align_to_pos
                 )
                 
                 if new_room is not None:
