@@ -246,25 +246,36 @@ def arrange_rooms(
     room_queue = [start_room]  # Queue of rooms to grow from
     all_rooms = [start_room]
     
+    STRATEGY_ATTEMPTS = 3
+
     # Keep growing until we hit target room count or run out of rooms to grow from
     while rooms_left > 0 and room_queue:
         # Get next room to grow from
         current_room = room_queue.pop(0)
         
-        # Get random strategy and its parameters
-        strategy_class, strategy_params = get_random_arrange_strategy(dungeon_map.options)
-        
-        # Limit rooms to generate based on remaining count
-        strategy_params.max_rooms = min(strategy_params.max_rooms, rooms_left)
-        
-        # Create and execute strategy
-        strategy = strategy_class(dungeon_map, strategy_params)
-        new_rooms = strategy.execute(rooms_left, current_room)
-        
-        if new_rooms:
-            # Add new rooms to queue and tracking lists
-            room_queue.extend(new_rooms)
-            all_rooms.extend(new_rooms)
-            rooms_left -= len(new_rooms)
+        # Try the same room with different strategies multiple times
+        success = False
+        for _ in range(STRATEGY_ATTEMPTS):
+            # Get random strategy and its parameters
+            strategy_class, strategy_params = get_random_arrange_strategy(dungeon_map.options)
+            
+            # Limit rooms to generate based on remaining count
+            strategy_params.max_rooms = min(strategy_params.max_rooms, rooms_left)
+            
+            # Create and execute strategy
+            strategy = strategy_class(dungeon_map, strategy_params)
+            new_rooms = strategy.execute(rooms_left, current_room)
+            
+            if new_rooms:
+                # Add new rooms to queue and tracking lists
+                room_queue.extend(new_rooms)
+                all_rooms.extend(new_rooms)
+                rooms_left -= len(new_rooms)
+                success = True
+                break
+                
+        # If all attempts failed, just continue to next room in queue
+        if not success:
+            continue
         
     return all_rooms
