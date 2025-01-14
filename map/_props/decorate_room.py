@@ -11,7 +11,7 @@ from constants import CELL_SIZE
 from map.enums import Direction, RockType
 from map.props import ColumnType, Altar, Dais, Rock
 from map.arrange import ColumnArrangement, arrange_columns, arrange_random_props, PropType
-from algorithms.rotation import Rotation
+from graphics.rotation import Rotation
 from map.room import Room, RoomType
 
 if TYPE_CHECKING:

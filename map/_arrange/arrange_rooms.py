@@ -20,11 +20,11 @@ from enum import Enum, auto
 from typing import List, Optional, Tuple
 import random
 
-from algorithms.math import Point2D
+from graphics.math import Point2D
 from options import Options
-from algorithms.shapes import Circle
+from graphics.shapes import Circle
 from constants import CELL_SIZE
-from map._arrange.room_shapes import RoomShape, make_room_shape
+from map._arrange.room_distribution import RoomShape, RoomShape
 
 from map.door import Door, DoorOrientation, DoorType
 from map.enums import Direction
@@ -191,7 +191,7 @@ def try_create_connected_room(
         raise ValueError("Room dimensions must be positive")
             
     # Create room shape
-    room_shape = make_room_shape(room_type or RoomType.RECTANGULAR, room_breadth, room_depth)
+    room_shape = RoomShape(room_type or RoomType.RECTANGULAR, room_breadth, room_depth)
     
     # Get room rect in grid coordinates using arrange utils
     new_room_x, new_room_y, new_room_width, new_room_height = get_adjacent_room_rect(

@@ -4,8 +4,8 @@ import math
 import random
 import skia
 from typing import List, Optional, Sequence
-from algorithms.types import Point
-from algorithms.shapes import Shape
+from graphics.aliases import Point
+from graphics.shapes import Shape
 
 class PoissonDiskSampler:
     def __init__(

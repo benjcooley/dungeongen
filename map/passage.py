@@ -1,6 +1,6 @@
 """Passage map element definition."""
 
-from algorithms.shapes import Rectangle, Shape
+from graphics.shapes import Rectangle, Shape
 from map.mapelement import MapElement
 from graphics.conversions import grid_to_map, grid_points_to_map_rect, map_to_grid_rect
 from constants import CELL_SIZE

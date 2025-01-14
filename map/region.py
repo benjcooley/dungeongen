@@ -2,7 +2,7 @@
 
 import skia
 from typing import List, Sequence
-from algorithms.shapes import Shape, ShapeGroup
+from graphics.shapes import Shape, ShapeGroup
 from map.mapelement import MapElement
 
 

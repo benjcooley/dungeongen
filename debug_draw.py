@@ -3,7 +3,7 @@
 import math
 import skia
 from typing import Tuple, Optional
-from algorithms.math import Point2D
+from graphics.math import Point2D
 from constants import CELL_SIZE, DEBUG_FONT_FAMILY, DEBUG_FONT_SIZE
 
 # Predefined colors for debug visualization with good contrast on white

@@ -4,11 +4,11 @@ from enum import Enum, auto
 from typing import Dict, Optional, Set, Tuple
 from tags import Tags
 import skia
-from algorithms.math import Matrix2D, Point2D
-from algorithms.shapes import Rectangle
+from graphics.math import Matrix2D, Point2D
+from graphics.shapes import Rectangle
 from map.room import Room, RoomType
 from constants import CELL_SIZE
-from algorithms.types import Point
+from graphics.aliases import Point
 
 def grid_points_to_grid_rect(grid_x1: int, grid_y1: int, grid_x2: int, grid_y2: int) -> Tuple[int, int, int, int]:
     """Convert grid points to a rectangle"""

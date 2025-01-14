@@ -5,7 +5,7 @@ from typing import Tuple, TYPE_CHECKING
 from altair import Point
 from constants import CELL_SIZE
 import math
-from algorithms.shapes import Rectangle
+from graphics.shapes import Rectangle
 
 if TYPE_CHECKING:
     from options import Options

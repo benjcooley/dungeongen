@@ -11,8 +11,8 @@ if TYPE_CHECKING:
     from options import Options
     from map._props.prop import Prop
     from map.occupancy import OccupancyGrid
-from algorithms.shapes import Rectangle, Circle
-from algorithms.shapes import Shape
+from graphics.shapes import Rectangle, Circle
+from graphics.shapes import Shape
 
 class MapElement:
     """Base class for all map elements.

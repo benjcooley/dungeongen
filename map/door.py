@@ -3,9 +3,9 @@
 from enum import Enum, auto
 import math
 import skia
-from algorithms.shapes import Rectangle, ShapeGroup
+from graphics.shapes import Rectangle, ShapeGroup
 from map.mapelement import MapElement
-from algorithms.shapes import Shape
+from graphics.shapes import Shape
 from graphics.conversions import grid_to_map
 from map.enums import Layers
 from constants import CELL_SIZE

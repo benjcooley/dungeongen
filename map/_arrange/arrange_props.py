@@ -1,5 +1,5 @@
 import random
-from algorithms.rotation import Rotation
+from graphics.rotation import Rotation
 from map.mapelement import MapElement
 from map._props.altar import Altar
 from map._arrange.proptypes import PropType

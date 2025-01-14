@@ -1,5 +1,6 @@
 """Room map element definition."""
 
+from dataclasses import dataclass
 from enum import Enum, auto
 import math
 from typing import List, TYPE_CHECKING, Tuple, Optional
@@ -7,8 +8,8 @@ import random
 import skia
 from map.occupancy import ElementType
 
-from algorithms.math import Point2D
-from algorithms.shapes import Rectangle, Circle, Shape
+from graphics.math import Point2D
+from graphics.shapes import Rectangle, Circle, Shape
 from graphics.conversions import grid_to_map, map_to_grid_rect
 from map.enums import Layers
 from map.mapelement import MapElement
@@ -39,6 +40,14 @@ class RoomType(Enum):
     """Types of column props."""
     CIRCULAR = auto()
     RECTANGULAR = auto()
+
+@dataclass
+class RoomShape:
+    """Defines the shape and dimensions of a room."""
+    room_type: RoomType
+    breadth: int  # Width relative to forward direction
+    depth: int    # Length relative to forward direction
+    breadth_offset: float  # Offset for alternating room placement
 
 class Room(MapElement):
     """A room in the dungeon.
@@ -124,7 +133,7 @@ class Room(MapElement):
         bottom = self._bounds.y + self._bounds.height - inset
         
         # Create corner points and wall vectors
-        from algorithms.math import Point2D
+        from graphics.math import Point2D
         
         # Corner positions
         tl = Point2D(left, top)

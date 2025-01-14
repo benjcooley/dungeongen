@@ -6,10 +6,10 @@ from typing import Generic, Iterator, List, Optional, Sequence, Tuple, TypeVar, 
 
 import skia
 
-from algorithms.shapes import Circle, Rectangle, Shape, ShapeGroup
+from graphics.shapes import Circle, Rectangle, Shape, ShapeGroup
 from constants import CELL_SIZE
 from graphics.conversions import grid_to_map
-from graphics.crosshatch import draw_crosshatches
+from drawing.crosshatch import draw_crosshatches
 from map.enums import Layers
 from typing import Generic, Iterator, List, Optional, Sequence, Tuple, TypeVar, TYPE_CHECKING
 from map.grid import GridStyle, draw_region_grid
@@ -337,7 +337,7 @@ class Map:
         from map.room import RoomType
         
         # Get initial room shape using options
-        from map._arrange.room_shapes import get_random_room_shape
+        from map._arrange.room_distribution import get_random_room_shape
         initial_shape = get_random_room_shape(options=self.options)
         print(f"\nInitial room shape selected:")
         print(f"  Type: {initial_shape.room_type}")

@@ -3,12 +3,12 @@
 from typing import TYPE_CHECKING
 import skia
 
-from algorithms.shapes import Rectangle
-from algorithms.types import Point
+from graphics.shapes import Rectangle
+from graphics.aliases import Point
 from constants import CELL_SIZE
 from map._props.prop import Prop, PropType
 from map.enums import Layers
-from algorithms.rotation import Rotation
+from graphics.rotation import Rotation
 
 # Constants for dais dimensions (2x2 grid cells)
 DAIS_WIDTH = CELL_SIZE * 2

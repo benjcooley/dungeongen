@@ -1,7 +1,7 @@
 """Stairs map element definition."""
 
 import skia
-from algorithms.shapes import Rectangle, Shape
+from graphics.shapes import Rectangle, Shape
 from map.mapelement import MapElement
 from graphics.conversions import grid_to_map
 from map.enums import Layers
