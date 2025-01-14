@@ -30,12 +30,12 @@ class LinearStrategy(Strategy):
         Returns:
             List of created rooms
         """
-        rooms_to_create = min(
+        num_rooms = min(
             rooms_left,
             random.randint(self.params.min_rooms, self.params.max_rooms)
         )
         
-        if rooms_to_create == 0:
+        if num_rooms == 0:
             return []
             
         # Pick random cardinal direction
@@ -57,6 +57,9 @@ class LinearStrategy(Strategy):
         )
             
         attempts = 0
+        max_attempts = 30
+        grow_direction = GrowDirection.FORWARD
+        
         while len(rooms) < num_rooms and attempts < max_attempts:
             attempts += 1
             
