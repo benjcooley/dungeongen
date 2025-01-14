@@ -16,7 +16,6 @@ class LinearStrategyParams(StrategyParams):
     """Parameters specific to linear room arrangement."""
     min_spacing: int = 2
     max_spacing: int = 4
-    branch_chance: float = 0.3
 
 class LinearStrategy(Strategy):
     """Arranges rooms in a linear sequence."""
@@ -66,8 +65,7 @@ class LinearStrategy(Strategy):
         start_room: Room,
         direction: RoomDirection,
         grow_direction: GrowDirection = GrowDirection.FORWARD,
-        max_attempts: int = 100,
-        branch_chance: float = 0.4
+        max_attempts: int = 100
     ) -> List[Room]:
         """Arrange rooms in a branching sequence.
         
@@ -97,36 +95,7 @@ class LinearStrategy(Strategy):
         while len(rooms) < num_rooms and attempts < max_attempts:
             attempts += 1
             
-            # Possibly start a new branch
-            if random.random() < branch_chance and len(rooms) < num_rooms - 1:
-                # Pick a random room to branch from
-                source_room = random.choice(rooms)
-                
-                # Pick a new random direction excluding current
-                possible_dirs = [
-                    RoomDirection.NORTH, RoomDirection.SOUTH,
-                    RoomDirection.EAST, RoomDirection.WEST
-                ]
-                possible_dirs.remove(direction)
-                new_direction = random.choice(possible_dirs)
-                
-                # Pick a random grow mode
-                new_grow_mode = random.choice(list(GrowDirection))
-                
-                # Recursively arrange a new branch
-                remaining_rooms = num_rooms - len(rooms)
-                if remaining_rooms > 1:
-                    branch_size = random.randint(1, remaining_rooms - 1)
-                    self._arrange_linear(
-                        branch_size,
-                        source_room,
-                        new_direction,
-                        new_grow_mode,
-                        max_attempts,
-                        branch_chance * 0.5  # Reduce branch chance for sub-branches
-                    )
-                    
-            # Continue main sequence
+            # Determine growth direction
             grow_from_first = (
                 random.random() < 0.5 if grow_direction == GrowDirection.BOTH
                 else grow_direction == GrowDirection.BACKWARD
