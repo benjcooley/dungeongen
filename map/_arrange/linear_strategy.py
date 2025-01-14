@@ -18,6 +18,7 @@ class LinearStrategyParams(StrategyParams):
     """Parameters specific to linear room arrangement."""
     min_spacing: int = 2
     max_spacing: int = 4
+    grow_direction: GrowDirection = GrowDirection.FORWARD
 
 class LinearStrategy(Strategy):
     """Arranges rooms in a linear sequence."""
@@ -60,15 +61,14 @@ class LinearStrategy(Strategy):
             
         attempts = 0
         max_attempts = 30
-        grow_direction = GrowDirection.FORWARD
         
         while len(rooms) < num_rooms and attempts < max_attempts:
             attempts += 1
             
             # Determine growth direction
             grow_from_first = (
-                random.random() < 0.5 if grow_direction == GrowDirection.BOTH
-                else grow_direction == GrowDirection.BACKWARD
+                random.random() < 0.5 if self.params.grow_direction == GrowDirection.BOTH
+                else self.params.grow_direction == GrowDirection.BACKWARD
             )
             
             # Set source room and growth direction

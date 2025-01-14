@@ -16,13 +16,16 @@ from map._arrange.distribution import normalize_distribution, get_from_distribut
 _STRATEGY_DISTRIBUTION: List[Tuple[Tuple[float, float, float], Type[Strategy], StrategyParams]] = [
     # Linear strategies with different parameters
     ((3.0, 2.0, 1.0), LinearStrategy, LinearStrategyParams(
-        min_rooms=1, max_rooms=2, min_spacing=2, max_spacing=3
+        min_rooms=1, max_rooms=2, min_spacing=2, max_spacing=3,
+        grow_direction=GrowDirection.FORWARD
     )),
     ((2.0, 2.5, 1.5), LinearStrategy, LinearStrategyParams(
-        min_rooms=2, max_rooms=3, min_spacing=2, max_spacing=4
+        min_rooms=2, max_rooms=3, min_spacing=2, max_spacing=4,
+        grow_direction=GrowDirection.BOTH
     )),
     ((1.0, 2.0, 2.5), LinearStrategy, LinearStrategyParams(
-        min_rooms=2, max_rooms=4, min_spacing=3, max_spacing=5
+        min_rooms=2, max_rooms=4, min_spacing=3, max_spacing=5,
+        grow_direction=GrowDirection.BACKWARD
     )),
 ]
 
