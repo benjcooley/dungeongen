@@ -3,6 +3,8 @@ from typing import List, Tuple, Type, Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from options import Options
+
+from map._arrange.arrange_utils import get_size_index_from_tags
 from dataclasses import dataclass
 
 from map._arrange.strategy import Strategy, StrategyParams, StrategyType
