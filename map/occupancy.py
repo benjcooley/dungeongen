@@ -249,8 +249,9 @@ class OccupancyGrid:
         Returns:
             True if area is valid (unoccupied), False otherwise
         """
-        # Convert bounds to grid coordinates first, then inflate by grid cells
-        grid_rect = Rectangle(*map_to_grid_rect(circle.bounds)).inflated(inflate_cells)
+        # Inflate circle first, then convert bounds to grid coordinates
+        inflated_circle = circle.inflated(inflate_cells * CELL_SIZE)
+        grid_rect = Rectangle(*map_to_grid_rect(inflated_circle.bounds))
             
         # Early out if no valid region
         if not grid_rect.is_valid:
