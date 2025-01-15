@@ -10,7 +10,7 @@ from dataclasses import dataclass
 from map._arrange.strategy import Strategy, StrategyParams, StrategyType
 from map._arrange.linear_strategy import LinearStrategy, LinearStrategyParams
 from map._arrange.symmetrical_strategy import SymmetricalStrategy, SymmetricalStrategyParams
-from map._arrange.distribution import normalize_distribution, get_from_distribution
+from map._arrange.distribution import normalize_distribution, try_get_from_distribution
 from map._arrange.arrange_enums import GrowDirection
 
 # Define strategy distribution with weights for different map sizes
@@ -54,6 +54,6 @@ def get_random_arrange_strategy(options: Optional['Options'] = None) -> Tuple[Ty
     # Get the appropriate weight index based on map size tags
     weight_idx = get_size_index_from_tags(options.tags) if options else 1  # Default to medium if no options
     
-    strategy_class, params = get_from_distribution(NORMALIZED_STRATEGY_DISTRIBUTION, weight_idx)
+    strategy_class, params = try_get_from_distribution(NORMALIZED_STRATEGY_DISTRIBUTION, weight_idx)
     return strategy_class, params
 
