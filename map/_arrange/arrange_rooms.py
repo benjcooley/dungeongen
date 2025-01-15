@@ -91,7 +91,7 @@ def connect_rooms(
 
         # Check passage area in grid coordinates
         passage = grid_points_to_grid_rect(r1_x, r1_y, r2_x, r2_y)
-        valid, crossed_passages = map.occupancy.check_passage(passage, r1_dir)
+        valid, _ = map.occupancy.check_passage(passage, r1_dir)
         
         # We're constrained on both ends, so give up
         if not valid and constrained:
@@ -149,11 +149,6 @@ def connect_rooms(
         # Create and add passage
         passage = Passage.from_grid(passage_x, passage_y, passage_width, passage_height)
         passage = map.add_element(passage)
-        
-        # Connect to any crossed passages
-        for passage_idx in crossed_passages:
-            crossed_passage = map._elements[passage_idx]
-            passage.connect_to(crossed_passage)
     
     # Connect everything based on which door types were specified
     elems: List[MapElement] = [room1]    
