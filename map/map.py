@@ -331,11 +331,11 @@ class Map:
         
         # Determine room count range based on size tag
         if Tags.SMALL in self.options.tags:
-            min_rooms, max_rooms = 3, 5
-        elif Tags.LARGE in self.options.tags:
-            min_rooms, max_rooms = 8, 12
-        else:  # MEDIUM is default
             min_rooms, max_rooms = 5, 8
+        elif Tags.LARGE in self.options.tags:
+            min_rooms, max_rooms = 12, 16
+        else:  # MEDIUM is default
+            min_rooms, max_rooms = 8, 12
         # Import here to avoid circular dependencies
         from map._arrange.arrange_rooms import _RoomArranger, GrowDirection
         from map._props.decorate_room import decorate_room
