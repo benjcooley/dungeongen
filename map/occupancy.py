@@ -307,11 +307,14 @@ class OccupancyGrid:
                 if dx * dx + dy * dy <= radius_sq:
                     self.mark_cell(x, y, element_type, element_idx)
         
-    def draw_debug(self, canvas: 'skia.Canvas') -> None:
+    def draw_debug(self, canvas: 'skia.Canvas', options: 'Options') -> None:
         """Draw debug visualization of occupied grid cells."""
         import skia
         from debug_draw import debug_draw_init, debug_draw_grid_cell
         
+        if not options.debug_draw_occupancy:
+            return
+            
         # Initialize debug drawing
         debug_draw_init(canvas)
         
