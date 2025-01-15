@@ -5,7 +5,6 @@ from array import array
 from enum import IntFlag, auto
 import math
 import skia
-from map.door import DoorOrientation
 from graphics.shapes import Rectangle, Circle
 from constants import CELL_SIZE
 from graphics.conversions import map_to_grid, map_rect_to_grid_points, map_to_grid_rect
@@ -384,13 +383,12 @@ class OccupancyGrid:
                 if dx * dx + dy * dy <= radius_sq:
                     self.mark_cell(x, y, element_type, element_idx)
         
-    def check_door(self, grid_x: int, grid_y: int, orientation: 'DoorOrientation') -> bool:
+    def check_door(self, grid_x: int, grid_y: int) -> bool:
         """Check if a door can be placed at the given grid position.
         
         Args:
             grid_x: Grid x coordinate
             grid_y: Grid y coordinate
-            orientation: Door orientation (unused, kept for API compatibility)
             
         Returns:
             True if position is unoccupied, False otherwise

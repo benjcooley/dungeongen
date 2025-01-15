@@ -117,7 +117,7 @@ def connect_rooms(
     )
 
     if dist > 0 and start_door_type is not None and \
-            map.occupancy.check_door(r1_x, r1_y, door_orientation):
+            map.occupancy.check_door(r1_x, r1_y):
         door1 = Door.from_grid(r1_x, r1_y, door_orientation, door_type=start_door_type)
         map.add_element(door1)
         r1_x += dx
@@ -125,7 +125,7 @@ def connect_rooms(
         dist -= 1
 
     if dist > 0 and end_door_type is not None and \
-            map.occupancy.check_door(r2_x, r2_y, door_orientation):
+            map.occupancy.check_door(r2_x, r2_y):
         door2 = Door.from_grid(r2_x, r2_y, door_orientation, door_type=end_door_type)
         map.add_element(door2)
         r2_x -= dx
