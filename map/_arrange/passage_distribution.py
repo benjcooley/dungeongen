@@ -41,11 +41,11 @@ def generate_long_length(data: Dict[str, Any]) -> int:
 # Format: (weights[small, medium, large], item, requirement_fn)
 LENGTH_DISTRIBUTION: List[Tuple[Tuple[float, float, float], int | Callable, None]] = [
     # Single cell (varies by size)
-    ((2.5, 1.0, 0.5), 1, None),
+    ((3, 3, 3), 1, None),
     
     # Short passages (varies by size)
-    ((0.8, 0.8, 0.4), 2, None),
-    ((0.3, 0.7, 0.3), 3, None),
+    ((0.8, 0.6, 0.4), 2, None),
+    ((0.3, 0.5, 0.3), 3, None),
     
     # Medium passages (varies by size)
     ((0.1, 0.4, 0.8), 4, None),  # Allow 4-grid passages in small maps with low weight

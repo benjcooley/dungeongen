@@ -2,11 +2,11 @@
 
 from enum import Enum, auto
 
-class Tags(Enum):
+class Tags:
     """Tags that can be used to customize random distributions."""
-    SMALL = auto()
-    MEDIUM = auto()
-    LARGE = auto()
+    SMALL = "small"
+    MEDIUM = "medium"
+    LARGE = "large"
     
     def __str__(self) -> str:
         """Return the tag name in lowercase for use as a string."""

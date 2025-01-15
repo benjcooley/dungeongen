@@ -24,7 +24,14 @@ class LinearStrategy(Strategy):
     """Arranges rooms in a linear sequence."""
     
     def execute(self, rooms_left: int, source_room: Room) -> List[Room]:
-        """Create a linear sequence of rooms.
+        """
+        Create a linear sequence of rooms. Decides whether to randomly grow 'forward'
+        or 'backward' from a source room, or in both directions. Gives up if it can't
+        add the requested rooms.
+
+        Passages will generally be centered in the rooms created, and the passages will
+        align to a single straight line. This is useful for creatiing a set of 
+        aligned rooms.
         
         Args:
             rooms_left: Maximum number of rooms to create
@@ -52,7 +59,9 @@ class LinearStrategy(Strategy):
         first_room = last_room = source_room
         last_shape = None
         
-        # Calculate alignment position from source room
+        # Calculate an alignment position to align all the other passages with. It's just used
+        # to align passages in a straight liene so it can be on either side of the room, we
+        # don't care.
         align_to_pos = get_room_exit_grid_position(
             source_room,
             direction,
@@ -97,7 +106,6 @@ class LinearStrategy(Strategy):
                     room_type=room_shape.room_type,
                     start_door_type=passage_config.doors.start_door,
                     end_door_type=passage_config.doors.end_door,
-                    breadth_offset=room_shape.breadth_offset,
                     align_to=align_to_pos
                 )
                 

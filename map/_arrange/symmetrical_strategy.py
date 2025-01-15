@@ -75,8 +75,7 @@ class SymmetricalStrategy(Strategy):
                 room_shape.depth,
                 room_type=room_shape.room_type,
                 start_door_type=passage_config.doors.start_door,
-                end_door_type=passage_config.doors.end_door,
-                breadth_offset=room_shape.breadth_offset
+                end_door_type=passage_config.doors.end_door
             )
             
             if room1 is None:
@@ -91,8 +90,7 @@ class SymmetricalStrategy(Strategy):
                 room_shape.depth,
                 room_type=room_shape.room_type,
                 start_door_type=passage_config.doors.start_door,
-                end_door_type=passage_config.doors.end_door,
-                breadth_offset=room_shape.breadth_offset
+                end_door_type=passage_config.doors.end_door
             )
             
             # Track new rooms

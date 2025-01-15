@@ -327,12 +327,12 @@ class Map:
     def generate(self) -> None:
         """Generate a random dungeon map using current options settings."""
         # Determine room count range based on size tag
-        if Tags.SMALL in self.options.tags:
-            min_rooms, max_rooms = 3, 8
-        elif Tags.LARGE in self.options.tags:
+        if Tags.LARGE in self.options.tags:
             min_rooms, max_rooms = 12, 24
-        else:  # MEDIUM is default
+        elif Tags.MEDIUM in self.options.tags:
             min_rooms, max_rooms = 8, 12
+        else:  # SMALL is default
+            min_rooms, max_rooms = 3, 8
         # Import here to avoid circular dependencies
         from map._arrange.arrange_rooms import _RoomArranger, GrowDirection
         from map._props.decorate_room import decorate_room
@@ -367,7 +367,7 @@ class Map:
         
         # Create room arranger and generate linear layout
         arranger = _RoomArranger(self)
-        rooms = arranger.arrange_linear(
+        _ = arranger.arrange_linear(
             random.randint(min_rooms, max_rooms),
             start_room,
             direction=initial_direction,
