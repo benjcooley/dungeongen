@@ -40,10 +40,13 @@ class LinearStrategy(Strategy):
         Returns:
             List of created rooms
         """
-        num_rooms = min(
-            rooms_left,
-            random.randint(self.params.min_rooms, self.params.max_rooms)
-        )
+        # Ensure min_rooms <= max_rooms and handle edge cases
+        adjusted_min = min(self.params.min_rooms, rooms_left)
+        adjusted_max = min(self.params.max_rooms, rooms_left)
+        if adjusted_min == adjusted_max:
+            num_rooms = adjusted_min
+        else:
+            num_rooms = random.randint(adjusted_min, adjusted_max)
         
         if num_rooms == 0:
             return []
