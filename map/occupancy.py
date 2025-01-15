@@ -296,6 +296,28 @@ class OccupancyGrid:
         
         # Convert to grid coordinates
         grid_rect = Rectangle(*map_to_grid_rect(rect))
+
+        # Check the grid points at each end of the passage first
+        if direction in (RoomDirection.NORTH, RoomDirection.SOUTH):
+            check_x = int(grid_rect.x + grid_rect.width / 2)
+            check_y1 = int(grid_rect.y - 1)
+            check_y2 = int(grid_rect.y + grid_rect.height)
+            
+            # Check both end points
+            for y in (check_y1, check_y2):
+                idx = self._to_grid_index(check_x, y)
+                if idx is None or self._grid[idx] == 0:
+                    return False, []
+        else:
+            check_y = int(grid_rect.y + grid_rect.height / 2)
+            check_x1 = int(grid_rect.x - 1)
+            check_x2 = int(grid_rect.x + grid_rect.width)
+            
+            # Check both end points
+            for x in (check_x1, check_x2):
+                idx = self._to_grid_index(x, check_y)
+                if idx is None or self._grid[idx] == 0:
+                    return False, []
         
         # Manually inflate perpendicular to direction
         if direction in (RoomDirection.NORTH, RoomDirection.SOUTH):
