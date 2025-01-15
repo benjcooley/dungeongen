@@ -71,9 +71,31 @@ def connect_rooms(
     # Get the opposite direction for room2
     r2_dir = r1_dir.get_opposite()
             
-    # Get connection points in grid coordinates
-    r1_x, r1_y = get_room_exit_grid_position(room1, r1_dir, align_to=align_to)
-    r2_x, r2_y = get_room_exit_grid_position(room2, r2_dir, align_to=(r1_x, r1_y))
+    # Check if passage positions are fixed
+    constrained = (room1.room_type == RoomType.CIRCULAR and \
+                  room2.room_type == RoomType.CIRCULAR) or \
+                  align_to is not None
+
+    # Try to find an entry/exit point pair from the room that aren't blocked
+    tries = 0
+    max_tries = 1 if constrained else 4
+    while tries < max_tries:
+
+        # Get connection points in grid coordinates
+        if align_to is not None:
+            r1_x, r1_y = get_room_exit_grid_position(room1, r1_dir, align_to=align_to)
+            r2_x, r2_y = get_room_exit_grid_position(room2, r2_dir, align_to=align_to)
+        else:
+            r1_x, r1_y = get_room_exit_grid_position(room1, r1_dir, random.random())
+            r2_x, r2_y = get_room_exit_grid_position(room2, r2_dir, wall_pos=random.random())
+
+        # Check passage area in grid coordinates
+        passage = grid_points_to_grid_rect(r1_x, r1_y, r2_x, r2_y)
+        valid, crosses = map.occupancy.check_passage(passage, r1_dir)
+        
+        # We're constrained on both ends, so gi
+        if not valid and constrained:
+            return None, None, None
 
     # Make sure we don't have too many doors
     dist = grid_line_dist(r1_x, r1_y, r2_x, r2_y)
@@ -82,24 +104,6 @@ def connect_rooms(
 
     # Deltas
     dx, dy = grid_line_to_grid_deltas(r1_x, r1_y, r2_x, r2_y)
-
-    # Check passage area in grid coordinates
-    passage_x = min(r1_x, r2_x)
-    passage_y = min(r1_y, r2_y)
-    passage_width = abs(r2_x - r1_x) + 1
-    passage_height = abs(r2_y - r1_y) + 1
-    
-    # Check each cell in the passage area
-    crossed_passages = []
-    for x in range(passage_x, passage_x + passage_width):
-        for y in range(passage_y, passage_y + passage_height):
-            idx = map.occupancy._to_grid_index(x, y)
-            if idx is not None:
-                element_type, element_idx, blocked = map.occupancy._decode_cell(map.occupancy._grid[idx])
-                if blocked or element_type == ElementType.ROOM:
-                    return None, None, None
-                elif element_type == ElementType.PASSAGE and element_idx not in crossed_passages:
-                    crossed_passages.append(element_idx)
 
     door1: Optional[Door] = None
     door2: Optional[Door] = None
@@ -112,14 +116,16 @@ def connect_rooms(
         else DoorOrientation.VERTICAL
     )
 
-    if dist > 0 and start_door_type is not None:
+    if dist > 0 and start_door_type is not None and \
+            map.occupancy.check_door(r1_x, r1_y, door_orientation):
         door1 = Door.from_grid(r1_x, r1_y, door_orientation, door_type=start_door_type)
         map.add_element(door1)
         r1_x += dx
         r1_y += dy
         dist -= 1
 
-    if dist > 0 and end_door_type is not None:
+    if dist > 0 and end_door_type is not None and \
+            map.occupancy.check_door(r2_x, r2_y, door_orientation):
         door2 = Door.from_grid(r2_x, r2_y, door_orientation, door_type=end_door_type)
         map.add_element(door2)
         r2_x -= dx
@@ -133,11 +139,12 @@ def connect_rooms(
         passage_width = abs(r2_x - r1_x) + 1
         passage_height = abs(r2_y - r1_y) + 1
         
-        print(f"\nPassage dimensions:")
-        print(f"  Start point: ({r1_x}, {r1_y})")
-        print(f"  End point: ({r2_x}, {r2_y})")
-        print(f"  Grid rect: ({passage_x}, {passage_y}, {passage_width}, {passage_height})")
-        print(f"  Size: {passage_width}x{passage_height}")
+        if map.options.debug_verbose:
+            print(f"\nPassage dimensions:")
+            print(f"  Start point: ({r1_x}, {r1_y})")
+            print(f"  End point: ({r2_x}, {r2_y})")
+            print(f"  Grid rect: ({passage_x}, {passage_y}, {passage_width}, {passage_height})")
+            print(f"  Size: {passage_width}x{passage_height}")
         
         # Create and add passage
         passage = Passage.from_grid(passage_x, passage_y, passage_width, passage_height)
