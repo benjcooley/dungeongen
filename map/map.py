@@ -40,7 +40,7 @@ class Map:
         self._bounds = Rectangle(0, 0, CELL_SIZE, CELL_SIZE)  # Default to single cell at origin
         self._bounds_dirty: bool = True
         # Initialize with large default size centered on origin (-100 to +100)
-        self.occupancy = OccupancyGrid(201, 201)  # Initialize with default size
+        self.occupancy = OccupancyGrid(201, 201, self._options)  # Initialize with default size
     
     @property
     def elements(self) -> Sequence[MapElement]:
@@ -177,7 +177,7 @@ class Map:
         
         # Create new grid or clear existing one
         if self.occupancy is None or (self.occupancy.width != grid_width or self.occupancy.height != grid_height):
-            self.occupancy = OccupancyGrid(grid_width, grid_height)
+            self.occupancy = OccupancyGrid(grid_width, grid_height, self._options)
         else:
             self.occupancy.clear()
         
