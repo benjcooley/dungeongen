@@ -58,8 +58,7 @@ class OccupancyGrid:
         self._origin_x = width // 2  # Center point
         self._origin_y = height // 2
         self._options = options
-        # Debug drawing sets
-        self._checked_cells = set()
+        # Debug drawing set for crossed passages
         self._crossed_passages = set()
         
     def _ensure_contains(self, grid_x: int, grid_y: int) -> None:
@@ -433,11 +432,7 @@ class OccupancyGrid:
                     else:
                         debug_draw_grid_cell(grid_x, grid_y, fill_color, None, blocked)
                         
-                # Draw passage check debug info
+                # Draw crossed passages with yellow highlight
                 pos = (grid_x, grid_y)
-                if pos in self._checked_cells:
-                    # Draw checked cells with light blue outline
-                    debug_draw_grid_cell(grid_x, grid_y, None, skia.Color(100, 100, 255, 100))
                 if pos in self._crossed_passages:
-                    # Draw crossed passages with yellow highlight
                     debug_draw_grid_cell(grid_x, grid_y, skia.Color(255, 255, 0, 100))
