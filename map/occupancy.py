@@ -214,19 +214,24 @@ class OccupancyGrid:
             for y in range(int(grid_rect.y), int(grid_rect.y + grid_rect.height)):
                 self.mark_cell(x, y, element_type, element_idx)
     
-    def check_rectangle(self, rect: Rectangle, inflate: float = CELL_SIZE * 0.5) -> bool:
+    def check_rectangle(self, rect: Rectangle, inflate_cells: int = 1) -> bool:
         """Check if a rectangle area is unoccupied.
         
         Args:
             rect: Rectangle to check in map coordinates
-            inflate: Amount to inflate rectangle by before checking (in map units)
+            inflate_cells: Number of grid cells to inflate by before checking
             
         Returns:
             True if area is valid (unoccupied), False otherwise
         """
-        # Inflate rectangle and convert to grid coordinates
-        inflated = rect.inflated(inflate)
-        grid_rect = Rectangle(*map_to_grid_rect(inflated))
+        # Convert to grid coordinates first, then inflate by grid cells
+        grid_rect = Rectangle(*map_to_grid_rect(rect))
+        grid_rect = Rectangle(
+            grid_rect.x - inflate_cells,
+            grid_rect.y - inflate_cells,
+            grid_rect.width + (inflate_cells * 2),
+            grid_rect.height + (inflate_cells * 2)
+        )
             
         # Early out if no valid region
         if not grid_rect.is_valid:
@@ -240,19 +245,24 @@ class OccupancyGrid:
                     return False
         return True
         
-    def check_circle(self, circle: Circle, inflate: float = CELL_SIZE * 0.5) -> bool:
+    def check_circle(self, circle: Circle, inflate_cells: int = 1) -> bool:
         """Check if a circle area is unoccupied.
         
         Args:
             circle: Circle to check in map coordinates
-            inflate: Amount to inflate circle by before checking (in map units)
+            inflate_cells: Number of grid cells to inflate by before checking
             
         Returns:
             True if area is valid (unoccupied), False otherwise
         """
-        # Inflate circle and convert bounds to grid coordinates
-        inflated = circle.inflated(inflate)
-        grid_rect = Rectangle(*map_to_grid_rect(inflated.bounds))
+        # Convert bounds to grid coordinates first, then inflate by grid cells
+        grid_rect = Rectangle(*map_to_grid_rect(circle.bounds))
+        grid_rect = Rectangle(
+            grid_rect.x - inflate_cells,
+            grid_rect.y - inflate_cells,
+            grid_rect.width + (inflate_cells * 2),
+            grid_rect.height + (inflate_cells * 2)
+        )
             
         # Early out if no valid region
         if not grid_rect.is_valid:
