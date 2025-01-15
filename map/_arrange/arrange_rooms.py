@@ -253,7 +253,7 @@ def try_create_connected_room(
         raise ValueError("Room dimensions must be positive")
             
     # Create room shape
-    room_shape = RoomShape(room_type or RoomType.RECTANGULAR, room_breadth, room_depth)
+    room_shape = RoomShape(room_type or RoomType.RECTANGULAR, room_breadth, room_depth, breadth_offset)
     
     # Get room rect in grid coordinates using arrange utils
     new_room_x, new_room_y, new_room_width, new_room_height = get_adjacent_room_rect(
