@@ -8,6 +8,7 @@ import skia
 from graphics.shapes import Rectangle, Circle
 from constants import CELL_SIZE
 from graphics.conversions import map_to_grid, map_rect_to_grid_points, map_to_grid_rect
+from map._arrange.arrange_enums import RoomDirection
 
 if TYPE_CHECKING:
     from options import Options
@@ -249,6 +250,52 @@ class OccupancyGrid:
         Returns:
             True if area is valid (unoccupied), False otherwise
         """
+            
+    def check_passage(self, rect: Rectangle, direction: RoomDirection) -> tuple[bool, list[int]]:
+        """Check if a passage can be placed, allowing crossing other passages.
+        
+        The check area is inflated by 1 grid cell perpendicular to the passage direction
+        to ensure proper spacing between parallel passages.
+        
+        Args:
+            rect: Rectangle defining passage bounds in map coordinates
+            direction: Direction of passage growth
+            
+        Returns:
+            Tuple of (is_valid, crossed_passage_indices)
+            where is_valid is True if area is clear of rooms and blocked cells,
+            and crossed_passage_indices is a list of indices of crossed passages
+        """
+        # Clear debug tracking
+        self._checked_cells.clear()
+        self._crossed_passages.clear()
+        
+        # Convert to grid coordinates and inflate perpendicular to direction
+        grid_rect = Rectangle(*map_to_grid_rect(rect))
+        if direction in (RoomDirection.NORTH, RoomDirection.SOUTH):
+            grid_rect = grid_rect.inflated(1, 0)  # Inflate horizontally
+        else:
+            grid_rect = grid_rect.inflated(0, 1)  # Inflate vertically
+            
+        crossed_passages = []
+        
+        # Check each cell in inflated grid coordinates
+        for grid_x in range(int(grid_rect.x), int(grid_rect.x + grid_rect.width)):
+            for grid_y in range(int(grid_rect.y), int(grid_rect.y + grid_rect.height)):
+                # Track checked cell for debug visualization
+                self._checked_cells.add((grid_x, grid_y))
+                
+                idx = self._to_grid_index(grid_x, grid_y)
+                if idx is not None:
+                    element_type, element_idx, blocked = self._decode_cell(self._grid[idx])
+                    if blocked or element_type == ElementType.ROOM:
+                        return False, []
+                    elif element_type == ElementType.PASSAGE and element_idx not in crossed_passages:
+                        crossed_passages.append(element_idx)
+                        # Track intersection for debug visualization
+                        self._crossed_passages.add((grid_x, grid_y))
+                        
+        return True, crossed_passages
         # Inflate circle first, then convert bounds to grid coordinates
         inflated_circle = circle.inflated(inflate_cells * CELL_SIZE)
         grid_rect = Rectangle(*map_to_grid_rect(inflated_circle.bounds))
