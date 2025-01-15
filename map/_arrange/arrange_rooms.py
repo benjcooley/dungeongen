@@ -88,8 +88,8 @@ def connect_rooms(
             r1_x, r1_y = get_room_exit_grid_position(room1, r1_dir, align_to=align_to)
             r2_x, r2_y = get_room_exit_grid_position(room2, r2_dir, align_to=align_to)
         else:
-            r1_x, r1_y = get_room_exit_grid_position(room1, r1_dir, random.random())
-            r2_x, r2_y = get_room_exit_grid_position(room2, r2_dir, wall_pos=random.random())
+            r1_x, r1_y = get_room_exit_grid_position(room1, r1_dir, wall_pos=random.random())
+            r2_x, r2_y = get_room_exit_grid_position(room2, r2_dir, align_to=(r1_x, r1_y))
 
         # Check passage area in grid coordinates
         passage_rect = grid_points_to_grid_rect(r1_x, r1_y, r2_x, r2_y)
