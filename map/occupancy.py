@@ -8,6 +8,7 @@ import skia
 from graphics.shapes import Rectangle, Circle
 from constants import CELL_SIZE
 from graphics.conversions import map_to_grid, map_rect_to_grid_points, map_to_grid_rect
+from map._arrange.arrange_utils import RoomDirection
 
 if TYPE_CHECKING:
     from options import Options
