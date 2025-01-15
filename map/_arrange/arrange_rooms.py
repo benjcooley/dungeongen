@@ -76,6 +76,8 @@ def connect_rooms(
                   room2.room_type == RoomType.CIRCULAR) or \
                   align_to is not None
 
+    crossed_passages: List[int] = []
+
     # Try to find an entry/exit point pair from the room that aren't blocked
     tries = 0
     max_tries = 1 if constrained else 4
@@ -90,12 +92,14 @@ def connect_rooms(
             r2_x, r2_y = get_room_exit_grid_position(room2, r2_dir, wall_pos=random.random())
 
         # Check passage area in grid coordinates
-        passage = grid_points_to_grid_rect(r1_x, r1_y, r2_x, r2_y)
-        valid, _ = map.occupancy.check_passage(passage, r1_dir)
+        passage_rect = grid_points_to_grid_rect(r1_x, r1_y, r2_x, r2_y)
+        valid, crossed_passages = map.occupancy.check_passage(passage_rect, r1_dir)
         
         # We're constrained on both ends, so give up
         if not valid and constrained:
             return None, None, None
+        
+        tries += 1
 
     # Make sure we don't have too many doors
     dist = grid_line_dist(r1_x, r1_y, r2_x, r2_y)
@@ -162,7 +166,13 @@ def connect_rooms(
 
     for i in range(len(elems) - 1):
         elems[i].connect_to(elems[i + 1])
-        
+    
+    # Our passage to any passages we crossed
+    if passage is not None:
+        for i in crossed_passages:
+            cross_passage = map.get_element_at(i)
+            passage.connect_to(cross_passage)
+
     return door1, passage, door2
 
 def try_create_connected_room(
