@@ -37,7 +37,7 @@ def generate_large_room(data: Dict[str, Any]) -> RoomShape:
     # Generate odd width
     width = random.randrange(5, max_width + 1, 2)
     
-    return RoomShape(RoomType.RECTANGULAR, width, depth)
+    return RoomShape(RoomType.RECTANGULAR, width, depth, 0.0)
 
 # Define room shape distribution with weights for different map sizes
 # Format: (weights[small, medium, large], item, requirement_fn)
