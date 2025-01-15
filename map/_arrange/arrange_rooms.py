@@ -40,6 +40,85 @@ from map._arrange.arrange_utils import (
 )
 from map._arrange.passage_distribution import PassageConfig
 
+class GrowDirection(Enum):
+    """Direction to grow rooms during arrangement."""
+    FORWARD = auto()
+    BACKWARD = auto()
+    BOTH = auto()
+
+class _RoomArranger:
+    """Helper class for arranging rooms in different patterns."""
+    
+    def __init__(self, dungeon_map: Map, min_size: int, max_size: int):
+        self.map = dungeon_map
+        self.min_size = min_size
+        self.max_size = max_size
+        
+    def arrange_linear(
+        self,
+        room_count: int,
+        start_room: Room,
+        direction: RoomDirection,
+        grow_direction: GrowDirection = GrowDirection.FORWARD,
+        branch_chance: float = 0.3
+    ) -> List[Room]:
+        """Arrange rooms in a roughly linear sequence.
+        
+        Args:
+            room_count: Number of rooms to create
+            start_room: Starting room to build from
+            direction: Initial direction to build in
+            grow_direction: How to grow from the start room
+            branch_chance: Chance of creating a branch at each room
+            
+        Returns:
+            List of created rooms
+        """
+        rooms = [start_room]
+        
+        # Create rooms
+        for _ in range(room_count - 1):
+            # Get random room dimensions
+            width = random.randint(self.min_size, self.max_size)
+            height = random.randint(self.min_size, self.max_size)
+            
+            # Get source room to build from
+            source_idx = random.randrange(len(rooms))
+            source_room = rooms[source_idx]
+            
+            # Randomly choose direction if growing both ways
+            if grow_direction == GrowDirection.BOTH:
+                direction = random.choice([
+                    RoomDirection.NORTH,
+                    RoomDirection.SOUTH,
+                    RoomDirection.EAST,
+                    RoomDirection.WEST
+                ])
+            
+            # Try to create room
+            distance = random.randint(2, 4)
+            new_room, _, _, _ = try_create_connected_room(
+                source_room,
+                direction,
+                distance,
+                width,
+                height
+            )
+            
+            if new_room is not None:
+                rooms.append(new_room)
+                
+                # Maybe change direction
+                if random.random() < branch_chance:
+                    direction = random.choice([
+                        RoomDirection.NORTH,
+                        RoomDirection.SOUTH,
+                        RoomDirection.EAST,
+                        RoomDirection.WEST
+                    ])
+                    
+        return rooms
+
 
 def connect_rooms(
     room1: Room,
