@@ -274,45 +274,16 @@ class OccupancyGrid:
                         return False
         return True
 
-    def check_passage(self, rect: Rectangle, direction: str) -> tuple[bool, list[int]]:
-        """Check if a passage can be placed, allowing crossing other passages.
-        
-        Args:
-            rect: Rectangle defining passage bounds in map coordinates
-            direction: Direction of passage growth
-            
-        Returns:
-            Tuple of (is_valid, crossed_passage_indices)
-            where is_valid is True if area is clear of rooms and blocked cells,
-            and crossed_passage_indices is a list of indices of crossed passages
-        """
-        # Convert to grid coordinates
-        grid_rect = Rectangle(*map_to_grid_rect(rect))
-        
-        # Manually inflate perpendicular to direction
-        if direction in ('NORTH', 'SOUTH'):
-            # Inflate horizontally by expanding width and shifting x
-            grid_rect.x -= 1
-            grid_rect.width += 2
-        else:
-            # Inflate vertically by expanding height and shifting y
-            grid_rect.y -= 1
-            grid_rect.height += 2
-            
-        # Track crossed passages
-        crossed_passages = []
-        
-        # Check each cell in grid coordinates
-        for grid_x in range(int(grid_rect.x), int(grid_rect.x + grid_rect.width)):
-            for grid_y in range(int(grid_rect.y), int(grid_rect.y + grid_rect.height)):
-                idx = self._to_grid_index(grid_x, grid_y)
-                if idx is not None:
-                    element_type, element_idx, blocked = self._decode_cell(self._grid[idx])
-                    if blocked or element_type == ElementType.ROOM:
-                        return False, []
-                    elif element_type == ElementType.PASSAGE and element_idx not in crossed_passages:
-                        crossed_passages.append(element_idx)
-        return True, crossed_passages
+    def __init__(self, width: int = 32, height: int = 32) -> None:
+        """Initialize an empty occupancy grid with default size."""
+        self._grid = array('L', [0] * (width * height))  # Using unsigned long
+        self.width = width
+        self.height = height
+        self._origin_x = width // 2  # Center point
+        self._origin_y = height // 2
+        # Debug tracking for passage checks
+        self._checked_cells = set()  # (x,y) tuples of cells checked for passages
+        self._crossed_passages = set()  # (x,y) tuples of passage intersections
 
     def mark_circle(self, circle: Circle, element_type: ElementType,
                    element_idx: int, clip_rect: Optional[Rectangle] = None) -> None:
@@ -381,3 +352,12 @@ class OccupancyGrid:
                         debug_draw_grid_cell(grid_x, grid_y, None, skia.Color(255, 0, 0), blocked)
                     else:
                         debug_draw_grid_cell(grid_x, grid_y, fill_color, None, blocked)
+                        
+                # Draw passage check debug info
+                pos = (grid_x, grid_y)
+                if pos in self._checked_cells:
+                    # Draw checked cells with light blue outline
+                    debug_draw_grid_cell(grid_x, grid_y, None, skia.Color(100, 100, 255, 100))
+                if pos in self._crossed_passages:
+                    # Draw crossed passages with yellow highlight
+                    debug_draw_grid_cell(grid_x, grid_y, skia.Color(255, 255, 0, 100))
