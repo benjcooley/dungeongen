@@ -347,8 +347,9 @@ class OccupancyGrid:
                         return False, []
                     elif element_type == ElementType.PASSAGE and element_idx not in crossed_passages:
                         crossed_passages.append(element_idx)
-                        # Track intersection for debug visualization
-                        self._crossed_passages.add((grid_x, grid_y))
+                        if self._options.debug_draw_occupancy:
+                            # Track intersection for debug visualization only when debug drawing is enabled
+                            self._crossed_passages.add((grid_x, grid_y))
                         
         return True, crossed_passages
 
