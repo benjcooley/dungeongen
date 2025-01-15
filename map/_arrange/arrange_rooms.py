@@ -79,7 +79,7 @@ class _RoomArranger:
             source_room = rooms[source_idx]
             
             # Get random room shape
-            room_shape = get_random_room_shape(options=self.map.options, breadth_offset=0.0)
+            room_shape = get_random_room_shape(options=self.map.options)
             
             # Randomly choose direction if growing both ways
             if grow_direction == GrowDirection.BOTH:
