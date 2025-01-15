@@ -58,10 +58,10 @@ def generate_large_room(data: Dict[str, Any]) -> RoomShape:
 # Format: (weights[small, medium, large], item, requirement_fn)
 _ROOM_DISTRIBUTION: List[Tuple[Tuple[float, float, float], RoomShape | Callable, None]] = [
     # Circular rooms (controlled by map size)
-    ((3.0, 4.0, 1.5), RoomShape(RoomType.CIRCULAR, 3, 3), None),  # Common in all sizes
-    ((2.0, 2.5, 1.2), RoomShape(RoomType.CIRCULAR, 5, 5), None),  # Medium and large only
-    ((0.0, 1.5, 1.0), RoomShape(RoomType.CIRCULAR, 7, 7), None),  # Medium and large only
-    ((0.0, 1.0, 0.8), RoomShape(RoomType.CIRCULAR, 9, 9), None),  # Medium and large only
+    ((3.0, 4.0, 2.0), RoomShape(RoomType.CIRCULAR, 3, 3), None),  # Common in all sizes
+    ((2.0, 2.5, 2.0), RoomShape(RoomType.CIRCULAR, 5, 5), None),  # Medium and large
+    ((0.0, 1.5, 1.5), RoomShape(RoomType.CIRCULAR, 7, 7), None),  # Medium and large
+    ((0.0, 1.0, 1.2), RoomShape(RoomType.CIRCULAR, 9, 9), None),  # Medium and large
 
     # Small asymmetric rooms (rare, slightly more common in small maps)
     ((0.3, 0.2, 0.1), RoomShape(RoomType.RECTANGULAR, 3, 2), None),
