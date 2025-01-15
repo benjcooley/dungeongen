@@ -17,6 +17,7 @@ from map.grid import GridStyle, draw_region_grid
 from map.mapelement import MapElement
 from map.occupancy import OccupancyGrid
 from map.region import Region
+from map.room import Room, RoomType
 
 if TYPE_CHECKING:
     from map._arrange.arrange_utils import RoomDirection
