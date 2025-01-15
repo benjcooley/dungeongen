@@ -14,29 +14,29 @@ from map._arrange.distribution import normalize_distribution, get_from_distribut
 from map._arrange.arrange_enums import GrowDirection
 
 # Define strategy distribution with weights for different map sizes
-# Format: (weights[small, medium, large], (strategy_class, params))
-_STRATEGY_DISTRIBUTION: List[Tuple[Tuple[float, float, float], Tuple[Type[Strategy], StrategyParams]]] = [
+# Format: (weights[small, medium, large], item, requirement_fn)
+_STRATEGY_DISTRIBUTION: List[Tuple[Tuple[float, float, float], Tuple[Type[Strategy], StrategyParams], None]] = [
     # Symmetrical strategies
     ((1.0, 2.0, 2.5), (SymmetricalStrategy, SymmetricalStrategyParams(
         min_rooms=2, max_rooms=4, iterations=2
-    ))),
+    )), None),
     ((0.5, 1.5, 2.0), (SymmetricalStrategy, SymmetricalStrategyParams(
         min_rooms=4, max_rooms=6, iterations=3
-    ))),
+    )), None),
     
     # Linear strategies with different parameters
     ((3.0, 2.0, 1.0), (LinearStrategy, LinearStrategyParams(
         min_rooms=1, max_rooms=2, min_spacing=2, max_spacing=3,
         grow_direction=GrowDirection.FORWARD
-    ))),
+    )), None),
     ((2.0, 2.5, 1.5), (LinearStrategy, LinearStrategyParams(
         min_rooms=2, max_rooms=3, min_spacing=2, max_spacing=4,
         grow_direction=GrowDirection.BOTH
-    ))),
+    )), None),
     ((1.0, 2.0, 2.5), (LinearStrategy, LinearStrategyParams(
         min_rooms=2, max_rooms=4, min_spacing=3, max_spacing=5,
         grow_direction=GrowDirection.BACKWARD
-    ))),
+    )), None),
 ]
 
 # Normalize the distribution once at module load
