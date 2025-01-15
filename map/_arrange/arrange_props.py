@@ -7,18 +7,35 @@ from map._props.rock import Rock
 from map._props.prop import Prop
 from typing import Optional
 
+# Constants for prop density
+BASE_AREA = 9.0  # Base area in grid cells (3x3 room)
+MIN_PROPS_PER_BASE_AREA = 0  # Minimum props per BASE_AREA
+MAX_PROPS_PER_BASE_AREA = 2  # Maximum props per BASE_AREA
+
 def arrange_random_props(elem: MapElement, prop_types: list[PropType], min_count: int = 0, max_count: int = 3) -> list['Prop']:
     """Create and add multiple randomly selected props from a list of types.
     
     Args:
         prop_types: List of prop types to choose from
-        min_count: Minimum number of props to create
-        max_count: Maximum number of props to create
+        min_count: Minimum number of props to create (overrides area-based calculation)
+        max_count: Maximum number of props to create (overrides area-based calculation)
         
     Returns:
         List of successfully placed props
     """
-    count = random.randint(min_count, max_count)
+    # Calculate room area in grid cells
+    bounds = elem.bounds
+    grid_width = bounds.width / 64  # Convert from pixels to grid cells
+    grid_height = bounds.height / 64
+    area = grid_width * grid_height
+    
+    # Scale prop counts based on area relative to BASE_AREA
+    area_scale = area / BASE_AREA
+    scaled_min = max(min_count, round(MIN_PROPS_PER_BASE_AREA * area_scale))
+    scaled_max = max(max_count, round(MAX_PROPS_PER_BASE_AREA * area_scale))
+    
+    # Use the larger of the scaled or provided counts
+    count = random.randint(scaled_min, scaled_max)
     placed_props = []
     
     # Create and try to place each prop
