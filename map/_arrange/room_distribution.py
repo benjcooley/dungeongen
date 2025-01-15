@@ -37,36 +37,36 @@ def generate_large_room(data: Dict[str, Any]) -> RoomShape:
     # Generate odd width
     width = random.randrange(5, max_width + 1, 2)
     
-    return RoomShape(RoomType.RECTANGULAR, width, depth, 0.0)
+    return RoomShape(RoomType.RECTANGULAR, width, depth)
 
 # Define room shape distribution with weights for different map sizes
 # Format: (weights[small, medium, large], item, requirement_fn)
 _ROOM_DISTRIBUTION: List[Tuple[Tuple[float, float, float], RoomShape | Callable, None]] = [
     # Circular rooms (common in small maps, less so in larger ones)
-    ((3.0, 1.5, 0.8), RoomShape(RoomType.CIRCULAR, 3, 3, 0.0), None),
-    ((2.0, 2.4, 1.4), RoomShape(RoomType.CIRCULAR, 5, 5, 0.0), None),  # Doubled weights for 5x5 circular
-    ((0.2, 0.8, 0.5), RoomShape(RoomType.CIRCULAR, 7, 7, 0.0), None),
-    ((0.0, 0.4, 0.3), RoomShape(RoomType.CIRCULAR, 9, 9, 0.0), None),
+    ((3.0, 1.5, 0.8), RoomShape(RoomType.CIRCULAR, 3, 3), None),
+    ((2.0, 2.4, 1.4), RoomShape(RoomType.CIRCULAR, 5, 5), None),  # Doubled weights for 5x5 circular
+    ((0.2, 0.8, 0.5), RoomShape(RoomType.CIRCULAR, 7, 7), None),
+    ((0.0, 0.4, 0.3), RoomShape(RoomType.CIRCULAR, 9, 9), None),
 
     # Small asymmetric rooms (rare, slightly more common in small maps)
-    ((0.3, 0.2, 0.1), RoomShape(RoomType.RECTANGULAR, 3, 2, 0.0), None),
-    ((0.2, 0.1, 0.05), RoomShape(RoomType.RECTANGULAR, 2, 3, 0.0), None),
+    ((0.3, 0.2, 0.1), RoomShape(RoomType.RECTANGULAR, 3, 2), None),
+    ((0.2, 0.1, 0.05), RoomShape(RoomType.RECTANGULAR, 2, 3), None),
 
     # Common small symmetric rooms
-    ((3.0, 1.5, 0.8), RoomShape(RoomType.RECTANGULAR, 3, 3, 0.0), None),
-    ((2.0, 1.2, 0.6), RoomShape(RoomType.RECTANGULAR, 3, 4, 0.0), None),
-    ((1.5, 1.0, 0.5), RoomShape(RoomType.RECTANGULAR, 4, 3, 0.0), None),
+    ((3.0, 1.5, 0.8), RoomShape(RoomType.RECTANGULAR, 3, 3), None),
+    ((2.0, 1.2, 0.6), RoomShape(RoomType.RECTANGULAR, 3, 4), None),
+    ((1.5, 1.0, 0.5), RoomShape(RoomType.RECTANGULAR, 4, 3), None),
     
     # Medium rectangular rooms (balanced distribution)
-    ((2.5, 2.0, 1.2), RoomShape(RoomType.RECTANGULAR, 3, 4, 0.0), None),
-    ((2.0, 2.0, 1.2), RoomShape(RoomType.RECTANGULAR, 3, 5, 0.0), None),
-    ((0.2, 1.5, 1.0), RoomShape(RoomType.RECTANGULAR, 3, 7, 0.0), None),
-    ((0.2, 1.8, 1.2), RoomShape(RoomType.RECTANGULAR, 5, 5, 0.0), None),  # Increased weights for 5x5 rectangular
-    ((0.0, 1.0, 0.7), RoomShape(RoomType.RECTANGULAR, 5, 7, 0.0), None),
+    ((2.5, 2.0, 1.2), RoomShape(RoomType.RECTANGULAR, 3, 4), None),
+    ((2.0, 2.0, 1.2), RoomShape(RoomType.RECTANGULAR, 3, 5), None),
+    ((0.2, 1.5, 1.0), RoomShape(RoomType.RECTANGULAR, 3, 7), None),
+    ((0.2, 1.8, 1.2), RoomShape(RoomType.RECTANGULAR, 5, 5), None),  # Increased weights for 5x5 rectangular
+    ((0.0, 1.0, 0.7), RoomShape(RoomType.RECTANGULAR, 5, 7), None),
 
     # Larger fixed rooms (more common in larger maps)
-    ((0.0, 0.8, 1.2), RoomShape(RoomType.RECTANGULAR, 7, 7, 0.0), None),
-    ((0.0, 0.6, 1.0), RoomShape(RoomType.RECTANGULAR, 7, 9, 0.0), None),
+    ((0.0, 0.8, 1.2), RoomShape(RoomType.RECTANGULAR, 7, 7), None),
+    ((0.0, 0.6, 1.0), RoomShape(RoomType.RECTANGULAR, 7, 9), None),
     
     # Dynamic large rooms (only in medium/large maps)
     ((0.0, 1.0, 2.0), generate_large_room, None)
