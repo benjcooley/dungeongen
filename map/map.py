@@ -335,6 +335,7 @@ class Map:
             min_rooms, max_rooms = 3, 8
         # Import here to avoid circular dependencies
         from map._arrange.arrange_rooms import arrange_rooms
+        from map._arrange.connect_nearby import try_connect_nearby_rooms
         from map._props.decorate_room import decorate_room
         from map.room import RoomType
         
@@ -363,6 +364,9 @@ class Map:
             start_room=start_room
         )
         
+        # Try connecting nearby rooms
+        try_connect_nearby_rooms(self)
+            
         # Decorate all elements
         for element in self._elements:
             decorate_room(element)
