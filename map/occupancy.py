@@ -58,6 +58,9 @@ class OccupancyGrid:
         self._origin_x = width // 2  # Center point
         self._origin_y = height // 2
         self._options = options
+        # Debug drawing sets
+        self._checked_cells = set()
+        self._crossed_passages = set()
         
     def _ensure_contains(self, grid_x: int, grid_y: int) -> None:
         """Resize grid if needed to contain the given grid coordinates."""
