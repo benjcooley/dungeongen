@@ -323,18 +323,16 @@ class Map:
             start_door_type, end_door_type
         )
 
-    def generate(self, size_tag: 'Tags' = Tags.MEDIUM, min_size: int = 4, max_size: int = 7) -> None:
-        """Generate a random dungeon map.
+    def generate(self) -> None:
+        """Generate a random dungeon map using current options settings."""
+        # Get size settings from options
+        min_size = self.options.min_room_size
+        max_size = self.options.max_room_size
         
-        Args:
-            size_tag: Tag determining map size (SMALL=3-5 rooms, MEDIUM=5-8 rooms, LARGE=8-12 rooms)
-            min_size: Minimum room size in grid units
-            max_size: Maximum room size in grid units
-        """
         # Determine room count range based on size tag
-        if size_tag == Tags.SMALL:
+        if Tags.SMALL in self.options.tags:
             min_rooms, max_rooms = 3, 5
-        elif size_tag == Tags.LARGE:
+        elif Tags.LARGE in self.options.tags:
             min_rooms, max_rooms = 8, 12
         else:  # MEDIUM is default
             min_rooms, max_rooms = 5, 8
