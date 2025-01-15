@@ -347,9 +347,10 @@ class Map:
         print(f"  Offset: {initial_shape.breadth_offset}")
         
         # Create starting room at origin using shape's dimensions
-        start_room = self.create_rectangular_room(0, 0,
+        start_room = self.add_element(Room.from_grid(0, 0,
             initial_shape.breadth,  # Use breadth for width
-            initial_shape.depth)    # Use depth for height
+            initial_shape.depth,    # Use depth for height
+            room_type=initial_shape.room_type))
             
         # Import here to avoid circular dependencies
         from map._arrange.arrange_utils import RoomDirection
