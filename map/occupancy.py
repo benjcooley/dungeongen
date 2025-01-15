@@ -303,20 +303,26 @@ class OccupancyGrid:
             check_y1 = int(grid_rect.y - 1)
             check_y2 = int(grid_rect.y + grid_rect.height)
             
-            # Check both end points
+            # Check both end points connect to rooms/passages
             for y in (check_y1, check_y2):
                 idx = self._to_grid_index(check_x, y)
-                if idx is None or self._grid[idx] == 0:
+                if idx is None:
+                    return False, []
+                element_type, _, blocked = self._decode_cell(self._grid[idx])
+                if blocked or (element_type != ElementType.ROOM and element_type != ElementType.PASSAGE):
                     return False, []
         else:
             check_y = int(grid_rect.y + grid_rect.height / 2)
             check_x1 = int(grid_rect.x - 1)
             check_x2 = int(grid_rect.x + grid_rect.width)
             
-            # Check both end points
+            # Check both end points connect to rooms/passages
             for x in (check_x1, check_x2):
                 idx = self._to_grid_index(x, check_y)
-                if idx is None or self._grid[idx] == 0:
+                if idx is None:
+                    return False, []
+                element_type, _, blocked = self._decode_cell(self._grid[idx])
+                if blocked or (element_type != ElementType.ROOM and element_type != ElementType.PASSAGE):
                     return False, []
         
         # Manually inflate perpendicular to direction
