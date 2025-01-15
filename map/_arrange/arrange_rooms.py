@@ -120,8 +120,13 @@ def connect_rooms(
         print(f"  Grid rect: ({passage_x}, {passage_y}, {passage_width}, {passage_height})")
         print(f"  Size: {passage_width}x{passage_height}")
         
-        passage = Passage.from_grid(passage_x, passage_y, passage_width, passage_height)
-        map.add_element(passage)
+        # Create test passage to check occupancy
+        test_passage = Passage.from_grid(passage_x, passage_y, passage_width, passage_height)
+        if not map.occupancy.check_rectangle(test_passage.bounds):
+            return None, None, None
+            
+        # Area is clear, create real passage
+        passage = map.add_element(test_passage)
     
     # Connect everything based on which door types were specified
     elems: List[MapElement] = [room1]    
