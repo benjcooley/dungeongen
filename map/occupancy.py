@@ -241,6 +241,7 @@ class OccupancyGrid:
         
     def check_circle(self, circle: Circle, inflate_cells: int = 1) -> bool:
         """Check if a circle area is unoccupied.
+        """Check if a circle area is unoccupied.
         
         Args:
             circle: Circle to check in map coordinates
@@ -273,6 +274,40 @@ class OccupancyGrid:
                     if idx is not None and self._grid[idx] != 0:
                         return False
         return True
+
+    def check_passage(self, rect: Rectangle, direction: 'RoomDirection') -> tuple[bool, list[int]]:
+        """Check if a passage can be placed, allowing crossing other passages.
+        
+        Args:
+            rect: Rectangle defining passage bounds in map coordinates
+            direction: Direction of passage growth
+            
+        Returns:
+            Tuple of (is_valid, crossed_passage_indices)
+            where is_valid is True if area is clear of rooms and blocked cells,
+            and crossed_passage_indices is a list of indices of crossed passages
+        """
+        # Convert to grid coordinates and inflate perpendicular to direction
+        grid_rect = Rectangle(*map_to_grid_rect(rect))
+        if direction in (RoomDirection.NORTH, RoomDirection.SOUTH):
+            grid_rect = grid_rect.inflated(1, 0)  # Inflate horizontally
+        else:
+            grid_rect = grid_rect.inflated(0, 1)  # Inflate vertically
+            
+        # Track crossed passages
+        crossed_passages = []
+        
+        # Check each cell in grid coordinates
+        for grid_x in range(int(grid_rect.x), int(grid_rect.x + grid_rect.width)):
+            for grid_y in range(int(grid_rect.y), int(grid_rect.y + grid_rect.height)):
+                idx = self._to_grid_index(grid_x, grid_y)
+                if idx is not None:
+                    element_type, element_idx, blocked = self._decode_cell(self._grid[idx])
+                    if blocked or element_type == ElementType.ROOM:
+                        return False, []
+                    elif element_type == ElementType.PASSAGE and element_idx not in crossed_passages:
+                        crossed_passages.append(element_idx)
+        return True, crossed_passages
 
     def mark_circle(self, circle: Circle, element_type: ElementType,
                    element_idx: int, clip_rect: Optional[Rectangle] = None) -> None:

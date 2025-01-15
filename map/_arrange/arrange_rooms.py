@@ -122,11 +122,18 @@ def connect_rooms(
         
         # Create test passage to check occupancy
         test_passage = Passage.from_grid(passage_x, passage_y, passage_width, passage_height)
-        if not map.occupancy.check_rectangle(test_passage.bounds):
+        is_valid, crossed_passages = map.occupancy.check_passage(test_passage.bounds, r1_dir)
+        
+        if not is_valid:
             return None, None, None
             
         # Area is clear, create real passage
         passage = map.add_element(test_passage)
+        
+        # Connect to any crossed passages
+        for passage_idx in crossed_passages:
+            crossed_passage = map._elements[passage_idx]
+            passage.connect_to(crossed_passage)
     
     # Connect everything based on which door types were specified
     elems: List[MapElement] = [room1]    
