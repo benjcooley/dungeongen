@@ -241,7 +241,6 @@ class OccupancyGrid:
         
     def check_circle(self, circle: Circle, inflate_cells: int = 1) -> bool:
         """Check if a circle area is unoccupied.
-        """Check if a circle area is unoccupied.
         
         Args:
             circle: Circle to check in map coordinates
