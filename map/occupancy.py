@@ -294,12 +294,26 @@ class OccupancyGrid:
         self._checked_cells.clear()
         self._crossed_passages.clear()
         
-        # Convert to grid coordinates and inflate perpendicular to direction
+        # Convert to grid coordinates
         grid_rect = Rectangle(*map_to_grid_rect(rect))
+        
+        # Manually inflate perpendicular to direction
         if direction in (RoomDirection.NORTH, RoomDirection.SOUTH):
-            grid_rect = grid_rect.inflated(1, 0)  # Inflate horizontally
+            # Inflate horizontally by 1 grid cell on each side
+            grid_rect = Rectangle(
+                grid_rect.x - 1,  # Move left edge out
+                grid_rect.y,      # Keep top edge
+                grid_rect.width + 2,  # Add 2 to width (1 each side)
+                grid_rect.height  # Keep height
+            )
         else:
-            grid_rect = grid_rect.inflated(0, 1)  # Inflate vertically
+            # Inflate vertically by 1 grid cell on each side
+            grid_rect = Rectangle(
+                grid_rect.x,      # Keep left edge
+                grid_rect.y - 1,  # Move top edge up
+                grid_rect.width,  # Keep width
+                grid_rect.height + 2  # Add 2 to height (1 each side)
+            )
             
         crossed_passages = []
         
