@@ -97,4 +97,4 @@ class Passage(MapElement):
         else:  # Vertical passage
             # Mark cells at each end of the passage
             grid.mark_cell(grid_x, grid_y, ElementType.BLOCKED, element_idx, blocked=True)  # Start cell
-            grid.mark_cell(grid_x, grid_y + grid_height - 1, grid_y, ElementType.BLOCKED, element_idx, blocked=True)  # End cell
+            grid.mark_cell(grid_x, grid_y + grid_height - 1, ElementType.BLOCKED, element_idx, blocked=True)  # End cell
