@@ -333,7 +333,7 @@ class Map:
         if Tags.SMALL in self.options.tags:
             min_rooms, max_rooms = 3, 8
         elif Tags.LARGE in self.options.tags:
-            min_rooms, max_rooms = 12, 16
+            min_rooms, max_rooms = 12, 24
         else:  # MEDIUM is default
             min_rooms, max_rooms = 8, 12
         # Import here to avoid circular dependencies
