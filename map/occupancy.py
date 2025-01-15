@@ -214,17 +214,19 @@ class OccupancyGrid:
             for y in range(int(grid_rect.y), int(grid_rect.y + grid_rect.height)):
                 self.mark_cell(x, y, element_type, element_idx)
     
-    def check_rectangle(self, rect: Rectangle) -> bool:
+    def check_rectangle(self, rect: Rectangle, inflate: float = CELL_SIZE * 0.5) -> bool:
         """Check if a rectangle area is unoccupied.
         
         Args:
             rect: Rectangle to check in map coordinates
+            inflate: Amount to inflate rectangle by before checking (in map units)
             
         Returns:
             True if area is valid (unoccupied), False otherwise
         """
-        # Convert to grid coordinates
-        grid_rect = Rectangle(*map_to_grid_rect(rect))
+        # Inflate rectangle and convert to grid coordinates
+        inflated = rect.inflated(inflate)
+        grid_rect = Rectangle(*map_to_grid_rect(inflated))
             
         # Early out if no valid region
         if not grid_rect.is_valid:
@@ -238,17 +240,19 @@ class OccupancyGrid:
                     return False
         return True
         
-    def check_circle(self, circle: Circle) -> bool:
+    def check_circle(self, circle: Circle, inflate: float = CELL_SIZE * 0.5) -> bool:
         """Check if a circle area is unoccupied.
         
         Args:
             circle: Circle to check in map coordinates
+            inflate: Amount to inflate circle by before checking (in map units)
             
         Returns:
             True if area is valid (unoccupied), False otherwise
         """
-        # Convert to grid coordinates
-        grid_rect = Rectangle(*map_to_grid_rect(circle.bounds))
+        # Inflate circle and convert bounds to grid coordinates
+        inflated = circle.inflated(inflate)
+        grid_rect = Rectangle(*map_to_grid_rect(inflated.bounds))
             
         # Early out if no valid region
         if not grid_rect.is_valid:
