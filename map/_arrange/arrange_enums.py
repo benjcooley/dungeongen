@@ -1,6 +1,24 @@
 """Enums for room arrangement strategies."""
 from enum import Enum, auto
 
+class RoomDirection(Enum):
+    """Direction to generate rooms."""
+    NORTH = auto()
+    SOUTH = auto()
+    EAST = auto()
+    WEST = auto()
+
+    def get_opposite(self) -> 'RoomDirection':
+        """Get the opposite direction."""
+        if self == RoomDirection.NORTH:
+            return RoomDirection.SOUTH
+        elif self == RoomDirection.SOUTH:
+            return RoomDirection.NORTH
+        elif self == RoomDirection.EAST:
+            return RoomDirection.WEST
+        else:
+            return RoomDirection.EAST
+
 class GrowDirection(Enum):
     """Controls which room to grow from when arranging."""
     FORWARD = auto()   # Only grow from last room

@@ -8,7 +8,6 @@ import skia
 from graphics.shapes import Rectangle, Circle
 from constants import CELL_SIZE
 from graphics.conversions import map_to_grid, map_rect_to_grid_points, map_to_grid_rect
-from map._arrange.arrange_utils import RoomDirection
 
 if TYPE_CHECKING:
     from options import Options
@@ -275,7 +274,7 @@ class OccupancyGrid:
                         return False
         return True
 
-    def check_passage(self, rect: Rectangle, direction: 'RoomDirection') -> tuple[bool, list[int]]:
+    def check_passage(self, rect: Rectangle, direction: str) -> tuple[bool, list[int]]:
         """Check if a passage can be placed, allowing crossing other passages.
         
         Args:
@@ -289,7 +288,7 @@ class OccupancyGrid:
         """
         # Convert to grid coordinates and inflate perpendicular to direction
         grid_rect = Rectangle(*map_to_grid_rect(rect))
-        if direction in (RoomDirection.NORTH, RoomDirection.SOUTH):
+        if direction in ('NORTH', 'SOUTH'):
             grid_rect = grid_rect.inflated(1, 0)  # Inflate horizontally
         else:
             grid_rect = grid_rect.inflated(0, 1)  # Inflate vertically
