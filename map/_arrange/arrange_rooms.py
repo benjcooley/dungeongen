@@ -49,10 +49,8 @@ class GrowDirection(Enum):
 class _RoomArranger:
     """Helper class for arranging rooms in different patterns."""
     
-    def __init__(self, dungeon_map: Map, min_size: int, max_size: int):
+    def __init__(self, dungeon_map: Map):
         self.map = dungeon_map
-        self.min_size = min_size
-        self.max_size = max_size
         
     def arrange_linear(
         self,
@@ -78,10 +76,6 @@ class _RoomArranger:
         
         # Create rooms
         for _ in range(room_count - 1):
-            # Get random room dimensions
-            width = random.randint(self.min_size, self.max_size)
-            height = random.randint(self.min_size, self.max_size)
-            
             # Get source room to build from
             source_idx = random.randrange(len(rooms))
             source_room = rooms[source_idx]
