@@ -3,6 +3,7 @@
 import math
 import random
 from typing import Generic, Iterator, List, Optional, Sequence, Tuple, TypeVar, TYPE_CHECKING
+from tags import Tags
 
 import skia
 
@@ -322,15 +323,21 @@ class Map:
             start_door_type, end_door_type
         )
 
-    def generate(self, min_rooms: int = 3, max_rooms: int = 5, min_size: int = 4, max_size: int = 7) -> None:
+    def generate(self, size_tag: 'Tags' = Tags.MEDIUM, min_size: int = 4, max_size: int = 7) -> None:
         """Generate a random dungeon map.
         
         Args:
-            min_rooms: Minimum number of rooms to generate
-            max_rooms: Maximum number of rooms to generate 
+            size_tag: Tag determining map size (SMALL=3-5 rooms, MEDIUM=5-8 rooms, LARGE=8-12 rooms)
             min_size: Minimum room size in grid units
             max_size: Maximum room size in grid units
         """
+        # Determine room count range based on size tag
+        if size_tag == Tags.SMALL:
+            min_rooms, max_rooms = 3, 5
+        elif size_tag == Tags.LARGE:
+            min_rooms, max_rooms = 8, 12
+        else:  # MEDIUM is default
+            min_rooms, max_rooms = 5, 8
         # Import here to avoid circular dependencies
         from map._arrange.arrange_rooms import _RoomArranger, GrowDirection
         from map._props.decorate_room import decorate_room
