@@ -76,6 +76,10 @@ class _RoomArranger:
         
         # Create rooms
         for _ in range(room_count - 1):
+            # Get random room shape
+            from map._arrange.room_distribution import get_random_room_shape
+            room_shape = get_random_room_shape(options=self.map.options)
+            
             # Get source room to build from
             source_idx = random.randrange(len(rooms))
             source_room = rooms[source_idx]
@@ -95,8 +99,8 @@ class _RoomArranger:
                 source_room,
                 direction,
                 distance,
-                width,
-                height
+                room_shape.breadth,
+                room_shape.depth
             )
             
             if new_room is not None:
