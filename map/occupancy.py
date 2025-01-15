@@ -334,16 +334,6 @@ class OccupancyGrid:
                         self._crossed_passages.add((grid_x, grid_y))
                         
         return True, crossed_passages
-        for grid_x in range(int(grid_rect.x), int(grid_rect.x + grid_rect.width)):
-            for grid_y in range(int(grid_rect.y), int(grid_rect.y + grid_rect.height)):
-                # Test cell center against circle
-                dx = (grid_x + 0.5) - grid_center_x
-                dy = (grid_y + 0.5) - grid_center_y
-                if dx * dx + dy * dy <= grid_radius_sq:
-                    idx = self._to_grid_index(grid_x, grid_y)
-                    if idx is not None and self._grid[idx] != 0:
-                        return False
-        return True
 
     def __init__(self, width: int = 32, height: int = 32) -> None:
         """Initialize an empty occupancy grid with default size."""
