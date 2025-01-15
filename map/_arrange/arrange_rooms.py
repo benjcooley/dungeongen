@@ -91,9 +91,9 @@ def connect_rooms(
 
         # Check passage area in grid coordinates
         passage = grid_points_to_grid_rect(r1_x, r1_y, r2_x, r2_y)
-        valid, crosses = map.occupancy.check_passage(passage, r1_dir)
+        valid, crossed_passages = map.occupancy.check_passage(passage, r1_dir)
         
-        # We're constrained on both ends, so gi
+        # We're constrained on both ends, so give up
         if not valid and constrained:
             return None, None, None
 

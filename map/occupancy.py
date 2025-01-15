@@ -383,6 +383,19 @@ class OccupancyGrid:
                 if dx * dx + dy * dy <= radius_sq:
                     self.mark_cell(x, y, element_type, element_idx)
         
+    def check_door(self, grid_x: int, grid_y: int, orientation: 'DoorOrientation') -> bool:
+        """Check if a door can be placed at the given grid position.
+        
+        Args:
+            grid_x: Grid x coordinate
+            grid_y: Grid y coordinate
+            orientation: Door orientation (unused, kept for API compatibility)
+            
+        Returns:
+            True if position is unoccupied, False otherwise
+        """
+        return not self.is_occupied(grid_x, grid_y)
+        
     def draw_debug(self, canvas: 'skia.Canvas', options: 'Options') -> None:
         """Draw debug visualization of occupied grid cells."""
         import skia
