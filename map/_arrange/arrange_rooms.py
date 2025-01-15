@@ -257,7 +257,7 @@ def arrange_rooms(
         success = False
         for _ in range(STRATEGY_ATTEMPTS):
             # Get random strategy and its parameters
-            strategy_class, strategy_params = get_random_arrange_strategy(dungeon_map.options, gen_data={"map": dungeon_map})
+            strategy_class, strategy_params = get_random_arrange_strategy(dungeon_map.options)
             
             # Limit rooms to generate based on remaining count
             strategy_params.max_rooms = min(strategy_params.max_rooms, rooms_left)
