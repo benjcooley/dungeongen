@@ -5,6 +5,7 @@ from array import array
 from enum import IntFlag, auto
 import math
 import skia
+from map.door import DoorOrientation
 from graphics.shapes import Rectangle, Circle
 from constants import CELL_SIZE
 from graphics.conversions import map_to_grid, map_rect_to_grid_points, map_to_grid_rect
