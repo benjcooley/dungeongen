@@ -92,9 +92,9 @@ class Passage(MapElement):
         # Mark blocked cells at passage ends
         if grid_width > grid_height:  # Horizontal passage
             # Mark cells at each end of the passage
-            grid.mark_cell(grid_x - 1, grid_y, ElementType.BLOCKED, element_idx, blocked=True)
-            grid.mark_cell(grid_x + grid_width - 1, grid_y, ElementType.BLOCKED, element_idx, blocked=True)
+            grid.mark_cell(grid_x, grid_y, ElementType.BLOCKED, element_idx, blocked=True)  # Start cell
+            grid.mark_cell(grid_x + grid_width - 1, grid_y, ElementType.BLOCKED, element_idx, blocked=True)  # End cell
         else:  # Vertical passage
             # Mark cells at each end of the passage
-            grid.mark_cell(grid_x, grid_y - 1, ElementType.BLOCKED, element_idx, blocked=True)
-            grid.mark_cell(grid_x, grid_y + grid_height - 1, ElementType.BLOCKED, element_idx, blocked=True)
+            grid.mark_cell(grid_x, grid_y, ElementType.BLOCKED, element_idx, blocked=True)  # Start cell
+            grid.mark_cell(grid_x, grid_y + grid_height - 1, grid_y, ElementType.BLOCKED, element_idx, blocked=True)  # End cell
