@@ -15,7 +15,7 @@ from map.enums import Layers
 from typing import Generic, Iterator, List, Optional, Sequence, Tuple, TypeVar, TYPE_CHECKING
 from map.grid import GridStyle, draw_region_grid
 from map.mapelement import MapElement
-from map.occupancy import OccupancyGrid
+from map.occupancy import ElementType, OccupancyGrid
 from map.region import Region
 from map.room import Room, RoomType
 
@@ -187,7 +187,7 @@ class Map:
     
     def is_occupied(self, x: int, y: int) -> bool:
         """Check if a grid position is occupied by any map element."""
-        return self._occupancy.is_occupied(x, y)
+        return self.occupancy.is_occupied(x, y)
     
     def get_element_at(self, x: int, y: int) -> Optional[MapElement]:
         """Get the map element at a grid position.
@@ -199,7 +199,7 @@ class Map:
         Returns:
             The MapElement at that position, or None if unoccupied
         """
-        idx = self._occupancy.get_occupant(x, y)
+        idx = self.occupancy.get_element_index(x, y)
         if idx >= 0:
             return self._elements[idx]
         return None
