@@ -334,7 +334,7 @@ class Map:
         else:  # SMALL is default
             min_rooms, max_rooms = 3, 8
         # Import here to avoid circular dependencies
-        from map._arrange.arrange_rooms import _RoomArranger, GrowDirection
+        from map._arrange.arrange_rooms import arrange_rooms
         from map._props.decorate_room import decorate_room
         from map.room import RoomType
         
@@ -353,26 +353,14 @@ class Map:
             initial_shape.depth,    # Use depth for height
             room_type=initial_shape.room_type))
             
-        # Import here to avoid circular dependencies
-        from map._arrange.arrange_utils import RoomDirection
-        
-        # Choose random initial direction
-        initial_direction = random.choice([
-            RoomDirection.NORTH,
-            RoomDirection.SOUTH, 
-            RoomDirection.EAST,
-            RoomDirection.WEST
-        ])
-        print(f"  Initial direction: {initial_direction}")
-        
-        # Create room arranger and generate linear layout
-        arranger = _RoomArranger(self)
-        _ = arranger.arrange_linear(
-            random.randint(min_rooms, max_rooms),
-            start_room,
-            direction=initial_direction,
-            grow_direction=GrowDirection.FORWARD,
-            branch_chance=0.4
+        # Generate rooms using arrange_rooms function
+        _ = arrange_rooms(
+            self,
+            min_rooms=min_rooms,
+            max_rooms=max_rooms,
+            min_size=3,
+            max_size=7,
+            start_room=start_room
         )
         
         # Decorate all elements
