@@ -7,6 +7,21 @@ from options import Options
 from map.room import RoomType, RoomShape
 from map._arrange.distribution import normalize_distribution, get_from_distribution
 
+@dataclass
+class RoomShape:
+    """Defines the shape and dimensions of a room.
+    
+    Attributes:
+        room_type: The type of room (rectangular, circular, etc)
+        breadth: Width perpendicular to growth direction
+        depth: Length parallel to growth direction
+        breadth_offset: Optional offset for passage placement (default 0.0)
+    """
+    room_type: RoomType
+    breadth: int
+    depth: int
+    breadth_offset: float = 0.0
+
 def generate_large_room(data: Dict[str, Any]) -> RoomShape:
     """Gets a random room shape given the current options.
     
