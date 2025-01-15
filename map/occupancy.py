@@ -286,12 +286,18 @@ class OccupancyGrid:
             where is_valid is True if area is clear of rooms and blocked cells,
             and crossed_passage_indices is a list of indices of crossed passages
         """
-        # Convert to grid coordinates and inflate perpendicular to direction
+        # Convert to grid coordinates
         grid_rect = Rectangle(*map_to_grid_rect(rect))
+        
+        # Manually inflate perpendicular to direction
         if direction in ('NORTH', 'SOUTH'):
-            grid_rect = grid_rect.inflated(1, 0)  # Inflate horizontally
+            # Inflate horizontally by expanding width and shifting x
+            grid_rect.x -= 1
+            grid_rect.width += 2
         else:
-            grid_rect = grid_rect.inflated(0, 1)  # Inflate vertically
+            # Inflate vertically by expanding height and shifting y
+            grid_rect.y -= 1
+            grid_rect.height += 2
             
         # Track crossed passages
         crossed_passages = []
