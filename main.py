@@ -41,7 +41,7 @@ def main():
     # Debug draw the occupancy grid with same transform 
     canvas.save()
     canvas.concat(transform)
-    dungeon_map.occupancy.draw_debug(canvas)
+    dungeon_map.occupancy.draw_debug(canvas, options)
     canvas.restore()
 
     # Save as PNG with size tag in filename
