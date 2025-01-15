@@ -82,18 +82,23 @@ def connect_rooms(
     # Deltas
     dx, dy = grid_line_to_grid_deltas(r1_x, r1_y, r2_x, r2_y)
 
-    # Calculate passage rect in grid coordinates first to check validity
+    # Check passage area in grid coordinates
     passage_x = min(r1_x, r2_x)
     passage_y = min(r1_y, r2_y)
     passage_width = abs(r2_x - r1_x) + 1
     passage_height = abs(r2_y - r1_y) + 1
     
-    # Create test passage to check occupancy
-    test_passage = Passage.from_grid(passage_x, passage_y, passage_width, passage_height)
-    is_valid, crossed_passages = map.occupancy.check_passage(test_passage.bounds, r1_dir)
-    
-    if not is_valid:
-        return None, None, None
+    # Check each cell in the passage area
+    crossed_passages = []
+    for x in range(passage_x, passage_x + passage_width):
+        for y in range(passage_y, passage_y + passage_height):
+            idx = map.occupancy._to_grid_index(x, y)
+            if idx is not None:
+                element_type, element_idx, blocked = map.occupancy._decode_cell(map.occupancy._grid[idx])
+                if blocked or element_type == ElementType.ROOM:
+                    return None, None, None
+                elif element_type == ElementType.PASSAGE and element_idx not in crossed_passages:
+                    crossed_passages.append(element_idx)
 
     door1: Optional[Door] = None
     door2: Optional[Door] = None
@@ -133,15 +138,9 @@ def connect_rooms(
         print(f"  Grid rect: ({passage_x}, {passage_y}, {passage_width}, {passage_height})")
         print(f"  Size: {passage_width}x{passage_height}")
         
-        # Create test passage to check occupancy
-        test_passage = Passage.from_grid(passage_x, passage_y, passage_width, passage_height)
-        is_valid, crossed_passages = map.occupancy.check_passage(test_passage.bounds, r1_dir)
-        
-        if not is_valid:
-            return None, None, None
-            
-        # Area is clear, create real passage
-        passage = map.add_element(test_passage)
+        # Create and add passage
+        passage = Passage.from_grid(passage_x, passage_y, passage_width, passage_height)
+        passage = map.add_element(passage)
         
         # Connect to any crossed passages
         for passage_idx in crossed_passages:
