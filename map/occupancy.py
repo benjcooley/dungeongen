@@ -250,7 +250,31 @@ class OccupancyGrid:
         Returns:
             True if area is valid (unoccupied), False otherwise
         """
+        # Inflate circle first, then convert bounds to grid coordinates
+        inflated_circle = circle.inflated(inflate_cells * CELL_SIZE)
+        grid_rect = Rectangle(*map_to_grid_rect(inflated_circle.bounds))
             
+        # Early out if no valid region
+        if not grid_rect.is_valid:
+            return False
+            
+        # Calculate grid-space circle parameters
+        grid_radius_sq = (circle.radius / CELL_SIZE) * (circle.radius / CELL_SIZE)
+        grid_center_x = circle.cx / CELL_SIZE
+        grid_center_y = circle.cy / CELL_SIZE
+        
+        # Check each cell in grid coordinates
+        for grid_x in range(int(grid_rect.x), int(grid_rect.x + grid_rect.width)):
+            for grid_y in range(int(grid_rect.y), int(grid_rect.y + grid_rect.height)):
+                # Test cell center against circle
+                dx = (grid_x + 0.5) - grid_center_x
+                dy = (grid_y + 0.5) - grid_center_y
+                if dx * dx + dy * dy <= grid_radius_sq:
+                    idx = self._to_grid_index(grid_x, grid_y)
+                    if idx is not None and self._grid[idx] != 0:
+                        return False
+        return True
+
     def check_passage(self, rect: Rectangle, direction: RoomDirection) -> tuple[bool, list[int]]:
         """Check if a passage can be placed, allowing crossing other passages.
         
@@ -296,20 +320,6 @@ class OccupancyGrid:
                         self._crossed_passages.add((grid_x, grid_y))
                         
         return True, crossed_passages
-        # Inflate circle first, then convert bounds to grid coordinates
-        inflated_circle = circle.inflated(inflate_cells * CELL_SIZE)
-        grid_rect = Rectangle(*map_to_grid_rect(inflated_circle.bounds))
-            
-        # Early out if no valid region
-        if not grid_rect.is_valid:
-            return False
-            
-        # Calculate grid-space circle parameters
-        grid_radius_sq = (circle.radius / CELL_SIZE) * (circle.radius / CELL_SIZE)
-        grid_center_x = circle.cx / CELL_SIZE
-        grid_center_y = circle.cy / CELL_SIZE
-        
-        # Check each cell in grid coordinates
         for grid_x in range(int(grid_rect.x), int(grid_rect.x + grid_rect.width)):
             for grid_y in range(int(grid_rect.y), int(grid_rect.y + grid_rect.height)):
                 # Test cell center against circle
