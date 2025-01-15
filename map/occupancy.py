@@ -58,8 +58,6 @@ class OccupancyGrid:
         self._origin_x = width // 2  # Center point
         self._origin_y = height // 2
         self._options = options
-        # Debug drawing set for crossed passages
-        self._crossed_passages = set()
         
     def _ensure_contains(self, grid_x: int, grid_y: int) -> None:
         """Resize grid if needed to contain the given grid coordinates."""
@@ -347,9 +345,6 @@ class OccupancyGrid:
                         return False, []
                     elif element_type == ElementType.PASSAGE and element_idx not in crossed_passages:
                         crossed_passages.append(element_idx)
-                        if self._options.debug_draw_occupancy:
-                            # Track intersection for debug visualization only when debug drawing is enabled
-                            self._crossed_passages.add((grid_x, grid_y))
                         
         return True, crossed_passages
 
@@ -433,7 +428,3 @@ class OccupancyGrid:
                     else:
                         debug_draw_grid_cell(grid_x, grid_y, fill_color, None, blocked)
                         
-                # Draw crossed passages with yellow highlight
-                pos = (grid_x, grid_y)
-                if pos in self._crossed_passages:
-                    debug_draw_grid_cell(grid_x, grid_y, skia.Color(255, 255, 0, 100))
