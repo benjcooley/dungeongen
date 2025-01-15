@@ -34,6 +34,7 @@ from map.door import Door, DoorOrientation, DoorType
 from map.enums import Direction
 from map.map import Map
 from map.mapelement import MapElement
+from map.occupancy import ElementType
 from map.passage import Passage
 from map.room import Room, RoomType
 from options import Options
