@@ -331,7 +331,7 @@ class Map:
         
         # Determine room count range based on size tag
         if Tags.SMALL in self.options.tags:
-            min_rooms, max_rooms = 5, 8
+            min_rooms, max_rooms = 3, 8
         elif Tags.LARGE in self.options.tags:
             min_rooms, max_rooms = 12, 16
         else:  # MEDIUM is default
