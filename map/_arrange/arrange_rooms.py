@@ -17,28 +17,26 @@ Available arrangement styles:
 """
 
 from enum import Enum, auto
-from typing import List, Optional, Tuple
 import random
+from typing import List, Optional, Tuple
 
-from graphics.math import Point2D
-from options import Options
-from graphics.shapes import Circle
 from constants import CELL_SIZE
-from map._arrange.room_distribution import RoomShape, RoomShape
-
+from graphics.math import Point2D
+from graphics.shapes import Circle
+from map._arrange.arrange_utils import (
+    get_room_direction, get_room_exit_grid_position,
+    grid_points_to_grid_rect, grid_line_to_grid_deltas,
+    grid_line_dist, get_adjacent_room_rect, RoomDirection
+)
+from map._arrange.passage_distribution import PassageConfig
+from map._arrange.room_distribution import RoomShape, get_random_room_shape
 from map.door import Door, DoorOrientation, DoorType
 from map.enums import Direction
 from map.map import Map
 from map.mapelement import MapElement
 from map.passage import Passage
 from map.room import Room, RoomType
-
-from map._arrange.arrange_utils import (
-    get_room_direction, get_room_exit_grid_position,
-    grid_points_to_grid_rect, grid_line_to_grid_deltas, 
-    grid_line_dist, get_adjacent_room_rect, RoomDirection
-)
-from map._arrange.passage_distribution import PassageConfig
+from options import Options
 
 class GrowDirection(Enum):
     """Direction to grow rooms during arrangement."""
@@ -76,10 +74,6 @@ class _RoomArranger:
         
         # Create rooms
         for _ in range(room_count - 1):
-            # Get random room shape
-            from map._arrange.room_distribution import get_random_room_shape
-            room_shape = get_random_room_shape(options=self.map.options)
-            
             # Get source room to build from
             source_idx = random.randrange(len(rooms))
             source_room = rooms[source_idx]
