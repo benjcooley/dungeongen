@@ -40,8 +40,7 @@ class DungeonLogger:
                 show_path=False
             )
             rich_handler.setFormatter(logging.Formatter(
-                '%(message)s',
-                datefmt='[%X]'
+                '%(message)s', datefmt='[%X]'
             ))
             
             # Configure root logger
