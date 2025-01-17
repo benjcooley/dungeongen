@@ -37,11 +37,10 @@ class DungeonLogger:
                 console=console,
                 rich_tracebacks=True,
                 markup=True,
-                show_path=False
+                show_path=False,
+                show_time=False
             )
-            rich_handler.setFormatter(logging.Formatter(
-                '%(message)s', datefmt='[%X]'
-            ))
+            rich_handler.setFormatter(logging.Formatter('%(message)s'))
             
             # Configure root logger
             self.logger = logging.getLogger('dungeon')
