@@ -395,11 +395,8 @@ class OccupancyGrid:
     def draw_debug(self, canvas: 'skia.Canvas') -> None:
         """Draw debug visualization of occupied grid cells."""
         import skia
-        from debug_draw import debug_draw_init, debug_draw_grid_cell
+        from debug_config import debug_draw, HatchPattern
             
-        # Initialize debug drawing
-        debug_draw_init(canvas)
-        
         # Define colors for different element types
         type_colors = {
             ElementType.ROOM: skia.Color(255, 200, 200),     # Light red
@@ -407,6 +404,9 @@ class OccupancyGrid:
             ElementType.DOOR: skia.Color(200, 200, 255),     # Light blue
             ElementType.STAIRS: skia.Color(255, 255, 200),   # Light yellow
         }
+        
+        # Save current pattern and set to CROSS for blocked cells
+        saved_pattern = debug_draw.hatch_pattern
         
         # Draw each occupied cell
         for grid_y in range(-self._origin_y, self.height - self._origin_y):
@@ -417,15 +417,22 @@ class OccupancyGrid:
                     
                     # Get color based on element type
                     color = type_colors.get(element_type, skia.Color(120, 120, 120))
+                    
+                    # Use cross pattern for blocked cells
                     if blocked:
                         color = skia.Color(255, 0, 0)
+                        debug_draw.hatch_pattern = HatchPattern.CROSS
+                    else:
+                        debug_draw.hatch_pattern = saved_pattern
 
                     # Create paint with hatch pattern
-                    from debug_config import debug_draw
                     paint = debug_draw.create_hatch_paint(color, spacing=CELL_SIZE/4)
 
                     # Draw hatched rectangle
                     x, y = grid_to_map(grid_x, grid_y)
                     rect = skia.Rect.MakeXYWH(x, y, CELL_SIZE, CELL_SIZE)
                     canvas.drawRect(rect, paint)
+        
+        # Restore original pattern
+        debug_draw.hatch_pattern = saved_pattern
                         
