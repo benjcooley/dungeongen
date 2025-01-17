@@ -1,6 +1,7 @@
 """Logging configuration for the dungeon generator."""
 
 import logging
+from rich.console import Console
 from rich.logging import RichHandler
 from enum import Flag, auto
 from typing import Set
@@ -30,12 +31,13 @@ class DungeonLogger:
     
     def __init__(self):
         if not DungeonLogger._initialized:
-            # Set up rich handler
+            # Set up rich console and handler
+            console = Console(width=200)  # Increase width to prevent wrapping
             rich_handler = RichHandler(
+                console=console,
                 rich_tracebacks=True,
                 markup=True,
-                show_path=False,
-                width=200,  # Increase width to prevent wrapping
+                show_path=False
             )
             rich_handler.setFormatter(logging.Formatter(
                 '%(message)s',
