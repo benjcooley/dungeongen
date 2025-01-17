@@ -12,6 +12,13 @@ from debug_config import debug_draw, DebugDrawFlags
 from debug_draw import debug_draw_init
 
 def main():
+
+    # Enable debug visualization and logging
+    debug_draw.enable(DebugDrawFlags.OCCUPANCY, DebugDrawFlags.ELEMENT_NUMBERS)
+    logger.enable_tags({LogTags.GENERATION, LogTags.ARRANGEMENT, LogTags.OCCUPANCY})
+    logger.debug_enabled = True
+    logger.log_to_console = True  # Ensure console output is enabled
+
     # Get seed from environment variable or use default
     # seed = random.randint(1, 400000) 
     # int(os.getenv('SEED', '44444'))
@@ -21,12 +28,6 @@ def main():
 
     options = Options()
     options.tags.add(str(Tags.SMALL))  # Generate small-sized dungeons
-    
-    # Enable debug visualization and logging
-    debug_draw.enable(DebugDrawFlags.OCCUPANCY, DebugDrawFlags.ELEMENT_NUMBERS)
-    logger.debug_enabled = True
-    logger.log_level = LogTags.ARRANGEMENT | LogTags.GENERATION  # Enable both log types
-    logger.log_to_console = True  # Ensure console output is enabled
     
     # Initialize Skia canvas
     surface = skia.Surface(options.canvas_width, options.canvas_height)

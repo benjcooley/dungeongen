@@ -47,7 +47,7 @@ class DungeonLogger:
             self.logger.addHandler(rich_handler)
             
             # Initialize enabled tags
-            self.enabled_tags: Set[LogTags] = {LogTags.GENERATION, LogTags.ARRANGEMENT}
+            self.enabled_tags: Set[LogTags] = {}
             
             DungeonLogger._initialized = True
     
