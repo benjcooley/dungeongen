@@ -157,13 +157,12 @@ def try_connect_rooms(
         passage_width = abs(r2_x - r1_x) + 1
         passage_height = abs(r2_y - r1_y) + 1
         
-        if map.options.debug_verbose:
-            logger.debug(LogTags.ARRANGEMENT,
-                f"\nPassage dimensions:\n"
-                f"  Start point: ({r1_x}, {r1_y})\n"
-                f"  End point: ({r2_x}, {r2_y})\n"
-                f"  Grid rect: ({passage_x}, {passage_y}, {passage_width}, {passage_height})\n"
-                f"  Size: {passage_width}x{passage_height}")
+        logger.debug(LogTags.ARRANGEMENT,
+            f"\nPassage dimensions:\n"
+            f"  Start point: ({r1_x}, {r1_y})\n"
+            f"  End point: ({r2_x}, {r2_y})\n"
+            f"  Grid rect: ({passage_x}, {passage_y}, {passage_width}, {passage_height})\n"
+            f"  Size: {passage_width}x{passage_height}")
         
         # Create and add passage
         passage = Passage.from_grid(passage_x, passage_y, passage_width, passage_height)
