@@ -9,6 +9,10 @@ from typing import TYPE_CHECKING, Optional, ClassVar, Union, Protocol
 import skia
 
 from debug_config import debug_draw, DebugDrawFlags
+from options import Options
+
+# Maximum attempts to find valid random position
+MAX_PLACEMENT_ATTEMPTS = 30
 
 from graphics.shapes import Rectangle, Shape
 from graphics.aliases import Point
@@ -89,7 +93,7 @@ class Prop(ABC):
         self._rotation = rotation
         self._map: 'Map' = None #type: ignore
         self._container: 'MapElement' = None #type: ignore
-        self._options: 'Options' = None #type: ignore
+        self._options: Optional[Options] = None
     
     @property
     def prop_type(self) -> PropType:
@@ -143,7 +147,7 @@ class Prop(ABC):
         return self._map
     
     @property
-    def options(self) -> 'Options':
+    def options(self) -> Options:
         """Get the current options."""
         return self._map.options
 
