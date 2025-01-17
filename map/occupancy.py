@@ -415,28 +415,17 @@ class OccupancyGrid:
                     # Get cell info
                     element_type, _, blocked = self.get_cell_info(grid_x, grid_y)
                     
-                    # Create hatched pattern paint
-                    paint = skia.Paint(
-                        AntiAlias=True,
-                        Style=skia.Paint.kStroke_Style,
-                        StrokeWidth=1.0,
-                        Color=type_colors.get(element_type, skia.Color(120, 120, 120))
-                    )
-
-                    # For blocked cells, use red
+                    # Get color based on element type
+                    color = type_colors.get(element_type, skia.Color(120, 120, 120))
                     if blocked:
-                        paint.setColor(skia.Color(255, 0, 0))
+                        color = skia.Color(255, 0, 0)
 
-                    # Draw hatched pattern
+                    # Create paint with hatch pattern
+                    from debug_config import debug_draw
+                    paint = debug_draw.create_hatch_paint(color, spacing=CELL_SIZE/4)
+
+                    # Draw hatched rectangle
                     x, y = grid_to_map(grid_x, grid_y)
                     rect = skia.Rect.MakeXYWH(x, y, CELL_SIZE, CELL_SIZE)
-                    
-                    # Draw diagonal lines for hatching
-                    spacing = CELL_SIZE / 4
-                    for i in range(-4, 8):  # Extra lines for complete coverage
-                        start_x = rect.left() + (i * spacing)
-                        start_y = rect.top()
-                        end_x = start_x + CELL_SIZE
-                        end_y = start_y + CELL_SIZE
-                        canvas.drawLine(start_x, start_y, end_x, end_y, paint)
+                    canvas.drawRect(rect, paint)
                         
