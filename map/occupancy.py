@@ -467,75 +467,77 @@ class OccupancyGrid:
                         return False
         return True
 
-    def check_passage(self, grid_rect: Rectangle, direction: RoomDirection, allow_crossing: bool = True) -> tuple[bool, list[int]]:
-        """Check if a passage can be placed, allowing crossing other passages.
-        
-        The check area is inflated by 1 grid cell perpendicular to the passage direction
-        to ensure proper spacing between parallel passages.
+    def check_passage(self, path_points: list[tuple[int, int]], direction: RoomDirection) -> tuple[bool, list[int]]:
+        """Check if a passage can be placed along a path of points.
         
         Args:
-            rect: Rectangle defining passage bounds in map coordinates
+            path_points: List of (x,y) grid coordinates defining the passage path
             direction: Direction of passage growth
-            allow_crossing: True to allow crossing other passages
             
         Returns:
             Tuple of (is_valid, crossed_passage_indices)
-            where is_valid is True if area is clear of rooms and blocked cells,
-            and crossed_passage_indices is a list of indices of crossed passages
+            where is_valid is True if path is valid,
+            and crossed_passage_indices is a list of unique passage indices crossed
         """
-        # Check the grid points at each end of the passage first
-        p1: Tuple[int, int]
-        p2: Tuple[int, int]
-        if direction == RoomDirection.NORTH or direction == RoomDirection.SOUTH:
-            p1 = (grid_rect.x, int(grid_rect.y - 1))
-            p2 = (grid_rect.x, int(grid_rect.y + grid_rect.height))
-        else:
-            p1 = (int(grid_rect.x - 1), grid_rect.y)
-            p2 = (int(grid_rect.x + grid_rect.width), grid_rect.y)
-            
-        # Check both end points connect to rooms/passages
-        for p in (p1, p2):
-            idx = self._to_grid_index(p[0], p[1])
-            if idx is None:
-                return False, []
-            element_type, _, blocked = self._decode_cell(self._grid[idx])
-            if blocked or (element_type != ElementType.NONE and element_type != ElementType.ROOM and element_type != ElementType.PASSAGE):
-                return False, []
-        
-        # Manually inflate perpendicular to direction
-        if direction in (RoomDirection.NORTH, RoomDirection.SOUTH):
-            # Inflate horizontally by 1 grid cell on each side
-            grid_rect = Rectangle(
-                grid_rect.x - 1,  # Move left edge out
-                grid_rect.y,      # Keep top edge
-                grid_rect.width + 2,  # Add 2 to width (1 each side)
-                grid_rect.height  # Keep height
-            )
-        else:
-            # Inflate vertically by 1 grid cell on each side
-            grid_rect = Rectangle(
-                grid_rect.x,      # Keep left edge
-                grid_rect.y - 1,  # Move top edge up
-                grid_rect.width,  # Keep width
-                grid_rect.height + 2  # Add 2 to height (1 each side)
-            )
+        if len(path_points) < 2:
+            return False, []
             
         crossed_passages = []
         
-        # Check each cell in inflated grid coordinates
-        for grid_x in range(int(grid_rect.x), int(grid_rect.x + grid_rect.width)):
-            for grid_y in range(int(grid_rect.y), int(grid_rect.y + grid_rect.height)):
-                idx = self._to_grid_index(grid_x, grid_y)
-                if idx is not None:
-                    element_type, element_idx, blocked = self._decode_cell(self._grid[idx])
-                    if blocked:
-                        return False, []
-                    if element_type != ElementType.NONE:
-                        if not allow_crossing or element_type != ElementType.PASSAGE:
-                            return False, []
-                    if element_type == ElementType.PASSAGE and element_idx not in crossed_passages:
-                        crossed_passages.append(element_idx)
-                        
+        # Get direction offsets for checking sides
+        dx, dy = direction.get_offset()
+        # Calculate perpendicular offsets for left/right checks
+        perp_dx = -dy  # Rotate 90° left
+        perp_dy = dx
+        
+        # Check first point - needs empty sides and room behind
+        x, y = path_points[0]
+        # Check left and right are empty
+        left_type, _, _ = self.get_cell_info(x + perp_dx, y + perp_dy)
+        right_type, _, _ = self.get_cell_info(x - perp_dx, y - perp_dy)
+        if left_type != ElementType.NONE or right_type != ElementType.NONE:
+            return False, []
+        # Check behind is room
+        back_type, _, _ = self.get_cell_info(x - dx, y - dy)
+        if back_type != ElementType.ROOM:
+            return False, []
+            
+        # Check last point - needs room in front
+        x, y = path_points[-1]
+        front_type, _, _ = self.get_cell_info(x + dx, y + dy)
+        if front_type != ElementType.ROOM:
+            return False, []
+            
+        # Check intermediate points
+        for i in range(1, len(path_points)-1):
+            x, y = path_points[i]
+            
+            # Get cell info for current position and sides
+            curr_type, curr_idx, curr_blocked = self.get_cell_info(x, y)
+            left_type, left_idx, _ = self.get_cell_info(x + perp_dx, y + perp_dy)
+            right_type, right_idx, _ = self.get_cell_info(x - perp_dx, y - perp_dy)
+            
+            # Check if blocked
+            if curr_blocked:
+                return False, []
+                
+            # If we're on a passage, check crossing rules
+            if curr_type == ElementType.PASSAGE:
+                # Must have passage on left or right (no parallel passages)
+                if (left_type != ElementType.PASSAGE and right_type != ElementType.PASSAGE):
+                    return False, []
+                # Track unique passage crossings
+                if curr_idx not in crossed_passages:
+                    crossed_passages.append(curr_idx)
+                if left_type == ElementType.PASSAGE and left_idx not in crossed_passages:
+                    crossed_passages.append(left_idx)
+                if right_type == ElementType.PASSAGE and right_idx not in crossed_passages:
+                    crossed_passages.append(right_idx)
+            else:
+                # Regular point - just check sides are empty
+                if left_type != ElementType.NONE or right_type != ElementType.NONE:
+                    return False, []
+                    
         return True, crossed_passages
        
     def check_door(self, grid_x: int, grid_y: int) -> bool:
