@@ -21,6 +21,7 @@ import random
 from typing import List, Optional, Tuple
 
 from constants import CELL_SIZE
+from logging_config import logger, LogTags
 from graphics.conversions import map_to_grid
 from graphics.math import Point2D
 from graphics.shapes import Circle, Rectangle
@@ -157,11 +158,12 @@ def try_connect_rooms(
         passage_height = abs(r2_y - r1_y) + 1
         
         if map.options.debug_verbose:
-            print(f"\nPassage dimensions:")
-            print(f"  Start point: ({r1_x}, {r1_y})")
-            print(f"  End point: ({r2_x}, {r2_y})")
-            print(f"  Grid rect: ({passage_x}, {passage_y}, {passage_width}, {passage_height})")
-            print(f"  Size: {passage_width}x{passage_height}")
+            logger.debug(LogTags.ARRANGEMENT,
+                f"\nPassage dimensions:\n"
+                f"  Start point: ({r1_x}, {r1_y})\n"
+                f"  End point: ({r2_x}, {r2_y})\n"
+                f"  Grid rect: ({passage_x}, {passage_y}, {passage_width}, {passage_height})\n"
+                f"  Size: {passage_width}x{passage_height}")
         
         # Create and add passage
         passage = Passage.from_grid(passage_x, passage_y, passage_width, passage_height)

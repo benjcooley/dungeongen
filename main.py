@@ -63,7 +63,7 @@ def main():
     #     dungeon_map.render(svg_canvas)
     #     del svg_canvas  # Ensure canvas is destroyed before stream
     
-    print("Room drawing completed and saved to 'map_output.png'")
+    logger.log(LogTags.GENERATION, "Room drawing completed and saved to 'map_output.png'")
 
 if __name__ == "__main__":
     main()
