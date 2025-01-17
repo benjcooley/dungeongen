@@ -9,12 +9,12 @@ from constants import CELL_SIZE, DEBUG_FONT_FAMILY, DEBUG_FONT_SIZE
 
 class HatchPattern(Enum):
     """Available hatch patterns for debug visualization."""
-    NONE = auto()         # No hatching
-    DIAGONAL = auto()     # 45-degree diagonal lines
-    CROSS = auto()        # Crossed diagonal lines
-    HORIZONTAL = auto()   # Horizontal lines
-    VERTICAL = auto()     # Vertical lines
-    GRID = auto()         # Grid pattern
+    NONE = 0         # No hatching
+    DIAGONAL = 1     # 45-degree diagonal lines
+    CROSS = 2        # Crossed diagonal lines
+    HORIZONTAL = 3   # Horizontal lines
+    VERTICAL = 4     # Vertical lines
+    GRID = 5         # Grid pattern
 
 # Predefined colors for debug visualization with good contrast on white
 DEBUG_COLORS = {
@@ -150,6 +150,10 @@ def _create_pattern_image(pattern: HatchPattern, spacing: float = 4.0) -> skia.I
 
     return surface.makeImageSnapshot()
 
+_last_key = None
+_last_pattern = None
+_hatch_patterns: dict[float, skia.Paint] = {}
+
 def create_hatched_paint(color: int, pattern: HatchPattern = HatchPattern.NONE, spacing: float = 4.0) -> skia.Paint:
     """Create a paint with optional hatch pattern.
     
@@ -161,12 +165,26 @@ def create_hatched_paint(color: int, pattern: HatchPattern = HatchPattern.NONE, 
     Returns:
         Configured skia.Paint object
     """
+    global _last_key
+    global _last_pattern
+
+    key = (color, pattern, spacing)
+    if key == _last_key:
+        return _last_pattern
+    
+    key_hash = hash(key)
+    if key_hash in _hatch_patterns:
+        paint =  _hatch_patterns[key_hash]
+        _last_key = key
+        _last_pattern = paint
+        return paint
+    
     paint = skia.Paint(
         AntiAlias=True,
         Style=skia.Paint.kFill_Style,
         Color=color
     )
-    
+
     if pattern == HatchPattern.NONE:
         return paint
 
@@ -178,6 +196,11 @@ def create_hatched_paint(color: int, pattern: HatchPattern = HatchPattern.NONE, 
     )
     
     paint.setShader(shader)
+
+    _last_key = key
+    _last_pattern = paint
+    _hatch_patterns[key_hash] = paint
+
     return paint
 
 def debug_draw_grid_cell(x: int, y: int, fill_color: int, outline_color: Optional[int] = None, 
@@ -199,25 +222,23 @@ def debug_draw_grid_cell(x: int, y: int, fill_color: int, outline_color: Optiona
     px = x * CELL_SIZE
     py = y * CELL_SIZE
     rect = skia.Rect(px, py, px + CELL_SIZE, py + CELL_SIZE)
-    
-    # Draw base fill
-    if fill_color is not None:
+        
+    # Draw pattern if specified
+    if hatch_pattern != HatchPattern.NONE:
+        pattern_paint = create_hatched_paint(
+            fill_color,
+            pattern=hatch_pattern,
+            spacing=CELL_SIZE/4
+        )
+        _debug_canvas.drawRect(rect, pattern_paint)
+    else:
         base_paint = skia.Paint(
             Color=fill_color,
             Style=skia.Paint.kFill_Style,
             AntiAlias=True
         )
         _debug_canvas.drawRect(rect, base_paint)
-    
-    # Draw pattern if specified
-    if hatch_pattern != HatchPattern.NONE:
-        pattern_paint = create_hatched_paint(
-            skia.Color(0, 0, 0, 80),  # Semi-transparent black
-            pattern=hatch_pattern,
-            spacing=CELL_SIZE/4
-        )
-        _debug_canvas.drawRect(rect, pattern_paint)
-    
+
     # Draw outline if specified
     if outline_color is not None:
         outline_paint = skia.Paint(
