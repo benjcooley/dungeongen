@@ -497,12 +497,12 @@ class Map:
                 
                 # Measure text for centering
                 text = str(idx)
-                text_bounds = font.measureText(text)
+                text_width = font.measureText(text)
                 
                 # Draw centered text
                 canvas.drawString(
                     text,
-                    center_x - text_bounds[0]/2,  # Center horizontally
+                    center_x - text_width/2,  # Center horizontally
                     center_y + font.getSize()/3,  # Approximate vertical centering
                     font,
                     number_paint
