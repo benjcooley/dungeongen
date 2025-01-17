@@ -137,25 +137,25 @@ def create_hatched_paint(color: int, pattern: HatchPattern = HatchPattern.NONE, 
         effect = skia.PathEffect.MakeLine2D(spacing, matrix)
     elif pattern == HatchPattern.CROSS:
         # Combine two diagonal patterns
-        effect1 = skia.PathEffect.MakeLine2D(spacing, skia.Matrix().setRotate(45))
-        effect2 = skia.PathEffect.MakeLine2D(spacing, skia.Matrix().setRotate(-45))
-        effect = skia.PathEffect.MakeSum(effect1, effect2)
+        effect1 = skia.SKPathEffect.MakeLine2D(spacing, skia.Matrix().setRotate(45))
+        effect2 = skia.SKPathEffect.MakeLine2D(spacing, skia.Matrix().setRotate(-45))
+        effect = skia.SKPathEffect.MakeSum(effect1, effect2)
     elif pattern == HatchPattern.HORIZONTAL:
-        effect = skia.PathEffect.MakeLine2D(spacing, matrix)
+        effect = skia.SKPathEffect.MakeLine2D(spacing, matrix)
     elif pattern == HatchPattern.VERTICAL:
         matrix.setRotate(90)
-        effect = skia.PathEffect.MakeLine2D(spacing, matrix)
+        effect = skia.SKPathEffect.MakeLine2D(spacing, matrix)
     else:  # GRID
         # Combine horizontal and vertical patterns
-        effect1 = skia.PathEffect.MakeLine2D(spacing, skia.Matrix())
-        effect2 = skia.PathEffect.MakeLine2D(spacing, skia.Matrix().setRotate(90))
-        effect = skia.PathEffect.MakeSum(effect1, effect2)
+        effect1 = skia.SKPathEffect.MakeLine2D(spacing, skia.Matrix())
+        effect2 = skia.SKPathEffect.MakeLine2D(spacing, skia.Matrix().setRotate(90))
+        effect = skia.SKPathEffect.MakeSum(effect1, effect2)
         
     paint.setPathEffect(effect)
     return paint
 
 def debug_draw_grid_cell(x: int, y: int, fill_color: int, outline_color: Optional[int] = None, 
-                        blocked: bool = False, pattern: HatchPattern = HatchPattern.NONE) -> None:
+                        blocked: bool = False, hatch_pattern: HatchPattern = HatchPattern.NONE) -> None:
     """Draw a filled grid cell with optional outline and pattern.
     
     Args:
@@ -164,7 +164,7 @@ def debug_draw_grid_cell(x: int, y: int, fill_color: int, outline_color: Optiona
         fill_color: Skia color for cell fill
         outline_color: Optional Skia color for cell outline
         blocked: Whether to draw an X marking the cell as blocked
-        pattern: Optional hatch pattern to apply
+        hatch_pattern: Optional hatch pattern to apply
     """
     if _debug_canvas is None:
         return
@@ -184,10 +184,10 @@ def debug_draw_grid_cell(x: int, y: int, fill_color: int, outline_color: Optiona
         _debug_canvas.drawRect(rect, base_paint)
     
     # Draw pattern if specified
-    if pattern != HatchPattern.NONE:
+    if hatch_pattern != HatchPattern.NONE:
         pattern_paint = create_hatched_paint(
             skia.Color(0, 0, 0, 80),  # Semi-transparent black
-            pattern=pattern,
+            pattern=hatch_pattern,
             spacing=CELL_SIZE/4
         )
         _debug_canvas.drawRect(rect, pattern_paint)

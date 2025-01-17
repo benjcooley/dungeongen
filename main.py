@@ -9,12 +9,13 @@ from options import Options
 from tags import Tags
 from logging_config import logger, LogTags
 from debug_config import debug_draw, DebugDrawFlags
+from debug_draw import debug_draw_init
 
 def main():
     # Get seed from environment variable or use default
     # seed = random.randint(1, 400000) 
     # int(os.getenv('SEED', '44444'))
-    seed = 73912
+    seed = 2314
     logger.log(LogTags.GENERATION, f"Using random seed: {seed}")
     random.seed(seed)
 
@@ -45,6 +46,7 @@ def main():
     
     # Debug draw the occupancy grid with same transform
     if debug_draw.is_enabled(DebugDrawFlags.OCCUPANCY):
+        debug_draw_init(canvas)
         dungeon_map.occupancy.draw_debug(canvas)
 
     # Save as PNG with size tag in filename

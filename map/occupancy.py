@@ -10,6 +10,7 @@ from constants import CELL_SIZE
 from graphics.conversions import map_to_grid, map_rect_to_grid_points, map_to_grid_rect, grid_to_map
 from map._arrange.arrange_enums import RoomDirection
 from options import Options
+from debug_draw import debug_draw_grid_cell
 from debug_config import debug_draw, HatchPattern
 
 if TYPE_CHECKING:
@@ -215,7 +216,40 @@ class OccupancyGrid:
         for x in range(int(grid_rect.x), int(grid_rect.x + grid_rect.width)):
             for y in range(int(grid_rect.y), int(grid_rect.y + grid_rect.height)):
                 self.mark_cell(x, y, element_type, element_idx)
-    
+
+    def mark_circle(self, circle: Circle, element_type: ElementType,
+                   element_idx: int, clip_rect: Optional[Rectangle] = None) -> None:
+        """Mark grid cells covered by a circle.
+        
+        Args:
+            circle: The circle to rasterize
+            element_type: Type of element being marked
+            element_idx: Index of element being marked
+            clip_rect: Optional rectangle to clip rasterization to
+        """
+        # Convert circle bounds to grid coordinates
+        grid_rect = Rectangle(*map_to_grid_rect(circle.bounds))
+        
+        # Apply clip rect if specified
+        if clip_rect:
+            grid_rect = grid_rect.intersection(Rectangle(*map_to_grid_rect(clip_rect)))
+            
+        # Early out if no valid region
+        if not grid_rect.is_valid:
+            return
+            
+        # Test each cell center against circle
+        radius_sq = (circle.radius / CELL_SIZE) * (circle.radius / CELL_SIZE)
+        center_x = circle.cx / CELL_SIZE
+        center_y = circle.cy / CELL_SIZE
+        
+        for x in range(int(grid_rect.x), int(grid_rect.x + grid_rect.width)):
+            for y in range(int(grid_rect.y), int(grid_rect.y + grid_rect.height)):
+                dx = (x + 0.5) - center_x
+                dy = (y + 0.5) - center_y
+                if dx * dx + dy * dy <= radius_sq:
+                    self.mark_cell(x, y, element_type, element_idx)
+
     def check_rectangle(self, grid_rect: Rectangle, inflate_cells: int = 1) -> bool:
         """Check if a rectangle area is unoccupied.
         
@@ -345,40 +379,7 @@ class OccupancyGrid:
                         crossed_passages.append(element_idx)
                         
         return True, crossed_passages
-
-    def mark_circle(self, circle: Circle, element_type: ElementType,
-                   element_idx: int, clip_rect: Optional[Rectangle] = None) -> None:
-        """Mark grid cells covered by a circle.
-        
-        Args:
-            circle: The circle to rasterize
-            element_type: Type of element being marked
-            element_idx: Index of element being marked
-            clip_rect: Optional rectangle to clip rasterization to
-        """
-        # Convert circle bounds to grid coordinates
-        grid_rect = Rectangle(*map_to_grid_rect(circle.bounds))
-        
-        # Apply clip rect if specified
-        if clip_rect:
-            grid_rect = grid_rect.intersection(Rectangle(*map_to_grid_rect(clip_rect)))
-            
-        # Early out if no valid region
-        if not grid_rect.is_valid:
-            return
-            
-        # Test each cell center against circle
-        radius_sq = (circle.radius / CELL_SIZE) * (circle.radius / CELL_SIZE)
-        center_x = circle.cx / CELL_SIZE
-        center_y = circle.cy / CELL_SIZE
-        
-        for x in range(int(grid_rect.x), int(grid_rect.x + grid_rect.width)):
-            for y in range(int(grid_rect.y), int(grid_rect.y + grid_rect.height)):
-                dx = (x + 0.5) - center_x
-                dy = (y + 0.5) - center_y
-                if dx * dx + dy * dy <= radius_sq:
-                    self.mark_cell(x, y, element_type, element_idx)
-        
+       
     def check_door(self, grid_x: int, grid_y: int) -> bool:
         """Check if a door can be placed at the given grid position.
         
@@ -395,7 +396,7 @@ class OccupancyGrid:
         """Draw debug visualization of occupied grid cells."""
             
         # Define colors for different element types
-        type_colors = list(range(5))
+        type_colors = list(range(6))
         type_colors[ElementType.NONE] =     skia.Color(0, 0, 0)       # NONE Light red
         type_colors[ElementType.ROOM] =     skia.Color(255, 200, 200) # ROOM Light red
         type_colors[ElementType.PASSAGE] =  skia.Color(200, 255, 200) # PASSAGE Light green
@@ -411,7 +412,7 @@ class OccupancyGrid:
                     element_type, _, blocked = self.get_cell_info(grid_x, grid_y)
                     
                     # Get color based on element type
-                    color = type_colors.get(element_type, skia.Color(120, 120, 120))
+                    color = type_colors[element_type]
                     
                     # Use cross pattern for blocked cells
                     if blocked:
@@ -420,6 +421,6 @@ class OccupancyGrid:
                         hatch_pattern = HatchPattern.DIAGONAL
 
                     # Draw hatched rectangle
-                    debug_draw.debug_draw_grid_cell(grid_x, grid_y, color, hatch_pattern=hatch_pattern)
+                    debug_draw_grid_cell(grid_x, grid_y, color, hatch_pattern=hatch_pattern)
 
                         

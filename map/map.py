@@ -94,6 +94,9 @@ class Map:
         element._options = self._options
         self._elements.append(element)
         self._bounds_dirty = True
+
+        element.draw_occupied(self.occupancy, len(self._elements) - 1)
+
         return element
     
     def remove_element(self, element: Generic[TMapElement]) -> TMapElement:
@@ -102,6 +105,7 @@ class Map:
             self._elements.remove(element)
             element._map = None
             self._bounds_dirty = True
+            self.recalculate_occupied()
     
     @property
     def rooms(self) -> Iterator['Room']:
@@ -352,7 +356,13 @@ class Map:
         # Decorate all elements
         for element in self._elements:
             decorate_room(element)
-    
+
+    def recalculate_occupied(self) -> None:
+        """Recalculate which grid spaces are occupied by map elements."""
+        self.occupancy.clear()
+        for idx, element in enumerate(self._elements):
+            element.draw_occupied(self.occupancy, idx)    
+
     def render(self, canvas: skia.Canvas, transform: Optional[skia.Matrix] = None) -> None:
         """Render the map to a canvas.
         
