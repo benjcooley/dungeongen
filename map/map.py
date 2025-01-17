@@ -343,11 +343,12 @@ class Map:
         from map._arrange.room_distribution import get_random_room_shape
         initial_shape = get_random_room_shape(options=self.options)
         if self.options.debug_verbose:
-            print(f"\nInitial room shape selected:")
-            print(f"  Type: {initial_shape.room_type}")
-            print(f"  Breadth: {initial_shape.breadth}")
-            print(f"  Depth: {initial_shape.depth}")
-            print(f"  Offset: {initial_shape.breadth_offset}")
+            logger.debug(LogTags.GENERATION, 
+                f"\nInitial room shape selected:\n"
+                f"  Type: {initial_shape.room_type}\n"
+                f"  Breadth: {initial_shape.breadth}\n"
+                f"  Depth: {initial_shape.depth}\n"
+                f"  Offset: {initial_shape.breadth_offset}")
         
         # Create starting room at origin using shape's dimensions
         start_room = self.add_element(Room.from_grid(0, 0,
