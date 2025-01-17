@@ -401,7 +401,7 @@ class OccupancyGrid:
         type_colors[ElementType.PASSAGE] =  skia.Color(200, 255, 200) # PASSAGE Light green
         type_colors[ElementType.DOOR] =     skia.Color(200, 200, 255) # DOOR Light blue
         type_colors[ElementType.STAIRS] =   skia.Color(255, 255, 200) # STAIRS Light yellow
-        type_colors[ElementType.BLOCKED] =  skia.Color(255, 0, 0),    # BLOCKED Light yellow
+        type_colors[ElementType.BLOCKED] =  skia.Color(255, 0, 0)     # BLOCKED Light yellow
         
         # Draw each occupied cell
         for grid_y in range(-self._origin_y, self.height - self._origin_y):
