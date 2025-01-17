@@ -34,7 +34,9 @@ class DungeonLogger:
             rich_handler = RichHandler(
                 rich_tracebacks=True,
                 markup=True,
-                show_path=False
+                show_path=False,
+                width=200,  # Increase width to prevent wrapping
+                overflow='fold'  # Fold long lines instead of wrapping
             )
             rich_handler.setFormatter(logging.Formatter(
                 '%(message)s',
