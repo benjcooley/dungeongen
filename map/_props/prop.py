@@ -1,17 +1,14 @@
 """Base class for map props."""
 
+from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from options import Options
-import math
 import math
 import random
-
-# Maximum attempts to find valid random position
-MAX_PLACEMENT_ATTEMPTS = 30
-from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Optional, ClassVar, Union, Protocol
 
 import skia
+
+from debug_config import debug_draw, DebugDrawFlags
 
 from graphics.shapes import Rectangle, Shape
 from graphics.aliases import Point
@@ -184,7 +181,7 @@ class Prop(ABC):
         self._draw_content(canvas, Rectangle(-draw_bounds.width/2, -draw_bounds.height/2, draw_bounds.width, draw_bounds.height), layer)
         
         # Draw debug grid bounds if enabled
-        if self._map and self._map.options.debug_draw_grid_bounds and self._grid_bounds:
+        if self._map and debug_draw.is_enabled(DebugDrawFlags.GRID_BOUNDS) and self._grid_bounds:
             debug_paint = skia.Paint(
                 AntiAlias=True,
                 Style=skia.Paint.kStroke_Style,
