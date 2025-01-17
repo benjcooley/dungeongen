@@ -467,12 +467,14 @@ class OccupancyGrid:
                         return False
         return True
 
-    def check_passage(self, path_points: list[tuple[int, int]], direction: RoomDirection) -> tuple[bool, list[int]]:
-        """Check if a passage can be placed along a path of points using a GridProbe.
+    def check_passage(self, start_x: int, start_y: int, direction: RoomDirection, steps: int) -> tuple[bool, list[int]]:
+        """Check if a passage can be placed using a GridProbe.
         
         Args:
-            path_points: List of (x,y) grid coordinates defining the passage path
+            start_x: Starting grid x coordinate
+            start_y: Starting grid y coordinate
             direction: Direction of passage growth
+            steps: Number of steps to check in the given direction
             
         Returns:
             Tuple of (is_valid, crossed_passage_indices)
@@ -480,7 +482,7 @@ class OccupancyGrid:
             and crossed_passage_indices is a list of unique passage indices crossed,
             even if validation fails
         """
-        if len(path_points) < 2:
+        if steps < 2:
             return False, []
             
         crossed_passages = []
@@ -494,9 +496,8 @@ class OccupancyGrid:
         }
         probe_dir = direction_map[direction]
         
-        # Create probe at first point facing the right direction
-        x, y = path_points[0]
-        probe = GridProbe(self, x, y, facing=probe_dir)
+        # Create probe at start point facing the right direction
+        probe = GridProbe(self, start_x, start_y, facing=probe_dir)
         
         # Check first point - needs empty sides and room behind
         if not probe.check_left().is_empty or not probe.check_right().is_empty:
@@ -504,18 +505,23 @@ class OccupancyGrid:
         if not probe.check_backward().is_room:
             return False, crossed_passages
             
+        # Move probe to end point to check it
+        end_probe = GridProbe(self, 
+            start_x + (probe_dir.get_offset()[0] * (steps - 1)),
+            start_y + (probe_dir.get_offset()[1] * (steps - 1)),
+            facing=probe_dir
+        )
+        
         # Check last point - needs empty sides and room in front
-        x, y = path_points[-1]
-        probe = GridProbe(self, x, y, facing=probe_dir)
-        if not probe.check_left().is_empty or not probe.check_right().is_empty:
+        if not end_probe.check_left().is_empty or not end_probe.check_right().is_empty:
             return False, crossed_passages
-        if not probe.check_forward().is_room:
+        if not end_probe.check_forward().is_room:
             return False, crossed_passages
             
-        # Check intermediate points
-        for i in range(1, len(path_points)-1):
-            x, y = path_points[i]
-            probe = GridProbe(self, x, y, facing=probe_dir)
+        # Check intermediate points by moving probe forward
+        probe = GridProbe(self, start_x, start_y, facing=probe_dir)
+        for _ in range(1, steps-1):  # Skip first and last points
+            probe.move_forward()
             
             # Get current cell and side info
             curr = probe.check_direction(probe_dir)
