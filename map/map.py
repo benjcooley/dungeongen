@@ -5,6 +5,7 @@ import random
 from typing import Generic, Iterator, List, Optional, Sequence, Tuple, TypeVar, TYPE_CHECKING
 from tags import Tags
 from logging_config import logger, LogTags
+from debug_config import debug_draw, DebugDrawFlags
 
 import skia
 
