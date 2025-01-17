@@ -11,6 +11,7 @@ from map.enums import Layers
 from constants import CELL_SIZE
 from typing import TYPE_CHECKING
 from map.occupancy import ElementType
+from logging_config import logger, LogTags
 
 if TYPE_CHECKING:
     from map.occupancy import OccupancyGrid
