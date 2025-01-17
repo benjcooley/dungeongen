@@ -16,6 +16,7 @@ def main():
     # Enable debug visualization and logging
     debug_draw.enable(DebugDrawFlags.OCCUPANCY, DebugDrawFlags.ELEMENT_NUMBERS)
     logger.enable_tags(LogTags.GENERATION, LogTags.ARRANGEMENT, LogTags.OCCUPANCY)
+    logger.set_level(7)
     logger.debug_enabled = True
     logger.log_to_console = True  # Ensure console output is enabled
 
