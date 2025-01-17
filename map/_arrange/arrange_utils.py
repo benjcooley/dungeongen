@@ -78,9 +78,10 @@ def get_room_exit_grid_position(room: Room, direction: RoomDirection, wall_pos: 
     grid_width = int(room.bounds.width / CELL_SIZE)
     grid_height = int(room.bounds.height / CELL_SIZE)
     
-    print(f"\nCalculating exit position:")
-    print(f"  Room bounds: x={room.bounds.x}, y={room.bounds.y}, w={room.bounds.width}, h={room.bounds.height}")
-    print(f"  Grid bounds: x={grid_x}, y={grid_y}, w={grid_width}, h={grid_height}")
+    logger.debug(LogTags.ARRANGEMENT, 
+        f"\nCalculating exit position:\n"
+        f"  Room bounds: x={room.bounds.x}, y={room.bounds.y}, w={room.bounds.width}, h={room.bounds.height}\n"
+        f"  Grid bounds: x={grid_x}, y={grid_y}, w={grid_width}, h={grid_height}")
 
     # For circular rooms, always exit from center
     if room.room_type == RoomType.CIRCULAR:
@@ -179,8 +180,9 @@ def get_adjacent_room_rect(room: Room, direction: RoomDirection, grid_dist: int,
     # Get transform for local coordinate space
     transform = make_room_transform(room, direction, wall_pos, align_to)
     
-    print(f"\nCalculating room position: dir={direction}, dist={grid_dist}, breadth={grid_breadth}, depth={grid_depth}")
-    print(f"Transform matrix: [{transform.a:.1f} {transform.b:.1f} {transform.tx:.1f}] [{transform.c:.1f} {transform.d:.1f} {transform.ty:.1f}]")
+    logger.debug(LogTags.ARRANGEMENT,
+        f"\nCalculating room position: dir={direction}, dist={grid_dist}, breadth={grid_breadth}, depth={grid_depth}\n"
+        f"Transform matrix: [{transform.a:.1f} {transform.b:.1f} {transform.tx:.1f}] [{transform.c:.1f} {transform.d:.1f} {transform.ty:.1f}]")
     
     # Calculate passage points. We step from the room exit to the far room's exit.
     # Then we step into the room one grid, and go to the near left corner grid, then we move
@@ -195,7 +197,8 @@ def get_adjacent_room_rect(room: Room, direction: RoomDirection, grid_dist: int,
     r1 = p2 + Point2D(1, -breadth_center + int(breadth_offset))  # Near left grid corner of room
     r2 = r1 + Point2D(grid_depth - 1, grid_breadth - 1) # Far right grid corner of room
 
-    print(f"Local points: passage=p1({p1.x}, {p1.y}), p2({p2.x}, {p2.y}), room=r1({r1.x}, {r1.y}), r2({r2.x}, {r2.y})")
+    logger.debug(LogTags.ARRANGEMENT,
+        f"Local points: passage=p1({p1.x}, {p1.y}), p2({p2.x}, {p2.y}), room=r1({r1.x}, {r1.y}), r2({r2.x}, {r2.y})")
     
     # Transform points to world space
     w_p1 = transform.transform_point(p1)
@@ -203,7 +206,9 @@ def get_adjacent_room_rect(room: Room, direction: RoomDirection, grid_dist: int,
     w_r1 = transform.transform_point(r1)
     w_r2 = transform.transform_point(r2)
     
-    print(f"World points: passage=p1({w_p1.x:.1f}, {w_p1.y:.1f}), p2({w_p2.x:.1f}, {w_p2.y:.1f}), room=r1({w_r1.x:.1f}, {w_r1.y:.1f}), r2({w_r2.x:.1f}, {w_r2.y:.1f})")
+    logger.debug(LogTags.ARRANGEMENT,
+        f"World points: passage=p1({w_p1.x:.1f}, {w_p1.y:.1f}), p2({w_p2.x:.1f}, {w_p2.y:.1f}), "
+        f"room=r1({w_r1.x:.1f}, {w_r1.y:.1f}), r2({w_r2.x:.1f}, {w_r2.y:.1f})")
     
     # Calculate final rectangle in both spaces
     local_rect = (
@@ -221,5 +226,7 @@ def get_adjacent_room_rect(room: Room, direction: RoomDirection, grid_dist: int,
         int(abs(w_r2.y - w_r1.y)) + 1
     )
     
-    print(f"Rects: local=({local_rect[0]}, {local_rect[1]}, {local_rect[2]}, {local_rect[3]}), world=({final_rect[0]}, {final_rect[1]}, {final_rect[2]}, {final_rect[3]})")
+    logger.debug(LogTags.ARRANGEMENT,
+        f"Rects: local=({local_rect[0]}, {local_rect[1]}, {local_rect[2]}, {local_rect[3]}), "
+        f"world=({final_rect[0]}, {final_rect[1]}, {final_rect[2]}, {final_rect[3]})")
     return final_rect

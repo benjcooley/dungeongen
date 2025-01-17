@@ -7,13 +7,14 @@ import skia
 from map.map import Map
 from options import Options
 from tags import Tags
+from logging_config import logger, LogTags
 
 def main():
     # Get seed from environment variable or use default
     # seed = random.randint(1, 400000) 
     # int(os.getenv('SEED', '44444'))
     seed = 73912
-    print(f"Using random seed: {seed}")
+    logger.log(LogTags.GENERATION, f"Using random seed: {seed}")
     random.seed(seed)
 
     options = Options()
