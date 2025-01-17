@@ -1,10 +1,20 @@
 """Debug drawing utilities for visualizing room placement and connections."""
 
 import math
+from enum import Enum, auto
 import skia
 from typing import Tuple, Optional
 from graphics.math import Point2D
 from constants import CELL_SIZE, DEBUG_FONT_FAMILY, DEBUG_FONT_SIZE
+
+class HatchPattern(Enum):
+    """Available hatch patterns for debug visualization."""
+    NONE = auto()         # No hatching
+    DIAGONAL = auto()     # 45-degree diagonal lines
+    CROSS = auto()        # Crossed diagonal lines
+    HORIZONTAL = auto()   # Horizontal lines
+    VERTICAL = auto()     # Vertical lines
+    GRID = auto()         # Grid pattern
 
 # Predefined colors for debug visualization with good contrast on white
 DEBUG_COLORS = {
@@ -99,7 +109,53 @@ def debug_draw_grid_label(x: int, y: int, text: str, color: str = 'DARK_BLUE') -
     if _debug_canvas is None:
         return
 
-def debug_draw_grid_cell(x: int, y: int, fill_color: int, outline_color: Optional[int] = None, blocked: bool = False) -> None:
+def create_hatched_paint(color: int, pattern: HatchPattern = HatchPattern.NONE, spacing: float = 4.0) -> skia.Paint:
+    """Create a paint with optional hatch pattern.
+    
+    Args:
+        color: Base color for the paint
+        pattern: Hatch pattern to apply (default NONE)
+        spacing: Spacing between hatch lines
+        
+    Returns:
+        Configured skia.Paint object
+    """
+    paint = skia.Paint(
+        AntiAlias=True,
+        Style=skia.Paint.kFill_Style,
+        Color=color
+    )
+    
+    if pattern == HatchPattern.NONE:
+        return paint
+        
+    # Create matrix for pattern orientation
+    matrix = skia.Matrix()
+    
+    if pattern == HatchPattern.DIAGONAL:
+        matrix.setRotate(45)
+        effect = skia.PathEffect.MakeLine2D(spacing, matrix)
+    elif pattern == HatchPattern.CROSS:
+        # Combine two diagonal patterns
+        effect1 = skia.PathEffect.MakeLine2D(spacing, skia.Matrix().setRotate(45))
+        effect2 = skia.PathEffect.MakeLine2D(spacing, skia.Matrix().setRotate(-45))
+        effect = skia.PathEffect.MakeSum(effect1, effect2)
+    elif pattern == HatchPattern.HORIZONTAL:
+        effect = skia.PathEffect.MakeLine2D(spacing, matrix)
+    elif pattern == HatchPattern.VERTICAL:
+        matrix.setRotate(90)
+        effect = skia.PathEffect.MakeLine2D(spacing, matrix)
+    else:  # GRID
+        # Combine horizontal and vertical patterns
+        effect1 = skia.PathEffect.MakeLine2D(spacing, skia.Matrix())
+        effect2 = skia.PathEffect.MakeLine2D(spacing, skia.Matrix().setRotate(90))
+        effect = skia.PathEffect.MakeSum(effect1, effect2)
+        
+    paint.setPathEffect(effect)
+    return paint
+
+def debug_draw_grid_cell(x: int, y: int, fill_color: int, outline_color: Optional[int] = None, 
+                        blocked: bool = False, pattern: HatchPattern = HatchPattern.NONE) -> None:
     """Draw a filled grid cell with optional outline and blocked marker.
     
     Args:
@@ -118,7 +174,7 @@ def debug_draw_grid_cell(x: int, y: int, fill_color: int, outline_color: Optiona
     
     # Draw filled cell if fill color provided
     if fill_color is not None:
-        fill_paint = skia.Paint(Color=fill_color, Style=skia.Paint.kFill_Style)
+        fill_paint = create_hatched_paint(fill_color, pattern, spacing=CELL_SIZE/4)
         _debug_canvas.drawRect(skia.Rect(px, py, px + CELL_SIZE, py + CELL_SIZE), fill_paint)
     
     # Draw outline if specified
