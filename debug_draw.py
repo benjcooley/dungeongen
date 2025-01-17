@@ -109,6 +109,47 @@ def debug_draw_grid_label(x: int, y: int, text: str, color: str = 'DARK_BLUE') -
     if _debug_canvas is None:
         return
 
+def _create_pattern_image(pattern: HatchPattern, spacing: float = 4.0) -> skia.Image:
+    """Create a bitmap image for the hatch pattern.
+    
+    Args:
+        pattern: Type of hatch pattern to create
+        spacing: Spacing between hatch lines
+        
+    Returns:
+        Skia Image containing the pattern
+    """
+    pattern_size = int(spacing * 4)  # Make pattern tile big enough for clean repeating
+    surface = skia.Surface(pattern_size, pattern_size)
+    canvas = surface.getCanvas()
+    canvas.clear(skia.Color4f(0, 0, 0, 0))  # Transparent background
+
+    paint = skia.Paint(
+        Color=skia.Color4f(0, 0, 0, 0.5),  # Semi-transparent black
+        StrokeWidth=1,
+        Style=skia.Paint.kStroke_Style,
+        AntiAlias=True
+    )
+
+    if pattern == HatchPattern.DIAGONAL:
+        canvas.drawLine(0, 0, pattern_size, pattern_size, paint)
+    elif pattern == HatchPattern.CROSS:
+        canvas.drawLine(0, 0, pattern_size, pattern_size, paint)
+        canvas.drawLine(0, pattern_size, pattern_size, 0, paint)
+    elif pattern == HatchPattern.HORIZONTAL:
+        for y in range(0, pattern_size, int(spacing)):
+            canvas.drawLine(0, y, pattern_size, y, paint)
+    elif pattern == HatchPattern.VERTICAL:
+        for x in range(0, pattern_size, int(spacing)):
+            canvas.drawLine(x, 0, x, pattern_size, paint)
+    elif pattern == HatchPattern.GRID:
+        for y in range(0, pattern_size, int(spacing)):
+            canvas.drawLine(0, y, pattern_size, y, paint)
+        for x in range(0, pattern_size, int(spacing)):
+            canvas.drawLine(x, 0, x, pattern_size, paint)
+
+    return surface.makeImageSnapshot()
+
 def create_hatched_paint(color: int, pattern: HatchPattern = HatchPattern.NONE, spacing: float = 4.0) -> skia.Paint:
     """Create a paint with optional hatch pattern.
     
@@ -128,30 +169,15 @@ def create_hatched_paint(color: int, pattern: HatchPattern = HatchPattern.NONE, 
     
     if pattern == HatchPattern.NONE:
         return paint
-        
-    # Create matrix for pattern orientation
-    matrix = skia.Matrix()
+
+    # Create pattern image and shader
+    pattern_image = _create_pattern_image(pattern, spacing)
+    shader = pattern_image.makeShader(
+        skia.TileMode.kRepeat,
+        skia.TileMode.kRepeat
+    )
     
-    if pattern == HatchPattern.DIAGONAL:
-        matrix.setRotate(45)
-        effect = skia.PathEffect.MakeLine2D(spacing, matrix)
-    elif pattern == HatchPattern.CROSS:
-        # Combine two diagonal patterns
-        effect1 = skia.SKPathEffect.MakeLine2D(spacing, skia.Matrix().setRotate(45))
-        effect2 = skia.SKPathEffect.MakeLine2D(spacing, skia.Matrix().setRotate(-45))
-        effect = skia.SKPathEffect.MakeSum(effect1, effect2)
-    elif pattern == HatchPattern.HORIZONTAL:
-        effect = skia.SKPathEffect.MakeLine2D(spacing, matrix)
-    elif pattern == HatchPattern.VERTICAL:
-        matrix.setRotate(90)
-        effect = skia.SKPathEffect.MakeLine2D(spacing, matrix)
-    else:  # GRID
-        # Combine horizontal and vertical patterns
-        effect1 = skia.SKPathEffect.MakeLine2D(spacing, skia.Matrix())
-        effect2 = skia.SKPathEffect.MakeLine2D(spacing, skia.Matrix().setRotate(90))
-        effect = skia.SKPathEffect.MakeSum(effect1, effect2)
-        
-    paint.setPathEffect(effect)
+    paint.setShader(shader)
     return paint
 
 def debug_draw_grid_cell(x: int, y: int, fill_color: int, outline_color: Optional[int] = None, 
