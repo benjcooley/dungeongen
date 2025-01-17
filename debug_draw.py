@@ -109,43 +109,48 @@ def debug_draw_grid_label(x: int, y: int, text: str, color: str = 'DARK_BLUE') -
     if _debug_canvas is None:
         return
 
-def _create_pattern_image(pattern: HatchPattern, spacing: float = 4.0) -> skia.Image:
-    """Create a bitmap image for the hatch pattern.
-    
-    Args:
-        pattern: Type of hatch pattern to create
-        spacing: Spacing between hatch lines
-        
-    Returns:
-        Skia Image containing the pattern
-    """
-    pattern_size = int(spacing * 4)  # Make pattern tile big enough for clean repeating
+def _create_pattern_image(pattern: HatchPattern) -> skia.Image:
+    pattern_size = 256
+    spacing = 32
     surface = skia.Surface(pattern_size, pattern_size)
     canvas = surface.getCanvas()
-    canvas.clear(skia.Color4f(0, 0, 0, 0))  # Transparent background
+    canvas.clear(skia.Color4f(0, 0, 1, 1))  # White background
 
     paint = skia.Paint(
-        Color=skia.Color4f(0, 0, 0, 0.5),  # Semi-transparent black
-        StrokeWidth=1,
+        Color4f=skia.Color4f(1, 0, 0, 1),  # Black lines
+        StrokeWidth=4,  # Scale stroke width with spacing but ensure minimum of 1
         Style=skia.Paint.kStroke_Style,
         AntiAlias=True
     )
 
+    pattern = HatchPattern.DIAGONAL
+
     if pattern == HatchPattern.DIAGONAL:
-        canvas.drawLine(0, 0, pattern_size, pattern_size, paint)
+        offset = 0
+        while offset <= pattern_size * 2:
+            canvas.drawLine(offset, 0, offset - pattern_size, pattern_size, paint)
+            offset += spacing
+            
     elif pattern == HatchPattern.CROSS:
-        canvas.drawLine(0, 0, pattern_size, pattern_size, paint)
-        canvas.drawLine(0, pattern_size, pattern_size, 0, paint)
+        # Draw both diagonal patterns
+        for offset in range(0, pattern_size * 2, max(1, int(spacing))):
+            canvas.drawLine(offset, 0, offset - pattern_size, pattern_size, paint)  # Forward slash
+            canvas.drawLine(offset - pattern_size, 0, offset, pattern_size, paint)  # Back slash
+            
     elif pattern == HatchPattern.HORIZONTAL:
-        for y in range(0, pattern_size, int(spacing)):
+        for y in range(0, pattern_size + 1, max(1, int(spacing))):
             canvas.drawLine(0, y, pattern_size, y, paint)
+            
     elif pattern == HatchPattern.VERTICAL:
-        for x in range(0, pattern_size, int(spacing)):
+        for x in range(0, pattern_size + 1, max(1, int(spacing))):
             canvas.drawLine(x, 0, x, pattern_size, paint)
+            
     elif pattern == HatchPattern.GRID:
-        for y in range(0, pattern_size, int(spacing)):
+        # Horizontal lines
+        for y in range(0, pattern_size + 1, max(1, int(spacing))):
             canvas.drawLine(0, y, pattern_size, y, paint)
-        for x in range(0, pattern_size, int(spacing)):
+        # Vertical lines    
+        for x in range(0, pattern_size + 1, max(1, int(spacing))):
             canvas.drawLine(x, 0, x, pattern_size, paint)
 
     return surface.makeImageSnapshot()
@@ -188,10 +193,12 @@ def create_hatched_paint(color: int, pattern: HatchPattern = HatchPattern.NONE, 
         return paint
 
     # Create pattern image and shader
-    pattern_image = _create_pattern_image(pattern, spacing)
+    pattern_image = _create_pattern_image(pattern)
+    scale = 0.25
     shader = pattern_image.makeShader(
-        skia.TileMode.kRepeat,
-        skia.TileMode.kRepeat
+        tmx=skia.TileMode.kRepeat,
+        tmy=skia.TileMode.kRepeat,
+        localMatrix=skia.Matrix().setScale(scale, scale)
     )
     
     # Set the paint's color and shader
