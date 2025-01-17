@@ -23,7 +23,7 @@ def main():
     options.tags.add(str(Tags.SMALL))  # Generate small-sized dungeons
     
     # Enable debug visualization
-    debug_draw.enable(DebugDrawFlags.OCCUPANCY)
+    debug_draw.enable(DebugDrawFlags.OCCUPANCY, DebugDrawFlags.ELEMENT_NUMBERS)
     
     # Initialize Skia canvas
     surface = skia.Surface(options.canvas_width, options.canvas_height)

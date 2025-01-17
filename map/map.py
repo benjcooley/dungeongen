@@ -480,5 +480,32 @@ class Map:
         for element in self._elements:
             element.draw(canvas, Layers.OVERLAY)
 
+        # Draw element numbers if enabled
+        if debug_draw.is_enabled(DebugDrawFlags.ELEMENT_NUMBERS):
+            number_paint = skia.Paint(
+                Color=skia.Color(0, 0, 0),  # Black text
+                AntiAlias=True
+            )
+            font = skia.Font(skia.Typeface('Arial'), CELL_SIZE/2)
+            
+            for idx, element in enumerate(self._elements):
+                # Get element center
+                bounds = element.bounds
+                center_x = bounds.x + bounds.width/2
+                center_y = bounds.y + bounds.height/2
+                
+                # Measure text for centering
+                text = str(idx)
+                text_bounds = font.measureText(text)
+                
+                # Draw centered text
+                canvas.drawString(
+                    text,
+                    center_x - text_bounds[0]/2,  # Center horizontally
+                    center_y + font.getSize()/3,  # Approximate vertical centering
+                    font,
+                    number_paint
+                )
+
         # Restore canvas state
         canvas.restore()
