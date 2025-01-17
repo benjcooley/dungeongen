@@ -369,8 +369,8 @@ class Map:
         logger.debug(LogTags.GENERATION, "*" * 80)
 
         # Try connecting nearby rooms
-        connections = try_connect_nearby_rooms(self, self.options)
-        logger.debug(LogTags.GENERATION, f"Created {len(connections) if connections else 0} connections")
+        connected = try_connect_nearby_rooms(self, self.options)
+        logger.debug(LogTags.GENERATION, f"Room connection {'succeeded' if connected else 'failed'}")
             
         logger.debug(LogTags.GENERATION, "\n" + "*" * 80)
         logger.debug(LogTags.GENERATION, "PHASE 5: DECORATING ROOMS")
