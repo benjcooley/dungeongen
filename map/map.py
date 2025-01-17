@@ -4,6 +4,7 @@ import math
 import random
 from typing import Generic, Iterator, List, Optional, Sequence, Tuple, TypeVar, TYPE_CHECKING
 from tags import Tags
+from logging_config import logger, LogTags
 
 import skia
 
