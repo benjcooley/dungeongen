@@ -64,22 +64,29 @@ class DebugDraw:
         path.lineTo(spacing, 0)
 
         if self.hatch_pattern == HatchPattern.DIAGONAL:
-            matrix.setRotate(45)
-            effect = skia.Path1DPathEffect.Make(path, spacing, 0, matrix)
+            path.transform(skia.Matrix().setRotate(45))
+            effect = skia.Path1DPathEffect.Make(path, spacing, 0, skia.Path1DPathEffect.Style.kRotate_Style)
         elif self.hatch_pattern == HatchPattern.CROSS:
             # Combine two diagonal patterns
-            effect1 = skia.Path1DPathEffect.Make(path, spacing, 0, skia.Matrix().setRotate(45))
-            effect2 = skia.Path1DPathEffect.Make(path, spacing, 0, skia.Matrix().setRotate(-45))
+            path1 = skia.Path().moveTo(0, 0).lineTo(spacing, 0)
+            path2 = skia.Path().moveTo(0, 0).lineTo(spacing, 0)
+            path1.transform(skia.Matrix().setRotate(45))
+            path2.transform(skia.Matrix().setRotate(-45))
+            effect1 = skia.Path1DPathEffect.Make(path1, spacing, 0, skia.Path1DPathEffect.Style.kRotate_Style)
+            effect2 = skia.Path1DPathEffect.Make(path2, spacing, 0, skia.Path1DPathEffect.Style.kRotate_Style)
             effect = skia.PathEffect.MakeSum(effect1, effect2)
         elif self.hatch_pattern == HatchPattern.HORIZONTAL:
-            effect = skia.Path1DPathEffect.Make(path, spacing, 0, matrix)
+            effect = skia.Path1DPathEffect.Make(path, spacing, 0, skia.Path1DPathEffect.Style.kTranslate_Style)
         elif self.hatch_pattern == HatchPattern.VERTICAL:
-            matrix.setRotate(90)
-            effect = skia.Path1DPathEffect.Make(path, spacing, 0, matrix)
+            path.transform(skia.Matrix().setRotate(90))
+            effect = skia.Path1DPathEffect.Make(path, spacing, 0, skia.Path1DPathEffect.Style.kTranslate_Style)
         else:  # GRID
             # Combine horizontal and vertical patterns
-            effect1 = skia.Path1DPathEffect.Make(path, spacing, 0, skia.Matrix())
-            effect2 = skia.Path1DPathEffect.Make(path, spacing, 0, skia.Matrix().setRotate(90))
+            path1 = skia.Path().moveTo(0, 0).lineTo(spacing, 0)
+            path2 = skia.Path().moveTo(0, 0).lineTo(spacing, 0)
+            path2.transform(skia.Matrix().setRotate(90))
+            effect1 = skia.Path1DPathEffect.Make(path1, spacing, 0, skia.Path1DPathEffect.Style.kTranslate_Style)
+            effect2 = skia.Path1DPathEffect.Make(path2, spacing, 0, skia.Path1DPathEffect.Style.kTranslate_Style)
             effect = skia.PathEffect.MakeSum(effect1, effect2)
 
         paint.setPathEffect(effect)
