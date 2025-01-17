@@ -40,8 +40,7 @@ class Map:
         self._options: Options = options
         self._bounds = Rectangle(0, 0, CELL_SIZE, CELL_SIZE)  # Default to single cell at origin
         self._bounds_dirty: bool = True
-        # Initialize with large default size centered on origin (-100 to +100)
-        self.occupancy = OccupancyGrid(201, 201, self._options)  # Initialize with default size
+        self.occupancy = OccupancyGrid(200, 200)  # Initialize with default size
     
     @property
     def elements(self) -> Sequence[MapElement]:
@@ -77,8 +76,6 @@ class Map:
         Raises:
             ValueError: If the element's bounds exceed reasonable limits
         """
-        # Update occupancy grid before adding new element
-        self.recalculate_occupied()
         # Validate element bounds
         bounds = element.bounds
         MAX_DIMENSION = 100 * CELL_SIZE  # 100 grid cells
@@ -168,23 +165,6 @@ class Map:
         
         self._bounds = bounds
         self._bounds_dirty = False
-
-    def recalculate_occupied(self) -> None:
-        """Recalculate which grid spaces are occupied by map elements."""
-        # Update bounds and create new occupancy grid if needed
-        bounds = self.bounds
-        grid_width = int(bounds.width / CELL_SIZE) + 1
-        grid_height = int(bounds.height / CELL_SIZE) + 1
-        
-        # Create new grid or clear existing one
-        if self.occupancy is None or (self.occupancy.width != grid_width or self.occupancy.height != grid_height):
-            self.occupancy = OccupancyGrid(grid_width, grid_height, self._options)
-        else:
-            self.occupancy.clear()
-        
-        # Mark occupied spaces
-        for idx, element in enumerate(self._elements):
-            element.draw_occupied(self.occupancy, idx)
     
     def is_occupied(self, x: int, y: int) -> bool:
         """Check if a grid position is occupied by any map element."""
@@ -381,8 +361,6 @@ class Map:
             transform: Optional Skia Matrix transform.
                       If None, calculates a transform to fit the map in the canvas.
         """
-        # Ensure occupancy grid is up to date
-        self.recalculate_occupied()
         # Get canvas dimensions
         canvas_width = canvas.imageInfo().width()
         canvas_height = canvas.imageInfo().height()

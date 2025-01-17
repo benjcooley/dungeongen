@@ -77,6 +77,3 @@ class Options:
     door_stroke_width: float = 4.0  # Width of door border strokes (2/3 of border_width)
     map_border_cells: float = 4.0  # Number of cells padding around the map
     
-    # Debug options
-    debug_verbose: bool = False  # Enable verbose debug logging
-    

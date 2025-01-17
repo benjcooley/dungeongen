@@ -8,6 +8,7 @@ from map.map import Map
 from options import Options
 from tags import Tags
 from logging_config import logger, LogTags
+from debug_config import debug_draw, DebugDrawFlags
 
 def main():
     # Get seed from environment variable or use default
@@ -21,7 +22,6 @@ def main():
     options.tags.add(str(Tags.SMALL))  # Generate small-sized dungeons
     
     # Enable debug visualization
-    from debug_config import debug_draw, DebugDrawFlags
     debug_draw.enable(DebugDrawFlags.OCCUPANCY)
     
     # Initialize Skia canvas
@@ -44,12 +44,8 @@ def main():
     dungeon_map.render(canvas, transform)
     
     # Debug draw the occupancy grid with same transform
-    from debug_config import debug_draw, DebugDrawFlags
     if debug_draw.is_enabled(DebugDrawFlags.OCCUPANCY):
-        canvas.save()
-        canvas.concat(transform)
         dungeon_map.occupancy.draw_debug(canvas)
-        canvas.restore()
 
     # Save as PNG with size tag in filename
     size_tag = next((tag for tag in options.tags if tag in ('small', 'medium', 'large')), 'medium')

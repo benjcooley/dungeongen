@@ -3,7 +3,6 @@
 from typing import List, Optional, Set, Tuple, TYPE_CHECKING
 from array import array
 from enum import IntFlag, auto
-import math
 import skia
 from logging_config import logger, LogTags
 from graphics.shapes import Rectangle, Circle
@@ -11,6 +10,7 @@ from constants import CELL_SIZE
 from graphics.conversions import map_to_grid, map_rect_to_grid_points, map_to_grid_rect, grid_to_map
 from map._arrange.arrange_enums import RoomDirection
 from options import Options
+from debug_config import debug_draw, HatchPattern
 
 if TYPE_CHECKING:
     from map.mapelement import MapElement
@@ -51,14 +51,13 @@ class OccupancyGrid:
     TYPE_SHIFT = 26
     INDEX_SHIFT = 0
     
-    def __init__(self, width: int, height: int, options: Options) -> None:
+    def __init__(self, width: int, height: int) -> None:
         """Initialize an empty occupancy grid with default size."""
         self._grid = array('L', [0] * (width * height))  # Using unsigned long
         self.width = width
         self.height = height
         self._origin_x = width // 2  # Center point
         self._origin_y = height // 2
-        self._options = options
         
     def _ensure_contains(self, grid_x: int, grid_y: int) -> None:
         """Resize grid if needed to contain the given grid coordinates."""
@@ -394,16 +393,15 @@ class OccupancyGrid:
         
     def draw_debug(self, canvas: 'skia.Canvas') -> None:
         """Draw debug visualization of occupied grid cells."""
-        import skia
-        from debug_config import debug_draw, HatchPattern
             
         # Define colors for different element types
-        type_colors = {
-            ElementType.ROOM: skia.Color(255, 200, 200),     # Light red
-            ElementType.PASSAGE: skia.Color(200, 255, 200),  # Light green
-            ElementType.DOOR: skia.Color(200, 200, 255),     # Light blue
-            ElementType.STAIRS: skia.Color(255, 255, 200),   # Light yellow
-        }
+        type_colors = list(range(5))
+        type_colors[ElementType.NONE] =     skia.Color(0, 0, 0)       # NONE Light red
+        type_colors[ElementType.ROOM] =     skia.Color(255, 200, 200) # ROOM Light red
+        type_colors[ElementType.PASSAGE] =  skia.Color(200, 255, 200) # PASSAGE Light green
+        type_colors[ElementType.DOOR] =     skia.Color(200, 200, 255) # DOOR Light blue
+        type_colors[ElementType.STAIRS] =   skia.Color(255, 255, 200) # STAIRS Light yellow
+        type_colors[ElementType.BLOCKED] =  skia.Color(255, 0, 0),    # BLOCKED Light yellow
         
         # Save current pattern and set to CROSS for blocked cells
         saved_pattern = debug_draw.hatch_pattern
@@ -420,18 +418,12 @@ class OccupancyGrid:
                     
                     # Use cross pattern for blocked cells
                     if blocked:
-                        color = skia.Color(255, 0, 0)
-                        debug_draw.hatch_pattern = HatchPattern.CROSS
+                        hatch_pattern = HatchPattern.CROSS
                     else:
-                        debug_draw.hatch_pattern = saved_pattern
-
-                    # Create paint with hatch pattern
-                    paint = debug_draw.create_hatch_paint(color, spacing=CELL_SIZE/4)
+                        hatch_pattern = HatchPattern.DIAGONAL
 
                     # Draw hatched rectangle
-                    x, y = grid_to_map(grid_x, grid_y)
-                    rect = skia.Rect.MakeXYWH(x, y, CELL_SIZE, CELL_SIZE)
-                    canvas.drawRect(rect, paint)
+                    debug_draw.debug_draw_grid_cell(grid_x, grid_y, color, hatch_pattern=hatch_pattern)
         
         # Restore original pattern
         debug_draw.hatch_pattern = saved_pattern
