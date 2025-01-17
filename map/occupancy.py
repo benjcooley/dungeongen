@@ -8,7 +8,7 @@ import skia
 from logging_config import logger, LogTags
 from graphics.shapes import Rectangle, Circle
 from constants import CELL_SIZE
-from graphics.conversions import map_to_grid, map_rect_to_grid_points, map_to_grid_rect
+from graphics.conversions import map_to_grid, map_rect_to_grid_points, map_to_grid_rect, grid_to_map
 from map._arrange.arrange_enums import RoomDirection
 from options import Options
 
@@ -415,12 +415,28 @@ class OccupancyGrid:
                     # Get cell info
                     element_type, _, blocked = self.get_cell_info(grid_x, grid_y)
                     
-                    # Get fill color based on element type
-                    fill_color = type_colors.get(element_type, skia.Color(220, 220, 220))
-                    
-                    # For blocked cells, only draw outline in red
+                    # Create hatched pattern paint
+                    paint = skia.Paint(
+                        AntiAlias=True,
+                        Style=skia.Paint.kStroke_Style,
+                        StrokeWidth=1.0,
+                        Color=type_colors.get(element_type, skia.Color(120, 120, 120))
+                    )
+
+                    # For blocked cells, use red
                     if blocked:
-                        debug_draw_grid_cell(grid_x, grid_y, None, skia.Color(255, 0, 0), blocked)
-                    else:
-                        debug_draw_grid_cell(grid_x, grid_y, fill_color, None, blocked)
+                        paint.setColor(skia.Color(255, 0, 0))
+
+                    # Draw hatched pattern
+                    x, y = grid_to_map(grid_x, grid_y)
+                    rect = skia.Rect.MakeXYWH(x, y, CELL_SIZE, CELL_SIZE)
+                    
+                    # Draw diagonal lines for hatching
+                    spacing = CELL_SIZE / 4
+                    for i in range(-4, 8):  # Extra lines for complete coverage
+                        start_x = rect.left() + (i * spacing)
+                        start_y = rect.top()
+                        end_x = start_x + CELL_SIZE
+                        end_y = start_y + CELL_SIZE
+                        canvas.drawLine(start_x, start_y, end_x, end_y, paint)
                         
