@@ -16,13 +16,13 @@ if TYPE_CHECKING:
     from map.mapelement import MapElement
 
 class ElementType(IntFlag):
-    """Bit flags for element types in occupancy grid."""
+    """Element types for occupancy grid cells."""
     NONE = 0
-    ROOM = auto()
-    PASSAGE = auto()
-    DOOR = auto()
-    STAIRS = auto()
-    BLOCKED = auto()  # For doorway areas that can't have props
+    ROOM = 1
+    PASSAGE = 2
+    DOOR = 3
+    STAIRS = 4
+    BLOCKED = 5
 
 class OccupancyGrid:
     """Tracks which grid spaces are occupied by map elements using a 2D array.
