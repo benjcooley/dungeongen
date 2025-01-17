@@ -181,8 +181,7 @@ def create_hatched_paint(color: int, pattern: HatchPattern = HatchPattern.NONE, 
     
     paint = skia.Paint(
         AntiAlias=True,
-        Style=skia.Paint.kFill_Style,
-        Color=color
+        Style=skia.Paint.kFill_Style
     )
 
     if pattern == HatchPattern.NONE:
@@ -195,10 +194,9 @@ def create_hatched_paint(color: int, pattern: HatchPattern = HatchPattern.NONE, 
         skia.TileMode.kRepeat
     )
     
-    # Combine the base color and the pattern shader
-    color_shader = skia.Shaders.Color(color)
-    composed_shader = skia.Shaders.Blend(skia.BlendMode.kSrcOver, shader, color_shader)
-    paint.setShader(composed_shader)
+    # Set the paint's color and shader
+    paint.setColor(color)
+    paint.setShader(shader)
 
     _last_key = key
     _last_pattern = paint
