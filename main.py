@@ -39,11 +39,13 @@ def main():
     # Draw the map with transform
     dungeon_map.render(canvas, transform)
     
-    # Debug draw the occupancy grid with same transform 
-    canvas.save()
-    canvas.concat(transform)
-    dungeon_map.occupancy.draw_debug(canvas)
-    canvas.restore()
+    # Debug draw the occupancy grid with same transform
+    from debug_config import debug_draw, DebugDrawFlags
+    if debug_draw.is_enabled(DebugDrawFlags.OCCUPANCY):
+        canvas.save()
+        canvas.concat(transform)
+        dungeon_map.occupancy.draw_debug(canvas)
+        canvas.restore()
 
     # Save as PNG with size tag in filename
     size_tag = next((tag for tag in options.tags if tag in ('small', 'medium', 'large')), 'medium')
