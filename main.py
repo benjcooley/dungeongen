@@ -25,7 +25,8 @@ def main():
     # Enable debug visualization and logging
     debug_draw.enable(DebugDrawFlags.OCCUPANCY, DebugDrawFlags.ELEMENT_NUMBERS)
     logger.debug_enabled = True
-    logger.log_level = LogTags.ARRANGEMENT  # Enable arrangement logging
+    logger.log_level = LogTags.ARRANGEMENT | LogTags.GENERATION  # Enable both log types
+    logger.log_to_console = True  # Ensure console output is enabled
     
     # Initialize Skia canvas
     surface = skia.Surface(options.canvas_width, options.canvas_height)
