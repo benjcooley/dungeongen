@@ -35,7 +35,7 @@ class DungeonLogger:
                 rich_tracebacks=True,
                 markup=True,
                 show_path=False,
-                console_width=200,  # Increase width to prevent wrapping
+                width=200,  # Increase width to prevent wrapping
             )
             rich_handler.setFormatter(logging.Formatter(
                 '%(message)s',
