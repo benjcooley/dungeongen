@@ -5,6 +5,7 @@ import math
 import skia
 from map.enums import Layers
 from constants import CELL_SIZE
+from debug_config import debug_draw, DebugDrawFlags
 
 if TYPE_CHECKING:
     from map.map import Map
@@ -165,7 +166,7 @@ class MapElement:
                 prop.draw(canvas, layer)
                 
         # Draw debug visualization on overlay layer if enabled
-        if layer == Layers.OVERLAY and self._options.debug_draw_prop_bounds:
+        if layer == Layers.OVERLAY and debug_draw.is_enabled(DebugDrawFlags.PROP_BOUNDS):
             debug_paint = skia.Paint(
                 AntiAlias=True,
                 Style=skia.Paint.kStroke_Style,
