@@ -317,6 +317,10 @@ class Map:
         from map.room import RoomType
 
         """Generate a random dungeon map using current options settings."""
+        logger.debug(LogTags.GENERATION, "\n" + "*" * 80)
+        logger.debug(LogTags.GENERATION, "PHASE 1: INITIALIZATION")
+        logger.debug(LogTags.GENERATION, "*" * 80)
+
         # Determine room count range based on size tag
         if Tags.LARGE in self.options.tags:
             min_rooms, max_rooms = 12, 24
@@ -335,14 +339,22 @@ class Map:
             f"  Depth: {initial_shape.depth}\n"
             f"  Offset: {initial_shape.breadth_offset}")
         
+        logger.debug(LogTags.GENERATION, "\n" + "*" * 80)
+        logger.debug(LogTags.GENERATION, "PHASE 2: CREATING STARTING ROOM")
+        logger.debug(LogTags.GENERATION, "*" * 80)
+
         # Create starting room at origin using shape's dimensions
         start_room = self.add_element(Room.from_grid(0, 0,
             initial_shape.breadth,  # Use breadth for width
             initial_shape.depth,    # Use depth for height
             room_type=initial_shape.room_type))
+        
+        logger.debug(LogTags.GENERATION, "\n" + "*" * 80)
+        logger.debug(LogTags.GENERATION, "PHASE 3: GENERATING ADDITIONAL ROOMS")
+        logger.debug(LogTags.GENERATION, "*" * 80)
             
         # Generate rooms using arrange_rooms function
-        _ = arrange_rooms(
+        rooms = arrange_rooms(
             self,
             min_rooms=min_rooms,
             max_rooms=max_rooms,
@@ -350,13 +362,28 @@ class Map:
             max_size=7,
             start_room=start_room
         )
+        logger.debug(LogTags.GENERATION, f"Generated {len(rooms)} rooms")
         
+        logger.debug(LogTags.GENERATION, "\n" + "*" * 80)
+        logger.debug(LogTags.GENERATION, "PHASE 4: CONNECTING ROOMS")
+        logger.debug(LogTags.GENERATION, "*" * 80)
+
         # Try connecting nearby rooms
-        try_connect_nearby_rooms(self, self.options)
+        connections = try_connect_nearby_rooms(self, self.options)
+        logger.debug(LogTags.GENERATION, f"Created {len(connections) if connections else 0} connections")
             
+        logger.debug(LogTags.GENERATION, "\n" + "*" * 80)
+        logger.debug(LogTags.GENERATION, "PHASE 5: DECORATING ROOMS")
+        logger.debug(LogTags.GENERATION, "*" * 80)
+
         # Decorate all elements
         for element in self._elements:
             decorate_room(element)
+        
+        logger.debug(LogTags.GENERATION, "\n" + "*" * 80)
+        logger.debug(LogTags.GENERATION, "GENERATION COMPLETE")
+        logger.debug(LogTags.GENERATION, f"Final element count: {len(self._elements)}")
+        logger.debug(LogTags.GENERATION, "*" * 80 + "\n")
 
     def recalculate_occupied(self) -> None:
         """Recalculate which grid spaces are occupied by map elements."""
