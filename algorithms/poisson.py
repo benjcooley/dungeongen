@@ -6,6 +6,7 @@ import skia
 from typing import List, Optional, Sequence
 from graphics.aliases import Point
 from graphics.shapes import Shape
+from logging_config import logger, LogTags
 
 class PoissonDiskSampler:
     def __init__(
@@ -137,5 +138,5 @@ def test_poisson_sampling():
         assert 0 <= x < width, f"X coordinate out of bounds: {x}"
         assert 0 <= y < height, f"Y coordinate out of bounds: {y}"
     
-    print(f"Generated {len(points)} points with minimum distance {min_distance}")
+    logger.debug(LogTags.GENERATION, f"Generated {len(points)} points with minimum distance {min_distance}")
     return points

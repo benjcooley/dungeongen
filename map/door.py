@@ -216,7 +216,7 @@ class Door(MapElement):
             # Create door rectangle
             door = Rectangle(door_x, door_y, door_width, door_height, inflate=1.0)
             if not door.is_valid:
-                print("Warning: Door rectangle is invalid!")
+                logger.warning(LogTags.VALIDATION, "Door rectangle is invalid!")
             
             # Draw filled door with thinner stroke
             fill_paint = skia.Paint(
