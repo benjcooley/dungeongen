@@ -11,7 +11,7 @@ from graphics.conversions import map_to_grid, map_rect_to_grid_points, map_to_gr
 from map._arrange.arrange_enums import RoomDirection
 from options import Options
 from debug_draw import debug_draw_grid_cell
-from debug_config import debug_draw, HatchPattern
+from debug_config import debug_draw
 
 if TYPE_CHECKING:
     from map.mapelement import MapElement
@@ -414,13 +414,10 @@ class OccupancyGrid:
                     # Get color based on element type
                     color = type_colors[element_type]
                     
-                    # Use cross pattern for blocked cells
-                    if blocked:
-                        hatch_pattern = HatchPattern.CROSS
-                    else:
-                        hatch_pattern = HatchPattern.DIAGONAL
+                    # Use darker alpha for blocked cells
+                    alpha = 200 if blocked else 128
 
-                    # Draw hatched rectangle
-                    debug_draw_grid_cell(grid_x, grid_y, color, hatch_pattern=hatch_pattern)
+                    # Draw semi-transparent rectangle
+                    debug_draw_grid_cell(grid_x, grid_y, color, alpha=alpha, blocked=blocked)
 
                         
