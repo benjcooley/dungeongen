@@ -78,7 +78,6 @@ class Options:
     map_border_cells: float = 4.0  # Number of cells padding around the map
     
     # Debug options
-    debug_verbose: bool = True  # Whether to print verbose debug messages
     debug_draw_prop_bounds: bool = False  # Whether to draw debug visualization of prop bounds in red
     debug_draw_grid: bool = False  # Whether to draw debug grid visualization
     debug_draw_grid_bounds: bool = False  # Whether to draw debug visualization of grid-aligned prop bounds in blue
