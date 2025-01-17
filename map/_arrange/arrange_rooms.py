@@ -178,6 +178,11 @@ def try_connect_rooms(
         elems.append(door2)
     elems.append(room2)
 
+    # Log the connections being made
+    map = room1.map
+    logger.debug(LogTags.ARRANGEMENT, 
+        f"Connecting elements: {[map.elements.index(e) for e in elems]}")
+
     for i in range(len(elems) - 1):
         elems[i].connect_to(elems[i + 1])
     
@@ -360,6 +365,7 @@ def arrange_rooms(
         start_room = dungeon_map.create_rectangular_room(0, 0,
             random.randint(min_size, max_size),
             random.randint(min_size, max_size))
+        logger.debug(LogTags.ARRANGEMENT, f"Created start room (element {len(dungeon_map.elements)-1})")
     
     # Initialize
     total_rooms = random.randint(min_rooms, max_rooms)
@@ -393,6 +399,12 @@ def arrange_rooms(
                 all_rooms.extend(new_rooms)
                 rooms_left -= len(new_rooms)
                 success = True
+                
+                # Log the new rooms that were created
+                for room in new_rooms:
+                    room_idx = dungeon_map.elements.index(room)
+                    logger.debug(LogTags.ARRANGEMENT, 
+                        f"Created new room (element {room_idx}) using {strategy_class.__name__}")
                 break
                 
         # If all attempts failed, just continue to next room in queue
