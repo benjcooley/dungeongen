@@ -477,7 +477,8 @@ class OccupancyGrid:
         Returns:
             Tuple of (is_valid, crossed_passage_indices)
             where is_valid is True if path is valid,
-            and crossed_passage_indices is a list of unique passage indices crossed
+            and crossed_passage_indices is a list of unique passage indices crossed,
+            even if validation fails
         """
         if len(path_points) < 2:
             return False, []
@@ -517,26 +518,28 @@ class OccupancyGrid:
             left_type, left_idx, _ = self.get_cell_info(x + perp_dx, y + perp_dy)
             right_type, right_idx, _ = self.get_cell_info(x - perp_dx, y - perp_dy)
             
-            # Check if blocked
-            if curr_blocked:
-                return False, []
-                
-            # If we're on a passage, check crossing rules
+            # Track passage crossings before validation
             if curr_type == ElementType.PASSAGE:
-                # Must have passage on left or right (no parallel passages)
-                if (left_type != ElementType.PASSAGE and right_type != ElementType.PASSAGE):
-                    return False, []
-                # Track unique passage crossings
                 if curr_idx not in crossed_passages:
                     crossed_passages.append(curr_idx)
                 if left_type == ElementType.PASSAGE and left_idx not in crossed_passages:
                     crossed_passages.append(left_idx)
                 if right_type == ElementType.PASSAGE and right_idx not in crossed_passages:
                     crossed_passages.append(right_idx)
+
+            # Check if blocked
+            if curr_blocked:
+                return False, crossed_passages
+                
+            # If we're on a passage, check crossing rules
+            if curr_type == ElementType.PASSAGE:
+                # Must have passage on left or right (no parallel passages)
+                if (left_type != ElementType.PASSAGE and right_type != ElementType.PASSAGE):
+                    return False, crossed_passages
             else:
                 # Regular point - just check sides are empty
                 if left_type != ElementType.NONE or right_type != ElementType.NONE:
-                    return False, []
+                    return False, crossed_passages
                     
         return True, crossed_passages
        
