@@ -343,7 +343,7 @@ class Map:
         # Get initial room shape using options
         from map._arrange.room_distribution import get_random_room_shape
         initial_shape = get_random_room_shape(options=self.options)
-        if self.options.debug_verbose:
+        if hasattr(self.options, 'debug_verbose') and self.options.debug_verbose:
             logger.debug(LogTags.GENERATION, 
                 f"\nInitial room shape selected:\n"
                 f"  Type: {initial_shape.room_type}\n"
