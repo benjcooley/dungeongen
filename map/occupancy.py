@@ -135,7 +135,7 @@ class GridProbe:
         self.facing = self.facing.turn_right()
     
     def check_direction(self, direction: ProbeDirection) -> ProbeResult:
-        """Check the cell in the given direction."""
+        """Check the cell in the given direction without moving."""
         dx, dy = direction.get_offset()
         element_type, element_idx, blocked = self.grid.get_cell_info(
             self.x + dx, self.y + dy
@@ -143,20 +143,36 @@ class GridProbe:
         return ProbeResult(element_type, element_idx, blocked)
     
     def check_forward(self) -> ProbeResult:
-        """Check the cell in front."""
+        """Check the cell in front without moving."""
         return self.check_direction(self.facing)
     
     def check_backward(self) -> ProbeResult:
-        """Check the cell behind."""
+        """Check the cell behind without moving."""
         return self.check_direction(self.facing.turn_around())
     
     def check_left(self) -> ProbeResult:
-        """Check the cell to the left."""
+        """Check the cell to the left without moving."""
         return self.check_direction(self.facing.turn_left())
     
     def check_right(self) -> ProbeResult:
-        """Check the cell to the right."""
+        """Check the cell to the right without moving."""
         return self.check_direction(self.facing.turn_right())
+        
+    def check_forward_left(self) -> ProbeResult:
+        """Check the cell diagonally forward-left without moving."""
+        return self.check_direction(ProbeDirection((self.facing.value - 1) % 8))
+        
+    def check_forward_right(self) -> ProbeResult:
+        """Check the cell diagonally forward-right without moving."""
+        return self.check_direction(ProbeDirection((self.facing.value + 1) % 8))
+        
+    def check_backward_left(self) -> ProbeResult:
+        """Check the cell diagonally backward-left without moving."""
+        return self.check_direction(ProbeDirection((self.facing.value - 3) % 8))
+        
+    def check_backward_right(self) -> ProbeResult:
+        """Check the cell diagonally backward-right without moving."""
+        return self.check_direction(ProbeDirection((self.facing.value + 3) % 8))
 
 class ElementType(IntFlag):
     """Element types for occupancy grid cells."""
