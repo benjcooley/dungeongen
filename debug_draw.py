@@ -123,8 +123,10 @@ def debug_draw_grid_cell(x: int, y: int, fill_color: int, outline_color: Optiona
     rect = skia.Rect(px, py, px + CELL_SIZE, py + CELL_SIZE)
         
     # Draw semi-transparent fill
+    color4f = skia.Color4f.FromColor(fill_color)
+    color4f.fA = alpha/255.0  # Directly set alpha component
     base_paint = skia.Paint(
-        Color4f=skia.Color4f.FromColor(fill_color).makeOpaque().makeAlpha(alpha/255.0),
+        Color4f=color4f,
         Style=skia.Paint.kFill_Style,
         AntiAlias=True
     )
