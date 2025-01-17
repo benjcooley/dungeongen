@@ -403,9 +403,6 @@ class OccupancyGrid:
         type_colors[ElementType.STAIRS] =   skia.Color(255, 255, 200) # STAIRS Light yellow
         type_colors[ElementType.BLOCKED] =  skia.Color(255, 0, 0),    # BLOCKED Light yellow
         
-        # Save current pattern and set to CROSS for blocked cells
-        saved_pattern = debug_draw.hatch_pattern
-        
         # Draw each occupied cell
         for grid_y in range(-self._origin_y, self.height - self._origin_y):
             for grid_x in range(-self._origin_x, self.width - self._origin_x):
@@ -424,7 +421,5 @@ class OccupancyGrid:
 
                     # Draw hatched rectangle
                     debug_draw.debug_draw_grid_cell(grid_x, grid_y, color, hatch_pattern=hatch_pattern)
-        
-        # Restore original pattern
-        debug_draw.hatch_pattern = saved_pattern
+
                         
