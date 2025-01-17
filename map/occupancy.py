@@ -392,12 +392,13 @@ class OccupancyGrid:
         """
         return not self.is_occupied(grid_x, grid_y)
         
-    def draw_debug(self, canvas: 'skia.Canvas', options: 'Options') -> None:
+    def draw_debug(self, canvas: 'skia.Canvas') -> None:
         """Draw debug visualization of occupied grid cells."""
         import skia
         from debug_draw import debug_draw_init, debug_draw_grid_cell
+        from debug_config import debug_draw, DebugDrawFlags
         
-        if not options.debug_draw_occupancy:
+        if not debug_draw.is_enabled(DebugDrawFlags.OCCUPANCY):
             return
             
         # Initialize debug drawing
