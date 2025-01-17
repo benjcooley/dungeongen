@@ -1,6 +1,7 @@
 """Debug drawing configuration."""
 
-from enum import Flag, auto
+from enum import Flag, auto, Enum
+import skia
 
 class HatchPattern(Enum):
     """Available hatch patterns for debug visualization."""
