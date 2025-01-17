@@ -216,7 +216,7 @@ class OccupancyGrid:
             for y in range(int(grid_rect.y), int(grid_rect.y + grid_rect.height)):
                 self.mark_cell(x, y, element_type, element_idx)
     
-    def check_rectangle(self, rect: Rectangle, inflate_cells: int = 1) -> bool:
+    def check_rectangle(self, grid_rect: Rectangle, inflate_cells: int = 1) -> bool:
         """Check if a rectangle area is unoccupied.
         
         Args:
@@ -226,22 +226,20 @@ class OccupancyGrid:
         Returns:
             True if area is valid (unoccupied), False otherwise
         """
-        # Convert to grid coordinates first, then inflate by grid cells
-        grid_rect = Rectangle(*map_to_grid_rect(rect)).inflated(inflate_cells)
-            
-        # Early out if no valid region
-        if not grid_rect.is_valid:
-            return False
+        grid_x1 = int(grid_rect.x) - inflate_cells
+        grid_y1 = int(grid_rect.y) - inflate_cells
+        grid_x2 = int(grid_rect.x + grid_rect.width) + (inflate_cells * 2)
+        grid_y2 = int(grid_rect.y + grid_rect.height) + (inflate_cells * 2)
             
         # Check each cell in grid coordinates
-        for grid_x in range(int(grid_rect.x), int(grid_rect.x + grid_rect.width)):
-            for grid_y in range(int(grid_rect.y), int(grid_rect.y + grid_rect.height)):
+        for grid_x in range(grid_x1, grid_x2):
+            for grid_y in range(grid_y1, grid_y2):
                 idx = self._to_grid_index(grid_x, grid_y)
                 if idx is not None and self._grid[idx] != 0:
                     return False
         return True
         
-    def check_circle(self, circle: Circle, inflate_cells: int = 1) -> bool:
+    def check_circle(self, grid_circle: Circle, inflate_cells: int = 1) -> bool:
         """Check if a circle area is unoccupied.
         
         Args:
@@ -252,21 +250,22 @@ class OccupancyGrid:
             True if area is valid (unoccupied), False otherwise
         """
         # Inflate circle first, then convert bounds to grid coordinates
-        inflated_circle = circle.inflated(inflate_cells * CELL_SIZE)
-        grid_rect = Rectangle(*map_to_grid_rect(inflated_circle.bounds))
+        grid_rect = grid_circle.bounds
             
-        # Early out if no valid region
-        if not grid_rect.is_valid:
-            return False
-            
+        grid_x1 = int(grid_rect.x) - inflate_cells
+        grid_y1 = int(grid_rect.y) - inflate_cells
+        grid_x2 = int(grid_rect.x + grid_rect.width) + (inflate_cells * 2)
+        grid_y2 = int(grid_rect.y + grid_rect.height) + (inflate_cells * 2)
+
         # Calculate grid-space circle parameters
-        grid_radius_sq = (circle.radius / CELL_SIZE) * (circle.radius / CELL_SIZE)
-        grid_center_x = circle.cx / CELL_SIZE
-        grid_center_y = circle.cy / CELL_SIZE
+        inflated_radius = grid_circle.radius + inflate_cells
+        grid_radius_sq = inflated_radius * inflated_radius
+        grid_center_x = grid_circle.cx
+        grid_center_y = grid_circle.cy
         
         # Check each cell in grid coordinates
-        for grid_x in range(int(grid_rect.x), int(grid_rect.x + grid_rect.width)):
-            for grid_y in range(int(grid_rect.y), int(grid_rect.y + grid_rect.height)):
+        for grid_x in range(grid_x1, grid_x2 + 1):
+            for grid_y in range(grid_y1, grid_y2 + 1):
                 # Test cell center against circle
                 dx = (grid_x + 0.5) - grid_center_x
                 dy = (grid_y + 0.5) - grid_center_y
@@ -276,7 +275,7 @@ class OccupancyGrid:
                         return False
         return True
 
-    def check_passage(self, rect: Rectangle, direction: RoomDirection) -> tuple[bool, list[int]]:
+    def check_passage(self, grid_rect: Rectangle, direction: RoomDirection, allow_crossing: bool = True) -> tuple[bool, list[int]]:
         """Check if a passage can be placed, allowing crossing other passages.
         
         The check area is inflated by 1 grid cell perpendicular to the passage direction
@@ -285,21 +284,17 @@ class OccupancyGrid:
         Args:
             rect: Rectangle defining passage bounds in map coordinates
             direction: Direction of passage growth
+            allow_crossing: True to allow crossing other passages
             
         Returns:
             Tuple of (is_valid, crossed_passage_indices)
             where is_valid is True if area is clear of rooms and blocked cells,
             and crossed_passage_indices is a list of indices of crossed passages
         """
-        draw_debug = self._options.debug_draw_occupancy
-
-        # Convert to grid coordinates
-        grid_rect = Rectangle(*map_to_grid_rect(rect))
-
         # Check the grid points at each end of the passage first
         p1: Tuple[int, int]
         p2: Tuple[int, int]
-        if direction in (RoomDirection.NORTH, RoomDirection.SOUTH):
+        if direction == RoomDirection.NORTH or direction == RoomDirection.SOUTH:
             p1 = (grid_rect.x, int(grid_rect.y - 1))
             p2 = (grid_rect.x, int(grid_rect.y + grid_rect.height))
         else:
@@ -312,7 +307,7 @@ class OccupancyGrid:
             if idx is None:
                 return False, []
             element_type, _, blocked = self._decode_cell(self._grid[idx])
-            if blocked or (element_type != ElementType.ROOM and element_type != ElementType.PASSAGE):
+            if blocked or (element_type != ElementType.NONE and element_type != ElementType.ROOM and element_type != ElementType.PASSAGE):
                 return False, []
         
         # Manually inflate perpendicular to direction
@@ -341,9 +336,12 @@ class OccupancyGrid:
                 idx = self._to_grid_index(grid_x, grid_y)
                 if idx is not None:
                     element_type, element_idx, blocked = self._decode_cell(self._grid[idx])
-                    if blocked or element_type == ElementType.ROOM:
+                    if blocked:
                         return False, []
-                    elif element_type == ElementType.PASSAGE and element_idx not in crossed_passages:
+                    if element_type != ElementType.NONE:
+                        if not allow_crossing or element_type != ElementType.PASSAGE:
+                            return False, []
+                    if element_type == ElementType.PASSAGE and element_idx not in crossed_passages:
                         crossed_passages.append(element_idx)
                         
         return True, crossed_passages

@@ -21,8 +21,9 @@ import random
 from typing import List, Optional, Tuple
 
 from constants import CELL_SIZE
+from graphics.conversions import map_to_grid
 from graphics.math import Point2D
-from graphics.shapes import Circle
+from graphics.shapes import Circle, Rectangle
 from map._arrange.arrange_utils import (
     get_room_direction, get_room_exit_grid_position,
     grid_points_to_grid_rect, grid_line_to_grid_deltas,
@@ -38,6 +39,7 @@ from map.occupancy import ElementType
 from map.passage import Passage
 from map.room import Room, RoomType
 from options import Options
+from tags import Tags
 
 class GrowDirection(Enum):
     """Direction to grow rooms during arrangement."""
@@ -45,7 +47,7 @@ class GrowDirection(Enum):
     BACKWARD = auto()
     BOTH = auto()
 
-def connect_rooms(
+def try_connect_rooms(
     room1: Room,
     room2: Room,
     start_door_type: Optional[DoorType] = None,
@@ -81,6 +83,7 @@ def connect_rooms(
     # Try to find an entry/exit point pair from the room that aren't blocked
     tries = 0
     max_tries = 1 if constrained else 4
+    valid = False
     while tries < max_tries:
 
         # Get connection points in grid coordinates
@@ -91,18 +94,25 @@ def connect_rooms(
             r1_x, r1_y = get_room_exit_grid_position(room1, r1_dir, wall_pos=random.random())
             r2_x, r2_y = get_room_exit_grid_position(room2, r2_dir, align_to=(r1_x, r1_y))
 
+        dist = grid_line_dist(r1_x, r1_y, r2_x, r2_y)
+
         # Check passage area in grid coordinates
         passage_rect = grid_points_to_grid_rect(r1_x, r1_y, r2_x, r2_y)
-        valid, crossed_passages = map.occupancy.check_passage(passage_rect, r1_dir)
-        
+        valid, crossed_passages = map.occupancy.check_passage(Rectangle(*passage_rect), r1_dir)
+
+        if crossed_passages and dist <= 3:
+            valid = False
+
         # We're constrained on both ends, so give up
         if not valid and constrained:
             return None, None, None
         
         tries += 1
 
+    if not valid:
+        return None, None, None
+
     # Make sure we don't have too many doors
-    dist = grid_line_dist(r1_x, r1_y, r2_x, r2_y)
     if start_door_type is not None and end_door_type is not None and dist <= 2:
         raise ValueError("Cannot have two doors in a passage 2 grids or smaller")
 
@@ -120,6 +130,7 @@ def connect_rooms(
         else DoorOrientation.VERTICAL
     )
 
+    door1: Optional[Door] = None
     if dist > 0 and start_door_type is not None and \
             map.occupancy.check_door(r1_x, r1_y):
         door1 = Door.from_grid(r1_x, r1_y, door_orientation, door_type=start_door_type)
@@ -128,6 +139,7 @@ def connect_rooms(
         r1_y += dy
         dist -= 1
 
+    door2: Optional[Door] = None
     if dist > 0 and end_door_type is not None and \
             map.occupancy.check_door(r2_x, r2_y):
         door2 = Door.from_grid(r2_x, r2_y, door_orientation, door_type=end_door_type)
@@ -136,6 +148,7 @@ def connect_rooms(
         r2_y -= dy
         dist -= 1
 
+    passage: Optional[Passage] = None
     if dist > 0:
         # Calculate passage rect in grid coordinates
         passage_x = min(r1_x, r2_x)
@@ -156,18 +169,18 @@ def connect_rooms(
     
     # Connect everything based on which door types were specified
     elems: List[MapElement] = [room1]    
-    if start_door_type is not None:
+    if door1 is not None:
         elems.append(door1)
     if passage is not None:
         elems.append(passage)
-    if end_door_type is not None:
+    if door2 is not None:
         elems.append(door2)
     elems.append(room2)
 
     for i in range(len(elems) - 1):
         elems[i].connect_to(elems[i + 1])
     
-    # Our passage to any passages we crossed
+    # Connect our passage to any passages it crossed
     if passage is not None:
         for i in crossed_passages:
             cross_passage = map.get_element_at(i)
@@ -213,8 +226,10 @@ def try_create_connected_room(
     if room_breadth * room_depth <= 0:
         raise ValueError("Room dimensions must be positive")
             
-    # Create room shape
-    room_shape = RoomShape(room_type or RoomType.RECTANGULAR, room_breadth, room_depth)
+    map = source_room.map
+
+    if room_type is None:
+        room_type = RoomType.RECTANGULAR
     
     # Get room rect in grid coordinates using arrange utils
     new_room_x, new_room_y, new_room_width, new_room_height = get_adjacent_room_rect(
@@ -222,33 +237,45 @@ def try_create_connected_room(
         wall_pos=0.5,
         align_to=align_to
     )
+    
+    if room_type == RoomType.CIRCULAR:
+        # Check if position is valid using occupancy grid
+        radius = room_breadth / 2
+        test_circle = Circle(new_room_x + radius, new_room_y + radius, radius)
+        if not map.occupancy.check_circle(test_circle):
+            return None, None, None, None
+    else:
+        test_rect = Rectangle(new_room_x, new_room_y, new_room_width, new_room_height)
+        if not map.occupancy.check_rectangle(test_rect):
+            return None, None, None, None
         
-    # Check if position is valid using occupancy grid
-    test_room = Room.from_grid(
+    # Create the new room and add it to the map
+    new_room = Room.from_grid(
         new_room_x,
         new_room_y, 
         new_room_width,
         new_room_height,
         room_type=room_type or RoomType.RECTANGULAR
     )
-    
-    if not source_room.map.occupancy.check_rectangle(test_room.bounds):
-        return None, None, None, None
-        
-    # Create the new room
-    new_room = source_room.map.add_element(test_room)
+    source_room.map.add_element(new_room)
     
     # Connect the rooms using the utility function
-    start_door_elem, passage, end_door_elem = connect_rooms(
+    start_door_elem, passage, end_door_elem = try_connect_rooms(
         source_room, new_room,
         start_door_type=start_door_type,
         end_door_type=end_door_type,
         align_to=align_to
     )
+
+    # Failed to connect rooms, remove the room and exit
+    if start_door_elem is None and passage is None and end_door_elem is None:
+        # Failed to connect rooms, remove the test room
+        source_room.map.remove_element(new_room)
+        return None, None, None, None
     
     return new_room, start_door_elem, passage, end_door_elem
 
-def try_connect_nearby_rooms(dungeon_map: Map, max_connection_dist: int = 5) -> None:
+def try_connect_nearby_rooms(dungeon_map: Map, options: Options) -> bool:
     """Try to connect rooms that are near each other but not already connected.
     
     Args:
@@ -258,6 +285,16 @@ def try_connect_nearby_rooms(dungeon_map: Map, max_connection_dist: int = 5) -> 
     # Get list of all rooms
     rooms = list(dungeon_map.rooms)
     
+    if Tags.LARGE in options.tags:
+        max_connection_dist = 9
+        max_tries = 12
+    elif Tags.MEDIUM in options.tags:
+        max_connection_dist = 7
+        max_tries = 10
+    else:
+        max_connection_dist = 5
+        max_tries = 8
+
     # Try connecting each room to others
     for source_room in rooms:
         # Get existing connections
@@ -265,11 +302,10 @@ def try_connect_nearby_rooms(dungeon_map: Map, max_connection_dist: int = 5) -> 
         
         # Get room bounds in grid coordinates
         bounds = source_room.bounds
-        grid_x = int(bounds.x / 64)
-        grid_y = int(bounds.y / 64)
+        grid_x, grid_y = map_to_grid(bounds.x, bounds.y)
         
         # Search in random positions within radius
-        for _ in range(8):  # Try up to 8 random positions per room
+        for _ in range(max_tries):  # Try up to 8 random positions per room
             # Pick random offset within max distance
             dx = random.randint(-max_connection_dist, max_connection_dist)
             dy = random.randint(-max_connection_dist, max_connection_dist)
@@ -288,12 +324,12 @@ def try_connect_nearby_rooms(dungeon_map: Map, max_connection_dist: int = 5) -> 
                     target_elem != source_room and
                     target_elem not in connected_rooms):
                     
-                    # Get direction between rooms
-                    direction = get_room_direction(source_room, target_elem)
-                    
                     # Try to connect the rooms
-                    connect_rooms(source_room, target_elem)
-
+                    d1, p, d2, = try_connect_rooms(source_room, target_elem)
+                    if d1 is not None or p is not None or d2 is not None:
+                        return True
+                    
+    return False
 
 def arrange_rooms(
     dungeon_map: Map,

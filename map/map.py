@@ -325,6 +325,11 @@ class Map:
         )
 
     def generate(self) -> None:
+        # Import here to avoid circular dependencies
+        from map._arrange.arrange_rooms import arrange_rooms, try_connect_nearby_rooms
+        from map._props.decorate_room import decorate_room
+        from map.room import RoomType
+
         """Generate a random dungeon map using current options settings."""
         # Determine room count range based on size tag
         if Tags.LARGE in self.options.tags:
@@ -333,11 +338,7 @@ class Map:
             min_rooms, max_rooms = 8, 12
         else:  # SMALL is default
             min_rooms, max_rooms = 3, 8
-        # Import here to avoid circular dependencies
-        from map._arrange.arrange_rooms import arrange_rooms, try_connect_nearby_rooms
-        from map._props.decorate_room import decorate_room
-        from map.room import RoomType
-        
+    
         # Get initial room shape using options
         from map._arrange.room_distribution import get_random_room_shape
         initial_shape = get_random_room_shape(options=self.options)
@@ -365,7 +366,7 @@ class Map:
         )
         
         # Try connecting nearby rooms
-        try_connect_nearby_rooms(self)
+        try_connect_nearby_rooms(self, self.options)
             
         # Decorate all elements
         for element in self._elements:

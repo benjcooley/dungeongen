@@ -1,5 +1,6 @@
 """Enums for room arrangement strategies."""
 from enum import Enum, auto
+from typing import Tuple
 
 class RoomDirection(Enum):
     """Direction to generate rooms."""
@@ -7,6 +8,28 @@ class RoomDirection(Enum):
     SOUTH = auto()
     EAST = auto()
     WEST = auto()
+        
+    def get_forward(self) -> Tuple[int, int]:
+        """Get the (dx, dy) grid offset for this direction."""
+        if self == RoomDirection.NORTH:
+            return (0, -1)
+        elif self == RoomDirection.SOUTH:
+            return (0, 1)
+        elif self == RoomDirection.EAST:
+            return (1, 0)
+        else:  # WEST
+            return (-1, 0)
+        
+    def get_left(self) -> Tuple[int, int]:
+        """Gets the (dx, dy) grid offset for the left direction."""
+        if self == RoomDirection.NORTH:
+            return (-1, 0)
+        elif self == RoomDirection.SOUTH:
+            return (1, 0)
+        elif self == RoomDirection.EAST:
+            return (0, -1)
+        else:
+            return (0, 1)  
 
     def get_opposite(self) -> 'RoomDirection':
         """Get the opposite direction."""

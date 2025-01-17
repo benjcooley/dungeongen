@@ -354,6 +354,17 @@ class Rectangle:
     When inflated, the rectangle's corners become rounded with radius equal to
     the inflation amount, effectively creating a rounded rectangle shape.
     """
+    def __init__(self, x: float, y: float, width: float, height: float, inflate: float = 0) -> None:
+        self.x = x  # Original x
+        self.y = y  # Original y
+        self.width = width  # Original width
+        self.height = height  # Original height
+        self._inflate = inflate
+        self._inflated_x = x - inflate
+        self._inflated_y = y - inflate
+        self._inflated_width = width + 2 * inflate
+        self._inflated_height = height + 2 * inflate
+        self._cached_path: skia.Path | None = None    
     
     @property
     def is_valid(self) -> bool:
@@ -366,13 +377,6 @@ class Rectangle:
         if not self.is_valid:
             return Rectangle(0, 0, 0, 0)
         return Rectangle(self._inflated_x, self._inflated_y, self._inflated_width, self._inflated_height)
-    
-    def __init__(self, x: float, y: float, width: float, height: float, inflate: float = 0) -> None:
-        self.x = x  # Original x
-        self.y = y  # Original y
-        self.width = width  # Original width
-        self.height = height  # Original height
-        self._inflate = inflate
         
     def __str__(self) -> str:
         return f"Rectangle(x={self.x:.1f}, y={self.y:.1f}, w={self.width:.1f}, h={self.height:.1f})"
@@ -432,18 +436,6 @@ class Rectangle:
             # For other shapes, use Skia path operations
             result = skia.Op(self.path, other.path, skia.PathOp.kDifference_PathOp)
             return result.isEmpty()
-    
-    def __init__(self, x: float, y: float, width: float, height: float, inflate: float = 0) -> None:
-        self.x = x  # Original x
-        self.y = y  # Original y
-        self.width = width  # Original width
-        self.height = height  # Original height
-        self._inflate = inflate
-        self._inflated_x = x - inflate
-        self._inflated_y = y - inflate
-        self._inflated_width = width + 2 * inflate
-        self._inflated_height = height + 2 * inflate
-        self._cached_path: skia.Path | None = None
         
     @property
     def path(self) -> skia.Path:

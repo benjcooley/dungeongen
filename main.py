@@ -10,14 +10,14 @@ from tags import Tags
 
 def main():
     # Get seed from environment variable or use default
-    seed = random.randint(1, 400000) 
+    # seed = random.randint(1, 400000) 
     # int(os.getenv('SEED', '44444'))
-    # seed = 122652
+    seed = 73912
     print(f"Using random seed: {seed}")
     random.seed(seed)
 
     options = Options()
-    options.tags.add(str(Tags.MEDIUM))  # Generate small-sized dungeons
+    options.tags.add(str(Tags.SMALL))  # Generate small-sized dungeons
     
     # Initialize Skia canvas
     surface = skia.Surface(options.canvas_width, options.canvas_height)
@@ -47,7 +47,7 @@ def main():
     # Save as PNG with size tag in filename
     size_tag = next((tag for tag in options.tags if tag in ('small', 'medium', 'large')), 'medium')
     image = surface.makeImageSnapshot()
-    image.save(f'{size_tag}_map.png', skia.kPNG)
+    image.save('map_output.png', skia.kPNG)
     
     # # Save as PDF
     # stream = skia.FILEWStream('map_output.pdf')

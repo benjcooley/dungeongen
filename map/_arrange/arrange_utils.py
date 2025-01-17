@@ -9,6 +9,7 @@ from graphics.shapes import Rectangle
 from map.room import Room, RoomType
 from constants import CELL_SIZE
 from graphics.aliases import Point
+from map._arrange.arrange_enums import RoomDirection
 
 def grid_points_to_grid_rect(grid_x1: int, grid_y1: int, grid_x2: int, grid_y2: int) -> Tuple[int, int, int, int]:
     """Convert grid points to a rectangle"""
@@ -27,40 +28,7 @@ def grid_line_to_grid_deltas(grid_x1: int, grid_y1: int, grid_x2: int, grid_y2: 
 # Assumes a vertical or horizontal line
 def grid_line_dist(grid_x1: int, grid_y1: int, grid_x2: int, grid_y2: int) -> int:
     """Get the distance between two grid points."""
-    return abs(grid_x2 - grid_x1) + abs(grid_y2 - grid_y1) + 1
-
-class RoomDirection(Enum):
-    """Direction to generate rooms."""
-    NORTH = auto()
-    SOUTH = auto()
-    EAST = auto()
-    WEST = auto()
-    
-    def get_opposite(self) -> 'RoomDirection':
-        """Get the opposite direction."""
-        return OPPOSITE_DIRECTIONS[self]
-        
-    def get_forward(self) -> Tuple[int, int]:
-        """Get the (dx, dy) grid offset for this direction."""
-        if self == RoomDirection.NORTH:
-            return (0, -1)
-        elif self == RoomDirection.SOUTH:
-            return (0, 1)
-        elif self == RoomDirection.EAST:
-            return (1, 0)
-        else:  # WEST
-            return (-1, 0)
-        
-    def get_left(self) -> Tuple[int, int]:
-        """Gets the (dx, dy) grid offset for the left direction."""
-        if self == RoomDirection.NORTH:
-            return (-1, 0)
-        elif self == RoomDirection.SOUTH:
-            return (1, 0)
-        elif self == RoomDirection.EAST:
-            return (0, -1)
-        else:
-            return (0, 1)   
+    return abs(grid_x2 - grid_x1) + abs(grid_y2 - grid_y1) + 1 
 
 # Mapping of directions to their opposites
 OPPOSITE_DIRECTIONS: Dict[RoomDirection, RoomDirection] = {
