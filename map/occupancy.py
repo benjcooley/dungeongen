@@ -2,7 +2,8 @@
 
 from typing import List, Optional, Set, Tuple, TYPE_CHECKING
 from array import array
-from enum import IntFlag, auto
+from enum import IntFlag, auto, Enum
+from dataclasses import dataclass
 import skia
 from logging_config import logger, LogTags
 from graphics.shapes import Rectangle, Circle
@@ -15,6 +16,147 @@ from debug_config import debug_draw
 
 if TYPE_CHECKING:
     from map.mapelement import MapElement
+
+class ProbeDirection(Enum):
+    """Directions for grid navigation probe.
+    
+    Directions are numbered clockwise from 0-7:
+    0 = North
+    1 = Northeast
+    2 = East
+    3 = Southeast
+    4 = South
+    5 = Southwest
+    6 = West
+    7 = Northwest
+    """
+    NORTH = 0
+    NORTHEAST = 1
+    EAST = 2
+    SOUTHEAST = 3
+    SOUTH = 4
+    SOUTHWEST = 5
+    WEST = 6
+    NORTHWEST = 7
+    
+    def turn_left(self) -> 'ProbeDirection':
+        """Return the direction 90 degrees to the left."""
+        return ProbeDirection((self.value - 2) % 8)
+    
+    def turn_right(self) -> 'ProbeDirection':
+        """Return the direction 90 degrees to the right."""
+        return ProbeDirection((self.value + 2) % 8)
+    
+    def turn_around(self) -> 'ProbeDirection':
+        """Return the opposite direction."""
+        return ProbeDirection((self.value + 4) % 8)
+    
+    def get_offset(self) -> tuple[int, int]:
+        """Get the grid coordinate offset for this direction."""
+        offsets = {
+            ProbeDirection.NORTH: (0, -1),
+            ProbeDirection.NORTHEAST: (1, -1),
+            ProbeDirection.EAST: (1, 0),
+            ProbeDirection.SOUTHEAST: (1, 1),
+            ProbeDirection.SOUTH: (0, 1),
+            ProbeDirection.SOUTHWEST: (-1, 1),
+            ProbeDirection.WEST: (-1, 0),
+            ProbeDirection.NORTHWEST: (-1, -1)
+        }
+        return offsets[self]
+
+@dataclass
+class ProbeResult:
+    """Results from probing a grid cell."""
+    element_type: 'ElementType'
+    element_idx: int
+    blocked: bool
+    
+    @property
+    def is_empty(self) -> bool:
+        """Check if cell is completely empty."""
+        return self.element_type == ElementType.NONE and not self.blocked
+    
+    @property
+    def is_blocked(self) -> bool:
+        """Check if cell is blocked."""
+        return self.blocked
+    
+    @property
+    def is_passage(self) -> bool:
+        """Check if cell contains a passage."""
+        return self.element_type == ElementType.PASSAGE
+    
+    @property
+    def is_room(self) -> bool:
+        """Check if cell contains a room."""
+        return self.element_type == ElementType.ROOM
+    
+    @property
+    def is_door(self) -> bool:
+        """Check if cell contains a door."""
+        return self.element_type == ElementType.DOOR
+
+class GridProbe:
+    """Virtual explorer for navigating the occupancy grid.
+    
+    The probe maintains a position and facing direction, and can:
+    - Move forward/backward
+    - Turn left/right
+    - Check cells in any direction
+    - Follow passages
+    """
+    
+    def __init__(self, grid: 'OccupancyGrid', x: int, y: int, 
+                 facing: ProbeDirection = ProbeDirection.NORTH):
+        self.grid = grid
+        self.x = x
+        self.y = y
+        self.facing = facing
+    
+    def move_forward(self) -> None:
+        """Move one cell in the facing direction."""
+        dx, dy = self.facing.get_offset()
+        self.x += dx
+        self.y += dy
+    
+    def move_backward(self) -> None:
+        """Move one cell opposite the facing direction."""
+        dx, dy = self.facing.turn_around().get_offset()
+        self.x += dx
+        self.y += dy
+    
+    def turn_left(self) -> None:
+        """Turn 90 degrees left."""
+        self.facing = self.facing.turn_left()
+    
+    def turn_right(self) -> None:
+        """Turn 90 degrees right."""
+        self.facing = self.facing.turn_right()
+    
+    def check_direction(self, direction: ProbeDirection) -> ProbeResult:
+        """Check the cell in the given direction."""
+        dx, dy = direction.get_offset()
+        element_type, element_idx, blocked = self.grid.get_cell_info(
+            self.x + dx, self.y + dy
+        )
+        return ProbeResult(element_type, element_idx, blocked)
+    
+    def check_forward(self) -> ProbeResult:
+        """Check the cell in front."""
+        return self.check_direction(self.facing)
+    
+    def check_backward(self) -> ProbeResult:
+        """Check the cell behind."""
+        return self.check_direction(self.facing.turn_around())
+    
+    def check_left(self) -> ProbeResult:
+        """Check the cell to the left."""
+        return self.check_direction(self.facing.turn_left())
+    
+    def check_right(self) -> ProbeResult:
+        """Check the cell to the right."""
+        return self.check_direction(self.facing.turn_right())
 
 class ElementType(IntFlag):
     """Element types for occupancy grid cells."""
