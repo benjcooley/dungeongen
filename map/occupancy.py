@@ -497,17 +497,23 @@ class OccupancyGrid:
         left_type, _, _ = self.get_cell_info(x + perp_dx, y + perp_dy)
         right_type, _, _ = self.get_cell_info(x - perp_dx, y - perp_dy)
         if left_type != ElementType.NONE or right_type != ElementType.NONE:
-            return False, []
+            return False, crossed_passages
         # Check behind is room
         back_type, _, _ = self.get_cell_info(x - dx, y - dy)
         if back_type != ElementType.ROOM:
-            return False, []
+            return False, crossed_passages
             
-        # Check last point - needs room in front
+        # Check last point - needs empty sides and room in front
         x, y = path_points[-1]
+        # Check left and right are empty
+        left_type, _, _ = self.get_cell_info(x + perp_dx, y + perp_dy)
+        right_type, _, _ = self.get_cell_info(x - perp_dx, y - perp_dy)
+        if left_type != ElementType.NONE or right_type != ElementType.NONE:
+            return False, crossed_passages
+        # Check front is room
         front_type, _, _ = self.get_cell_info(x + dx, y + dy)
         if front_type != ElementType.ROOM:
-            return False, []
+            return False, crossed_passages
             
         # Check intermediate points
         for i in range(1, len(path_points)-1):
