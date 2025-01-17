@@ -395,7 +395,7 @@ class OccupancyGrid:
         """Draw debug visualization of occupied grid cells."""
             
         # Define colors for different element types
-        type_colors = list(range(7))
+        type_colors = list(range(5))
         type_colors[ElementType.NONE] =     skia.Color(0, 0, 0)       # NONE Light red
         type_colors[ElementType.ROOM] =     skia.Color(255, 200, 200) # ROOM Light red
         type_colors[ElementType.PASSAGE] =  skia.Color(200, 255, 200) # PASSAGE Light green
