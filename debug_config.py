@@ -58,23 +58,28 @@ class DebugDraw:
         # Create matrix for pattern orientation
         matrix = skia.Matrix()
         
+        # Create a path for the line pattern
+        path = skia.Path()
+        path.moveTo(0, 0)
+        path.lineTo(spacing, 0)
+
         if self.hatch_pattern == HatchPattern.DIAGONAL:
             matrix.setRotate(45)
-            effect = skia.PathEffect.MakeLine2D(spacing, matrix)
+            effect = skia.Path1DPathEffect.Make(path, spacing, 0, matrix)
         elif self.hatch_pattern == HatchPattern.CROSS:
             # Combine two diagonal patterns
-            effect1 = skia.PathEffect.MakeLine2D(spacing, skia.Matrix().setRotate(45))
-            effect2 = skia.PathEffect.MakeLine2D(spacing, skia.Matrix().setRotate(-45))
+            effect1 = skia.Path1DPathEffect.Make(path, spacing, 0, skia.Matrix().setRotate(45))
+            effect2 = skia.Path1DPathEffect.Make(path, spacing, 0, skia.Matrix().setRotate(-45))
             effect = skia.PathEffect.MakeSum(effect1, effect2)
         elif self.hatch_pattern == HatchPattern.HORIZONTAL:
-            effect = skia.PathEffect.MakeLine2D(spacing, matrix)
+            effect = skia.Path1DPathEffect.Make(path, spacing, 0, matrix)
         elif self.hatch_pattern == HatchPattern.VERTICAL:
             matrix.setRotate(90)
-            effect = skia.PathEffect.MakeLine2D(spacing, matrix)
+            effect = skia.Path1DPathEffect.Make(path, spacing, 0, matrix)
         else:  # GRID
             # Combine horizontal and vertical patterns
-            effect1 = skia.PathEffect.MakeLine2D(spacing, skia.Matrix())
-            effect2 = skia.PathEffect.MakeLine2D(spacing, skia.Matrix().setRotate(90))
+            effect1 = skia.Path1DPathEffect.Make(path, spacing, 0, skia.Matrix())
+            effect2 = skia.Path1DPathEffect.Make(path, spacing, 0, skia.Matrix().setRotate(90))
             effect = skia.PathEffect.MakeSum(effect1, effect2)
 
         paint.setPathEffect(effect)
