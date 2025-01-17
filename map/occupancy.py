@@ -398,6 +398,7 @@ class OccupancyGrid:
         from debug_draw import debug_draw_init, debug_draw_grid_cell
         from debug_config import debug_draw, DebugDrawFlags
         
+        # Test if debug drawing is enabled
         if not debug_draw.is_enabled(DebugDrawFlags.OCCUPANCY):
             return
             

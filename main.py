@@ -39,10 +39,6 @@ def main():
     # Draw the map with transform
     dungeon_map.render(canvas, transform)
     
-    # Enable debug drawing flags
-    from debug_config import debug_draw, DebugDrawFlags
-    debug_draw.enable(DebugDrawFlags.OCCUPANCY, DebugDrawFlags.GRID)
-    
     # Debug draw the occupancy grid with same transform 
     canvas.save()
     canvas.concat(transform)
