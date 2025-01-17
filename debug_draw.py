@@ -156,7 +156,7 @@ def create_hatched_paint(color: int, pattern: HatchPattern = HatchPattern.NONE, 
 
 def debug_draw_grid_cell(x: int, y: int, fill_color: int, outline_color: Optional[int] = None, 
                         blocked: bool = False, pattern: HatchPattern = HatchPattern.NONE) -> None:
-    """Draw a filled grid cell with optional outline and blocked marker.
+    """Draw a filled grid cell with optional outline and pattern.
     
     Args:
         x: Grid x coordinate
@@ -164,6 +164,7 @@ def debug_draw_grid_cell(x: int, y: int, fill_color: int, outline_color: Optiona
         fill_color: Skia color for cell fill
         outline_color: Optional Skia color for cell outline
         blocked: Whether to draw an X marking the cell as blocked
+        pattern: Optional hatch pattern to apply
     """
     if _debug_canvas is None:
         return
@@ -171,20 +172,35 @@ def debug_draw_grid_cell(x: int, y: int, fill_color: int, outline_color: Optiona
     # Convert grid coords to pixels
     px = x * CELL_SIZE
     py = y * CELL_SIZE
+    rect = skia.Rect(px, py, px + CELL_SIZE, py + CELL_SIZE)
     
-    # Draw filled cell if fill color provided
+    # Draw base fill
     if fill_color is not None:
-        fill_paint = create_hatched_paint(fill_color, pattern, spacing=CELL_SIZE/4)
-        _debug_canvas.drawRect(skia.Rect(px, py, px + CELL_SIZE, py + CELL_SIZE), fill_paint)
+        base_paint = skia.Paint(
+            Color=fill_color,
+            Style=skia.Paint.kFill_Style,
+            AntiAlias=True
+        )
+        _debug_canvas.drawRect(rect, base_paint)
+    
+    # Draw pattern if specified
+    if pattern != HatchPattern.NONE:
+        pattern_paint = create_hatched_paint(
+            skia.Color(0, 0, 0, 80),  # Semi-transparent black
+            pattern=pattern,
+            spacing=CELL_SIZE/4
+        )
+        _debug_canvas.drawRect(rect, pattern_paint)
     
     # Draw outline if specified
     if outline_color is not None:
         outline_paint = skia.Paint(
             Color=outline_color,
             Style=skia.Paint.kStroke_Style,
-            StrokeWidth=2
+            StrokeWidth=2,
+            AntiAlias=True
         )
-        _debug_canvas.drawRect(skia.Rect(px, py, px + CELL_SIZE, py + CELL_SIZE), outline_paint)
+        _debug_canvas.drawRect(rect, outline_paint)
     
     # Draw X if blocked
     if blocked:
