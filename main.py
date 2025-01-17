@@ -22,11 +22,7 @@ def main():
     
     # Enable debug visualization
     from debug_config import debug_draw, DebugDrawFlags
-    debug_draw.enable(
-        DebugDrawFlags.OCCUPANCY,
-        DebugDrawFlags.GRID,
-        DebugDrawFlags.GRID_BOUNDS
-    )
+    debug_draw.enable(DebugDrawFlags.OCCUPANCY)
     
     # Initialize Skia canvas
     surface = skia.Surface(options.canvas_width, options.canvas_height)
