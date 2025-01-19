@@ -675,19 +675,15 @@ class OccupancyGrid:
             curr_direction = ProbeDirection(self._points[idx + 2])
             probe.facing = curr_direction
             
-            # Quick side checks first (most common failure)
-            if not probe.check_left_empty() or not probe.check_right_empty():
-                if debug_enabled:
-                    self._debug_passage_points.append(
-                        self.PassageCheckPoint(probe.x, probe.y, probe.facing, False, False, False)
-                    )
-                return False, self._crossed_passages[:cross_count]
-            
-            # Track valid point
-            if debug_enabled:
-                self._debug_passage_points.append(
-                    self.PassageCheckPoint(probe.x, probe.y, probe.facing, True, False, False)
-                )
+            # Check endpoints first
+            if i == 0:
+                back = probe.check_backward()
+                if not (back.is_room or back.is_passage):
+                    return False, self._crossed_passages[:cross_count]
+            elif i == len(points) - 1 and not allow_dead_end:
+                forward = probe.check_forward()
+                if not (forward.is_room or forward.is_passage):
+                    return False, self._crossed_passages[:cross_count]
             
             # Check if corner (direction changes from previous point)
             if i > 0 and curr_direction != prev_direction:
@@ -724,15 +720,19 @@ class OccupancyGrid:
                         
                 continue
             
-            # Check endpoints
-            if i == 0:
-                back = probe.check_backward()
-                if not (back.is_room or back.is_passage):
-                    return False, self._crossed_passages[:cross_count]
-            elif i == len(points) - 1 and not allow_dead_end:
-                forward = probe.check_forward()
-                if not (forward.is_room or forward.is_passage):
-                    return False, self._crossed_passages[:cross_count]
+            # Normal point validation
+            if not probe.check_left_empty() or not probe.check_right_empty():
+                if debug_enabled:
+                    self._debug_passage_points.append(
+                        self.PassageCheckPoint(probe.x, probe.y, probe.facing, False, False, False)
+                    )
+                return False, self._crossed_passages[:cross_count]
+            
+            # Track valid point
+            if debug_enabled:
+                self._debug_passage_points.append(
+                    self.PassageCheckPoint(probe.x, probe.y, probe.facing, True, False, False)
+                )
             
             # Quick check for blocked cells first
             curr = probe.check_forward()
