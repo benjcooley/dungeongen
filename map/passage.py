@@ -171,44 +171,70 @@ class Passage(MapElement):
         if start_direction == end_direction and (sx == ex or sy == ey):
             return [start, end]
             
-        # Break path into series of L-shaped segments
+        # Calculate valid corner region
+        # This creates a triangle of valid space bounded by the start/end points
         points = [start]
-        curr_x, curr_y = sx, sy
-        curr_dir = start_direction
         
-        while (curr_x, curr_y) != end:
-            # Calculate remaining distance
-            rem_dx = ex - curr_x
-            rem_dy = ey - curr_y
+        # Take minimum length step in start direction
+        curr_x, curr_y = sx, sy
+        if start_direction == RoomDirection.NORTH:
+            curr_y -= min_segment_length
+        elif start_direction == RoomDirection.SOUTH:
+            curr_y += min_segment_length
+        elif start_direction == RoomDirection.EAST:
+            curr_x += min_segment_length
+        else:  # WEST
+            curr_x -= min_segment_length
+        points.append((curr_x, curr_y))
+        
+        # Calculate remaining distance after initial step
+        rem_dx = ex - curr_x
+        rem_dy = ey - curr_y
+        
+        # If we can reach end with remaining distance, try random corner points
+        if abs(rem_dx) >= min_segment_length and abs(rem_dy) >= min_segment_length:
+            # Calculate valid corner region
+            min_x = min(curr_x, ex)
+            max_x = max(curr_x, ex)
+            min_y = min(curr_y, ey)
+            max_y = max(curr_y, ey)
             
-            # If we can reach end with single L-shape meeting min length, do it
-            if abs(rem_dx) >= min_segment_length and abs(rem_dy) >= min_segment_length:
-                # Add corner point based on current direction
-                if curr_dir in (RoomDirection.NORTH, RoomDirection.SOUTH):
-                    points.append((curr_x, ey))
-                    curr_y = ey
-                else:
-                    points.append((ex, curr_y))
-                    curr_x = ex
-                points.append(end)
-                return points if curr_dir == end_direction else None
+            # Try a few random corner points
+            import random
+            for _ in range(5):
+                # Pick random point in valid region
+                corner_x = random.randint(min_x + min_segment_length, max_x - min_segment_length)
+                corner_y = random.randint(min_y + min_segment_length, max_y - min_segment_length)
                 
-            # Otherwise take a min-length step in current direction
-            if curr_dir == RoomDirection.NORTH:
-                curr_y -= min_segment_length
-            elif curr_dir == RoomDirection.SOUTH:
-                curr_y += min_segment_length
-            elif curr_dir == RoomDirection.EAST:
-                curr_x += min_segment_length
-            else:  # WEST
-                curr_x -= min_segment_length
-            points.append((curr_x, curr_y))
-            
-            # Turn 90 degrees toward destination
-            if curr_dir in (RoomDirection.NORTH, RoomDirection.SOUTH):
-                curr_dir = RoomDirection.EAST if rem_dx > 0 else RoomDirection.WEST
-            else:
-                curr_dir = RoomDirection.SOUTH if rem_dy > 0 else RoomDirection.NORTH
+                # Create path through corner point
+                corner_points = list(points)  # Copy current points
+                
+                # Add first segment to corner
+                if start_direction in (RoomDirection.NORTH, RoomDirection.SOUTH):
+                    corner_points.append((curr_x, corner_y))
+                    corner_points.append((corner_x, corner_y))
+                else:
+                    corner_points.append((corner_x, curr_y))
+                    corner_points.append((corner_x, corner_y))
+                    
+                # Add final segment to end
+                if end_direction in (RoomDirection.NORTH, RoomDirection.SOUTH):
+                    corner_points.append((corner_x, ey))
+                else:
+                    corner_points.append((ex, corner_y))
+                corner_points.append(end)
+                
+                # Verify all segments meet minimum length
+                valid = True
+                for i in range(len(corner_points) - 1):
+                    x1, y1 = corner_points[i]
+                    x2, y2 = corner_points[i + 1]
+                    if abs(x2 - x1) + abs(y2 - y1) < min_segment_length:
+                        valid = False
+                        break
+                        
+                if valid:
+                    return corner_points
                 
         return None
 
