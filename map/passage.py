@@ -171,70 +171,54 @@ class Passage(MapElement):
         if start_direction == end_direction and (sx == ex or sy == ey):
             return [start, end]
             
-        # Calculate valid corner region
-        # This creates a triangle of valid space bounded by the start/end points
-        points = [start]
-        
-        # Take minimum length step in start direction
-        curr_x, curr_y = sx, sy
-        if start_direction == RoomDirection.NORTH:
-            curr_y -= min_segment_length
-        elif start_direction == RoomDirection.SOUTH:
-            curr_y += min_segment_length
-        elif start_direction == RoomDirection.EAST:
-            curr_x += min_segment_length
-        else:  # WEST
-            curr_x -= min_segment_length
-        points.append((curr_x, curr_y))
-        
-        # Calculate remaining distance after initial step
-        rem_dx = ex - curr_x
-        rem_dy = ey - curr_y
-        
-        # If we can reach end with remaining distance, try random corner points
-        if abs(rem_dx) >= min_segment_length and abs(rem_dy) >= min_segment_length:
-            # Calculate valid corner region
-            min_x = min(curr_x, ex)
-            max_x = max(curr_x, ex)
-            min_y = min(curr_y, ey)
-            max_y = max(curr_y, ey)
+        # Find corner point for L-shape
+        corner_x, corner_y = sx, sy
+        if start_direction in (RoomDirection.NORTH, RoomDirection.SOUTH):
+            corner_y = ey
+        else:
+            corner_x = ex
             
-            # Try a few random corner points
-            import random
-            for _ in range(5):
-                # Pick random point in valid region
-                corner_x = random.randint(min_x + min_segment_length, max_x - min_segment_length)
-                corner_y = random.randint(min_y + min_segment_length, max_y - min_segment_length)
+        # Helper function to subdivide a run
+        def subdivide_run(start_pt: tuple[int, int], end_pt: tuple[int, int]) -> list[tuple[int, int]]:
+            x1, y1 = start_pt
+            x2, y2 = end_pt
+            
+            # Calculate run length
+            run_length = abs(x2 - x1) if x1 != x2 else abs(y2 - y1)
+            
+            # Get unit direction vector
+            dx = 1 if x2 > x1 else -1 if x2 < x1 else 0
+            dy = 1 if y2 > y1 else -1 if y2 < y1 else 0
+            
+            points = [start_pt]
+            curr_x, curr_y = x1, y1
+            remaining = run_length
+            
+            # While we can fit at least 2 more segments
+            while remaining >= 2 * min_segment_length:
+                # Choose random length for this segment
+                d = random.randint(min_segment_length, remaining - min_segment_length)
                 
-                # Create path through corner point
-                corner_points = list(points)  # Copy current points
+                # Move in current direction
+                curr_x += dx * d
+                curr_y += dy * d
+                points.append((curr_x, curr_y))
                 
-                # Add first segment to corner
-                if start_direction in (RoomDirection.NORTH, RoomDirection.SOUTH):
-                    corner_points.append((curr_x, corner_y))
-                    corner_points.append((corner_x, corner_y))
-                else:
-                    corner_points.append((corner_x, curr_y))
-                    corner_points.append((corner_x, corner_y))
-                    
-                # Add final segment to end
-                if end_direction in (RoomDirection.NORTH, RoomDirection.SOUTH):
-                    corner_points.append((corner_x, ey))
-                else:
-                    corner_points.append((ex, corner_y))
-                corner_points.append(end)
+                remaining -= d
                 
-                # Verify all segments meet minimum length
-                valid = True
-                for i in range(len(corner_points) - 1):
-                    x1, y1 = corner_points[i]
-                    x2, y2 = corner_points[i + 1]
-                    if abs(x2 - x1) + abs(y2 - y1) < min_segment_length:
-                        valid = False
-                        break
-                        
-                if valid:
-                    return corner_points
+            # Add final segment if any length remains
+            if remaining > 0:
+                curr_x += dx * remaining
+                curr_y += dy * remaining
+                points.append((curr_x, curr_y))
+                
+            return points
+            
+        # Subdivide first run (start to corner)
+        points = subdivide_run(start, (corner_x, corner_y))
+        
+        # Subdivide second run (corner to end)
+        points.extend(subdivide_run((corner_x, corner_y), end)[1:])  # Skip first point as it's already added
                 
         return None
 
