@@ -587,7 +587,7 @@ class OccupancyGrid:
             if i > 0 and curr_direction != prev_direction:
                 # Calculate turn direction by comparing current to previous
                 turn_right = (curr_direction.value - prev_direction.value) % 8 == 2
-                    check_dirs = (
+                check_dirs = (
                     ProbeDirection.NORTHEAST, 
                     ProbeDirection.SOUTHEAST
                 ) if turn_right else (
