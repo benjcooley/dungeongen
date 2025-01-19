@@ -207,10 +207,8 @@ class GridProbe:
     def check_direction_empty(self, direction: ProbeDirection) -> bool:
         """Check if the cell in the given direction is empty."""
         dx, dy = direction.relative_to(self._facing)
-        element_type, _, _ = self.grid.get_cell_info(
-            self.x + dx, self.y + dy
-        )
-        return element_type == ElementType.NONE
+        idx = self.grid._to_grid_index(self.x + dx, self.y + dy)
+        return idx is None or self.grid._grid[idx] == 0
     
     def check_forward(self) -> ProbeResult:
         """Check the cell in front without moving."""
