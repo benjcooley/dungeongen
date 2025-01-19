@@ -13,7 +13,7 @@ from graphics.conversions import map_to_grid, map_rect_to_grid_points, map_to_gr
 from map._arrange.arrange_enums import RoomDirection
 from options import Options
 from debug_draw import debug_draw_grid_cell
-from debug_config import debug_draw
+from debug_config import debug_draw, DebugDrawFlags
 
 if TYPE_CHECKING:
     from map.mapelement import MapElement
