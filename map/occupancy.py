@@ -80,18 +80,40 @@ class ProbeDirection(Enum):
             return ProbeDirection.FORWARD
     
     def get_offset(self) -> tuple[int, int]:
-        """Get the grid coordinate offset for this direction."""
-        offsets = {
-            ProbeDirection.NORTH: (0, -1),
-            ProbeDirection.NORTHEAST: (1, -1),
-            ProbeDirection.EAST: (1, 0),
-            ProbeDirection.SOUTHEAST: (1, 1),
-            ProbeDirection.SOUTH: (0, 1),
-            ProbeDirection.SOUTHWEST: (-1, 1),
-            ProbeDirection.WEST: (-1, 0),
-            ProbeDirection.NORTHWEST: (-1, -1)
-        }
-        return offsets[self]
+        """Get the grid coordinate offset for this direction relative to FORWARD."""
+        # Base offsets for FORWARD direction
+        offsets = [
+            (0, -1),  # FORWARD
+            (1, -1),  # FORWARD_RIGHT
+            (1, 0),   # RIGHT
+            (1, 1),   # BACK_RIGHT
+            (0, 1),   # BACK
+            (-1, 1),  # BACK_LEFT
+            (-1, 0),  # LEFT
+            (-1, -1)  # FORWARD_LEFT
+        ]
+        return offsets[self.value]
+        
+    def relative_to(self, facing: 'ProbeDirection') -> tuple[int, int]:
+        """Get offset relative to a facing direction.
+        
+        Args:
+            facing: The direction being faced
+            
+        Returns:
+            Tuple of (dx, dy) grid coordinate offsets
+        """
+        # Calculate how many 45-degree rotations needed
+        rotation = facing.value * 2
+        
+        # Get base offset
+        dx, dy = self.get_offset()
+        
+        # Rotate offset by facing direction
+        for _ in range(rotation):
+            dx, dy = -dy, dx
+            
+        return dx, dy
 
 @dataclass
 class ProbeResult:
@@ -175,7 +197,7 @@ class GridProbe:
     
     def check_direction(self, direction: ProbeDirection) -> ProbeResult:
         """Check the cell in the given direction without moving."""
-        dx, dy = direction.get_offset()
+        dx, dy = direction.relative_to(self._facing)
         element_type, element_idx, blocked = self.grid.get_cell_info(
             self.x + dx, self.y + dy
         )
