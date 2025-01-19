@@ -22,21 +22,66 @@ class Passage(MapElement):
     """
     
     def __init__(self, grid_points: List[Tuple[int, int]], 
-                 start_direction: RoomDirection,
-                 end_direction: RoomDirection,
+                 start_direction: Optional[RoomDirection] = None,
+                 end_direction: Optional[RoomDirection] = None,
                  allow_dead_end: bool = False) -> None:
         """Create a passage from a list of grid points.
         
         Args:
             grid_points: List of (x,y) grid coordinates defining the passage path
-            start_direction: Direction at start of passage
-            end_direction: Direction at end of passage
+            start_direction: Direction at start of passage (optional if can be determined from points)
+            end_direction: Direction at end of passage (optional if can be determined from points)
             allow_dead_end: Whether this passage can end without connecting to anything
+            
+        Raises:
+            ValueError: If directions cannot be determined from points and aren't provided
         """
+        if not grid_points:
+            raise ValueError("Passage must have at least one grid point")
+            
         self._grid_points = grid_points
-        self._start_direction = start_direction
-        self._end_direction = end_direction
         self._allow_dead_end = allow_dead_end
+        
+        # For single point passages, both directions must be provided
+        if len(grid_points) == 1:
+            if start_direction is None or end_direction is None:
+                raise ValueError("Single point passages must specify both start and end directions")
+            self._start_direction = start_direction
+            self._end_direction = end_direction
+        else:
+            # Determine start direction from first two points if not provided
+            if start_direction is None:
+                x1, y1 = grid_points[0]
+                x2, y2 = grid_points[1]
+                dx = x2 - x1
+                dy = y2 - y1
+                if dx > 0:
+                    self._start_direction = RoomDirection.EAST
+                elif dx < 0:
+                    self._start_direction = RoomDirection.WEST
+                elif dy > 0:
+                    self._start_direction = RoomDirection.SOUTH
+                else:
+                    self._start_direction = RoomDirection.NORTH
+            else:
+                self._start_direction = start_direction
+                
+            # Determine end direction from last two points if not provided
+            if end_direction is None:
+                x1, y1 = grid_points[-2]
+                x2, y2 = grid_points[-1]
+                dx = x2 - x1
+                dy = y2 - y1
+                if dx > 0:
+                    self._end_direction = RoomDirection.EAST
+                elif dx < 0:
+                    self._end_direction = RoomDirection.WEST
+                elif dy > 0:
+                    self._end_direction = RoomDirection.SOUTH
+                else:
+                    self._end_direction = RoomDirection.NORTH
+            else:
+                self._end_direction = end_direction
         
         # Create shapes for each straight section
         shapes = []
@@ -88,19 +133,22 @@ class Passage(MapElement):
     
     @classmethod
     def from_grid_path(cls, grid_points: List[Tuple[int, int]], 
-                      start_direction: RoomDirection,
-                      end_direction: RoomDirection,
+                      start_direction: Optional[RoomDirection] = None,
+                      end_direction: Optional[RoomDirection] = None,
                       allow_dead_end: bool = False) -> 'Passage':
         """Create a passage from a list of grid points.
         
         Args:
             grid_points: List of (x,y) grid coordinates defining the passage path
-            start_direction: Direction at start of passage
-            end_direction: Direction at end of passage
+            start_direction: Direction at start of passage (optional if can be determined from points)
+            end_direction: Direction at end of passage (optional if can be determined from points)
             allow_dead_end: Whether this passage can end without connecting to anything
             
         Returns:
             A new Passage instance
+            
+        Raises:
+            ValueError: If directions cannot be determined from points and aren't provided
         """
         return cls(grid_points, start_direction, end_direction, allow_dead_end)
         
