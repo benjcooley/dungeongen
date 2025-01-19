@@ -551,18 +551,58 @@ class OccupancyGrid:
                     
             return True, []
             
-        # Calculate initial direction
-        dx = points[1][0] - points[0][0]
-        dy = points[1][1] - points[0][1]
-        current_direction = (
-            ProbeDirection.EAST if dx > 0 else
-            ProbeDirection.WEST if dx < 0 else
-            ProbeDirection.SOUTH if dy > 0 else
-            ProbeDirection.NORTH
-        )
-        
-        # Validate each point
-        for i, (curr_x, curr_y) in enumerate(points):
+        # Helper to get points along a line
+        def get_line_points(x1: int, y1: int, x2: int, y2: int) -> list[tuple[int, int]]:
+            points = []
+            dx = abs(x2 - x1)
+            dy = abs(y2 - y1)
+            x, y = x1, y1
+            
+            step_x = 1 if x2 > x1 else -1 if x2 < x1 else 0
+            step_y = 1 if y2 > y1 else -1 if y2 < y1 else 0
+            
+            if dx > dy:
+                err = dx / 2
+                while x != x2:
+                    points.append((x, y))
+                    err -= dy
+                    if err < 0:
+                        y += step_y
+                        err += dx
+                    x += step_x
+            else:
+                err = dy / 2
+                while y != y2:
+                    points.append((x, y))
+                    err -= dx
+                    if err < 0:
+                        x += step_x
+                        err += dy
+                    y += step_y
+                    
+            points.append((x2, y2))
+            return points
+            
+        # Process each line segment
+        for i in range(len(points) - 1):
+            start = points[i]
+            end = points[i + 1]
+            
+            # Get all points along this line segment
+            line_points = get_line_points(start[0], start[1], end[0], end[1])
+            
+            # Calculate direction for this segment
+            dx = end[0] - start[0]
+            dy = end[1] - start[1]
+            current_direction = (
+                ProbeDirection.EAST if dx > 0 else
+                ProbeDirection.WEST if dx < 0 else
+                ProbeDirection.SOUTH if dy > 0 else
+                ProbeDirection.NORTH
+            )
+            
+            # Check each point along the line
+            for j, (curr_x, curr_y) in enumerate(line_points):
             probe.x, probe.y = curr_x, curr_y
             probe.facing = current_direction
             
