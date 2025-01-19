@@ -233,6 +233,9 @@ class OccupancyGrid:
     TYPE_SHIFT = 26
     INDEX_SHIFT = 0
     
+    # Maximum length of a passage in grid cells
+    MAX_PASSAGE_LENGTH = 100
+    
     def __init__(self, width: int, height: int) -> None:
         """Initialize an empty occupancy grid with default size."""
         self._grid = array('L', [0] * (width * height))  # Using unsigned long
@@ -240,6 +243,11 @@ class OccupancyGrid:
         self.height = height
         self._origin_x = width // 2  # Center point
         self._origin_y = height // 2
+        
+        # Pre-allocate lists for passage validation
+        self._crossed_passages = [0] * self.MAX_PASSAGE_LENGTH
+        self._line_points = []  # List of tuples (x, y, direction)
+        self._all_points = []   # Combined points from all line segments
         
     def _ensure_contains(self, grid_x: int, grid_y: int) -> None:
         """Resize grid if needed to contain the given grid coordinates."""
@@ -546,9 +554,7 @@ class OccupancyGrid:
         if not points:
             return False, []
             
-        # Pre-allocate crossed passages list to avoid resizing
-        crossed_passages = []
-        crossed_passages.extend([0] * len(points))  # Worst case: every point crosses a passage
+        # Reset crossed passages tracking
         cross_count = 0
         
         # Reuse a single probe for all checks
@@ -575,8 +581,8 @@ class OccupancyGrid:
             return True, []
             
         # Helper to get points along a straight line with direction
-        def get_line_points(x1: int, y1: int, x2: int, y2: int) -> list[tuple[int, int, ProbeDirection]]:
-            points = []
+        def _get_line_points(x1: int, y1: int, x2: int, y2: int, points: list) -> None:
+            points.clear()
             # Calculate direction once for the whole line
             dx = x2 - x1
             dy = y2 - y1
@@ -603,12 +609,13 @@ class OccupancyGrid:
             start = points[i]
             end = points[i + 1]
             
-            # Get all points along this line segment
-            line_points = get_line_points(start[0], start[1], end[0], end[1])
-            all_points.extend(line_points)
+            # Get points along this line segment
+            self._line_points.clear()
+            self._get_line_points(start[0], start[1], end[0], end[1], self._line_points)
+            self._all_points.extend(self._line_points)
             
             # Check each point along the line
-            for curr_x, curr_y, direction in all_points:
+            for curr_x, curr_y, direction in self._all_points:
                 probe.x, probe.y = curr_x, curr_y
                 probe.facing = direction
                 
@@ -644,9 +651,9 @@ class OccupancyGrid:
                 for direction in check_dirs:
                     result = probe.check_direction(direction)
                     if result.is_passage:
-                        crossed_passages[cross_count] = result.element_idx
+                        self._crossed_passages[cross_count] = result.element_idx
                         cross_count += 1
-                        return False, crossed_passages[:cross_count]
+                        return False, self._crossed_passages[:cross_count]
                     if not result.is_empty:
                         return False, crossed_passages[:cross_count]
                         
