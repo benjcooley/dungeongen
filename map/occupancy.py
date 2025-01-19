@@ -253,10 +253,17 @@ class GridProbe:
         dx, dy = self.facing.turn_left().get_offset()
         return (self.x + dx, self.y + dy)
         
-    def grid_right(self) -> tuple[int, int]:
-        """Get grid coordinates of the right cell."""
-        dx, dy = self.facing.turn_right().get_offset()
-        return (self.x + dx, self.y + dy)
+    def get_debug_point(self, direction: ProbeDirection) -> tuple[int, int, ProbeDirection]:
+        """Get debug visualization info for a direction.
+        
+        Args:
+            direction: Direction to check relative to current facing
+            
+        Returns:
+            Tuple of (grid_x, grid_y, direction) for debug visualization
+        """
+        dx, dy = direction.relative_to(self.facing)
+        return (self.x + dx, self.y + dy, self.facing)
         
     def check_forward_left(self) -> ProbeResult:
         """Check the cell diagonally forward-left without moving."""
@@ -697,7 +704,7 @@ class OccupancyGrid:
             curr = probe.check_forward()
             if curr.is_blocked:
                 if debug_enabled:
-                    fail_x, fail_y = probe.grid_forward()
+                    fail_x, fail_y, fail_dir = probe.get_debug_point(probe.facing)
                     self._debug_passage_points.append(
                         self.PassageCheckPoint(fail_x, fail_y, probe.facing, False)
                     )
@@ -708,7 +715,7 @@ class OccupancyGrid:
                 back = probe.check_backward()
                 if not (back.is_room or back.is_passage):
                     if debug_enabled:
-                        fail_x, fail_y = probe.grid_backward()
+                        fail_x, fail_y, fail_dir = probe.get_debug_point(probe.facing.turn_around())
                         self._debug_passage_points.append(
                             self.PassageCheckPoint(fail_x, fail_y, probe.facing, False)
                         )
@@ -717,7 +724,7 @@ class OccupancyGrid:
                 forward = probe.check_forward()
                 if not (forward.is_room or forward.is_passage):
                     if debug_enabled:
-                        fail_x, fail_y = probe.grid_forward()
+                        fail_x, fail_y, fail_dir = probe.get_debug_point(probe.facing)
                         self._debug_passage_points.append(
                             self.PassageCheckPoint(fail_x, fail_y, probe.facing, False)
                         )
@@ -804,7 +811,7 @@ class OccupancyGrid:
             # Normal point validation (must be last)
             if not probe.check_left_empty():
                 if debug_enabled:
-                    fail_x, fail_y = probe.grid_left()
+                    fail_x, fail_y, fail_dir = probe.get_debug_point(probe.facing.turn_left())
                     self._debug_passage_points.append(
                         self.PassageCheckPoint(fail_x, fail_y, probe.facing, False)
                     )
@@ -812,7 +819,7 @@ class OccupancyGrid:
                 
             if not probe.check_right_empty():
                 if debug_enabled:
-                    fail_x, fail_y = probe.grid_right()
+                    fail_x, fail_y, fail_dir = probe.get_debug_point(probe.facing.turn_right())
                     self._debug_passage_points.append(
                         self.PassageCheckPoint(fail_x, fail_y, probe.facing, False)
                     )
