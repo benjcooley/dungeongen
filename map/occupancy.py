@@ -551,31 +551,20 @@ class OccupancyGrid:
                     
             return True, []
             
-        # Multi-point path - cache directions for efficiency
-        directions = [None] * len(points)
-        
-        # Pre-calculate directions
-        for i in range(len(points)):
-            if i == 0:
-                dx = points[1][0] - points[0][0]
-                dy = points[1][1] - points[0][1]
-            else:
-                dx = points[i][0] - points[i-1][0]
-                dy = points[i][1] - points[i-1][1]
-                
-            if dx > 0:
-                directions[i] = ProbeDirection.EAST
-            elif dx < 0:
-                directions[i] = ProbeDirection.WEST
-            elif dy > 0:
-                directions[i] = ProbeDirection.SOUTH
-            else:
-                directions[i] = ProbeDirection.NORTH
+        # Calculate initial direction
+        dx = points[1][0] - points[0][0]
+        dy = points[1][1] - points[0][1]
+        current_direction = (
+            ProbeDirection.EAST if dx > 0 else
+            ProbeDirection.WEST if dx < 0 else
+            ProbeDirection.SOUTH if dy > 0 else
+            ProbeDirection.NORTH
+        )
         
         # Validate each point
         for i, (curr_x, curr_y) in enumerate(points):
             probe.x, probe.y = curr_x, curr_y
-            probe.facing = directions[i]
+            probe.facing = current_direction
             
             # Quick side checks first (most common failure)
             if not probe.check_left().is_empty or not probe.check_right().is_empty:
@@ -583,8 +572,18 @@ class OccupancyGrid:
             
             # Check if corner (direction change)
             is_corner = False
-            if 0 < i < len(points) - 1 and directions[i-1] != directions[i]:
-                is_corner = True
+            if 0 < i < len(points) - 1:
+                next_dx = points[i+1][0] - curr_x
+                next_dy = points[i+1][1] - curr_y
+                next_direction = (
+                    ProbeDirection.EAST if next_dx > 0 else
+                    ProbeDirection.WEST if next_dx < 0 else
+                    ProbeDirection.SOUTH if next_dy > 0 else
+                    ProbeDirection.NORTH
+                )
+                if next_direction != current_direction:
+                    is_corner = True
+                    current_direction = next_direction
                 
                 # Only check relevant quadrant based on turn direction
                 turn_right = (directions[i-1].value + 2) % 8 == directions[i].value
