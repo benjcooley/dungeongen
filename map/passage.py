@@ -120,12 +120,12 @@ class Passage(MapElement):
     ) -> Optional[List[Tuple[int, int]]]:
         """Generate a list of grid points for a passage with optional random turns.
         
-        The passage will:
-        - Start in the specified start_direction for at least min_segment_length
-        - End in the specified end_direction for at least min_segment_length
-        - Have random turns if direct path isn't possible/desired
-        - Never double back (segments always make forward progress)
-        - Have segments at least min_segment_length long
+        Following the segment-and-turn algorithm:
+        1. Identify the straight runs needed to connect the points
+        2. For each run longer than 2*min_segment_length:
+           - Subdivide into random length pieces (at least min_segment_length each)
+           - Add turns between pieces
+        3. Connect the runs together
         
         Args:
             start: Starting grid point (x,y)
@@ -133,29 +133,32 @@ class Passage(MapElement):
             end: Ending grid point (x,y)
             end_direction: Direction to enter end point
             min_segment_length: Minimum grid cells between turns (default 2)
+            max_subdivisions: Maximum number of subdivisions per straight run
             
         Returns:
             List of grid points defining passage path, or None if no valid path possible
         """
-        import random
-        
         # First check if passage is possible
-        if not Passage.can_connect(start, start_direction, end, end_direction, min_segment_length):
+        if not Passage.can_connect(start, start_direction, end, end_direction):
             return None
 
         # Handle single grid case
         sx, sy = start
         ex, ey = end
         if sx == ex and sy == ey:
-            return [start, end]
+            return [start]
 
-        # Helper function to subdivide a run
         def subdivide_run(start_pt: tuple[int, int], end_pt: tuple[int, int]) -> list[tuple[int, int]]:
+            """Subdivide a straight run into smaller segments."""
             x1, y1 = start_pt
             x2, y2 = end_pt
             
             # Calculate run length
             run_length = abs(x2 - x1) if x1 != x2 else abs(y2 - y1)
+            
+            # If run is too short for subdivision, return endpoints
+            if run_length < 2 * min_segment_length:
+                return [start_pt, end_pt]
             
             # Get unit direction vector
             dx = 1 if x2 > x1 else -1 if x2 < x1 else 0
@@ -164,11 +167,8 @@ class Passage(MapElement):
             points = [start_pt]
             curr_x, curr_y = x1, y1
             remaining = run_length
-            
-            # Track number of subdivisions
             subdivisions = 0
             
-            # While we can fit at least 2 more segments and haven't hit max subdivisions
             while remaining >= 2 * min_segment_length and subdivisions < max_subdivisions:
                 # Choose random length for this segment
                 d = random.randint(min_segment_length, remaining - min_segment_length)
@@ -180,73 +180,53 @@ class Passage(MapElement):
                 
                 remaining -= d
                 subdivisions += 1
-                
-            # Add final segment if any length remains
-            if remaining > 0:
-                curr_x += dx * remaining
-                curr_y += dy * remaining
-                points.append((curr_x, curr_y))
+            
+            # Add final point if not at end
+            if (curr_x, curr_y) != end_pt:
+                points.append(end_pt)
                 
             return points
 
-        # Handle straight passage case
-        if sx == ex or sy == ey:
-            if start_direction == end_direction:
-                return subdivide_run(start, end)
-                
-        # Handle zig-zag case (parallel but opposite directions)
+        # Determine intermediate points based on directions
+        corner_points = []
+        
+        # For parallel but opposite directions (zig-zag)
         if start_direction.is_parallel(end_direction):
-            # Calculate offset based on direction
-            if start_direction in (RoomDirection.NORTH, RoomDirection.SOUTH):
-                # Moving vertically, need horizontal offset
-                offset = 2 * min_segment_length
-                if start_direction == RoomDirection.EAST:
-                    mid_x = min(sx, ex) + offset
-                else:  # WEST
-                    mid_x = max(sx, ex) - offset
-                    
-                # Subdivide each leg
-                first_leg = subdivide_run(start, (mid_x, sy))
-                second_leg = subdivide_run((mid_x, sy), (mid_x, ey))
-                third_leg = subdivide_run((mid_x, ey), end)
-                
-                # Combine legs, removing duplicate points
-                points = first_leg[:-1] + second_leg[:-1] + third_leg
-                return points
-            else:
-                # Moving horizontally, need vertical offset
-                offset = 2 * min_segment_length
-                if start_direction == RoomDirection.SOUTH:
-                    mid_y = min(sy, ey) + offset
-                else:  # NORTH
-                    mid_y = max(sy, ey) - offset
-                    
-                # Subdivide each leg
-                first_leg = subdivide_run(start, (sx, mid_y))
-                second_leg = subdivide_run((sx, mid_y), (ex, mid_y))
-                third_leg = subdivide_run((ex, mid_y), end)
-                
-                # Combine legs, removing duplicate points
-                points = first_leg[:-1] + second_leg[:-1] + third_leg
-                return points
+            # Calculate offset for middle section
+            offset = 2 * min_segment_length
             
-        # Handle L-shape case (perpendicular directions)
-        if start_direction.is_perpendicular(end_direction):
+            # Add two corners to create zig-zag
+            if start_direction in (RoomDirection.NORTH, RoomDirection.SOUTH):
+                mid_x = min(sx, ex) + offset if start_direction == RoomDirection.EAST else max(sx, ex) - offset
+                corner_points = [(mid_x, sy), (mid_x, ey)]
+            else:
+                mid_y = min(sy, ey) + offset if start_direction == RoomDirection.SOUTH else max(sy, ey) - offset
+                corner_points = [(sx, mid_y), (ex, mid_y)]
+                
+        # For perpendicular directions (L-shape)
+        elif start_direction.is_perpendicular(end_direction):
+            # Add single corner point
             corner_x, corner_y = sx, sy
             if start_direction in (RoomDirection.NORTH, RoomDirection.SOUTH):
                 corner_y = ey
             else:
                 corner_x = ex
-                
-            # Subdivide each leg
-            first_leg = subdivide_run(start, (corner_x, corner_y))
-            second_leg = subdivide_run((corner_x, corner_y), end)
+            corner_points = [(corner_x, corner_y)]
             
-            # Combine legs, removing duplicate corner point
-            points = first_leg[:-1] + second_leg
-            return points
-                
-        return None
+        # Subdivide each straight run
+        points = []
+        prev_point = start
+        
+        # Process each segment including final run to end point
+        for corner in corner_points + [end]:
+            segment = subdivide_run(prev_point, corner)
+            points.extend(segment[:-1])  # Don't add corner yet
+            prev_point = corner
+            
+        # Add final point
+        points.append(end)
+        
+        return points
 
     @staticmethod
     def can_connect(
