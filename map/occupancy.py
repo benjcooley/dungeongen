@@ -979,19 +979,21 @@ class OccupancyGrid:
         # Draw passage check debug visualization if enabled
         debug_enabled = debug_draw.is_enabled(DebugDrawFlags.PASSAGE_CHECK)
         if debug_enabled and self._debug_passage_points:
+            # First pass: Draw all cells
             for point in self._debug_passage_points:
-                # Red for invalid points, green for valid
+                # Purple for invalid points, blue for valid
                 if not point.is_valid:
-                    color = skia.Color(255, 0, 0)  # Red
-                    alpha = 160
+                    fill_color = skia.Color(200, 0, 200)  # Purple
+                    outline_color = skia.Color(255, 0, 255)  # Bright purple
                 else:
-                    color = skia.Color(0, 255, 0)  # Green
-                    alpha = 96
+                    fill_color = skia.Color(0, 0, 200)  # Blue
+                    outline_color = skia.Color(0, 0, 255)  # Bright blue
                 
-                # Draw cell
-                debug_draw_grid_cell(point.x, point.y, color, alpha=alpha)
-                
-                # Draw direction indicator
+                # Draw cell with outline
+                debug_draw_grid_cell(point.x, point.y, fill_color, outline_color=outline_color, alpha=128)
+            
+            # Second pass: Draw direction indicators on top
+            for point in self._debug_passage_points:
                 if point.direction is not None:
                     # Convert grid to pixel coordinates
                     px = point.x * CELL_SIZE + CELL_SIZE/2
@@ -1003,7 +1005,7 @@ class OccupancyGrid:
                     dx *= CELL_SIZE/2
                     dy *= CELL_SIZE/2
                     
-                    # Draw direction line
-                    paint = skia.Paint(Color=color, StrokeWidth=2)
+                    # Draw direction line in white
+                    paint = skia.Paint(Color=skia.Color(255, 255, 255), StrokeWidth=2)
                     canvas.drawLine(px, py, px + dx, py + dy, paint)
                         
