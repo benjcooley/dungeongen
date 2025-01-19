@@ -602,13 +602,14 @@ class OccupancyGrid:
             if i > 0 and curr_direction != prev_direction:
                 turn = prev_direction.get_turn_direction(curr_direction)
                 if turn:
-                    check_dirs = (
-                        ProbeDirection.FORWARD_RIGHT, 
-                        ProbeDirection.BACK_RIGHT
-                    ) if turn == 'right' else (
-                        ProbeDirection.FORWARD_LEFT,
-                        ProbeDirection.BACK_LEFT
-                    )
+                    # When turning, we need to check the cells in the direction of the turn
+                    # to ensure there's enough clearance for the corner
+                    if turn == 'right':
+                        # Check forward-right and back-right for right turns
+                        check_dirs = (ProbeDirection.FORWARD_RIGHT, ProbeDirection.BACK_RIGHT)
+                    else:  # turn == 'left'
+                        # Check forward-left and back-left for left turns
+                        check_dirs = (ProbeDirection.FORWARD_LEFT, ProbeDirection.BACK_LEFT)
                 
                 for direction in check_dirs:
                     result = probe.check_direction(direction)
