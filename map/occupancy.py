@@ -1,8 +1,9 @@
 """Grid-based occupancy tracking for map elements."""
 
-from typing import List, Optional, Set, Tuple, TYPE_CHECKING
+from typing import List, Optional, Set, Tuple, TYPE_CHECKING, NamedTuple
 from array import array
 from enum import IntFlag, auto, Enum
+from dataclasses import dataclass
 from dataclasses import dataclass
 import skia
 from logging_config import logger, LogTags
@@ -244,12 +245,20 @@ class OccupancyGrid:
         self._origin_x = width // 2  # Center point
         self._origin_y = height // 2
         
-        # Pre-allocate lists for passage validation with maximum sizes
-        self._crossed_passages = [0] * self.MAX_PASSAGE_LENGTH  # Passage indices
-        self._line_points = [(0,0,ProbeDirection.NORTH)] * self.MAX_PASSAGE_LENGTH  # Current line points
-        self._all_points = [(0,0,ProbeDirection.NORTH)] * (self.MAX_PASSAGE_LENGTH * 2)  # All segment points
-        self._line_count = 0  # Number of points in _line_points
-        self._all_count = 0   # Number of points in _all_points
+        # Pre-allocate arrays for passage validation
+        self._crossed_passages = array('H', [0] * self.MAX_PASSAGE_LENGTH)  # Passage indices (unsigned short)
+        
+        # Arrays for point coordinates and directions
+        self._line_x = array('h', [0] * self.MAX_PASSAGE_LENGTH)  # signed short
+        self._line_y = array('h', [0] * self.MAX_PASSAGE_LENGTH)
+        self._line_dir = array('B', [0] * self.MAX_PASSAGE_LENGTH)  # unsigned char
+        
+        self._all_x = array('h', [0] * (self.MAX_PASSAGE_LENGTH * 2))
+        self._all_y = array('h', [0] * (self.MAX_PASSAGE_LENGTH * 2))
+        self._all_dir = array('B', [0] * (self.MAX_PASSAGE_LENGTH * 2))
+        
+        self._line_count = 0
+        self._all_count = 0
         
     def _ensure_contains(self, grid_x: int, grid_y: int) -> None:
         """Resize grid if needed to contain the given grid coordinates."""
@@ -598,12 +607,16 @@ class OccupancyGrid:
             if x1 == x2:  # Vertical line
                 step = 1 if y2 > y1 else -1
                 for y in range(y1, y2 + step, step):
-                    points[points_count] = (x1, y, direction)
+                    self._line_x[points_count] = x1
+                    self._line_y[points_count] = y
+                    self._line_dir[points_count] = direction.value
                     points_count += 1
             else:  # Horizontal line
                 step = 1 if x2 > x1 else -1
                 for x in range(x1, x2 + step, step):
-                    points[points_count] = (x, y1, direction)
+                    self._line_x[points_count] = x
+                    self._line_y[points_count] = y1
+                    self._line_dir[points_count] = direction.value
                     points_count += 1
             self._line_count = points_count
             
@@ -617,15 +630,19 @@ class OccupancyGrid:
             self._line_count = 0
             self._get_line_points(start[0], start[1], end[0], end[1], self._line_points)
             
-            # Copy line points to all points
+            # Copy line points to all points arrays
             for i in range(self._line_count):
-                self._all_points[self._all_count + i] = self._line_points[i]
+                idx = self._all_count + i
+                self._all_x[idx] = self._line_x[i]
+                self._all_y[idx] = self._line_y[i]
+                self._all_dir[idx] = self._line_dir[i]
             self._all_count += self._line_count
             
             # Check each point along the line
-            for curr_x, curr_y, direction in self._all_points:
-                probe.x, probe.y = curr_x, curr_y
-                probe.facing = direction
+            for i in range(self._all_count):
+                probe.x = self._all_x[i]
+                probe.y = self._all_y[i]
+                probe.facing = ProbeDirection(self._all_dir[i])
                 
                 # Quick side checks first (most common failure)
                 if not probe.check_left().is_empty or not probe.check_right().is_empty:
