@@ -41,6 +41,18 @@ class RoomDirection(Enum):
             return RoomDirection.WEST
         else:
             return RoomDirection.EAST
+            
+    def is_perpendicular(self, other: 'RoomDirection') -> bool:
+        """Check if this direction is perpendicular to another direction."""
+        return ((self in (RoomDirection.NORTH, RoomDirection.SOUTH) and 
+                other in (RoomDirection.EAST, RoomDirection.WEST)) or
+               (self in (RoomDirection.EAST, RoomDirection.WEST) and 
+                other in (RoomDirection.NORTH, RoomDirection.SOUTH)))
+                
+    def is_parallel(self, other: 'RoomDirection') -> bool:
+        """Check if this direction is parallel to another direction."""
+        return self in (RoomDirection.NORTH, RoomDirection.SOUTH) == \
+               other in (RoomDirection.NORTH, RoomDirection.SOUTH)
 
 class GrowDirection(Enum):
     """Controls which room to grow from when arranging."""

@@ -226,30 +226,22 @@ class Passage(MapElement):
         dx = ex - sx
         dy = ey - sy
 
-        # For single grid case or straight lines:
+        # For single point or straight lines:
         # - Directions must be parallel to the line
         # - Directions must be opposite
-        if dx == 0 and dy == 0:  # Single point
-            if start_direction == RoomDirection.NORTH and end_direction == RoomDirection.SOUTH: return True
-            if start_direction == RoomDirection.SOUTH and end_direction == RoomDirection.NORTH: return True
-            if start_direction == RoomDirection.EAST and end_direction == RoomDirection.WEST: return True
-            if start_direction == RoomDirection.WEST and end_direction == RoomDirection.EAST: return True
-            return False
-        elif sx == ex:  # Vertical line
-            if start_direction not in (RoomDirection.NORTH, RoomDirection.SOUTH): return False
-            if end_direction not in (RoomDirection.NORTH, RoomDirection.SOUTH): return False
-            return (start_direction == RoomDirection.NORTH and end_direction == RoomDirection.SOUTH) or \
-                   (start_direction == RoomDirection.SOUTH and end_direction == RoomDirection.NORTH)
-        elif sy == ey:  # Horizontal line
-            if start_direction not in (RoomDirection.EAST, RoomDirection.WEST): return False
-            if end_direction not in (RoomDirection.EAST, RoomDirection.WEST): return False
-            return (start_direction == RoomDirection.EAST and end_direction == RoomDirection.WEST) or \
-                   (start_direction == RoomDirection.WEST and end_direction == RoomDirection.EAST)
+        if dx == 0 and dy == 0 or sx == ex or sy == ey:  
+            # Must be parallel
+            if not start_direction.is_parallel(end_direction):
+                return False
+            # Must be opposite
+            return end_direction == start_direction.get_opposite()
 
         # For L-shaped paths:
         # - Start direction must match first leg direction
         # - End direction must match second leg direction reversed
         # - Directions must be perpendicular
+        if not start_direction.is_perpendicular(end_direction):
+            return False
         # Start direction must match first leg direction
         # End direction must match second leg direction reversed
         if dx > 0:  # Going east
