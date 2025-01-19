@@ -551,41 +551,43 @@ class OccupancyGrid:
                     
             return True, []
             
-        # Helper to get points along a straight line
-        def get_line_points(x1: int, y1: int, x2: int, y2: int) -> list[tuple[int, int]]:
+        # Helper to get points along a straight line with direction
+        def get_line_points(x1: int, y1: int, x2: int, y2: int) -> list[tuple[int, int, ProbeDirection]]:
             points = []
-            if x1 == x2:  # Vertical line
-                step = 1 if y2 > y1 else -1
-                for y in range(y1, y2 + step, step):
-                    points.append((x1, y))
-            else:  # Horizontal line
-                step = 1 if x2 > x1 else -1
-                for x in range(x1, x2 + step, step):
-                    points.append((x, y1))
-            return points
-            
-        # Process each line segment
-        for i in range(len(points) - 1):
-            start = points[i]
-            end = points[i + 1]
-            
-            # Get all points along this line segment
-            line_points = get_line_points(start[0], start[1], end[0], end[1])
-            
-            # Calculate direction for this segment
-            dx = end[0] - start[0]
-            dy = end[1] - start[1]
-            current_direction = (
+            # Calculate direction once for the whole line
+            dx = x2 - x1
+            dy = y2 - y1
+            direction = (
                 ProbeDirection.EAST if dx > 0 else
                 ProbeDirection.WEST if dx < 0 else
                 ProbeDirection.SOUTH if dy > 0 else
                 ProbeDirection.NORTH
             )
             
+            if x1 == x2:  # Vertical line
+                step = 1 if y2 > y1 else -1
+                for y in range(y1, y2 + step, step):
+                    points.append((x1, y, direction))
+            else:  # Horizontal line
+                step = 1 if x2 > x1 else -1
+                for x in range(x1, x2 + step, step):
+                    points.append((x, y1, direction))
+            return points
+            
+        # Process each line segment
+        all_points = []
+        for i in range(len(points) - 1):
+            start = points[i]
+            end = points[i + 1]
+            
+            # Get all points along this line segment
+            line_points = get_line_points(start[0], start[1], end[0], end[1])
+            all_points.extend(line_points)
+            
             # Check each point along the line
-            for j, (curr_x, curr_y) in enumerate(line_points):
+            for curr_x, curr_y, direction in all_points:
                 probe.x, probe.y = curr_x, curr_y
-                probe.facing = current_direction
+                probe.facing = direction
                 
                 # Quick side checks first (most common failure)
                 if not probe.check_left().is_empty or not probe.check_right().is_empty:
