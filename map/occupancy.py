@@ -748,10 +748,18 @@ class OccupancyGrid:
                 for offset in range(1, 4):
                     # Check cells behind
                     if not probe.check_direction_empty(ProbeDirection((probe.facing.value + 4 + offset) % 8)):
+                        if debug_enabled:
+                            self._debug_passage_points.append(
+                                self.PassageCheckPoint(probe.x, probe.y, probe.facing, False)
+                            )
                         return False, self._crossed_passages[:cross_count]
                         
                     # Check cells ahead
                     if not probe.check_direction_empty(ProbeDirection((probe.facing.value + offset) % 8)):
+                        if debug_enabled:
+                            self._debug_passage_points.append(
+                                self.PassageCheckPoint(probe.x, probe.y, probe.facing, False)
+                            )
                         return False, self._crossed_passages[:cross_count]
 
             # Normal point validation (must be last)
