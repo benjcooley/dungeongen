@@ -690,9 +690,7 @@ class OccupancyGrid:
             curr = probe.check_forward()
             if curr.is_blocked:
                 if debug_enabled:
-                    self._debug_passage_points.append(
-                        probe.get_debug_point(probe.facing, False)
-                    )
+                    probe.add_debug_point(probe.facing, False, self._debug_passage_points)
                 return False, self._crossed_passages[:cross_count]
 
             # Check endpoints
@@ -700,17 +698,13 @@ class OccupancyGrid:
                 back = probe.check_backward()
                 if not (back.is_room or back.is_passage):
                     if debug_enabled:
-                        self._debug_passage_points.append(
-                            self.PassageCheckPoint(*probe.get_debug_point(probe.facing.turn_around(), False))
-                        )
+                        probe.add_debug_point(probe.facing.turn_around(), False, self._debug_passage_points)
                     return False, self._crossed_passages[:cross_count]
             elif i == len(points) - 1 and not allow_dead_end:
                 forward = probe.check_forward()
                 if not (forward.is_room or forward.is_passage):
                     if debug_enabled:
-                        self._debug_passage_points.append(
-                            self.PassageCheckPoint(*probe.get_debug_point(probe.facing, False))
-                        )
+                        probe.add_debug_point(probe.facing, False, self._debug_passage_points)
                     return False, self._crossed_passages[:cross_count]
             
             # Check if corner (direction changes from previous point)
@@ -719,14 +713,9 @@ class OccupancyGrid:
                 # Fail if not a valid 90-degree turn (no backtracking)
                 if not turn:
                     if debug_enabled:
-                        # For invalid turns, mark both the current and next position
-                        self._debug_passage_points.append(
-                            self.PassageCheckPoint(probe.x, probe.y, probe.facing, False)
-                        )
-                        fail_x, fail_y = probe.grid_forward()
-                        self._debug_passage_points.append(
-                            self.PassageCheckPoint(fail_x, fail_y, curr_direction, False)
-                        )
+                        # For invalid turns, mark both positions
+                        probe.add_debug_point(probe.facing, False, self._debug_passage_points)
+                        probe.add_debug_point(curr_direction, False, self._debug_passage_points)
                     return False, self._crossed_passages[:cross_count]
                     
                 # When turning, we need to check the cells in the direction of the turn
@@ -744,18 +733,11 @@ class OccupancyGrid:
                         self._crossed_passages[cross_count] = result.element_idx
                         cross_count += 1
                         if debug_enabled:
-                            self._debug_passage_points.append(
-                                self.PassageCheckPoint(probe.x, probe.y, probe.facing, False)
-                            )
+                            probe.add_debug_point(probe.facing, False, self._debug_passage_points)
                         return False, self._crossed_passages[:cross_count]
                     if not probe.check_direction_empty(direction):
                         if debug_enabled:
-                            dx, dy = direction.relative_to(probe.facing)
-                            fail_x = probe.x + dx
-                            fail_y = probe.y + dy
-                            self._debug_passage_points.append(
-                                self.PassageCheckPoint(fail_x, fail_y, probe.facing, False)
-                            )
+                            probe.add_debug_point(direction, False, self._debug_passage_points)
                         return False, self._crossed_passages[:cross_count]
                         
                 continue
@@ -771,46 +753,30 @@ class OccupancyGrid:
                     if not probe.check_direction_empty(ProbeDirection((probe.facing.value + 4 + offset) % 8)):
                         if debug_enabled:
                             direction = ProbeDirection((probe.facing.value + 4 + offset) % 8)
-                            dx, dy = direction.relative_to(probe.facing)
-                            fail_x = probe.x + dx
-                            fail_y = probe.y + dy
-                            self._debug_passage_points.append(
-                                self.PassageCheckPoint(fail_x, fail_y, probe.facing, False)
-                            )
+                            probe.add_debug_point(direction, False, self._debug_passage_points)
                         return False, self._crossed_passages[:cross_count]
                         
                     # Check cells ahead
                     if not probe.check_direction_empty(ProbeDirection((probe.facing.value + offset) % 8)):
                         if debug_enabled:
                             direction = ProbeDirection((probe.facing.value + offset) % 8)
-                            dx, dy = direction.relative_to(probe.facing)
-                            fail_x = probe.x + dx
-                            fail_y = probe.y + dy
-                            self._debug_passage_points.append(
-                                self.PassageCheckPoint(fail_x, fail_y, probe.facing, False)
-                            )
+                            probe.add_debug_point(direction, False, self._debug_passage_points)
                         return False, self._crossed_passages[:cross_count]
 
             # Normal point validation (must be last)
             if not probe.check_left_empty():
                 if debug_enabled:
-                    self._debug_passage_points.append(
-                        self.PassageCheckPoint(*probe.get_debug_point(probe.facing.turn_left(), False))
-                    )
+                    probe.add_debug_point(probe.facing.turn_left(), False, self._debug_passage_points)
                 return False, self._crossed_passages[:cross_count]
                 
             if not probe.check_right_empty():
                 if debug_enabled:
-                    self._debug_passage_points.append(
-                        self.PassageCheckPoint(*probe.get_debug_point(probe.facing.turn_right(), False))
-                    )
+                    probe.add_debug_point(probe.facing.turn_right(), False, self._debug_passage_points)
                 return False, self._crossed_passages[:cross_count]
             
             # Track valid point
             if debug_enabled:
-                self._debug_passage_points.append(
-                    self.PassageCheckPoint(probe.x, probe.y, probe.facing, True)
-                )
+                probe.add_debug_point(probe.facing, True, self._debug_passage_points)
                     
         return True, self._crossed_passages[:cross_count]
         
