@@ -244,10 +244,12 @@ class OccupancyGrid:
         self._origin_x = width // 2  # Center point
         self._origin_y = height // 2
         
-        # Pre-allocate lists for passage validation
-        self._crossed_passages = [0] * self.MAX_PASSAGE_LENGTH
-        self._line_points = []  # List of tuples (x, y, direction)
-        self._all_points = []   # Combined points from all line segments
+        # Pre-allocate lists for passage validation with maximum sizes
+        self._crossed_passages = [0] * self.MAX_PASSAGE_LENGTH  # Passage indices
+        self._line_points = [(0,0,ProbeDirection.NORTH)] * self.MAX_PASSAGE_LENGTH  # Current line points
+        self._all_points = [(0,0,ProbeDirection.NORTH)] * (self.MAX_PASSAGE_LENGTH * 2)  # All segment points
+        self._line_count = 0  # Number of points in _line_points
+        self._all_count = 0   # Number of points in _all_points
         
     def _ensure_contains(self, grid_x: int, grid_y: int) -> None:
         """Resize grid if needed to contain the given grid coordinates."""
@@ -582,7 +584,7 @@ class OccupancyGrid:
             
         # Helper to get points along a straight line with direction
         def _get_line_points(x1: int, y1: int, x2: int, y2: int, points: list) -> None:
-            points.clear()
+            points_count = 0
             # Calculate direction once for the whole line
             dx = x2 - x1
             dy = y2 - y1
@@ -596,12 +598,14 @@ class OccupancyGrid:
             if x1 == x2:  # Vertical line
                 step = 1 if y2 > y1 else -1
                 for y in range(y1, y2 + step, step):
-                    points.append((x1, y, direction))
+                    points[points_count] = (x1, y, direction)
+                    points_count += 1
             else:  # Horizontal line
                 step = 1 if x2 > x1 else -1
                 for x in range(x1, x2 + step, step):
-                    points.append((x, y1, direction))
-            return points
+                    points[points_count] = (x, y1, direction)
+                    points_count += 1
+            self._line_count = points_count
             
         # Process each line segment
         all_points = []
@@ -610,9 +614,13 @@ class OccupancyGrid:
             end = points[i + 1]
             
             # Get points along this line segment
-            self._line_points.clear()
+            self._line_count = 0
             self._get_line_points(start[0], start[1], end[0], end[1], self._line_points)
-            self._all_points.extend(self._line_points)
+            
+            # Copy line points to all points
+            for i in range(self._line_count):
+                self._all_points[self._all_count + i] = self._line_points[i]
+            self._all_count += self._line_count
             
             # Check each point along the line
             for curr_x, curr_y, direction in self._all_points:
