@@ -238,6 +238,26 @@ class GridProbe:
         """Check if the cell to the right is empty."""
         return self.check_direction_empty(self.facing.turn_right())
         
+    def grid_forward(self) -> tuple[int, int]:
+        """Get grid coordinates of the forward cell."""
+        dx, dy = self.facing.get_offset()
+        return (self.x + dx, self.y + dy)
+        
+    def grid_backward(self) -> tuple[int, int]:
+        """Get grid coordinates of the backward cell."""
+        dx, dy = self.facing.turn_around().get_offset()
+        return (self.x + dx, self.y + dy)
+        
+    def grid_left(self) -> tuple[int, int]:
+        """Get grid coordinates of the left cell."""
+        dx, dy = self.facing.turn_left().get_offset()
+        return (self.x + dx, self.y + dy)
+        
+    def grid_right(self) -> tuple[int, int]:
+        """Get grid coordinates of the right cell."""
+        dx, dy = self.facing.turn_right().get_offset()
+        return (self.x + dx, self.y + dy)
+        
     def check_forward_left(self) -> ProbeResult:
         """Check the cell diagonally forward-left without moving."""
         return self.check_direction(ProbeDirection((self.facing.value - 1) % 8))
@@ -765,15 +785,17 @@ class OccupancyGrid:
             # Normal point validation (must be last)
             if not probe.check_left_empty():
                 if debug_enabled:
+                    fail_x, fail_y = probe.grid_left()
                     self._debug_passage_points.append(
-                        self.PassageCheckPoint(probe.x, probe.y, probe.facing, False)
+                        self.PassageCheckPoint(fail_x, fail_y, probe.facing, False)
                     )
                 return False, self._crossed_passages[:cross_count]
                 
             if not probe.check_right_empty():
                 if debug_enabled:
+                    fail_x, fail_y = probe.grid_right()
                     self._debug_passage_points.append(
-                        self.PassageCheckPoint(probe.x, probe.y, probe.facing, False)
+                        self.PassageCheckPoint(fail_x, fail_y, probe.facing, False)
                     )
                 return False, self._crossed_passages[:cross_count]
             
