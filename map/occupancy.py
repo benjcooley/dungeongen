@@ -238,21 +238,6 @@ class GridProbe:
         """Check if the cell to the right is empty."""
         return self.check_direction_empty(self.facing.turn_right())
         
-    def grid_forward(self) -> tuple[int, int]:
-        """Get grid coordinates of the forward cell."""
-        dx, dy = self.facing.get_offset()
-        return (self.x + dx, self.y + dy)
-        
-    def grid_backward(self) -> tuple[int, int]:
-        """Get grid coordinates of the backward cell."""
-        dx, dy = self.facing.turn_around().get_offset()
-        return (self.x + dx, self.y + dy)
-        
-    def grid_left(self) -> tuple[int, int]:
-        """Get grid coordinates of the left cell."""
-        dx, dy = self.facing.turn_left().get_offset()
-        return (self.x + dx, self.y + dy)
-        
     def get_debug_point(self, direction: ProbeDirection) -> tuple[int, int, ProbeDirection]:
         """Get debug visualization info for a direction.
         
