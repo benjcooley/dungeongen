@@ -725,7 +725,7 @@ class OccupancyGrid:
                         
                 continue
             
-            # Track passage crossings
+            # Check and track passage crossings
             if curr.is_passage:
                 self._crossed_passages[cross_count] = curr.element_idx
                 cross_count += 1

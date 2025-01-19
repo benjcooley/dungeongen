@@ -332,12 +332,11 @@ class Map:
         # Get initial room shape using options
         from map._arrange.room_distribution import get_random_room_shape
         initial_shape = get_random_room_shape(options=self.options)
-        logger.debug(LogTags.GENERATION, 
-            f"\nInitial room shape selected:\n"
-            f"  Type: {initial_shape.room_type}\n"
-            f"  Breadth: {initial_shape.breadth}\n"
-            f"  Depth: {initial_shape.depth}\n"
-            f"  Offset: {initial_shape.breadth_offset}")
+        logger.debug(LogTags.GENERATION, "\nInitial room shape selected:")
+        logger.debug(LogTags.GENERATION, f"  Type: {initial_shape.room_type}")
+        logger.debug(LogTags.GENERATION, f"  Breadth: {initial_shape.breadth}")
+        logger.debug(LogTags.GENERATION, f"  Depth: {initial_shape.depth}")
+        logger.debug(LogTags.GENERATION, f"  Offset: {initial_shape.breadth_offset}")
         
         logger.debug(LogTags.GENERATION, "\n" + "*" * 80)
         logger.debug(LogTags.GENERATION, "PHASE 2: CREATING STARTING ROOM")
