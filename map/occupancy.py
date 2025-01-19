@@ -581,10 +581,9 @@ class OccupancyGrid:
                     
             return True, []
             
-        # Helper to get points along a straight line with direction
-        def _get_line_points(x1: int, y1: int, x2: int, y2: int, points: list) -> None:
+        def _expand_line_points(x1: int, y1: int, x2: int, y2: int) -> int:
+            """Expand a line segment into individual grid points with directions."""
             points_count = 0
-            # Calculate direction once for the whole line
             dx = x2 - x1
             dy = y2 - y1
             direction = (
@@ -610,48 +609,35 @@ class OccupancyGrid:
                     self._points[idx + 1] = y1
                     self._points[idx + 2] = direction.value
                     points_count += 1
-            self._line_count = points_count
+            return points_count
             
-        # Process each line segment
-        all_points = []
+        # Expand all line segments into points array
+        self._point_count = 0
         for i in range(len(points) - 1):
             start = points[i]
             end = points[i + 1]
-            
-            # Get points along this line segment
-            self._line_count = 0
-            self._get_line_points(start[0], start[1], end[0], end[1], self._line_points)
-            
-            # Points already added by _get_line_points
-            pass
-            
-            # Check each point along the line
-            for i in range(self._point_count):
-                idx = i * 3
-                probe.x = self._points[idx]
-                probe.y = self._points[idx + 1]
-                probe.facing = ProbeDirection(self._points[idx + 2])
+            count = self._expand_line_points(start[0], start[1], end[0], end[1])
+            self._point_count += count
+
+        # Process each point
+        for i in range(self._point_count):
+            idx = i * 3
+            probe.x = self._points[idx]
+            probe.y = self._points[idx + 1]
+            probe.facing = ProbeDirection(self._points[idx + 2])
                 
                 # Quick side checks first (most common failure)
                 if not probe.check_left().is_empty or not probe.check_right().is_empty:
                     return False, self._crossed_passages[:cross_count]
             
-            # Check if corner (direction change)
+            # Check if corner (direction changes from previous point)
             is_corner = False
-            if 0 < i < len(points) - 1:
-                idx = i * 3
-                next_dx = points[i+1][0] - self._points[idx]
-                next_dy = points[i+1][1] - self._points[idx + 1]
-                next_direction = (
-                    ProbeDirection.EAST if next_dx > 0 else
-                    ProbeDirection.WEST if next_dx < 0 else
-                    ProbeDirection.SOUTH if next_dy > 0 else
-                    ProbeDirection.NORTH
-                )
+            if i > 0:
+                prev_idx = (i - 1) * 3
                 curr_direction = ProbeDirection(self._points[idx + 2])
-                if next_direction != curr_direction:
+                prev_direction = ProbeDirection(self._points[prev_idx + 2])
+                if curr_direction != prev_direction:
                     is_corner = True
-                    self._points[idx + 2] = next_direction.value  # Update for next iteration
                 
                 # Only check relevant quadrant based on turn direction
                 turn_right = (curr_direction.value + 2) % 8 == next_direction.value
