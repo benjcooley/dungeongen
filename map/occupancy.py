@@ -621,7 +621,7 @@ class OccupancyGrid:
                 
                 # Quick side checks first (most common failure)
                 if not probe.check_left().is_empty or not probe.check_right().is_empty:
-                    return False, crossed_passages[:cross_count]
+                    return False, self._crossed_passages[:cross_count]
             
             # Check if corner (direction change)
             is_corner = False
@@ -655,7 +655,7 @@ class OccupancyGrid:
                         cross_count += 1
                         return False, self._crossed_passages[:cross_count]
                     if not result.is_empty:
-                        return False, crossed_passages[:cross_count]
+                        return False, self._crossed_passages[:cross_count]
                         
                 continue
             
@@ -663,25 +663,25 @@ class OccupancyGrid:
             if i == 0:
                 back = probe.check_backward()
                 if not (back.is_room or back.is_passage):
-                    return False, crossed_passages[:cross_count]
+                    return False, self._crossed_passages[:cross_count]
             elif i == len(points) - 1 and not allow_dead_end:
                 forward = probe.check_forward()
                 if not (forward.is_room or forward.is_passage):
-                    return False, crossed_passages[:cross_count]
+                    return False, self._crossed_passages[:cross_count]
             
             # Check current position
             curr = probe.check_forward()
             
             # Track passage crossings
             if curr.is_passage:
-                crossed_passages[cross_count] = curr.element_idx
+                self._crossed_passages[cross_count] = curr.element_idx
                 cross_count += 1
                 
                 # Efficient passage crossing check
                 probe.move_backward()
                 for _ in range(3):
                     if not probe.check_forward().is_empty:
-                        return False, crossed_passages[:cross_count]
+                        return False, self._crossed_passages[:cross_count]
                     probe.move_backward()
                     
                 probe.x, probe.y = curr_x, curr_y  # Reset position
@@ -689,12 +689,12 @@ class OccupancyGrid:
                 for _ in range(3):
                     probe.move_forward()
                     if not probe.check_forward().is_empty:
-                        return False, crossed_passages[:cross_count]
+                        return False, self._crossed_passages[:cross_count]
                         
             elif curr.is_blocked:
-                return False, crossed_passages[:cross_count]
+                return False, self._crossed_passages[:cross_count]
                     
-        return True, crossed_passages[:cross_count]
+        return True, self._crossed_passages[:cross_count]
         
     def _room_to_probe_dir(self, direction: RoomDirection) -> ProbeDirection:
         """Convert RoomDirection to ProbeDirection."""
