@@ -136,39 +136,16 @@ class Passage(MapElement):
         import random
         
         # First check if passage is possible
+        if not Passage.can_connect(start, start_direction, end, end_direction, min_segment_length):
+            return None
+
+        # Handle single grid case
         sx, sy = start
         ex, ey = end
-        dx = ex - sx
-        dy = ey - sy
-
-        # For single grid case, directions must be opposite
-        if dx == 0 and dy == 0:
-            opposite_dirs = {
-                RoomDirection.NORTH: RoomDirection.SOUTH,
-                RoomDirection.SOUTH: RoomDirection.NORTH,
-                RoomDirection.EAST: RoomDirection.WEST,
-                RoomDirection.WEST: RoomDirection.EAST
-            }
-            if end_direction != opposite_dirs.get(start_direction):
-                return None
+        if sx == ex and sy == ey:
             return [start, end]
 
-        # For other cases:
-        # 1. Start direction must not point away from end
-        if ((start_direction == RoomDirection.NORTH and dy > 0) or
-            (start_direction == RoomDirection.SOUTH and dy < 0) or
-            (start_direction == RoomDirection.EAST and dx < 0) or
-            (start_direction == RoomDirection.WEST and dx > 0)):
-            return None
-
-        # 2. End direction must not point away from start
-        if ((end_direction == RoomDirection.NORTH and dy < 0) or
-            (end_direction == RoomDirection.SOUTH and dy > 0) or
-            (end_direction == RoomDirection.EAST and dx > 0) or
-            (end_direction == RoomDirection.WEST and dx < 0)):
-            return None
-
-        # 3. For straight passages, directions must match and either x or y must align
+        # Handle straight passage case
         if start_direction == end_direction and (sx == ex or sy == ey):
             return [start, end]
             
@@ -243,12 +220,43 @@ class Passage(MapElement):
         Returns:
             True if points can be connected with a valid passage, False otherwise
         """
-        points = Passage.generate_passage_points(
-            start, start_direction,
-            end, end_direction,
-            min_segment_length
-        )
-        return points is not None
+        # Get deltas between points
+        sx, sy = start
+        ex, ey = end
+        dx = ex - sx
+        dy = ey - sy
+
+        # For single grid case, directions must be opposite
+        if dx == 0 and dy == 0:
+            opposite_dirs = {
+                RoomDirection.NORTH: RoomDirection.SOUTH,
+                RoomDirection.SOUTH: RoomDirection.NORTH,
+                RoomDirection.EAST: RoomDirection.WEST,
+                RoomDirection.WEST: RoomDirection.EAST
+            }
+            return end_direction == opposite_dirs.get(start_direction)
+
+        # For other cases:
+        # 1. Start direction must not point away from end
+        if ((start_direction == RoomDirection.NORTH and dy > 0) or
+            (start_direction == RoomDirection.SOUTH and dy < 0) or
+            (start_direction == RoomDirection.EAST and dx < 0) or
+            (start_direction == RoomDirection.WEST and dx > 0)):
+            return False
+
+        # 2. End direction must not point away from start
+        if ((end_direction == RoomDirection.NORTH and dy < 0) or
+            (end_direction == RoomDirection.SOUTH and dy > 0) or
+            (end_direction == RoomDirection.EAST and dx > 0) or
+            (end_direction == RoomDirection.WEST and dx < 0)):
+            return False
+
+        # 3. For straight passages, directions must match and either x or y must align
+        if start_direction == end_direction:
+            return sx == ex or sy == ey
+
+        # If we get here, an L-shaped passage should be possible
+        return True
 
     @classmethod
     def from_grid_path(cls, grid_points: List[Tuple[int, int]], 
