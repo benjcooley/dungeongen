@@ -601,15 +601,18 @@ class OccupancyGrid:
             # Check if corner (direction changes from previous point)
             if i > 0 and curr_direction != prev_direction:
                 turn = prev_direction.get_turn_direction(curr_direction)
-                if turn:
-                    # When turning, we need to check the cells in the direction of the turn
-                    # to ensure there's enough clearance for the corner
-                    if turn == ProbeDirection.RIGHT:
-                        # Check forward-right and back-right for right turns
-                        check_dirs = (ProbeDirection.FORWARD_RIGHT, ProbeDirection.BACK_RIGHT)
-                    else:  # turn == ProbeDirection.LEFT
-                        # Check forward-left and back-left for left turns
-                        check_dirs = (ProbeDirection.FORWARD_LEFT, ProbeDirection.BACK_LEFT)
+                # Fail if not a valid 90-degree turn (no backtracking)
+                if not turn:
+                    return False, self._crossed_passages[:cross_count]
+                    
+                # When turning, we need to check the cells in the direction of the turn
+                # to ensure there's enough clearance for the corner
+                if turn == ProbeDirection.RIGHT:
+                    # Check forward-right and back-right for right turns
+                    check_dirs = (ProbeDirection.FORWARD_RIGHT, ProbeDirection.BACK_RIGHT)
+                else:  # turn == ProbeDirection.LEFT
+                    # Check forward-left and back-left for left turns
+                    check_dirs = (ProbeDirection.FORWARD_LEFT, ProbeDirection.BACK_LEFT)
                 
                 for direction in check_dirs:
                     result = probe.check_direction(direction)
