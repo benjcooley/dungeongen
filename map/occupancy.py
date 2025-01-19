@@ -625,10 +625,10 @@ class OccupancyGrid:
             probe.x = self._points[idx]
             probe.y = self._points[idx + 1]
             probe.facing = ProbeDirection(self._points[idx + 2])
-                
-                # Quick side checks first (most common failure)
-                if not probe.check_left().is_empty or not probe.check_right().is_empty:
-                    return False, self._crossed_passages[:cross_count]
+            
+            # Quick side checks first (most common failure)
+            if not probe.check_left().is_empty or not probe.check_right().is_empty:
+                return False, self._crossed_passages[:cross_count]
             
             # Check if corner (direction changes from previous point)
             is_corner = False
