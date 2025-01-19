@@ -617,34 +617,27 @@ class OccupancyGrid:
                 # Set direction for previous point (including first point)
                 self._points[(points_count-1) * 3 + 2] = direction.value
                 
-                # Add points along segment (excluding start point which was already added)
+                # Add all points along segment including end point
                 if x1 == x2:  # Vertical
                     step = 1 if y2 > y1 else -1
                     y = y1 + step  # Start after first point
-                    while y != y2:
+                    while y <= y2 if step > 0 else y >= y2:
                         idx = points_count * 3
                         self._points[idx] = x1
                         self._points[idx + 1] = y
                         self._points[idx + 2] = direction.value
                         points_count += 1
                         y += step
-                else:  # Horizontal
+                else:  # Horizontal  
                     step = 1 if x2 > x1 else -1
                     x = x1 + step  # Start after first point
-                    while x != x2:
+                    while x <= x2 if step > 0 else x >= x2:
                         idx = points_count * 3
                         self._points[idx] = x
                         self._points[idx + 1] = y1
                         self._points[idx + 2] = direction.value
                         points_count += 1
                         x += step
-                
-                # Add end point of segment (will be a corner except for last segment)
-                idx = points_count * 3
-                self._points[idx] = x2
-                self._points[idx + 1] = y2
-                # Direction will be set in next iteration or below for last point
-                points_count += 1
             
             # Set direction for last point based on approach direction
             if points_count > 1:
