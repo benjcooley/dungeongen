@@ -571,27 +571,22 @@ class OccupancyGrid:
         self._point_count = self._expand_passage_points(points)
 
         # Process each point
+        prev_direction = None
         for i in range(self._point_count):
             idx = i * 3
             probe.x = self._points[idx]
             probe.y = self._points[idx + 1]
-            probe.facing = ProbeDirection(self._points[idx + 2])
+            curr_direction = ProbeDirection(self._points[idx + 2])
+            probe.facing = curr_direction
             
             # Quick side checks first (most common failure)
             if not probe.check_left().is_empty or not probe.check_right().is_empty:
                 return False, self._crossed_passages[:cross_count]
             
             # Check if corner (direction changes from previous point)
-            is_corner = False
-            if i > 0:
-                prev_idx = (i - 1) * 3
-                curr_direction = ProbeDirection(self._points[idx + 2])
-                prev_direction = ProbeDirection(self._points[prev_idx + 2])
-                if curr_direction != prev_direction:
-                    is_corner = True
-                    
-                    # Calculate turn direction by comparing current to previous
-                    turn_right = (curr_direction.value - prev_direction.value) % 8 == 2
+            if i > 0 and curr_direction != prev_direction:
+                # Calculate turn direction by comparing current to previous
+                turn_right = (curr_direction.value - prev_direction.value) % 8 == 2
                     check_dirs = (
                     ProbeDirection.NORTHEAST, 
                     ProbeDirection.SOUTHEAST
