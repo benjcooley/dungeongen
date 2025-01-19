@@ -228,51 +228,39 @@ class Passage(MapElement):
 
         # For single grid case, directions must be opposite
         if dx == 0 and dy == 0:
-            opposite_dirs = {
-                RoomDirection.NORTH: RoomDirection.SOUTH,
-                RoomDirection.SOUTH: RoomDirection.NORTH,
-                RoomDirection.EAST: RoomDirection.WEST,
-                RoomDirection.WEST: RoomDirection.EAST
-            }
-            return end_direction == opposite_dirs.get(start_direction)
+            if start_direction == RoomDirection.NORTH and end_direction == RoomDirection.SOUTH: return True
+            if start_direction == RoomDirection.SOUTH and end_direction == RoomDirection.NORTH: return True
+            if start_direction == RoomDirection.EAST and end_direction == RoomDirection.WEST: return True
+            if start_direction == RoomDirection.WEST and end_direction == RoomDirection.EAST: return True
+            return False
 
-        # For other cases:
-        # 1. Start direction must match direction from start to end
-        if sx == ex:  # Vertical path
-            if dy > 0 and start_direction != RoomDirection.SOUTH:
-                return False
-            if dy < 0 and start_direction != RoomDirection.NORTH:
-                return False
-        else:  # Horizontal path
-            if dx > 0 and start_direction != RoomDirection.EAST:
-                return False
-            if dx < 0 and start_direction != RoomDirection.WEST:
-                return False
-
-        # 2. End direction must match direction from end to start
-        if sx == ex:  # Vertical path
-            if dy > 0 and end_direction != RoomDirection.NORTH:
-                return False
-            if dy < 0 and end_direction != RoomDirection.SOUTH:
-                return False
-        else:  # Horizontal path
-            if dx > 0 and end_direction != RoomDirection.WEST:
-                return False
-            if dx < 0 and end_direction != RoomDirection.EAST:
-                return False
-
-        # 3. For straight passages, directions must be opposite and either x or y must align
-        if (sx == ex or sy == ey):
-            opposite_dirs = {
-                RoomDirection.NORTH: RoomDirection.SOUTH,
-                RoomDirection.SOUTH: RoomDirection.NORTH,
-                RoomDirection.EAST: RoomDirection.WEST,
-                RoomDirection.WEST: RoomDirection.EAST
-            }
-            return end_direction == opposite_dirs.get(start_direction)
-
-        # If we get here, an L-shaped passage should be possible
-        return True
+        # For L-shaped paths:
+        # Start direction must match first leg direction
+        # End direction must match second leg direction reversed
+        if dx > 0:  # Going east
+            if start_direction != RoomDirection.EAST: return False
+            if dy > 0:  # Then south
+                return end_direction == RoomDirection.NORTH
+            else:  # Then north
+                return end_direction == RoomDirection.SOUTH
+        elif dx < 0:  # Going west
+            if start_direction != RoomDirection.WEST: return False
+            if dy > 0:  # Then south
+                return end_direction == RoomDirection.NORTH
+            else:  # Then north
+                return end_direction == RoomDirection.SOUTH
+        elif dy > 0:  # Going south
+            if start_direction != RoomDirection.SOUTH: return False
+            if dx > 0:  # Then east
+                return end_direction == RoomDirection.WEST
+            else:  # Then west
+                return end_direction == RoomDirection.EAST
+        else:  # Going north
+            if start_direction != RoomDirection.NORTH: return False
+            if dx > 0:  # Then east
+                return end_direction == RoomDirection.WEST
+            else:  # Then west
+                return end_direction == RoomDirection.EAST
 
     @classmethod
     def from_grid_path(cls, grid_points: List[Tuple[int, int]], 
