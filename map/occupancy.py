@@ -238,18 +238,18 @@ class GridProbe:
         """Check if the cell to the right is empty."""
         return self.check_direction_empty(self.facing.turn_right())
         
-    def get_debug_point(self, direction: ProbeDirection, is_valid: bool = False) -> 'OccupancyGrid.PassageCheckPoint':
-        """Get debug visualization info for a direction.
+    def add_debug_point(self, direction: ProbeDirection, is_valid: bool, debug_points: list['OccupancyGrid.PassageCheckPoint']) -> None:
+        """Add a debug visualization point for a direction.
         
         Args:
             direction: Direction to check relative to current facing
             is_valid: Whether this point passed validation
-            
-        Returns:
-            PassageCheckPoint with grid position, direction and validity
+            debug_points: List to append the debug point to
         """
         dx, dy = direction.relative_to(self.facing)
-        return self.PassageCheckPoint(self.x + dx, self.y + dy, direction, is_valid)
+        debug_points.append(
+            self.PassageCheckPoint(self.x + dx, self.y + dy, direction, is_valid)
+        )
         
     def check_forward_left(self) -> ProbeResult:
         """Check the cell diagonally forward-left without moving."""
