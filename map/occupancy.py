@@ -40,6 +40,18 @@ class ProbeDirection(Enum):
     LEFT = 6
     FORWARD_LEFT = 7
     
+    # Pre-computed direction offsets relative to FORWARD direction
+    OFFSETS = [
+        (0, -1),  # FORWARD
+        (1, -1),  # FORWARD_RIGHT
+        (1, 0),   # RIGHT
+        (1, 1),   # BACK_RIGHT
+        (0, 1),   # BACK
+        (-1, 1),  # BACK_LEFT
+        (-1, 0),  # LEFT
+        (-1, -1)  # FORWARD_LEFT
+    ]
+    
     def turn_left(self) -> 'ProbeDirection':
         """Return the direction 90 degrees to the left."""
         return ProbeDirection((self.value - 2) % 8)
@@ -81,18 +93,7 @@ class ProbeDirection(Enum):
     
     def get_offset(self) -> tuple[int, int]:
         """Get the grid coordinate offset for this direction relative to FORWARD."""
-        # Base offsets for FORWARD direction
-        offsets = [
-            (0, -1),  # FORWARD
-            (1, -1),  # FORWARD_RIGHT
-            (1, 0),   # RIGHT
-            (1, 1),   # BACK_RIGHT
-            (0, 1),   # BACK
-            (-1, 1),  # BACK_LEFT
-            (-1, 0),  # LEFT
-            (-1, -1)  # FORWARD_LEFT
-        ]
-        return offsets[self.value]
+        return self.OFFSETS[self.value]
         
     def relative_to(self, facing: 'ProbeDirection') -> tuple[int, int]:
         """Get offset relative to a facing direction.
