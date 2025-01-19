@@ -226,15 +226,22 @@ class Passage(MapElement):
         dx = ex - sx
         dy = ey - sy
 
-        # For single point or straight lines:
-        # - Directions must be parallel to the line
-        # - Directions must be opposite
-        if dx == 0 and dy == 0 or sx == ex or sy == ey:  
-            # Must be parallel
-            if not start_direction.is_parallel(end_direction):
+        # For single point:
+        if dx == 0 and dy == 0:
+            # Must be parallel and opposite
+            return (start_direction.is_parallel(end_direction) and 
+                   end_direction == start_direction.get_opposite())
+                   
+        # For straight lines:
+        if sx == ex or sy == ey:
+            # Get expected directions based on line
+            line_dir = RoomDirection.from_points(start, end)
+            if line_dir is None:
                 return False
-            # Must be opposite
-            return end_direction == start_direction.get_opposite()
+            # Start direction must match line direction
+            # End direction must match reversed line direction
+            return (start_direction == line_dir and 
+                   end_direction == line_dir.get_opposite())
 
         # For L-shaped paths:
         # - Start direction must match first leg direction

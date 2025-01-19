@@ -53,6 +53,30 @@ class RoomDirection(Enum):
         """Check if this direction is parallel to another direction."""
         return self in (RoomDirection.NORTH, RoomDirection.SOUTH) == \
                other in (RoomDirection.NORTH, RoomDirection.SOUTH)
+               
+    @staticmethod
+    def from_points(p1: tuple[int, int], p2: tuple[int, int]) -> Optional['RoomDirection']:
+        """Get the direction from p1 to p2 assuming they form a straight line.
+        
+        Args:
+            p1: Starting point (x,y)
+            p2: Ending point (x,y)
+            
+        Returns:
+            Direction from p1 to p2, or None if points are same or not in straight line
+        """
+        x1, y1 = p1
+        x2, y2 = p2
+        
+        if x1 == x2 and y1 == y2:
+            return None
+            
+        if x1 == x2:  # Vertical line
+            return RoomDirection.SOUTH if y2 > y1 else RoomDirection.NORTH
+        elif y1 == y2:  # Horizontal line
+            return RoomDirection.EAST if x2 > x1 else RoomDirection.WEST
+        else:
+            return None  # Not a straight line
 
 class GrowDirection(Enum):
     """Controls which room to grow from when arranging."""
