@@ -603,12 +603,12 @@ class OccupancyGrid:
             
             # Check each point along the line
             for j, (curr_x, curr_y) in enumerate(line_points):
-            probe.x, probe.y = curr_x, curr_y
-            probe.facing = current_direction
-            
-            # Quick side checks first (most common failure)
-            if not probe.check_left().is_empty or not probe.check_right().is_empty:
-                return False, crossed_passages[:cross_count]
+                probe.x, probe.y = curr_x, curr_y
+                probe.facing = current_direction
+                
+                # Quick side checks first (most common failure)
+                if not probe.check_left().is_empty or not probe.check_right().is_empty:
+                    return False, crossed_passages[:cross_count]
             
             # Check if corner (direction change)
             is_corner = False
