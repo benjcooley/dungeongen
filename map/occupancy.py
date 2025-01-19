@@ -475,7 +475,7 @@ class OccupancyGrid:
         1. Single Point Passage:
            - MUST have room/passage behind (no exceptions)
            - Must have empty spaces on both sides (left/right)
-           - Optionally must have room/passage ahead (based on allow_dead_end)
+           - Must have room/passage ahead (unless allow_dead_end=True)
         
         2. Multi-Point Passage:
            a) Start Point:
@@ -489,21 +489,20 @@ class OccupancyGrid:
               - Direction determined by previous point
            
            c) Corner Points (direction changes):
-              - If NOT intersecting a passage:
-                * Must have ALL 8 surrounding cells empty
-                * No adjacent rooms/passages allowed
+              - Must have ALL 8 surrounding cells empty (no adjacent rooms/passages)
               - If intersecting a passage:
-                * Return false but add passage to crossed_passages list as potential connection point
+                * Return false but add passage index to crossed_passages list
+                * This allows using intersection point as potential connection
            
            d) Passage Crossing Points:
               - Must have 3 empty cells behind and 3 empty cells ahead
-              - This automatically enforces:
-                * Right angle crossings
+              - This spacing automatically enforces:
+                * Right angle crossings only
                 * No parallel passages
-                * Proper spacing
+                * Proper passage spacing
            
            e) Regular Points:
-              - Direction from previous to next point
+              - Direction determined by previous and next points
               - Must have empty sides (left/right)
               - Cannot be blocked
         
