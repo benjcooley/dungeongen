@@ -52,6 +52,21 @@ class ProbeDirection(Enum):
         """Return the opposite direction."""
         return ProbeDirection((self.value + 4) % 8)
         
+    def get_turn_direction(self, next_dir: 'ProbeDirection') -> Optional[str]:
+        """Get the turn direction from this direction to next_dir.
+        
+        Returns:
+            'right' for right turns
+            'left' for left turns
+            None if directions are the same or opposite
+        """
+        diff = (next_dir.value - self.value) % 8
+        if diff == 2:
+            return 'right'
+        elif diff == 6:
+            return 'left'
+        return None
+        
     @staticmethod
     def from_delta(dx: int, dy: int) -> 'ProbeDirection':
         """Convert a delta to a cardinal direction."""
@@ -585,15 +600,15 @@ class OccupancyGrid:
             
             # Check if corner (direction changes from previous point)
             if i > 0 and curr_direction != prev_direction:
-                # Calculate turn direction by comparing current to previous
-                turn_right = (curr_direction.value - prev_direction.value) % 8 == 2
-                check_dirs = (
-                    ProbeDirection.FORWARD_RIGHT, 
-                    ProbeDirection.BACK_RIGHT
-                ) if turn_right else (
-                    ProbeDirection.FORWARD_LEFT,
-                    ProbeDirection.BACK_LEFT
-                )
+                turn = prev_direction.get_turn_direction(curr_direction)
+                if turn:
+                    check_dirs = (
+                        ProbeDirection.FORWARD_RIGHT, 
+                        ProbeDirection.BACK_RIGHT
+                    ) if turn == 'right' else (
+                        ProbeDirection.FORWARD_LEFT,
+                        ProbeDirection.BACK_LEFT
+                    )
                 
                 for direction in check_dirs:
                     result = probe.check_direction(direction)
