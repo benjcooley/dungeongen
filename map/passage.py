@@ -95,13 +95,17 @@ class Passage(MapElement):
             
             # Create rectangle for this section
             if x1 == x2:  # Vertical section
+                # Convert upper-left grid point directly
                 x = map_x1
                 y = min(map_y1, map_y2)
                 width = CELL_SIZE
+                # Add 1 to lower grid point for height
                 height = abs(map_y2 - map_y1) + CELL_SIZE
             else:  # Horizontal section
+                # Convert upper-left grid point directly
                 x = min(map_x1, map_x2)
                 y = map_y1
+                # Add 1 to right grid point for width
                 width = abs(map_x2 - map_x1) + CELL_SIZE
                 height = CELL_SIZE
                 
