@@ -1,5 +1,6 @@
 """Passage map element definition."""
 
+import random
 from graphics.shapes import Rectangle, Shape, ShapeGroup
 from map.mapelement import MapElement
 from graphics.conversions import grid_to_map, grid_points_to_map_rect, map_to_grid_rect
@@ -24,7 +25,9 @@ class Passage(MapElement):
     def __init__(self, grid_points: List[Tuple[int, int]], 
                  start_direction: Optional[RoomDirection] = None,
                  end_direction: Optional[RoomDirection] = None,
-                 allow_dead_end: bool = False) -> None:
+                 allow_dead_end: bool = False,
+                 min_segment_length: int = 2,
+                 max_subdivisions: int = 3) -> None:
         """Create a passage from a list of grid points.
         
         Args:
