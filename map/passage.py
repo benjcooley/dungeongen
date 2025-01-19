@@ -157,36 +157,30 @@ class Passage(MapElement):
         if not is_valid_direction(end_direction, -dx, -dy):
             return None
             
-        # Try straight line first if directions align
-        if start_direction == end_direction or (
-            abs(dx) >= min_segment_length * 2 and abs(dy) >= min_segment_length * 2
-        ):
-            # Generate straight or L-shaped path
+        # Handle single grid case
+        if abs(dx) <= 1 and abs(dy) <= 1:
+            if start_direction == end_direction:
+                return [start, end]
+            return None
+            
+        # Try straight line if directions align
+        if start_direction == end_direction:
+            return [start, end]
+            
+        # Try L-shaped path if enough space
+        if abs(dx) >= min_segment_length * 2 and abs(dy) >= min_segment_length * 2:
             points = [start]
             
-            # Add start segment
-            if start_direction == RoomDirection.NORTH:
-                points.append((sx, sy - min_segment_length))
-            elif start_direction == RoomDirection.SOUTH:
-                points.append((sx, sy + min_segment_length))
-            elif start_direction == RoomDirection.EAST:
-                points.append((sx + min_segment_length, sy))
-            else:  # WEST
-                points.append((sx - min_segment_length, sy))
+            # Add corner point based on start direction
+            if start_direction in (RoomDirection.NORTH, RoomDirection.SOUTH):
+                points.append((sx, ey))
+            else:
+                points.append((ex, sy))
                 
-            # Add corner point if needed
-            if start_direction != end_direction:
-                if start_direction in (RoomDirection.NORTH, RoomDirection.SOUTH):
-                    points.append((ex, points[-1][1]))
-                else:
-                    points.append((points[-1][0], ey))
-                    
-            # Add end point
             points.append(end)
-            
             return points
             
-        # For longer paths, add random turns
+        # For more complex paths, add random turns
         max_turns = min(3, max(abs(dx), abs(dy)) // min_segment_length)
         if max_turns < 1:
             return None
