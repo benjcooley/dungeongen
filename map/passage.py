@@ -112,7 +112,8 @@ class Passage(MapElement):
         start_direction: RoomDirection,
         end: Tuple[int, int],
         end_direction: RoomDirection,
-        min_segment_length: int = 2
+        min_segment_length: int = 2,
+        max_subdivisions: int = 3
     ) -> Optional[List[Tuple[int, int]]]:
         """Generate a list of grid points for a passage with optional random turns.
         
@@ -197,8 +198,11 @@ class Passage(MapElement):
             curr_x, curr_y = x1, y1
             remaining = run_length
             
-            # While we can fit at least 2 more segments
-            while remaining >= 2 * min_segment_length:
+            # Track number of subdivisions
+            subdivisions = 0
+            
+            # While we can fit at least 2 more segments and haven't hit max subdivisions
+            while remaining >= 2 * min_segment_length and subdivisions < max_subdivisions:
                 # Choose random length for this segment
                 d = random.randint(min_segment_length, remaining - min_segment_length)
                 
