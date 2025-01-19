@@ -734,8 +734,10 @@ class OccupancyGrid:
                 if not (forward.is_room or forward.is_passage):
                     return False, self._crossed_passages[:cross_count]
             
-            # Check current position
+            # Quick check for blocked cells first
             curr = probe.check_forward()
+            if curr.is_blocked:
+                return False, self._crossed_passages[:cross_count]
             
             # Track passage crossings
             if curr.is_passage:
@@ -751,9 +753,6 @@ class OccupancyGrid:
                     # Check cells ahead
                     if not probe.check_direction_empty(ProbeDirection((probe.facing.value + offset) % 8)):
                         return False, self._crossed_passages[:cross_count]
-                        
-            elif curr.is_blocked:
-                return False, self._crossed_passages[:cross_count]
                     
         return True, self._crossed_passages[:cross_count]
         
