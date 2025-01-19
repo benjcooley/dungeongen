@@ -592,6 +592,8 @@ class OccupancyGrid:
         This is a performance-critical method used frequently during dungeon generation.
         It uses a single reused probe and optimized checks to validate passage placement.
         
+        Debug visualization can be enabled with DebugDrawFlags.PASSAGE_CHECK.
+        
         The passage validation rules are:
         
         1. Single Point Passage:
@@ -644,6 +646,10 @@ class OccupancyGrid:
         # Reset crossed passages tracking
         cross_count = 0
         
+        # Clear debug visualization if enabled
+        if debug_draw.is_enabled(DebugDrawFlags.PASSAGE_CHECK):
+            self._debug_passage_points.clear()
+        
         # Reuse a single probe for all checks
         probe = GridProbe(self, 0, 0, facing=self._room_to_probe_dir(start_direction))
         
@@ -667,7 +673,17 @@ class OccupancyGrid:
             
             # Quick side checks first (most common failure)
             if not probe.check_left_empty() or not probe.check_right_empty():
+                if debug_draw.is_enabled(DebugDrawFlags.PASSAGE_CHECK):
+                    self._debug_passage_points.append(
+                        self.PassageCheckPoint(probe.x, probe.y, probe.facing, False, False, False)
+                    )
                 return False, self._crossed_passages[:cross_count]
+            
+            # Track valid point
+            if debug_draw.is_enabled(DebugDrawFlags.PASSAGE_CHECK):
+                self._debug_passage_points.append(
+                    self.PassageCheckPoint(probe.x, probe.y, probe.facing, True, False, False)
+                )
             
             # Check if corner (direction changes from previous point)
             if i > 0 and curr_direction != prev_direction:
@@ -690,8 +706,16 @@ class OccupancyGrid:
                     if result.is_passage:
                         self._crossed_passages[cross_count] = result.element_idx
                         cross_count += 1
+                        if debug_draw.is_enabled(DebugDrawFlags.PASSAGE_CHECK):
+                            self._debug_passage_points.append(
+                                self.PassageCheckPoint(probe.x, probe.y, probe.facing, False, True, True)
+                            )
                         return False, self._crossed_passages[:cross_count]
                     if not probe.check_direction_empty(direction):
+                        if debug_draw.is_enabled(DebugDrawFlags.PASSAGE_CHECK):
+                            self._debug_passage_points.append(
+                                self.PassageCheckPoint(probe.x, probe.y, probe.facing, False, True, False)
+                            )
                         return False, self._crossed_passages[:cross_count]
                         
                 continue
@@ -886,7 +910,7 @@ class OccupancyGrid:
         return not self.is_occupied(grid_x, grid_y)
         
     def draw_debug(self, canvas: 'skia.Canvas') -> None:
-        """Draw debug visualization of occupied grid cells."""
+        """Draw debug visualization of occupied grid cells and passage checks."""
             
         # Define colors for different element types
         type_colors = list(range(6))
@@ -913,4 +937,40 @@ class OccupancyGrid:
                     # Draw semi-transparent rectangle
                     debug_draw_grid_cell(grid_x, grid_y, color, alpha=alpha, blocked=blocked)
 
+                        
+        # Draw passage check debug visualization if enabled
+        if debug_draw.is_enabled(DebugDrawFlags.PASSAGE_CHECK) and self._debug_passage_points:
+            for point in self._debug_passage_points:
+                # Choose colors based on point type
+                if not point.is_valid:
+                    color = skia.Color(255, 0, 0)  # Red for invalid
+                    alpha = 128
+                elif point.is_corner:
+                    color = skia.Color(0, 0, 255)  # Blue for corners
+                    alpha = 160
+                elif point.is_crossing:
+                    color = skia.Color(255, 255, 0)  # Yellow for crossings
+                    alpha = 160
+                else:
+                    color = skia.Color(0, 255, 0)  # Green for valid
+                    alpha = 96
+                
+                # Draw cell
+                debug_draw_grid_cell(point.x, point.y, color, alpha=alpha)
+                
+                # Draw direction indicator
+                if point.direction is not None:
+                    # Convert grid to pixel coordinates
+                    px = point.x * CELL_SIZE + CELL_SIZE/2
+                    py = point.y * CELL_SIZE + CELL_SIZE/2
+                    
+                    # Get direction offset
+                    dx, dy = point.direction.get_offset()
+                    # Scale for visibility
+                    dx *= CELL_SIZE/2
+                    dy *= CELL_SIZE/2
+                    
+                    # Draw direction line
+                    paint = skia.Paint(Color=color, StrokeWidth=2)
+                    canvas.drawLine(px, py, px + dx, py + dy, paint)
                         
