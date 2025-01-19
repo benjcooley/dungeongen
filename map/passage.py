@@ -222,6 +222,33 @@ class Passage(MapElement):
                 
         return None
 
+    @staticmethod
+    def can_connect(
+        start: Tuple[int, int],
+        start_direction: RoomDirection,
+        end: Tuple[int, int],
+        end_direction: RoomDirection,
+        min_segment_length: int = 2
+    ) -> bool:
+        """Check if two points with given directions can be connected with a valid passage.
+        
+        Args:
+            start: Starting grid point (x,y)
+            start_direction: Direction to exit start point
+            end: Ending grid point (x,y)
+            end_direction: Direction to enter end point
+            min_segment_length: Minimum grid cells between turns (default 2)
+            
+        Returns:
+            True if points can be connected with a valid passage, False otherwise
+        """
+        points = Passage.generate_passage_points(
+            start, start_direction,
+            end, end_direction,
+            min_segment_length
+        )
+        return points is not None
+
     @classmethod
     def from_grid_path(cls, grid_points: List[Tuple[int, int]], 
                       start_direction: Optional[RoomDirection] = None,
