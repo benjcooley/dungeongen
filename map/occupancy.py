@@ -690,9 +690,8 @@ class OccupancyGrid:
             curr = probe.check_forward()
             if curr.is_blocked:
                 if debug_enabled:
-                    fail_x, fail_y, fail_dir, valid = probe.get_debug_point(probe.facing, False)
                     self._debug_passage_points.append(
-                        self.PassageCheckPoint(fail_x, fail_y, probe.facing, False)
+                        self.PassageCheckPoint(*probe.get_debug_point(probe.facing, False))
                     )
                 return False, self._crossed_passages[:cross_count]
 
@@ -701,18 +700,16 @@ class OccupancyGrid:
                 back = probe.check_backward()
                 if not (back.is_room or back.is_passage):
                     if debug_enabled:
-                        fail_x, fail_y, fail_dir, valid = probe.get_debug_point(probe.facing.turn_around(), False)
                         self._debug_passage_points.append(
-                            self.PassageCheckPoint(fail_x, fail_y, probe.facing, False)
+                            self.PassageCheckPoint(*probe.get_debug_point(probe.facing.turn_around(), False))
                         )
                     return False, self._crossed_passages[:cross_count]
             elif i == len(points) - 1 and not allow_dead_end:
                 forward = probe.check_forward()
                 if not (forward.is_room or forward.is_passage):
                     if debug_enabled:
-                        fail_x, fail_y, fail_dir, valid = probe.get_debug_point(probe.facing, False)
                         self._debug_passage_points.append(
-                            self.PassageCheckPoint(fail_x, fail_y, probe.facing, False)
+                            self.PassageCheckPoint(*probe.get_debug_point(probe.facing, False))
                         )
                     return False, self._crossed_passages[:cross_count]
             
@@ -797,17 +794,15 @@ class OccupancyGrid:
             # Normal point validation (must be last)
             if not probe.check_left_empty():
                 if debug_enabled:
-                    fail_x, fail_y, fail_dir, valid = probe.get_debug_point(probe.facing.turn_left(), False)
                     self._debug_passage_points.append(
-                        self.PassageCheckPoint(fail_x, fail_y, probe.facing, False)
+                        self.PassageCheckPoint(*probe.get_debug_point(probe.facing.turn_left(), False))
                     )
                 return False, self._crossed_passages[:cross_count]
                 
             if not probe.check_right_empty():
                 if debug_enabled:
-                    fail_x, fail_y, fail_dir, valid = probe.get_debug_point(probe.facing.turn_right(), False)
                     self._debug_passage_points.append(
-                        self.PassageCheckPoint(fail_x, fail_y, probe.facing, False)
+                        self.PassageCheckPoint(*probe.get_debug_point(probe.facing.turn_right(), False))
                     )
                 return False, self._crossed_passages[:cross_count]
             
