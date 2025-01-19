@@ -676,16 +676,28 @@ class OccupancyGrid:
             # Quick check for blocked cells first - must be at top
             curr = probe.check_forward()
             if curr.is_blocked:
+                if debug_enabled:
+                    self._debug_passage_points.append(
+                        self.PassageCheckPoint(probe.x, probe.y, probe.facing, False)
+                    )
                 return False, self._crossed_passages[:cross_count]
 
             # Check endpoints
             if i == 0:
                 back = probe.check_backward()
                 if not (back.is_room or back.is_passage):
+                    if debug_enabled:
+                        self._debug_passage_points.append(
+                            self.PassageCheckPoint(probe.x, probe.y, probe.facing, False)
+                        )
                     return False, self._crossed_passages[:cross_count]
             elif i == len(points) - 1 and not allow_dead_end:
                 forward = probe.check_forward()
                 if not (forward.is_room or forward.is_passage):
+                    if debug_enabled:
+                        self._debug_passage_points.append(
+                            self.PassageCheckPoint(probe.x, probe.y, probe.facing, False)
+                        )
                     return False, self._crossed_passages[:cross_count]
             
             # Check if corner (direction changes from previous point)
@@ -693,6 +705,10 @@ class OccupancyGrid:
                 turn = prev_direction.get_turn_direction(curr_direction)
                 # Fail if not a valid 90-degree turn (no backtracking)
                 if not turn:
+                    if debug_enabled:
+                        self._debug_passage_points.append(
+                            self.PassageCheckPoint(probe.x, probe.y, probe.facing, False)
+                        )
                     return False, self._crossed_passages[:cross_count]
                     
                 # When turning, we need to check the cells in the direction of the turn
