@@ -203,6 +203,14 @@ class GridProbe:
             self.x + dx, self.y + dy
         )
         return ProbeResult(element_type, element_idx, blocked)
+        
+    def check_direction_empty(self, direction: ProbeDirection) -> bool:
+        """Check if the cell in the given direction is empty."""
+        dx, dy = direction.relative_to(self._facing)
+        element_type, _, _ = self.grid.get_cell_info(
+            self.x + dx, self.y + dy
+        )
+        return element_type == ElementType.NONE
     
     def check_forward(self) -> ProbeResult:
         """Check the cell in front without moving."""
@@ -211,30 +219,58 @@ class GridProbe:
     def check_backward(self) -> ProbeResult:
         """Check the cell behind without moving."""
         return self.check_direction(self.facing.turn_around())
+        
+    def check_backward_empty(self) -> bool:
+        """Check if the cell behind is empty."""
+        return self.check_direction_empty(self.facing.turn_around())
     
     def check_left(self) -> ProbeResult:
         """Check the cell to the left without moving."""
         return self.check_direction(self.facing.turn_left())
+        
+    def check_left_empty(self) -> bool:
+        """Check if the cell to the left is empty."""
+        return self.check_direction_empty(self.facing.turn_left())
     
     def check_right(self) -> ProbeResult:
         """Check the cell to the right without moving."""
         return self.check_direction(self.facing.turn_right())
         
+    def check_right_empty(self) -> bool:
+        """Check if the cell to the right is empty."""
+        return self.check_direction_empty(self.facing.turn_right())
+        
     def check_forward_left(self) -> ProbeResult:
         """Check the cell diagonally forward-left without moving."""
         return self.check_direction(ProbeDirection((self.facing.value - 1) % 8))
+        
+    def check_forward_left_empty(self) -> bool:
+        """Check if the cell diagonally forward-left is empty."""
+        return self.check_direction_empty(ProbeDirection((self.facing.value - 1) % 8))
         
     def check_forward_right(self) -> ProbeResult:
         """Check the cell diagonally forward-right without moving."""
         return self.check_direction(ProbeDirection((self.facing.value + 1) % 8))
         
+    def check_forward_right_empty(self) -> bool:
+        """Check if the cell diagonally forward-right is empty."""
+        return self.check_direction_empty(ProbeDirection((self.facing.value + 1) % 8))
+        
     def check_backward_left(self) -> ProbeResult:
         """Check the cell diagonally backward-left without moving."""
         return self.check_direction(ProbeDirection((self.facing.value - 3) % 8))
         
+    def check_backward_left_empty(self) -> bool:
+        """Check if the cell diagonally backward-left is empty."""
+        return self.check_direction_empty(ProbeDirection((self.facing.value - 3) % 8))
+        
     def check_backward_right(self) -> ProbeResult:
         """Check the cell diagonally backward-right without moving."""
         return self.check_direction(ProbeDirection((self.facing.value + 3) % 8))
+        
+    def check_backward_right_empty(self) -> bool:
+        """Check if the cell diagonally backward-right is empty."""
+        return self.check_direction_empty(ProbeDirection((self.facing.value + 3) % 8))
 
 class ElementType(IntFlag):
     """Element types for occupancy grid cells."""
@@ -618,7 +654,7 @@ class OccupancyGrid:
             probe.facing = curr_direction
             
             # Quick side checks first (most common failure)
-            if not probe.check_left().is_empty or not probe.check_right().is_empty:
+            if not probe.check_left_empty() or not probe.check_right_empty():
                 return False, self._crossed_passages[:cross_count]
             
             # Check if corner (direction changes from previous point)
@@ -643,7 +679,7 @@ class OccupancyGrid:
                         self._crossed_passages[cross_count] = result.element_idx
                         cross_count += 1
                         return False, self._crossed_passages[:cross_count]
-                    if not result.is_empty:
+                    if not probe.check_direction_empty(direction):
                         return False, self._crossed_passages[:cross_count]
                         
                 continue
@@ -762,7 +798,7 @@ class OccupancyGrid:
         probe = GridProbe(self, x, y, facing=direction)
         
         # Quick checks in order of likelihood
-        if not probe.check_left().is_empty or not probe.check_right().is_empty:
+        if not probe.check_left_empty() or not probe.check_right_empty():
             return False
             
         back = probe.check_backward()
