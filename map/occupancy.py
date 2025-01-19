@@ -52,19 +52,19 @@ class ProbeDirection(Enum):
         """Return the opposite direction."""
         return ProbeDirection((self.value + 4) % 8)
         
-    def get_turn_direction(self, next_dir: 'ProbeDirection') -> Optional[str]:
+    def get_turn_direction(self, next_dir: 'ProbeDirection') -> Optional['ProbeDirection']:
         """Get the turn direction from this direction to next_dir.
         
         Returns:
-            'right' for right turns
-            'left' for left turns
+            ProbeDirection.RIGHT for right turns
+            ProbeDirection.LEFT for left turns
             None if directions are the same or opposite
         """
         diff = (next_dir.value - self.value) % 8
         if diff == 2:
-            return 'right'
+            return ProbeDirection.RIGHT
         elif diff == 6:
-            return 'left'
+            return ProbeDirection.LEFT
         return None
         
     @staticmethod
@@ -604,10 +604,10 @@ class OccupancyGrid:
                 if turn:
                     # When turning, we need to check the cells in the direction of the turn
                     # to ensure there's enough clearance for the corner
-                    if turn == 'right':
+                    if turn == ProbeDirection.RIGHT:
                         # Check forward-right and back-right for right turns
                         check_dirs = (ProbeDirection.FORWARD_RIGHT, ProbeDirection.BACK_RIGHT)
-                    else:  # turn == 'left'
+                    else:  # turn == ProbeDirection.LEFT
                         # Check forward-left and back-left for left turns
                         check_dirs = (ProbeDirection.FORWARD_LEFT, ProbeDirection.BACK_LEFT)
                 
