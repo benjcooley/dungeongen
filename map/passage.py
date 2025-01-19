@@ -135,12 +135,22 @@ class Passage(MapElement):
         """
         import random
         
-        # Validate directions relative to start/end points
+        # Get deltas between points
         sx, sy = start
         ex, ey = end
         dx = ex - sx
         dy = ey - sy
         
+        # Handle single grid case first - points must be adjacent and directions opposite
+        if abs(dx) <= 1 and abs(dy) <= 1:
+            # Check if directions are opposite
+            if (start_direction == RoomDirection.NORTH and end_direction == RoomDirection.SOUTH) or \
+               (start_direction == RoomDirection.SOUTH and end_direction == RoomDirection.NORTH) or \
+               (start_direction == RoomDirection.EAST and end_direction == RoomDirection.WEST) or \
+               (start_direction == RoomDirection.WEST and end_direction == RoomDirection.EAST):
+                return [start, end]
+            return None
+            
         # Helper to check if direction is valid for delta
         def is_valid_direction(direction: RoomDirection, dx: int, dy: int) -> bool:
             if direction == RoomDirection.NORTH and dy > 0: return False
@@ -155,12 +165,6 @@ class Passage(MapElement):
             
         # Check end direction is valid
         if not is_valid_direction(end_direction, -dx, -dy):
-            return None
-            
-        # Handle single grid case
-        if abs(dx) <= 1 and abs(dy) <= 1:
-            if start_direction == end_direction:
-                return [start, end]
             return None
             
         # Try straight line if directions align
