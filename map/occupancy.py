@@ -586,7 +586,7 @@ class OccupancyGrid:
                     current_direction = next_direction
                 
                 # Only check relevant quadrant based on turn direction
-                turn_right = (directions[i-1].value + 2) % 8 == directions[i].value
+                turn_right = (current_direction.value + 2) % 8 == next_direction.value
                 check_dirs = (
                     ProbeDirection.NORTHEAST, 
                     ProbeDirection.SOUTHEAST
