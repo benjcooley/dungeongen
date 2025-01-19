@@ -21,24 +21,24 @@ if TYPE_CHECKING:
 class ProbeDirection(Enum):
     """Directions for grid navigation probe.
     
-    Directions are numbered clockwise from 0-7:
-    0 = North
-    1 = Northeast
-    2 = East
-    3 = Southeast
-    4 = South
-    5 = Southwest
-    6 = West
-    7 = Northwest
+    Directions are relative to probe facing:
+    0 = Forward
+    1 = Forward-Right
+    2 = Right
+    3 = Back-Right
+    4 = Back
+    5 = Back-Left
+    6 = Left
+    7 = Forward-Left
     """
-    NORTH = 0
-    NORTHEAST = 1
-    EAST = 2
-    SOUTHEAST = 3
-    SOUTH = 4
-    SOUTHWEST = 5
-    WEST = 6
-    NORTHWEST = 7
+    FORWARD = 0
+    FORWARD_RIGHT = 1
+    RIGHT = 2
+    BACK_RIGHT = 3
+    BACK = 4
+    BACK_LEFT = 5
+    LEFT = 6
+    FORWARD_LEFT = 7
     
     def turn_left(self) -> 'ProbeDirection':
         """Return the direction 90 degrees to the left."""
@@ -56,13 +56,13 @@ class ProbeDirection(Enum):
     def from_delta(dx: int, dy: int) -> 'ProbeDirection':
         """Convert a delta to a cardinal direction."""
         if dx > 0:
-            return ProbeDirection.EAST
+            return ProbeDirection.RIGHT
         elif dx < 0:
-            return ProbeDirection.WEST
+            return ProbeDirection.LEFT
         elif dy > 0:
-            return ProbeDirection.SOUTH
+            return ProbeDirection.BACK
         else:
-            return ProbeDirection.NORTH
+            return ProbeDirection.FORWARD
     
     def get_offset(self) -> tuple[int, int]:
         """Get the grid coordinate offset for this direction."""
@@ -588,11 +588,11 @@ class OccupancyGrid:
                 # Calculate turn direction by comparing current to previous
                 turn_right = (curr_direction.value - prev_direction.value) % 8 == 2
                 check_dirs = (
-                    ProbeDirection.NORTHEAST, 
-                    ProbeDirection.SOUTHEAST
+                    ProbeDirection.FORWARD_RIGHT, 
+                    ProbeDirection.BACK_RIGHT
                 ) if turn_right else (
-                    ProbeDirection.NORTHWEST,
-                    ProbeDirection.SOUTHWEST
+                    ProbeDirection.FORWARD_LEFT,
+                    ProbeDirection.BACK_LEFT
                 )
                 
                 for direction in check_dirs:
@@ -671,10 +671,10 @@ class OccupancyGrid:
             dx = x2 - x1
             dy = y2 - y1
             direction = (
-                ProbeDirection.EAST if dx > 0 else
-                ProbeDirection.WEST if dx < 0 else
-                ProbeDirection.SOUTH if dy > 0 else
-                ProbeDirection.NORTH
+                ProbeDirection.RIGHT if dx > 0 else
+                ProbeDirection.LEFT if dx < 0 else
+                ProbeDirection.BACK if dy > 0 else
+                ProbeDirection.FORWARD
             )
             
             # Set direction for previous point (including first point)
@@ -737,10 +737,10 @@ class OccupancyGrid:
     def _room_to_probe_dir(self, direction: RoomDirection) -> ProbeDirection:
         """Convert RoomDirection to ProbeDirection."""
         direction_map = {
-            RoomDirection.NORTH: ProbeDirection.NORTH,
-            RoomDirection.SOUTH: ProbeDirection.SOUTH,
-            RoomDirection.EAST: ProbeDirection.EAST,
-            RoomDirection.WEST: ProbeDirection.WEST
+            RoomDirection.NORTH: ProbeDirection.FORWARD,
+            RoomDirection.SOUTH: ProbeDirection.BACK,
+            RoomDirection.EAST: ProbeDirection.RIGHT,
+            RoomDirection.WEST: ProbeDirection.LEFT
         }
         return direction_map[direction]
         
