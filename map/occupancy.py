@@ -471,6 +471,9 @@ class OccupancyGrid:
                      allow_dead_end: bool = False) -> tuple[bool, list[int]]:
         """Check if a passage can be placed along a series of grid points.
         
+        This is a performance-critical method used frequently during dungeon generation.
+        It uses a single reused probe and optimized checks to validate passage placement.
+        
         The passage validation rules are:
         
         1. Single Point Passage:
@@ -520,96 +523,126 @@ class OccupancyGrid:
         if not points:
             return False, []
             
+        # Pre-allocate crossed passages list to avoid resizing
         crossed_passages = []
+        crossed_passages.extend([0] * len(points))  # Worst case: every point crosses a passage
+        cross_count = 0
         
-        # Handle single point case
+        # Reuse a single probe for all checks
+        probe = GridProbe(self, 0, 0, facing=self._room_to_probe_dir(start_direction))
+        
+        # Handle single point case efficiently
         if len(points) == 1:
             x, y = points[0]
-            probe = GridProbe(self, x, y, facing=self._room_to_probe_dir(start_direction))
+            probe.x, probe.y = x, y
             
-            # Must have room/passage behind (no exceptions)
+            # Quick checks in order of likelihood
+            if not probe.check_left().is_empty or not probe.check_right().is_empty:
+                return False, []
+                
             back = probe.check_backward()
             if not (back.is_room or back.is_passage):
-                return False, crossed_passages
+                return False, []
                 
-            # Must have empty sides
-            if not probe.check_left().is_empty or not probe.check_right().is_empty:
-                return False, crossed_passages
-                
-            # Must have room/passage ahead (unless allow_dead_end)
-            forward = probe.check_forward()
-            if not allow_dead_end and not (forward.is_room or forward.is_passage):
-                return False, crossed_passages
-                
-            return True, crossed_passages
+            if not allow_dead_end:
+                forward = probe.check_forward()
+                if not (forward.is_room or forward.is_passage):
+                    return False, []
+                    
+            return True, []
             
-        # Multi-point path
+        # Multi-point path - cache directions for efficiency
+        directions = [None] * len(points)
+        
+        # Pre-calculate directions
+        for i in range(len(points)):
+            if i == 0:
+                dx = points[1][0] - points[0][0]
+                dy = points[1][1] - points[0][1]
+            else:
+                dx = points[i][0] - points[i-1][0]
+                dy = points[i][1] - points[i-1][1]
+                
+            if dx > 0:
+                directions[i] = ProbeDirection.EAST
+            elif dx < 0:
+                directions[i] = ProbeDirection.WEST
+            elif dy > 0:
+                directions[i] = ProbeDirection.SOUTH
+            else:
+                directions[i] = ProbeDirection.NORTH
+        
+        # Validate each point
         for i, (curr_x, curr_y) in enumerate(points):
-            # Get probe direction based on position in path
-            probe = self._get_probe_for_path_point(points, i, curr_x, curr_y, start_direction)
+            probe.x, probe.y = curr_x, curr_y
+            probe.facing = directions[i]
             
-            # Check if this is a corner point
+            # Quick side checks first (most common failure)
+            if not probe.check_left().is_empty or not probe.check_right().is_empty:
+                return False, crossed_passages[:cross_count]
+            
+            # Check if corner (direction change)
             is_corner = False
-            if 0 < i < len(points) - 1:
-                prev_probe = self._get_probe_for_path_point(points, i-1, points[i-1][0], points[i-1][1], start_direction)
-                next_probe = self._get_probe_for_path_point(points, i+1, points[i+1][0], points[i+1][1], start_direction)
-                is_corner = prev_probe.facing != next_probe.facing
-            
-            if is_corner:
-                # For corners, check all 8 surrounding cells are empty
-                for direction in ProbeDirection:
+            if 0 < i < len(points) - 1 and directions[i-1] != directions[i]:
+                is_corner = True
+                
+                # Only check relevant quadrant based on turn direction
+                turn_right = (directions[i-1].value + 2) % 8 == directions[i].value
+                check_dirs = (
+                    ProbeDirection.NORTHEAST, 
+                    ProbeDirection.SOUTHEAST
+                ) if turn_right else (
+                    ProbeDirection.NORTHWEST,
+                    ProbeDirection.SOUTHWEST
+                )
+                
+                for direction in check_dirs:
                     result = probe.check_direction(direction)
                     if result.is_passage:
-                        crossed_passages.append(result.element_idx)
-                        return False, crossed_passages
+                        crossed_passages[cross_count] = result.element_idx
+                        cross_count += 1
+                        return False, crossed_passages[:cross_count]
                     if not result.is_empty:
-                        return False, crossed_passages
+                        return False, crossed_passages[:cross_count]
+                        
                 continue
-                
+            
             # Check endpoints
             if i == 0:
-                # First point must connect to room/passage
                 back = probe.check_backward()
                 if not (back.is_room or back.is_passage):
-                    return False, crossed_passages
-            elif i == len(points) - 1:
-                # Last point must connect to room/passage unless allow_dead_end
+                    return False, crossed_passages[:cross_count]
+            elif i == len(points) - 1 and not allow_dead_end:
                 forward = probe.check_forward()
-                if not allow_dead_end and not (forward.is_room or forward.is_passage):
-                    return False, crossed_passages
+                if not (forward.is_room or forward.is_passage):
+                    return False, crossed_passages[:cross_count]
             
             # Check current position
             curr = probe.check_forward()
-            left = probe.check_left()
-            right = probe.check_right()
             
             # Track passage crossings
             if curr.is_passage:
-                crossed_passages.append(curr.element_idx)
+                crossed_passages[cross_count] = curr.element_idx
+                cross_count += 1
                 
-                # Check 3 cells behind and ahead for passage crossing
-                for steps in range(1, 4):
-                    probe.move_backward()
+                # Efficient passage crossing check
+                probe.move_backward()
+                for _ in range(3):
                     if not probe.check_forward().is_empty:
-                        return False, crossed_passages
-                        
-                probe = GridProbe(self, curr_x, curr_y, facing=probe.facing)  # Reset position
+                        return False, crossed_passages[:cross_count]
+                    probe.move_backward()
+                    
+                probe.x, probe.y = curr_x, curr_y  # Reset position
                 
-                for steps in range(1, 4):
+                for _ in range(3):
                     probe.move_forward()
                     if not probe.check_forward().is_empty:
-                        return False, crossed_passages
+                        return False, crossed_passages[:cross_count]
                         
-                probe = GridProbe(self, curr_x, curr_y, facing=probe.facing)  # Reset position
-            
-            # Regular point validation
-            if curr.is_blocked:
-                return False, crossed_passages
-                
-            if not (left.is_empty and right.is_empty):
-                return False, crossed_passages
+            elif curr.is_blocked:
+                return False, crossed_passages[:cross_count]
                     
-        return True, crossed_passages
+        return True, crossed_passages[:cross_count]
         
     def _room_to_probe_dir(self, direction: RoomDirection) -> ProbeDirection:
         """Convert RoomDirection to ProbeDirection."""
