@@ -240,8 +240,7 @@ class Passage(MapElement):
         start: Tuple[int, int],
         start_direction: RoomDirection,
         end: Tuple[int, int],
-        end_direction: RoomDirection,
-        min_segment_length: int = 2
+        end_direction: RoomDirection
     ) -> bool:
         """Check if two points with given directions can be connected with a valid passage.
         
@@ -250,47 +249,18 @@ class Passage(MapElement):
             start_direction: Direction to exit start point
             end: Ending grid point (x,y)
             end_direction: Direction to enter end point
-            min_segment_length: Minimum grid cells between turns (default 2)
             
         Returns:
             True if points can be connected with a valid passage, False otherwise
         """
-        # Get deltas between points
-        sx, sy = start
-        ex, ey = end
-        dx = ex - sx
-        dy = ey - sy
-
         # For single point:
-        if dx == 0 and dy == 0:
+        if start[0] == end[0] and start[1] == end[1]:
             # Must be opposite directions
             return end_direction == start_direction.get_opposite()
-                   
-        # For straight lines:
-        if sx == ex or sy == ey:
-            # Start direction must be valid for moving from start to end
-            # End direction must be valid for moving from end to start
-            return (start_direction.is_valid_direction_for(start, end) and
-                   end_direction.is_valid_direction_for(end, start))
 
-        # For L-shaped or zig-zag paths:
-        # - Directions must be either perpendicular (L-shape) or parallel (zig-zag)
-        # - Start direction must be valid for first leg
-        # - End direction must be valid for second leg reversed
-        if not (start_direction.is_perpendicular(end_direction) or 
-                start_direction.is_parallel(end_direction)):
-            return False
-            
-        # For L-shape, create corner point based on start direction
-        corner = start
-        if start_direction in (RoomDirection.NORTH, RoomDirection.SOUTH):
-            corner = (start[0], end[1])  # Move vertically first
-        else:
-            corner = (end[0], start[1])  # Move horizontally first
-            
-        # Validate both legs
-        return (start_direction.is_valid_direction_for(start, corner) and
-                end_direction.is_valid_direction_for(end, corner))
+        # For all other cases:                  
+        return (start_direction.is_valid_direction_for(start, end) and
+                end_direction.is_valid_direction_for(end, start))
 
     @classmethod
     def from_grid_path(cls, grid_points: List[Tuple[int, int]], 
