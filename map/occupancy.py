@@ -561,25 +561,11 @@ class OccupancyGrid:
         # Reuse a single probe for all checks
         probe = GridProbe(self, 0, 0, facing=self._room_to_probe_dir(start_direction))
         
-        # Handle single point case efficiently
+        # Handle single point case efficiently 
         if len(points) == 1:
             x, y = points[0]
-            probe.x, probe.y = x, y
-            
-            # Quick checks in order of likelihood
-            if not probe.check_left().is_empty or not probe.check_right().is_empty:
-                return False, []
-                
-            back = probe.check_backward()
-            if not (back.is_room or back.is_passage):
-                return False, []
-                
-            if not allow_dead_end:
-                forward = probe.check_forward()
-                if not (forward.is_room or forward.is_passage):
-                    return False, []
-                    
-            return True, []
+            return self._check_single_point(x, y, self._room_to_probe_dir(start_direction), 
+                                         allow_dead_end), []
             
         # Expand corner points into full grid point sequence
         self._point_count = self._expand_passage_points(points)
@@ -726,6 +712,32 @@ class OccupancyGrid:
             self._points[(points_count-1) * 3 + 2] = direction.value
             
         return points_count
+
+    def _check_single_point(self, x: int, y: int, direction: ProbeDirection, 
+                           allow_dead_end: bool = False) -> bool:
+        """Check if a single point passage is valid.
+        
+        Single point passages must have:
+        - Room/passage behind (no exceptions) 
+        - Empty spaces on both sides
+        - Room/passage ahead (unless allow_dead_end=True)
+        """
+        probe = GridProbe(self, x, y, facing=direction)
+        
+        # Quick checks in order of likelihood
+        if not probe.check_left().is_empty or not probe.check_right().is_empty:
+            return False
+            
+        back = probe.check_backward()
+        if not (back.is_room or back.is_passage):
+            return False
+            
+        if not allow_dead_end:
+            forward = probe.check_forward()
+            if not (forward.is_room or forward.is_passage):
+                return False
+                
+        return True
 
     def _room_to_probe_dir(self, direction: RoomDirection) -> ProbeDirection:
         """Convert RoomDirection to ProbeDirection."""
