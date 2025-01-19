@@ -720,20 +720,6 @@ class OccupancyGrid:
                         
                 continue
             
-            # Normal point validation
-            if not probe.check_left_empty() or not probe.check_right_empty():
-                if debug_enabled:
-                    self._debug_passage_points.append(
-                        self.PassageCheckPoint(probe.x, probe.y, probe.facing, False, False, False)
-                    )
-                return False, self._crossed_passages[:cross_count]
-            
-            # Track valid point
-            if debug_enabled:
-                self._debug_passage_points.append(
-                    self.PassageCheckPoint(probe.x, probe.y, probe.facing, True, False, False)
-                )
-            
             # Quick check for blocked cells first
             curr = probe.check_forward()
             if curr.is_blocked:
@@ -753,6 +739,20 @@ class OccupancyGrid:
                     # Check cells ahead
                     if not probe.check_direction_empty(ProbeDirection((probe.facing.value + offset) % 8)):
                         return False, self._crossed_passages[:cross_count]
+
+            # Normal point validation (must be last)
+            if not probe.check_left_empty() or not probe.check_right_empty():
+                if debug_enabled:
+                    self._debug_passage_points.append(
+                        self.PassageCheckPoint(probe.x, probe.y, probe.facing, False, False, False)
+                    )
+                return False, self._crossed_passages[:cross_count]
+            
+            # Track valid point
+            if debug_enabled:
+                self._debug_passage_points.append(
+                    self.PassageCheckPoint(probe.x, probe.y, probe.facing, True, False, False)
+                )
                     
         return True, self._crossed_passages[:cross_count]
         
