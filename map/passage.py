@@ -226,15 +226,15 @@ class Passage(MapElement):
         dx = ex - sx
         dy = ey - sy
 
-        # For single grid case, directions must be opposite
-        if dx == 0 and dy == 0:
+        # For single grid case or straight lines, directions must be opposite
+        if dx == 0 and dy == 0 or (sx == ex or sy == ey):
             if start_direction == RoomDirection.NORTH and end_direction == RoomDirection.SOUTH: return True
             if start_direction == RoomDirection.SOUTH and end_direction == RoomDirection.NORTH: return True
             if start_direction == RoomDirection.EAST and end_direction == RoomDirection.WEST: return True
             if start_direction == RoomDirection.WEST and end_direction == RoomDirection.EAST: return True
             return False
 
-        # For L-shaped paths:
+        # For L-shaped paths (two valid direction pairs):
         # Start direction must match first leg direction
         # End direction must match second leg direction reversed
         if dx > 0:  # Going east
