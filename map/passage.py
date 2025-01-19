@@ -141,7 +141,7 @@ class Passage(MapElement):
         dx = ex - sx
         dy = ey - sy
         
-        # Handle single grid case first - points must be same or adjacent and directions opposite
+        # Handle single grid case first - points must be same and directions opposite
         if abs(dx) == 0 and abs(dy) == 0:
             # Check if directions are opposite
             if (start_direction == RoomDirection.NORTH and end_direction == RoomDirection.SOUTH) or \
