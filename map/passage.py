@@ -146,8 +146,23 @@ class Passage(MapElement):
             return [start, end]
 
         # Handle straight passage case
-        if start_direction == end_direction and (sx == ex or sy == ey):
-            return [start, end]
+        if sx == ex or sy == ey:
+            if start_direction == end_direction:
+                return [start, end]
+            elif start_direction == end_direction.get_opposite():
+                # For parallel but opposite directions (zig-zag),
+                # pick a midpoint that allows the path to reach both ends
+                if sx == ex:  # Vertical alignment
+                    # Move horizontally to create zig-zag
+                    mid_x = sx + (2 * min_segment_length if start_direction == RoomDirection.EAST else -2 * min_segment_length)
+                    corner1 = (mid_x, sy)
+                    corner2 = (mid_x, ey)
+                else:  # Horizontal alignment
+                    # Move vertically to create zig-zag
+                    mid_y = sy + (2 * min_segment_length if start_direction == RoomDirection.SOUTH else -2 * min_segment_length)
+                    corner1 = (sx, mid_y)
+                    corner2 = (ex, mid_y)
+                return [start, corner1, corner2, end]
             
         # Find corner point for L-shape
         corner_x, corner_y = sx, sy
@@ -245,8 +260,9 @@ class Passage(MapElement):
         # For L-shaped paths:
         # - Start direction must match first leg direction
         # - End direction must match second leg direction reversed
-        # - Directions must be perpendicular
-        if not start_direction.is_perpendicular(end_direction):
+        # - Directions can be either perpendicular (L-shape) or parallel (zig-zag)
+        if not (start_direction.is_perpendicular(end_direction) or 
+                start_direction.is_parallel(end_direction)):
             return False
         # Start direction must match first leg direction
         # End direction must match second leg direction reversed
