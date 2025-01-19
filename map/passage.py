@@ -141,8 +141,8 @@ class Passage(MapElement):
         dx = ex - sx
         dy = ey - sy
         
-        # Handle single grid case first - points must be adjacent and directions opposite
-        if abs(dx) <= 1 and abs(dy) <= 1:
+        # Handle single grid case first - points must be same or adjacent and directions opposite
+        if abs(dx) == 0 and abs(dy) == 0:
             # Check if directions are opposite
             if (start_direction == RoomDirection.NORTH and end_direction == RoomDirection.SOUTH) or \
                (start_direction == RoomDirection.SOUTH and end_direction == RoomDirection.NORTH) or \
@@ -171,8 +171,8 @@ class Passage(MapElement):
         if start_direction == end_direction:
             return [start, end]
             
-        # Try L-shaped path if enough space
-        if abs(dx) >= min_segment_length * 2 and abs(dy) >= min_segment_length * 2:
+        # Try L-shaped path if enough space (add 1 to account for end point)
+        if abs(dx) >= min_segment_length + 1 and abs(dy) >= min_segment_length + 1:
             points = [start]
             
             # Add corner point based on start direction
