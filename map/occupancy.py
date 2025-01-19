@@ -551,36 +551,17 @@ class OccupancyGrid:
                     
             return True, []
             
-        # Helper to get points along a line
+        # Helper to get points along a straight line
         def get_line_points(x1: int, y1: int, x2: int, y2: int) -> list[tuple[int, int]]:
             points = []
-            dx = abs(x2 - x1)
-            dy = abs(y2 - y1)
-            x, y = x1, y1
-            
-            step_x = 1 if x2 > x1 else -1 if x2 < x1 else 0
-            step_y = 1 if y2 > y1 else -1 if y2 < y1 else 0
-            
-            if dx > dy:
-                err = dx / 2
-                while x != x2:
-                    points.append((x, y))
-                    err -= dy
-                    if err < 0:
-                        y += step_y
-                        err += dx
-                    x += step_x
-            else:
-                err = dy / 2
-                while y != y2:
-                    points.append((x, y))
-                    err -= dx
-                    if err < 0:
-                        x += step_x
-                        err += dy
-                    y += step_y
-                    
-            points.append((x2, y2))
+            if x1 == x2:  # Vertical line
+                step = 1 if y2 > y1 else -1
+                for y in range(y1, y2 + step, step):
+                    points.append((x1, y))
+            else:  # Horizontal line
+                step = 1 if x2 > x1 else -1
+                for x in range(x1, x2 + step, step):
+                    points.append((x, y1))
             return points
             
         # Process each line segment
