@@ -106,6 +106,146 @@ class Passage(MapElement):
         """Whether this passage can end without connecting to anything."""
         return self._allow_dead_end
     
+    @staticmethod
+    def generate_passage_points(
+        start: Tuple[int, int],
+        start_direction: RoomDirection,
+        end: Tuple[int, int],
+        end_direction: RoomDirection,
+        min_segment_length: int = 2
+    ) -> Optional[List[Tuple[int, int]]]:
+        """Generate a list of grid points for a passage with optional random turns.
+        
+        The passage will:
+        - Start in the specified start_direction for at least min_segment_length
+        - End in the specified end_direction for at least min_segment_length
+        - Have random turns if direct path isn't possible/desired
+        - Never double back (segments always make forward progress)
+        - Have segments at least min_segment_length long
+        
+        Args:
+            start: Starting grid point (x,y)
+            start_direction: Direction to exit start point
+            end: Ending grid point (x,y)
+            end_direction: Direction to enter end point
+            min_segment_length: Minimum grid cells between turns (default 2)
+            
+        Returns:
+            List of grid points defining passage path, or None if no valid path possible
+        """
+        import random
+        
+        # Validate directions relative to start/end points
+        sx, sy = start
+        ex, ey = end
+        dx = ex - sx
+        dy = ey - sy
+        
+        # Helper to check if direction is valid for delta
+        def is_valid_direction(direction: RoomDirection, dx: int, dy: int) -> bool:
+            if direction == RoomDirection.NORTH and dy > 0: return False
+            if direction == RoomDirection.SOUTH and dy < 0: return False
+            if direction == RoomDirection.EAST and dx < 0: return False
+            if direction == RoomDirection.WEST and dx > 0: return False
+            return True
+            
+        # Check start direction is valid
+        if not is_valid_direction(start_direction, dx, dy):
+            return None
+            
+        # Check end direction is valid
+        if not is_valid_direction(end_direction, -dx, -dy):
+            return None
+            
+        # Try straight line first if directions align
+        if start_direction == end_direction or (
+            abs(dx) >= min_segment_length * 2 and abs(dy) >= min_segment_length * 2
+        ):
+            # Generate straight or L-shaped path
+            points = [start]
+            
+            # Add start segment
+            if start_direction == RoomDirection.NORTH:
+                points.append((sx, sy - min_segment_length))
+            elif start_direction == RoomDirection.SOUTH:
+                points.append((sx, sy + min_segment_length))
+            elif start_direction == RoomDirection.EAST:
+                points.append((sx + min_segment_length, sy))
+            else:  # WEST
+                points.append((sx - min_segment_length, sy))
+                
+            # Add corner point if needed
+            if start_direction != end_direction:
+                if start_direction in (RoomDirection.NORTH, RoomDirection.SOUTH):
+                    points.append((ex, points[-1][1]))
+                else:
+                    points.append((points[-1][0], ey))
+                    
+            # Add end point
+            points.append(end)
+            
+            return points
+            
+        # For longer paths, add random turns
+        max_turns = min(3, max(abs(dx), abs(dy)) // min_segment_length)
+        if max_turns < 1:
+            return None
+            
+        # Try a few times with random turns
+        for _ in range(10):
+            points = [start]
+            curr_x, curr_y = sx, sy
+            curr_dir = start_direction
+            turns_left = random.randint(1, max_turns)
+            
+            while turns_left >= 0:
+                # Calculate remaining delta
+                rem_dx = ex - curr_x
+                rem_dy = ey - curr_y
+                
+                # Determine segment length
+                if turns_left == 0:
+                    # Final segment must reach end point
+                    if curr_dir in (RoomDirection.NORTH, RoomDirection.SOUTH):
+                        length = abs(ey - curr_y)
+                    else:
+                        length = abs(ex - curr_x)
+                else:
+                    # Random length but at least minimum
+                    if curr_dir in (RoomDirection.NORTH, RoomDirection.SOUTH):
+                        max_len = abs(rem_dy)
+                    else:
+                        max_len = abs(rem_dx)
+                    length = random.randint(min_segment_length, max(min_segment_length, max_len-min_segment_length))
+                
+                # Add segment end point
+                if curr_dir == RoomDirection.NORTH:
+                    curr_y -= length
+                elif curr_dir == RoomDirection.SOUTH:
+                    curr_y += length
+                elif curr_dir == RoomDirection.EAST:
+                    curr_x += length
+                else:  # WEST
+                    curr_x -= length
+                points.append((curr_x, curr_y))
+                
+                if turns_left == 0:
+                    break
+                    
+                # Choose new direction
+                if curr_dir in (RoomDirection.NORTH, RoomDirection.SOUTH):
+                    curr_dir = RoomDirection.EAST if rem_dx > 0 else RoomDirection.WEST
+                else:
+                    curr_dir = RoomDirection.SOUTH if rem_dy > 0 else RoomDirection.NORTH
+                    
+                turns_left -= 1
+                
+            # Validate final direction matches required end direction
+            if curr_dir == end_direction:
+                return points
+                
+        return None
+
     @classmethod
     def from_grid_path(cls, grid_points: List[Tuple[int, int]], 
                       start_direction: Optional[RoomDirection] = None,
