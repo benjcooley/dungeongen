@@ -331,8 +331,6 @@ class OccupancyGrid:
             y: int
             direction: ProbeDirection
             is_valid: bool
-            is_corner: bool
-            is_crossing: bool
             
         self._debug_passage_points: list[PassageCheckPoint] = []
         
@@ -713,13 +711,13 @@ class OccupancyGrid:
                         cross_count += 1
                         if debug_enabled:
                             self._debug_passage_points.append(
-                                self.PassageCheckPoint(probe.x, probe.y, probe.facing, False, True, True)
+                                self.PassageCheckPoint(probe.x, probe.y, probe.facing, False)
                             )
                         return False, self._crossed_passages[:cross_count]
                     if not probe.check_direction_empty(direction):
                         if debug_enabled:
                             self._debug_passage_points.append(
-                                self.PassageCheckPoint(probe.x, probe.y, probe.facing, False, True, False)
+                                self.PassageCheckPoint(probe.x, probe.y, probe.facing, False)
                             )
                         return False, self._crossed_passages[:cross_count]
                         
@@ -744,14 +742,14 @@ class OccupancyGrid:
             if not probe.check_left_empty() or not probe.check_right_empty():
                 if debug_enabled:
                     self._debug_passage_points.append(
-                        self.PassageCheckPoint(probe.x, probe.y, probe.facing, False, False, False)
+                        self.PassageCheckPoint(probe.x, probe.y, probe.facing, False)
                     )
                 return False, self._crossed_passages[:cross_count]
             
             # Track valid point
             if debug_enabled:
                 self._debug_passage_points.append(
-                    self.PassageCheckPoint(probe.x, probe.y, probe.facing, True, False, False)
+                    self.PassageCheckPoint(probe.x, probe.y, probe.facing, True)
                 )
                     
         return True, self._crossed_passages[:cross_count]
@@ -940,18 +938,12 @@ class OccupancyGrid:
         debug_enabled = debug_draw.is_enabled(DebugDrawFlags.PASSAGE_CHECK)
         if debug_enabled and self._debug_passage_points:
             for point in self._debug_passage_points:
-                # Choose colors based on point type
+                # Red for invalid points, green for valid
                 if not point.is_valid:
-                    color = skia.Color(255, 0, 0)  # Red for invalid
-                    alpha = 128
-                elif point.is_corner:
-                    color = skia.Color(0, 0, 255)  # Blue for corners
-                    alpha = 160
-                elif point.is_crossing:
-                    color = skia.Color(255, 255, 0)  # Yellow for crossings
+                    color = skia.Color(255, 0, 0)  # Red
                     alpha = 160
                 else:
-                    color = skia.Color(0, 255, 0)  # Green for valid
+                    color = skia.Color(0, 255, 0)  # Green
                     alpha = 96
                 
                 # Draw cell
