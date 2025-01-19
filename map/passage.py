@@ -228,9 +228,8 @@ class Passage(MapElement):
 
         # For single point:
         if dx == 0 and dy == 0:
-            # Must be parallel and opposite
-            return (start_direction.is_parallel(end_direction) and 
-                   end_direction == start_direction.get_opposite())
+            # Must be opposite directions
+            return end_direction == start_direction.get_opposite()
                    
         # For straight lines:
         if sx == ex or sy == ey:
