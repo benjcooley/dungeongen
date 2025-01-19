@@ -651,17 +651,18 @@ class OccupancyGrid:
             # Check if corner (direction change)
             is_corner = False
             if 0 < i < len(points) - 1:
-                next_dx = points[i+1][0] - curr_x
-                next_dy = points[i+1][1] - curr_y
+                next_dx = points[i+1][0] - self._all_x[i]
+                next_dy = points[i+1][1] - self._all_y[i]
                 next_direction = (
                     ProbeDirection.EAST if next_dx > 0 else
                     ProbeDirection.WEST if next_dx < 0 else
                     ProbeDirection.SOUTH if next_dy > 0 else
                     ProbeDirection.NORTH
                 )
-                if next_direction != direction:  # Compare with current point's direction
+                curr_direction = ProbeDirection(self._all_dir[i])
+                if next_direction != curr_direction:
                     is_corner = True
-                    direction = next_direction  # Update for next iteration
+                    self._all_dir[i] = next_direction.value  # Update for next iteration
                 
                 # Only check relevant quadrant based on turn direction
                 turn_right = (direction.value + 2) % 8 == next_direction.value
@@ -709,7 +710,7 @@ class OccupancyGrid:
                         return False, self._crossed_passages[:cross_count]
                     probe.move_backward()
                     
-                probe.x, probe.y = curr_x, curr_y  # Reset position
+                probe.x, probe.y = self._all_x[i], self._all_y[i]  # Reset position
                 
                 for _ in range(3):
                     probe.move_forward()
