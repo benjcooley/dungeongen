@@ -171,76 +171,44 @@ class Passage(MapElement):
         if start_direction == end_direction and (sx == ex or sy == ey):
             return [start, end]
             
-        # Try L-shaped path if enough space (add 1 to account for end point)
-        if abs(dx) >= min_segment_length + 1 and abs(dy) >= min_segment_length + 1:
-            points = [start]
+        # Break path into series of L-shaped segments
+        points = [start]
+        curr_x, curr_y = sx, sy
+        curr_dir = start_direction
+        
+        while (curr_x, curr_y) != end:
+            # Calculate remaining distance
+            rem_dx = ex - curr_x
+            rem_dy = ey - curr_y
             
-            # Add corner point based on start direction
-            if start_direction in (RoomDirection.NORTH, RoomDirection.SOUTH):
-                points.append((sx, ey))
-            else:
-                points.append((ex, sy))
-                
-            points.append(end)
-            return points
-            
-        # For more complex paths, add random turns
-        max_turns = min(3, max(abs(dx), abs(dy)) // min_segment_length)
-        if max_turns < 1:
-            return None
-            
-        # Try a few times with random turns
-        for _ in range(10):
-            points = [start]
-            curr_x, curr_y = sx, sy
-            curr_dir = start_direction
-            turns_left = random.randint(1, max_turns)
-            
-            while turns_left >= 0:
-                # Calculate remaining delta
-                rem_dx = ex - curr_x
-                rem_dy = ey - curr_y
-                
-                # Determine segment length
-                if turns_left == 0:
-                    # Final segment must reach end point
-                    if curr_dir in (RoomDirection.NORTH, RoomDirection.SOUTH):
-                        length = abs(ey - curr_y)
-                    else:
-                        length = abs(ex - curr_x)
-                else:
-                    # Random length but at least minimum
-                    if curr_dir in (RoomDirection.NORTH, RoomDirection.SOUTH):
-                        max_len = abs(rem_dy)
-                    else:
-                        max_len = abs(rem_dx)
-                    length = random.randint(min_segment_length, max(min_segment_length, max_len-min_segment_length))
-                
-                # Add segment end point
-                if curr_dir == RoomDirection.NORTH:
-                    curr_y -= length
-                elif curr_dir == RoomDirection.SOUTH:
-                    curr_y += length
-                elif curr_dir == RoomDirection.EAST:
-                    curr_x += length
-                else:  # WEST
-                    curr_x -= length
-                points.append((curr_x, curr_y))
-                
-                if turns_left == 0:
-                    break
-                    
-                # Choose new direction
+            # If we can reach end with single L-shape meeting min length, do it
+            if abs(rem_dx) >= min_segment_length and abs(rem_dy) >= min_segment_length:
+                # Add corner point based on current direction
                 if curr_dir in (RoomDirection.NORTH, RoomDirection.SOUTH):
-                    curr_dir = RoomDirection.EAST if rem_dx > 0 else RoomDirection.WEST
+                    points.append((curr_x, ey))
+                    curr_y = ey
                 else:
-                    curr_dir = RoomDirection.SOUTH if rem_dy > 0 else RoomDirection.NORTH
-                    
-                turns_left -= 1
+                    points.append((ex, curr_y))
+                    curr_x = ex
+                points.append(end)
+                return points if curr_dir == end_direction else None
                 
-            # Validate final direction matches required end direction
-            if curr_dir == end_direction:
-                return points
+            # Otherwise take a min-length step in current direction
+            if curr_dir == RoomDirection.NORTH:
+                curr_y -= min_segment_length
+            elif curr_dir == RoomDirection.SOUTH:
+                curr_y += min_segment_length
+            elif curr_dir == RoomDirection.EAST:
+                curr_x += min_segment_length
+            else:  # WEST
+                curr_x -= min_segment_length
+            points.append((curr_x, curr_y))
+            
+            # Turn 90 degrees toward destination
+            if curr_dir in (RoomDirection.NORTH, RoomDirection.SOUTH):
+                curr_dir = RoomDirection.EAST if rem_dx > 0 else RoomDirection.WEST
+            else:
+                curr_dir = RoomDirection.SOUTH if rem_dy > 0 else RoomDirection.NORTH
                 
         return None
 
