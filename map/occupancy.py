@@ -50,6 +50,18 @@ class ProbeDirection(Enum):
     def turn_around(self) -> 'ProbeDirection':
         """Return the opposite direction."""
         return ProbeDirection((self.value + 4) % 8)
+        
+    @staticmethod
+    def from_delta(dx: int, dy: int) -> 'ProbeDirection':
+        """Convert a delta to a cardinal direction."""
+        if dx > 0:
+            return ProbeDirection.EAST
+        elif dx < 0:
+            return ProbeDirection.WEST
+        elif dy > 0:
+            return ProbeDirection.SOUTH
+        else:
+            return ProbeDirection.NORTH
     
     def get_offset(self) -> tuple[int, int]:
         """Get the grid coordinate offset for this direction."""
@@ -112,19 +124,30 @@ class GridProbe:
         self.grid = grid
         self.x = x
         self.y = y
-        self.facing = facing
+        self._facing = facing
+        self._cached_offsets = facing.get_offset()
+        
+    @property
+    def facing(self) -> ProbeDirection:
+        """Get the current facing direction."""
+        return self._facing
+        
+    @facing.setter 
+    def facing(self, value: ProbeDirection) -> None:
+        """Set the facing direction and update cached offsets."""
+        if value != self._facing:
+            self._facing = value
+            self._cached_offsets = value.get_offset()
     
     def move_forward(self) -> None:
         """Move one cell in the facing direction."""
-        dx, dy = self.facing.get_offset()
-        self.x += dx
-        self.y += dy
+        self.x += self._cached_offsets[0]
+        self.y += self._cached_offsets[1]
     
     def move_backward(self) -> None:
         """Move one cell opposite the facing direction."""
-        dx, dy = self.facing.turn_around().get_offset()
-        self.x += dx
-        self.y += dy
+        self.x -= self._cached_offsets[0]
+        self.y -= self._cached_offsets[1]
     
     def turn_left(self) -> None:
         """Turn 90 degrees left."""
