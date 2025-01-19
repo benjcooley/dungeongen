@@ -167,8 +167,8 @@ class Passage(MapElement):
         if not is_valid_direction(end_direction, -dx, -dy):
             return None
             
-        # Try straight line if directions align
-        if start_direction == end_direction:
+        # Try straight line if directions align and either x or y matches
+        if start_direction == end_direction and (sx == ex or sy == ey):
             return [start, end]
             
         # Try L-shaped path if enough space (add 1 to account for end point)
