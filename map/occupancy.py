@@ -581,43 +581,79 @@ class OccupancyGrid:
                     
             return True, []
             
-        def _expand_line_points(x1: int, y1: int, x2: int, y2: int) -> int:
-            """Expand a line segment into individual grid points with directions."""
-            points_count = 0
-            dx = x2 - x1
-            dy = y2 - y1
-            direction = (
-                ProbeDirection.EAST if dx > 0 else
-                ProbeDirection.WEST if dx < 0 else
-                ProbeDirection.SOUTH if dy > 0 else
-                ProbeDirection.NORTH
-            )
+        def _expand_passage_points(points: list[tuple[int, int]]) -> int:
+            """Expand passage corner points into a sequence of grid points with directions.
             
-            if x1 == x2:  # Vertical line
-                step = 1 if y2 > y1 else -1
-                for y in range(y1, y2 + step, step):
-                    idx = points_count * 3
-                    self._points[idx] = x1
-                    self._points[idx + 1] = y  
-                    self._points[idx + 2] = direction.value
-                    points_count += 1
-            else:  # Horizontal line
-                step = 1 if x2 > x1 else -1
-                for x in range(x1, x2 + step, step):
-                    idx = points_count * 3
-                    self._points[idx] = x
-                    self._points[idx + 1] = y1
-                    self._points[idx + 2] = direction.value
-                    points_count += 1
+            Handles corners by:
+            1. Not duplicating corner points
+            2. Setting correct direction for approaching and leaving corner
+            """
+            if not points:
+                return 0
+                
+            points_count = 0
+            
+            # Add first point
+            self._points[0] = points[0][0]
+            self._points[1] = points[0][1]
+            # Direction will be set based on next point
+            points_count += 1
+            
+            # Process each segment
+            for i in range(len(points) - 1):
+                x1, y1 = points[i]
+                x2, y2 = points[i + 1]
+                
+                # Calculate direction for this segment
+                dx = x2 - x1
+                dy = y2 - y1
+                direction = (
+                    ProbeDirection.EAST if dx > 0 else
+                    ProbeDirection.WEST if dx < 0 else
+                    ProbeDirection.SOUTH if dy > 0 else
+                    ProbeDirection.NORTH
+                )
+                
+                # Set direction for previous point (including first point)
+                self._points[(points_count-1) * 3 + 2] = direction.value
+                
+                # Add points along segment (excluding start point which was already added)
+                if x1 == x2:  # Vertical
+                    step = 1 if y2 > y1 else -1
+                    y = y1 + step  # Start after first point
+                    while y != y2:
+                        idx = points_count * 3
+                        self._points[idx] = x1
+                        self._points[idx + 1] = y
+                        self._points[idx + 2] = direction.value
+                        points_count += 1
+                        y += step
+                else:  # Horizontal
+                    step = 1 if x2 > x1 else -1
+                    x = x1 + step  # Start after first point
+                    while x != x2:
+                        idx = points_count * 3
+                        self._points[idx] = x
+                        self._points[idx + 1] = y1
+                        self._points[idx + 2] = direction.value
+                        points_count += 1
+                        x += step
+                
+                # Add end point of segment (will be a corner except for last segment)
+                idx = points_count * 3
+                self._points[idx] = x2
+                self._points[idx + 1] = y2
+                # Direction will be set in next iteration or below for last point
+                points_count += 1
+            
+            # Set direction for last point based on approach direction
+            if points_count > 1:
+                self._points[(points_count-1) * 3 + 2] = direction.value
+                
             return points_count
             
-        # Expand all line segments into points array
-        self._point_count = 0
-        for i in range(len(points) - 1):
-            start = points[i]
-            end = points[i + 1]
-            count = self._expand_line_points(start[0], start[1], end[0], end[1])
-            self._point_count += count
+        # Expand corner points into full grid point sequence
+        self._point_count = _expand_passage_points(points)
 
         # Process each point
         for i in range(self._point_count):
