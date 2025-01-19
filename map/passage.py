@@ -268,48 +268,29 @@ class Passage(MapElement):
                    
         # For straight lines:
         if sx == ex or sy == ey:
-            # Get expected directions based on line
-            line_dir = RoomDirection.from_points(start, end)
-            if line_dir is None:
-                return False
-            # Start direction must match line direction
-            # End direction must match reversed line direction
-            return (start_direction == line_dir and 
-                   end_direction == line_dir.get_opposite())
+            # Start direction must be valid for moving from start to end
+            # End direction must be valid for moving from end to start
+            return (start_direction.is_valid_direction_for(start, end) and
+                   end_direction.is_valid_direction_for(end, start))
 
-        # For L-shaped paths:
-        # - Start direction must match first leg direction
-        # - End direction must match second leg direction reversed
-        # - Directions can be either perpendicular (L-shape) or parallel (zig-zag)
+        # For L-shaped or zig-zag paths:
+        # - Directions must be either perpendicular (L-shape) or parallel (zig-zag)
+        # - Start direction must be valid for first leg
+        # - End direction must be valid for second leg reversed
         if not (start_direction.is_perpendicular(end_direction) or 
                 start_direction.is_parallel(end_direction)):
             return False
-        # Start direction must match first leg direction
-        # End direction must match second leg direction reversed
-        if dx > 0:  # Going east
-            if start_direction != RoomDirection.EAST: return False
-            if dy > 0:  # Then south
-                return end_direction == RoomDirection.NORTH
-            else:  # Then north
-                return end_direction == RoomDirection.SOUTH
-        elif dx < 0:  # Going west
-            if start_direction != RoomDirection.WEST: return False
-            if dy > 0:  # Then south
-                return end_direction == RoomDirection.NORTH
-            else:  # Then north
-                return end_direction == RoomDirection.SOUTH
-        elif dy > 0:  # Going south
-            if start_direction != RoomDirection.SOUTH: return False
-            if dx > 0:  # Then east
-                return end_direction == RoomDirection.WEST
-            else:  # Then west
-                return end_direction == RoomDirection.EAST
-        else:  # Going north
-            if start_direction != RoomDirection.NORTH: return False
-            if dx > 0:  # Then east
-                return end_direction == RoomDirection.WEST
-            else:  # Then west
-                return end_direction == RoomDirection.EAST
+            
+        # For L-shape, create corner point based on start direction
+        corner = start
+        if start_direction in (RoomDirection.NORTH, RoomDirection.SOUTH):
+            corner = (start[0], end[1])  # Move vertically first
+        else:
+            corner = (end[0], start[1])  # Move horizontally first
+            
+        # Validate both legs
+        return (start_direction.is_valid_direction_for(start, corner) and
+                end_direction.is_valid_direction_for(end, corner))
 
     @classmethod
     def from_grid_path(cls, grid_points: List[Tuple[int, int]], 

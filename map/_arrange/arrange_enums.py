@@ -77,6 +77,35 @@ class RoomDirection(Enum):
             return RoomDirection.EAST if x2 > x1 else RoomDirection.WEST
         else:
             return None  # Not a straight line
+            
+    def is_valid_direction_for(self, p1: tuple[int, int], p2: tuple[int, int]) -> bool:
+        """Check if this direction is valid for moving from p1 to p2.
+        
+        Args:
+            p1: Starting point (x,y)
+            p2: Ending point (x,y)
+            
+        Returns:
+            True if this direction would move from p1 towards p2
+        """
+        x1, y1 = p1
+        x2, y2 = p2
+        
+        # Points are same - no valid direction
+        if x1 == x2 and y1 == y2:
+            return False
+            
+        # Check if direction matches delta
+        if self == RoomDirection.EAST and x2 > x1:
+            return True
+        if self == RoomDirection.WEST and x2 < x1:
+            return True
+        if self == RoomDirection.SOUTH and y2 > y1:
+            return True
+        if self == RoomDirection.NORTH and y2 < y1:
+            return True
+            
+        return False
 
 class GrowDirection(Enum):
     """Controls which room to grow from when arranging."""
