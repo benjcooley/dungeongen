@@ -53,7 +53,10 @@ class Passage(MapElement):
             if start_direction is None:
                 x1, y1 = grid_points[0]
                 x2, y2 = grid_points[1]
-                self._start_direction = OccupancyGrid.get_direction_between_points(x1, y1, x2, y2)
+                direction = OccupancyGrid.get_direction_between_points(x1, y1, x2, y2)
+                if direction is None:
+                    raise ValueError("Cannot determine start direction from zero-length line")
+                self._start_direction = direction
             else:
                 self._start_direction = start_direction
                 
@@ -61,7 +64,10 @@ class Passage(MapElement):
             if end_direction is None:
                 x1, y1 = grid_points[-2]
                 x2, y2 = grid_points[-1]
-                self._end_direction = OccupancyGrid.get_direction_between_points(x1, y1, x2, y2)
+                direction = OccupancyGrid.get_direction_between_points(x1, y1, x2, y2)
+                if direction is None:
+                    raise ValueError("Cannot determine end direction from zero-length line")
+                self._end_direction = direction
             else:
                 self._end_direction = end_direction
         
