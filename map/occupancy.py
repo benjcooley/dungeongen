@@ -736,7 +736,7 @@ class OccupancyGrid:
                         self._crossed_passages[cross_count] = result.element_idx
                         cross_count += 1
                         if debug_enabled:
-                            probe.add_debug_point(probe.facing, False, self._debug_passage_points)
+                            probe.add_debug_grid(probe.facing, False)
                         return False, self._crossed_passages[:cross_count]
                     if not probe.check_direction_empty(direction):
                         if debug_enabled:
