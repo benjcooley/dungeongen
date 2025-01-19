@@ -740,7 +740,7 @@ class OccupancyGrid:
                         return False, self._crossed_passages[:cross_count]
                     if not probe.check_direction_empty(direction):
                         if debug_enabled:
-                            probe.add_debug_point(direction, False, self._debug_passage_points)
+                            probe.add_debug_grid(direction, False)
                         return False, self._crossed_passages[:cross_count]
                         
                 continue
@@ -756,14 +756,14 @@ class OccupancyGrid:
                     if not probe.check_direction_empty(ProbeDirection((probe.facing.value + 4 + offset) % 8)):
                         if debug_enabled:
                             direction = ProbeDirection((probe.facing.value + 4 + offset) % 8)
-                            probe.add_debug_point(direction, False, self._debug_passage_points)
+                            probe.add_debug_grid(direction, False)
                         return False, self._crossed_passages[:cross_count]
                         
                     # Check cells ahead
                     if not probe.check_direction_empty(ProbeDirection((probe.facing.value + offset) % 8)):
                         if debug_enabled:
                             direction = ProbeDirection((probe.facing.value + offset) % 8)
-                            probe.add_debug_point(direction, False, self._debug_passage_points)
+                            probe.add_debug_grid(direction, False)
                         return False, self._crossed_passages[:cross_count]
 
             # Normal point validation (must be last)
