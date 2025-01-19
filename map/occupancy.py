@@ -322,6 +322,20 @@ class OccupancyGrid:
         self._crossed_passages = []  # List of crossed passage indices
         self._point_count = 0
         
+        # Debug visualization storage
+        from dataclasses import dataclass
+        
+        @dataclass
+        class PassageCheckPoint:
+            x: int
+            y: int
+            direction: ProbeDirection
+            is_valid: bool
+            is_corner: bool
+            is_crossing: bool
+            
+        self._debug_passage_points: list[PassageCheckPoint] = []
+        
     def _ensure_contains(self, grid_x: int, grid_y: int) -> None:
         """Resize grid if needed to contain the given grid coordinates."""
         min_grid_x = -self._origin_x

@@ -19,7 +19,8 @@ class DebugDrawFlags(Flag):
     GRID_BOUNDS = auto()      # Draw blue grid-aligned prop bounds
     OCCUPANCY = auto()        # Draw occupied grid cells
     ELEMENT_NUMBERS = auto()  # Draw element index numbers
-    ALL = (PROP_BOUNDS | GRID | GRID_BOUNDS | OCCUPANCY | ELEMENT_NUMBERS)
+    PASSAGE_CHECK = auto()    # Draw passage validation visualization
+    ALL = (PROP_BOUNDS | GRID | GRID_BOUNDS | OCCUPANCY | ELEMENT_NUMBERS | PASSAGE_CHECK)
 
 class DebugDraw:
     """Centralized debug drawing configuration."""
