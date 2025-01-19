@@ -473,33 +473,39 @@ class OccupancyGrid:
         The passage validation rules are:
         
         1. Single Point Passage:
-           - Must have rooms on both ends (forward and backward)
-           - Must have empty spaces on both sides (left and right)
+           - MUST have room/passage behind (no exceptions)
+           - Must have empty spaces on both sides (left/right)
+           - Optionally must have room/passage ahead (based on allow_dead_end)
         
         2. Multi-Point Passage:
            a) Start Point:
-              - Must have a room behind
-              - Must have empty sides
+              - MUST have room/passage behind (no exceptions)
+              - Must have empty sides (left/right)
               - Direction determined by next point
            
            b) End Point:
-              - Must have a room ahead
-              - Must have empty sides
+              - Must have room/passage ahead (unless allow_dead_end=True)
+              - Must have empty sides (left/right)
               - Direction determined by previous point
            
            c) Corner Points (direction changes):
-              - Checks both incoming and outgoing directions
-              - For each direction:
-                * If on passage: must have passage on left OR right (no parallel passages)
-                * If on empty cell: must have empty sides
-                * Cannot be blocked
+              - If NOT intersecting a passage:
+                * Must have ALL 8 surrounding cells empty
+                * No adjacent rooms/passages allowed
+              - If intersecting a passage:
+                * Return false but add passage to crossed_passages list as potential connection point
            
-           d) Regular Points:
+           d) Passage Crossing Points:
+              - Must have 3 empty cells behind and 3 empty cells ahead
+              - This automatically enforces:
+                * Right angle crossings
+                * No parallel passages
+                * Proper spacing
+           
+           e) Regular Points:
               - Direction from previous to next point
-              - If on passage: must have passage on left OR right
-              - If on empty cell: must have empty sides
+              - Must have empty sides (left/right)
               - Cannot be blocked
-              - Records all passage indices crossed
         
         Args:
             points: List of (x,y) grid coordinates for the passage
