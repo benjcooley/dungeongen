@@ -638,10 +638,10 @@ class OccupancyGrid:
                 prev_direction = ProbeDirection(self._points[prev_idx + 2])
                 if curr_direction != prev_direction:
                     is_corner = True
-                
-                # Only check relevant quadrant based on turn direction
-                turn_right = (curr_direction.value + 2) % 8 == next_direction.value
-                check_dirs = (
+                    
+                    # Calculate turn direction by comparing current to previous
+                    turn_right = (curr_direction.value - prev_direction.value) % 8 == 2
+                    check_dirs = (
                     ProbeDirection.NORTHEAST, 
                     ProbeDirection.SOUTHEAST
                 ) if turn_right else (
