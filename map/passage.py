@@ -74,61 +74,11 @@ class Passage(MapElement):
             else:
                 self._end_direction = end_direction
         
-        # Helper function to subdivide a run
-        def subdivide_run(start_pt: tuple[int, int], end_pt: tuple[int, int]) -> list[tuple[int, int]]:
-            x1, y1 = start_pt
-            x2, y2 = end_pt
-            
-            # Calculate run length
-            run_length = abs(x2 - x1) if x1 != x2 else abs(y2 - y1)
-            
-            # Get unit direction vector
-            dx = 1 if x2 > x1 else -1 if x2 < x1 else 0
-            dy = 1 if y2 > y1 else -1 if y2 < y1 else 0
-            
-            points = [start_pt]
-            curr_x, curr_y = x1, y1
-            remaining = run_length
-            
-            # Track number of subdivisions
-            subdivisions = 0
-            
-            # While we can fit at least 2 more segments and haven't hit max subdivisions
-            while remaining >= 2 * min_segment_length and subdivisions < max_subdivisions:
-                # Choose random length for this segment
-                d = random.randint(min_segment_length, remaining - min_segment_length)
-                
-                # Move in current direction
-                curr_x += dx * d
-                curr_y += dy * d
-                points.append((curr_x, curr_y))
-                
-                remaining -= d
-                subdivisions += 1
-                
-            # Add final segment if any length remains
-            if remaining > 0:
-                curr_x += dx * remaining
-                curr_y += dy * remaining
-                points.append((curr_x, curr_y))
-                
-            return points
-
-        # Subdivide each straight section
-        subdivided_points = []
-        for i in range(len(grid_points) - 1):
-            points = subdivide_run(grid_points[i], grid_points[i+1])
-            subdivided_points.extend(points[:-1])  # Don't add end point except for last segment
-        subdivided_points.append(grid_points[-1])  # Add final end point
-        
-        # Store the subdivided points
-        self._grid_points = subdivided_points
-        
         # Create shapes for each straight section
         shapes = []
-        for i in range(len(subdivided_points) - 1):
-            x1, y1 = subdivided_points[i]
-            x2, y2 = subdivided_points[i + 1]
+        for i in range(len(grid_points) - 1):
+            x1, y1 = grid_points[i]
+            x2, y2 = grid_points[i + 1]
             
             # Convert grid line to map rectangle
             x, y, width, height = grid_points_to_map_rect(x1, y1, x2, y2)
@@ -199,10 +149,50 @@ class Passage(MapElement):
         if sx == ex and sy == ey:
             return [start, end]
 
+        # Helper function to subdivide a run
+        def subdivide_run(start_pt: tuple[int, int], end_pt: tuple[int, int]) -> list[tuple[int, int]]:
+            x1, y1 = start_pt
+            x2, y2 = end_pt
+            
+            # Calculate run length
+            run_length = abs(x2 - x1) if x1 != x2 else abs(y2 - y1)
+            
+            # Get unit direction vector
+            dx = 1 if x2 > x1 else -1 if x2 < x1 else 0
+            dy = 1 if y2 > y1 else -1 if y2 < y1 else 0
+            
+            points = [start_pt]
+            curr_x, curr_y = x1, y1
+            remaining = run_length
+            
+            # Track number of subdivisions
+            subdivisions = 0
+            
+            # While we can fit at least 2 more segments and haven't hit max subdivisions
+            while remaining >= 2 * min_segment_length and subdivisions < max_subdivisions:
+                # Choose random length for this segment
+                d = random.randint(min_segment_length, remaining - min_segment_length)
+                
+                # Move in current direction
+                curr_x += dx * d
+                curr_y += dy * d
+                points.append((curr_x, curr_y))
+                
+                remaining -= d
+                subdivisions += 1
+                
+            # Add final segment if any length remains
+            if remaining > 0:
+                curr_x += dx * remaining
+                curr_y += dy * remaining
+                points.append((curr_x, curr_y))
+                
+            return points
+
         # Handle straight passage case
         if sx == ex or sy == ey:
             if start_direction == end_direction:
-                return [start, end]
+                return subdivide_run(start, end)
                 
         # Handle zig-zag case (parallel but opposite directions)
         if start_direction.is_parallel(end_direction):
@@ -214,7 +204,15 @@ class Passage(MapElement):
                     mid_x = min(sx, ex) + offset
                 else:  # WEST
                     mid_x = max(sx, ex) - offset
-                return [start, (mid_x, sy), (mid_x, ey), end]
+                    
+                # Subdivide each leg
+                first_leg = subdivide_run(start, (mid_x, sy))
+                second_leg = subdivide_run((mid_x, sy), (mid_x, ey))
+                third_leg = subdivide_run((mid_x, ey), end)
+                
+                # Combine legs, removing duplicate points
+                points = first_leg[:-1] + second_leg[:-1] + third_leg
+                return points
             else:
                 # Moving horizontally, need vertical offset
                 offset = 2 * min_segment_length
@@ -222,7 +220,15 @@ class Passage(MapElement):
                     mid_y = min(sy, ey) + offset
                 else:  # NORTH
                     mid_y = max(sy, ey) - offset
-                return [start, (sx, mid_y), (ex, mid_y), end]
+                    
+                # Subdivide each leg
+                first_leg = subdivide_run(start, (sx, mid_y))
+                second_leg = subdivide_run((sx, mid_y), (ex, mid_y))
+                third_leg = subdivide_run((ex, mid_y), end)
+                
+                # Combine legs, removing duplicate points
+                points = first_leg[:-1] + second_leg[:-1] + third_leg
+                return points
             
         # Handle L-shape case (perpendicular directions)
         if start_direction.is_perpendicular(end_direction):
@@ -231,7 +237,14 @@ class Passage(MapElement):
                 corner_y = ey
             else:
                 corner_x = ex
-            return [start, (corner_x, corner_y), end]
+                
+            # Subdivide each leg
+            first_leg = subdivide_run(start, (corner_x, corner_y))
+            second_leg = subdivide_run((corner_x, corner_y), end)
+            
+            # Combine legs, removing duplicate corner point
+            points = first_leg[:-1] + second_leg
+            return points
                 
         return None
 
