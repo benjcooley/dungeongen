@@ -742,19 +742,16 @@ class OccupancyGrid:
                 self._crossed_passages[cross_count] = curr.element_idx
                 cross_count += 1
                 
-                # Efficient passage crossing check
-                probe.move_backward()
-                for _ in range(3):
-                    if not probe.check_forward().is_empty:
+                # Check 3 cells behind and 3 cells ahead are empty
+                for offset in range(1, 4):
+                    # Check cells behind
+                    back_result = probe.check_direction(ProbeDirection((probe.facing.value + 4 + offset) % 8))
+                    if not back_result.is_empty:
                         return False, self._crossed_passages[:cross_count]
-                    probe.move_backward()
-                    
-                idx = i * 3
-                probe.x, probe.y = self._points[idx], self._points[idx + 1]  # Reset position
-                
-                for _ in range(3):
-                    probe.move_forward()
-                    if not probe.check_forward().is_empty:
+                        
+                    # Check cells ahead
+                    forward_result = probe.check_direction(ProbeDirection((probe.facing.value + offset) % 8))
+                    if not forward_result.is_empty:
                         return False, self._crossed_passages[:cross_count]
                         
             elif curr.is_blocked:
