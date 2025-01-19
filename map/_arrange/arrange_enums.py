@@ -1,6 +1,6 @@
 """Enums for room arrangement strategies."""
 from enum import Enum, auto
-from typing import Tuple
+from typing import Tuple, Optional
 
 class RoomDirection(Enum):
     """Direction to generate rooms."""
