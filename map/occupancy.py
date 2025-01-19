@@ -470,6 +470,37 @@ class OccupancyGrid:
     def check_passage(self, points: list[tuple[int, int]], start_direction: RoomDirection) -> tuple[bool, list[int]]:
         """Check if a passage can be placed along a series of grid points.
         
+        The passage validation rules are:
+        
+        1. Single Point Passage:
+           - Must have rooms on both ends (forward and backward)
+           - Must have empty spaces on both sides (left and right)
+        
+        2. Multi-Point Passage:
+           a) Start Point:
+              - Must have a room behind
+              - Must have empty sides
+              - Direction determined by next point
+           
+           b) End Point:
+              - Must have a room ahead
+              - Must have empty sides
+              - Direction determined by previous point
+           
+           c) Corner Points (direction changes):
+              - Checks both incoming and outgoing directions
+              - For each direction:
+                * If on passage: must have passage on left OR right (no parallel passages)
+                * If on empty cell: must have empty sides
+                * Cannot be blocked
+           
+           d) Regular Points:
+              - Direction from previous to next point
+              - If on passage: must have passage on left OR right
+              - If on empty cell: must have empty sides
+              - Cannot be blocked
+              - Records all passage indices crossed
+        
         Args:
             points: List of (x,y) grid coordinates for the passage
             start_direction: Initial facing direction (needed for single-point passages)
