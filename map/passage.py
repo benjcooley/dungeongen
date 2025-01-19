@@ -135,39 +135,40 @@ class Passage(MapElement):
         """
         import random
         
-        # Get deltas between points
+        # First check if passage is possible
         sx, sy = start
         ex, ey = end
         dx = ex - sx
         dy = ey - sy
-        
-        # Handle single grid case first - points must be same and directions opposite
-        if abs(dx) == 0 and abs(dy) == 0:
-            # Check if directions are opposite
-            if (start_direction == RoomDirection.NORTH and end_direction == RoomDirection.SOUTH) or \
-               (start_direction == RoomDirection.SOUTH and end_direction == RoomDirection.NORTH) or \
-               (start_direction == RoomDirection.EAST and end_direction == RoomDirection.WEST) or \
-               (start_direction == RoomDirection.WEST and end_direction == RoomDirection.EAST):
-                return [start, end]
+
+        # For single grid case, directions must be opposite
+        if dx == 0 and dy == 0:
+            opposite_dirs = {
+                RoomDirection.NORTH: RoomDirection.SOUTH,
+                RoomDirection.SOUTH: RoomDirection.NORTH,
+                RoomDirection.EAST: RoomDirection.WEST,
+                RoomDirection.WEST: RoomDirection.EAST
+            }
+            if end_direction != opposite_dirs.get(start_direction):
+                return None
+            return [start, end]
+
+        # For other cases:
+        # 1. Start direction must not point away from end
+        if ((start_direction == RoomDirection.NORTH and dy > 0) or
+            (start_direction == RoomDirection.SOUTH and dy < 0) or
+            (start_direction == RoomDirection.EAST and dx < 0) or
+            (start_direction == RoomDirection.WEST and dx > 0)):
             return None
-            
-        # Helper to check if direction is valid for delta
-        def is_valid_direction(direction: RoomDirection, dx: int, dy: int) -> bool:
-            if direction == RoomDirection.NORTH and dy > 0: return False
-            if direction == RoomDirection.SOUTH and dy < 0: return False
-            if direction == RoomDirection.EAST and dx < 0: return False
-            if direction == RoomDirection.WEST and dx > 0: return False
-            return True
-            
-        # Check start direction is valid
-        if not is_valid_direction(start_direction, dx, dy):
+
+        # 2. End direction must not point away from start
+        if ((end_direction == RoomDirection.NORTH and dy < 0) or
+            (end_direction == RoomDirection.SOUTH and dy > 0) or
+            (end_direction == RoomDirection.EAST and dx > 0) or
+            (end_direction == RoomDirection.WEST and dx < 0)):
             return None
-            
-        # Check end direction is valid
-        if not is_valid_direction(end_direction, -dx, -dy):
-            return None
-            
-        # Try straight line if directions align and either x or y matches
+
+        # 3. For straight passages, directions must match and either x or y must align
         if start_direction == end_direction and (sx == ex or sy == ey):
             return [start, end]
             
