@@ -149,27 +149,37 @@ class Passage(MapElement):
         if sx == ex or sy == ey:
             if start_direction == end_direction:
                 return [start, end]
-            elif start_direction == end_direction.get_opposite():
-                # For parallel but opposite directions (zig-zag),
-                # pick a midpoint that allows the path to reach both ends
-                if sx == ex:  # Vertical alignment
-                    # Move horizontally to create zig-zag
-                    mid_x = sx + (2 * min_segment_length if start_direction == RoomDirection.EAST else -2 * min_segment_length)
-                    corner1 = (mid_x, sy)
-                    corner2 = (mid_x, ey)
-                else:  # Horizontal alignment
-                    # Move vertically to create zig-zag
-                    mid_y = sy + (2 * min_segment_length if start_direction == RoomDirection.SOUTH else -2 * min_segment_length)
-                    corner1 = (sx, mid_y)
-                    corner2 = (ex, mid_y)
-                return [start, corner1, corner2, end]
+                
+        # Handle zig-zag case (parallel but opposite directions)
+        if start_direction.is_parallel(end_direction):
+            # Calculate offset based on direction
+            if start_direction in (RoomDirection.NORTH, RoomDirection.SOUTH):
+                # Moving vertically, need horizontal offset
+                offset = 2 * min_segment_length
+                if start_direction == RoomDirection.EAST:
+                    mid_x = min(sx, ex) + offset
+                else:  # WEST
+                    mid_x = max(sx, ex) - offset
+                corner1 = (mid_x, sy)
+                corner2 = (mid_x, ey)
+            else:
+                # Moving horizontally, need vertical offset
+                offset = 2 * min_segment_length
+                if start_direction == RoomDirection.SOUTH:
+                    mid_y = min(sy, ey) + offset
+                else:  # NORTH
+                    mid_y = max(sy, ey) - offset
+                corner1 = (sx, mid_y)
+                corner2 = (ex, mid_y)
+            return [start, corner1, corner2, end]
             
-        # Find corner point for L-shape
-        corner_x, corner_y = sx, sy
-        if start_direction in (RoomDirection.NORTH, RoomDirection.SOUTH):
-            corner_y = ey
-        else:
-            corner_x = ex
+        # Handle L-shape case (perpendicular directions)
+        if start_direction.is_perpendicular(end_direction):
+            corner_x, corner_y = sx, sy
+            if start_direction in (RoomDirection.NORTH, RoomDirection.SOUTH):
+                corner_y = ey
+            else:
+                corner_x = ex
             
         # Helper function to subdivide a run
         def subdivide_run(start_pt: tuple[int, int], end_pt: tuple[int, int]) -> list[tuple[int, int]]:
