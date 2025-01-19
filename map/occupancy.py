@@ -861,29 +861,29 @@ class OccupancyGrid:
         # Quick checks in order of likelihood
         if not probe.check_left_empty():
             if debug_enabled:
-                probe.add_debug_point(probe.facing.turn_left(), False, self._debug_passage_points)
+                probe.add_debug_grid(probe.facing.turn_left(), False)
             return False
             
         if not probe.check_right_empty():
             if debug_enabled:
-                probe.add_debug_point(probe.facing.turn_right(), False, self._debug_passage_points)
+                probe.add_debug_grid(probe.facing.turn_right(), False)
             return False
             
         back = probe.check_backward()
         if not (back.is_room or back.is_passage):
             if debug_enabled:
-                probe.add_debug_point(probe.facing.turn_around(), False, self._debug_passage_points)
+                probe.add_debug_grid(probe.facing.turn_around(), False)
             return False
             
         if not allow_dead_end:
             forward = probe.check_forward()
             if not (forward.is_room or forward.is_passage):
                 if debug_enabled:
-                    probe.add_debug_point(probe.facing, False, self._debug_passage_points)
+                    probe.add_debug_grid(probe.facing, False)
                 return False
         
         if debug_enabled:
-            probe.add_debug_point(probe.facing, True, self._debug_passage_points)
+            probe.add_debug_grid(probe.facing, True)
         return True
 
     def _room_to_probe_dir(self, direction: RoomDirection) -> ProbeDirection:
