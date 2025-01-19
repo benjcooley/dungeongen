@@ -581,72 +581,8 @@ class OccupancyGrid:
                     
             return True, []
             
-        def _expand_passage_points(points: list[tuple[int, int]]) -> int:
-            """Expand passage corner points into a sequence of grid points with directions.
-            
-            Handles corners by:
-            1. Not duplicating corner points
-            2. Setting correct direction for approaching and leaving corner
-            """
-            if not points:
-                return 0
-                
-            points_count = 0
-            
-            # Add first point
-            self._points[0] = points[0][0]
-            self._points[1] = points[0][1]
-            # Direction will be set based on next point
-            points_count += 1
-            
-            # Process each segment
-            for i in range(len(points) - 1):
-                x1, y1 = points[i]
-                x2, y2 = points[i + 1]
-                
-                # Calculate direction for this segment
-                dx = x2 - x1
-                dy = y2 - y1
-                direction = (
-                    ProbeDirection.EAST if dx > 0 else
-                    ProbeDirection.WEST if dx < 0 else
-                    ProbeDirection.SOUTH if dy > 0 else
-                    ProbeDirection.NORTH
-                )
-                
-                # Set direction for previous point (including first point)
-                self._points[(points_count-1) * 3 + 2] = direction.value
-                
-                # Add all points along segment including end point
-                if x1 == x2:  # Vertical
-                    step = 1 if y2 > y1 else -1
-                    y = y1 + step  # Start after first point
-                    while y <= y2 if step > 0 else y >= y2:
-                        idx = points_count * 3
-                        self._points[idx] = x1
-                        self._points[idx + 1] = y
-                        self._points[idx + 2] = direction.value
-                        points_count += 1
-                        y += step
-                else:  # Horizontal  
-                    step = 1 if x2 > x1 else -1
-                    x = x1 + step  # Start after first point
-                    while x <= x2 if step > 0 else x >= x2:
-                        idx = points_count * 3
-                        self._points[idx] = x
-                        self._points[idx + 1] = y1
-                        self._points[idx + 2] = direction.value
-                        points_count += 1
-                        x += step
-            
-            # Set direction for last point based on approach direction
-            if points_count > 1:
-                self._points[(points_count-1) * 3 + 2] = direction.value
-                
-            return points_count
-            
         # Expand corner points into full grid point sequence
-        self._point_count = _expand_passage_points(points)
+        self._point_count = self._expand_passage_points(points)
 
         # Process each point
         for i in range(self._point_count):
@@ -727,6 +663,70 @@ class OccupancyGrid:
                     
         return True, self._crossed_passages[:cross_count]
         
+    def _expand_passage_points(self, points: list[tuple[int, int]]) -> int:
+        """Expand passage corner points into a sequence of grid points with directions.
+        
+        Handles corners by:
+        1. Not duplicating corner points
+        2. Setting correct direction for approaching and leaving corner
+        """
+        if not points:
+            return 0
+            
+        points_count = 0
+        
+        # Add first point
+        self._points[0] = points[0][0]
+        self._points[1] = points[0][1]
+        # Direction will be set based on next point
+        points_count += 1
+        
+        # Process each segment
+        for i in range(len(points) - 1):
+            x1, y1 = points[i]
+            x2, y2 = points[i + 1]
+            
+            # Calculate direction for this segment
+            dx = x2 - x1
+            dy = y2 - y1
+            direction = (
+                ProbeDirection.EAST if dx > 0 else
+                ProbeDirection.WEST if dx < 0 else
+                ProbeDirection.SOUTH if dy > 0 else
+                ProbeDirection.NORTH
+            )
+            
+            # Set direction for previous point (including first point)
+            self._points[(points_count-1) * 3 + 2] = direction.value
+            
+            # Add all points along segment including end point
+            if x1 == x2:  # Vertical
+                step = 1 if y2 > y1 else -1
+                y = y1 + step  # Start after first point
+                while y <= y2 if step > 0 else y >= y2:
+                    idx = points_count * 3
+                    self._points[idx] = x1
+                    self._points[idx + 1] = y
+                    self._points[idx + 2] = direction.value
+                    points_count += 1
+                    y += step
+            else:  # Horizontal  
+                step = 1 if x2 > x1 else -1
+                x = x1 + step  # Start after first point
+                while x <= x2 if step > 0 else x >= x2:
+                    idx = points_count * 3
+                    self._points[idx] = x
+                    self._points[idx + 1] = y1
+                    self._points[idx + 2] = direction.value
+                    points_count += 1
+                    x += step
+        
+        # Set direction for last point based on approach direction
+        if points_count > 1:
+            self._points[(points_count-1) * 3 + 2] = direction.value
+            
+        return points_count
+
     def _room_to_probe_dir(self, direction: RoomDirection) -> ProbeDirection:
         """Convert RoomDirection to ProbeDirection."""
         direction_map = {
