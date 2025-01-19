@@ -593,6 +593,9 @@ class OccupancyGrid:
         It uses a single reused probe and optimized checks to validate passage placement.
         
         Debug visualization can be enabled with DebugDrawFlags.PASSAGE_CHECK.
+        """
+        # Set debug flag once at start of method
+        debug_enabled = debug_draw.is_enabled(DebugDrawFlags.PASSAGE_CHECK)
         
         The passage validation rules are:
         
@@ -647,7 +650,7 @@ class OccupancyGrid:
         cross_count = 0
         
         # Clear debug visualization if enabled
-        if debug_draw.is_enabled(DebugDrawFlags.PASSAGE_CHECK):
+        if debug_enabled:
             self._debug_passage_points.clear()
         
         # Reuse a single probe for all checks
@@ -673,14 +676,14 @@ class OccupancyGrid:
             
             # Quick side checks first (most common failure)
             if not probe.check_left_empty() or not probe.check_right_empty():
-                if debug_draw.is_enabled(DebugDrawFlags.PASSAGE_CHECK):
+                if debug_enabled:
                     self._debug_passage_points.append(
                         self.PassageCheckPoint(probe.x, probe.y, probe.facing, False, False, False)
                     )
                 return False, self._crossed_passages[:cross_count]
             
             # Track valid point
-            if debug_draw.is_enabled(DebugDrawFlags.PASSAGE_CHECK):
+            if debug_enabled:
                 self._debug_passage_points.append(
                     self.PassageCheckPoint(probe.x, probe.y, probe.facing, True, False, False)
                 )
@@ -706,13 +709,13 @@ class OccupancyGrid:
                     if result.is_passage:
                         self._crossed_passages[cross_count] = result.element_idx
                         cross_count += 1
-                        if debug_draw.is_enabled(DebugDrawFlags.PASSAGE_CHECK):
+                        if debug_enabled:
                             self._debug_passage_points.append(
                                 self.PassageCheckPoint(probe.x, probe.y, probe.facing, False, True, True)
                             )
                         return False, self._crossed_passages[:cross_count]
                     if not probe.check_direction_empty(direction):
-                        if debug_draw.is_enabled(DebugDrawFlags.PASSAGE_CHECK):
+                        if debug_enabled:
                             self._debug_passage_points.append(
                                 self.PassageCheckPoint(probe.x, probe.y, probe.facing, False, True, False)
                             )
@@ -939,7 +942,8 @@ class OccupancyGrid:
 
                         
         # Draw passage check debug visualization if enabled
-        if debug_draw.is_enabled(DebugDrawFlags.PASSAGE_CHECK) and self._debug_passage_points:
+        debug_enabled = debug_draw.is_enabled(DebugDrawFlags.PASSAGE_CHECK)
+        if debug_enabled and self._debug_passage_points:
             for point in self._debug_passage_points:
                 # Choose colors based on point type
                 if not point.is_valid:
