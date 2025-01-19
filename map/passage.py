@@ -71,11 +71,61 @@ class Passage(MapElement):
             else:
                 self._end_direction = end_direction
         
+        # Helper function to subdivide a run
+        def subdivide_run(start_pt: tuple[int, int], end_pt: tuple[int, int]) -> list[tuple[int, int]]:
+            x1, y1 = start_pt
+            x2, y2 = end_pt
+            
+            # Calculate run length
+            run_length = abs(x2 - x1) if x1 != x2 else abs(y2 - y1)
+            
+            # Get unit direction vector
+            dx = 1 if x2 > x1 else -1 if x2 < x1 else 0
+            dy = 1 if y2 > y1 else -1 if y2 < y1 else 0
+            
+            points = [start_pt]
+            curr_x, curr_y = x1, y1
+            remaining = run_length
+            
+            # Track number of subdivisions
+            subdivisions = 0
+            
+            # While we can fit at least 2 more segments and haven't hit max subdivisions
+            while remaining >= 2 * min_segment_length and subdivisions < max_subdivisions:
+                # Choose random length for this segment
+                d = random.randint(min_segment_length, remaining - min_segment_length)
+                
+                # Move in current direction
+                curr_x += dx * d
+                curr_y += dy * d
+                points.append((curr_x, curr_y))
+                
+                remaining -= d
+                subdivisions += 1
+                
+            # Add final segment if any length remains
+            if remaining > 0:
+                curr_x += dx * remaining
+                curr_y += dy * remaining
+                points.append((curr_x, curr_y))
+                
+            return points
+
+        # Subdivide each straight section
+        subdivided_points = []
+        for i in range(len(grid_points) - 1):
+            points = subdivide_run(grid_points[i], grid_points[i+1])
+            subdivided_points.extend(points[:-1])  # Don't add end point except for last segment
+        subdivided_points.append(grid_points[-1])  # Add final end point
+        
+        # Store the subdivided points
+        self._grid_points = subdivided_points
+        
         # Create shapes for each straight section
         shapes = []
-        for i in range(len(grid_points) - 1):
-            x1, y1 = grid_points[i]
-            x2, y2 = grid_points[i + 1]
+        for i in range(len(subdivided_points) - 1):
+            x1, y1 = subdivided_points[i]
+            x2, y2 = subdivided_points[i + 1]
             
             # Convert grid line to map rectangle
             x, y, width, height = grid_points_to_map_rect(x1, y1, x2, y2)
@@ -161,8 +211,7 @@ class Passage(MapElement):
                     mid_x = min(sx, ex) + offset
                 else:  # WEST
                     mid_x = max(sx, ex) - offset
-                corner1 = (mid_x, sy)
-                corner2 = (mid_x, ey)
+                return [start, (mid_x, sy), (mid_x, ey), end]
             else:
                 # Moving horizontally, need vertical offset
                 offset = 2 * min_segment_length
@@ -170,9 +219,7 @@ class Passage(MapElement):
                     mid_y = min(sy, ey) + offset
                 else:  # NORTH
                     mid_y = max(sy, ey) - offset
-                corner1 = (sx, mid_y)
-                corner2 = (ex, mid_y)
-            return [start, corner1, corner2, end]
+                return [start, (sx, mid_y), (ex, mid_y), end]
             
         # Handle L-shape case (perpendicular directions)
         if start_direction.is_perpendicular(end_direction):
@@ -181,51 +228,7 @@ class Passage(MapElement):
                 corner_y = ey
             else:
                 corner_x = ex
-            
-        # Helper function to subdivide a run
-        def subdivide_run(start_pt: tuple[int, int], end_pt: tuple[int, int]) -> list[tuple[int, int]]:
-            x1, y1 = start_pt
-            x2, y2 = end_pt
-            
-            # Calculate run length
-            run_length = abs(x2 - x1) if x1 != x2 else abs(y2 - y1)
-            
-            # Get unit direction vector
-            dx = 1 if x2 > x1 else -1 if x2 < x1 else 0
-            dy = 1 if y2 > y1 else -1 if y2 < y1 else 0
-            
-            points = [start_pt]
-            curr_x, curr_y = x1, y1
-            remaining = run_length
-            
-            # Track number of subdivisions
-            subdivisions = 0
-            
-            # While we can fit at least 2 more segments and haven't hit max subdivisions
-            while remaining >= 2 * min_segment_length and subdivisions < max_subdivisions:
-                # Choose random length for this segment
-                d = random.randint(min_segment_length, remaining - min_segment_length)
-                
-                # Move in current direction
-                curr_x += dx * d
-                curr_y += dy * d
-                points.append((curr_x, curr_y))
-                
-                remaining -= d
-                
-            # Add final segment if any length remains
-            if remaining > 0:
-                curr_x += dx * remaining
-                curr_y += dy * remaining
-                points.append((curr_x, curr_y))
-                
-            return points
-            
-        # Subdivide first run (start to corner)
-        points = subdivide_run(start, (corner_x, corner_y))
-        
-        # Subdivide second run (corner to end)
-        points.extend(subdivide_run((corner_x, corner_y), end)[1:])  # Skip first point as it's already added
+            return [start, (corner_x, corner_y), end]
                 
         return None
 
