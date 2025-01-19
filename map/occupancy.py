@@ -238,7 +238,7 @@ class GridProbe:
         """Check if the cell to the right is empty."""
         return self.check_direction_empty(self.facing.turn_right())
         
-    def get_debug_point(self, direction: ProbeDirection, is_valid: bool = False) -> tuple[int, int, ProbeDirection, bool]:
+    def get_debug_point(self, direction: ProbeDirection, is_valid: bool = False) -> 'OccupancyGrid.PassageCheckPoint':
         """Get debug visualization info for a direction.
         
         Args:
@@ -246,10 +246,10 @@ class GridProbe:
             is_valid: Whether this point passed validation
             
         Returns:
-            Tuple of (grid_x, grid_y, direction, is_valid) for debug visualization
+            PassageCheckPoint with grid position, direction and validity
         """
         dx, dy = direction.relative_to(self.facing)
-        return (self.x + dx, self.y + dy, self.facing, is_valid)
+        return self.PassageCheckPoint(self.x + dx, self.y + dy, direction, is_valid)
         
     def check_forward_left(self) -> ProbeResult:
         """Check the cell diagonally forward-left without moving."""
@@ -691,7 +691,7 @@ class OccupancyGrid:
             if curr.is_blocked:
                 if debug_enabled:
                     self._debug_passage_points.append(
-                        self.PassageCheckPoint(*probe.get_debug_point(probe.facing, False))
+                        probe.get_debug_point(probe.facing, False)
                     )
                 return False, self._crossed_passages[:cross_count]
 
