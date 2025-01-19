@@ -597,6 +597,7 @@ class OccupancyGrid:
         # Set debug flag once at start of method
         debug_enabled = debug_draw.is_enabled(DebugDrawFlags.PASSAGE_CHECK)
         
+        """
         The passage validation rules are:
         
         1. Single Point Passage:
