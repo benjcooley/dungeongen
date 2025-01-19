@@ -467,7 +467,8 @@ class OccupancyGrid:
                         return False
         return True
 
-    def check_passage(self, points: list[tuple[int, int]], start_direction: RoomDirection) -> tuple[bool, list[int]]:
+    def check_passage(self, points: list[tuple[int, int]], start_direction: RoomDirection, 
+                     allow_dead_end: bool = False) -> tuple[bool, list[int]]:
         """Check if a passage can be placed along a series of grid points.
         
         The passage validation rules are:
@@ -526,70 +527,87 @@ class OccupancyGrid:
             x, y = points[0]
             probe = GridProbe(self, x, y, facing=self._room_to_probe_dir(start_direction))
             
-            # Need room behind and in front
-            if not probe.check_backward().is_room or not probe.check_forward().is_room:
+            # Must have room/passage behind (no exceptions)
+            back = probe.check_backward()
+            if not (back.is_room or back.is_passage):
                 return False, crossed_passages
                 
-            # Sides must be empty
+            # Must have empty sides
             if not probe.check_left().is_empty or not probe.check_right().is_empty:
+                return False, crossed_passages
+                
+            # Must have room/passage ahead (unless allow_dead_end)
+            forward = probe.check_forward()
+            if not allow_dead_end and not (forward.is_room or forward.is_passage):
                 return False, crossed_passages
                 
             return True, crossed_passages
             
         # Multi-point path
         for i, (curr_x, curr_y) in enumerate(points):
-            # Determine direction based on next/previous point
-            if i == 0:
-                next_x, next_y = points[i + 1]
-                direction = self._get_direction_between_points(curr_x, curr_y, next_x, next_y)
-            elif i == len(points) - 1:
-                prev_x, prev_y = points[i - 1]
-                direction = self._get_direction_between_points(prev_x, prev_y, curr_x, curr_y)
-            else:
-                prev_x, prev_y = points[i - 1]
-                next_x, next_y = points[i + 1]
-                prev_dir = self._get_direction_between_points(prev_x, prev_y, curr_x, curr_y)
-                next_dir = self._get_direction_between_points(curr_x, curr_y, next_x, next_y)
-                if prev_dir != next_dir:
-                    # Corner point - check both directions
-                    if not self._check_corner(curr_x, curr_y, prev_dir, next_dir, crossed_passages):
-                        return False, crossed_passages
-                    continue
-                direction = prev_dir
-                
-            probe = GridProbe(self, curr_x, curr_y, facing=direction)
+            # Get probe direction based on position in path
+            probe = self._get_probe_for_path_point(points, i, curr_x, curr_y, start_direction)
             
+            # Check if this is a corner point
+            is_corner = False
+            if 0 < i < len(points) - 1:
+                prev_probe = self._get_probe_for_path_point(points, i-1, points[i-1][0], points[i-1][1], start_direction)
+                next_probe = self._get_probe_for_path_point(points, i+1, points[i+1][0], points[i+1][1], start_direction)
+                is_corner = prev_probe.facing != next_probe.facing
+            
+            if is_corner:
+                # For corners, check all 8 surrounding cells are empty
+                for direction in ProbeDirection:
+                    result = probe.check_direction(direction)
+                    if result.is_passage:
+                        crossed_passages.append(result.element_idx)
+                        return False, crossed_passages
+                    if not result.is_empty:
+                        return False, crossed_passages
+                continue
+                
             # Check endpoints
             if i == 0:
-                if not probe.check_backward().is_room:
+                # First point must connect to room/passage
+                back = probe.check_backward()
+                if not (back.is_room or back.is_passage):
                     return False, crossed_passages
             elif i == len(points) - 1:
-                if not probe.check_forward().is_room:
+                # Last point must connect to room/passage unless allow_dead_end
+                forward = probe.check_forward()
+                if not allow_dead_end and not (forward.is_room or forward.is_passage):
                     return False, crossed_passages
-                    
-            # Get current cell and side info
-            curr = probe.check_direction(direction)
+            
+            # Check current position
+            curr = probe.check_forward()
             left = probe.check_left()
             right = probe.check_right()
             
             # Track passage crossings
-            for result in (curr, left, right):
-                if result.is_passage and result.element_idx not in crossed_passages:
-                    crossed_passages.append(result.element_idx)
-                    
-            # Check if blocked
+            if curr.is_passage:
+                crossed_passages.append(curr.element_idx)
+                
+                # Check 3 cells behind and ahead for passage crossing
+                for steps in range(1, 4):
+                    probe.move_backward()
+                    if not probe.check_forward().is_empty:
+                        return False, crossed_passages
+                        
+                probe = GridProbe(self, curr_x, curr_y, facing=probe.facing)  # Reset position
+                
+                for steps in range(1, 4):
+                    probe.move_forward()
+                    if not probe.check_forward().is_empty:
+                        return False, crossed_passages
+                        
+                probe = GridProbe(self, curr_x, curr_y, facing=probe.facing)  # Reset position
+            
+            # Regular point validation
             if curr.is_blocked:
                 return False, crossed_passages
                 
-            # If we're on a passage, check crossing rules
-            if curr.is_passage:
-                # Must have passage on left or right (no parallel passages)
-                if not (left.is_passage or right.is_passage):
-                    return False, crossed_passages
-            else:
-                # Regular point - just check sides are empty
-                if not (left.is_empty and right.is_empty):
-                    return False, crossed_passages
+            if not (left.is_empty and right.is_empty):
+                return False, crossed_passages
                     
         return True, crossed_passages
         
@@ -616,36 +634,31 @@ class OccupancyGrid:
         else:
             return ProbeDirection.NORTH
             
-    def _check_corner(self, x: int, y: int, prev_dir: ProbeDirection, 
-                     next_dir: ProbeDirection, crossed_passages: list[int]) -> bool:
-        """Check if a corner point is valid."""
-        # Check both directions
-        for direction in (prev_dir, next_dir):
-            probe = GridProbe(self, x, y, facing=direction)
+    def _get_probe_for_path_point(self, points: list[tuple[int, int]], index: int, 
+                                 curr_x: int, curr_y: int, start_direction: RoomDirection) -> GridProbe:
+        """Get a properly oriented probe for a point in the path."""
+        if index == 0:
+            # First point - use direction to next point
+            next_x, next_y = points[index + 1]
+            dx = next_x - curr_x
+            dy = next_y - curr_y
+        else:
+            # Other points - use direction from previous point
+            prev_x, prev_y = points[index - 1]
+            dx = curr_x - prev_x
+            dy = curr_y - prev_y
             
-            # Get cell info
-            curr = probe.check_direction(direction)
-            left = probe.check_left()
-            right = probe.check_right()
+        # Convert delta to probe direction
+        if dx > 0:
+            direction = ProbeDirection.EAST
+        elif dx < 0:
+            direction = ProbeDirection.WEST
+        elif dy > 0:
+            direction = ProbeDirection.SOUTH
+        else:
+            direction = ProbeDirection.NORTH
             
-            # Track crossings
-            for result in (curr, left, right):
-                if result.is_passage and result.element_idx not in crossed_passages:
-                    crossed_passages.append(result.element_idx)
-                    
-            # Check if blocked
-            if curr.is_blocked:
-                return False
-                
-            # Must be empty or have valid passage crossing
-            if curr.is_passage:
-                if not (left.is_passage or right.is_passage):
-                    return False
-            else:
-                if not (left.is_empty and right.is_empty):
-                    return False
-                    
-        return True
+        return GridProbe(self, curr_x, curr_y, facing=direction)
        
     def check_door(self, grid_x: int, grid_y: int) -> bool:
         """Check if a door can be placed at the given grid position.
