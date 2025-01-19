@@ -251,9 +251,15 @@ class Passage(MapElement):
             (end_direction == RoomDirection.WEST and dx < 0)):
             return False
 
-        # 3. For straight passages, directions must match and either x or y must align
-        if start_direction == end_direction:
-            return sx == ex or sy == ey
+        # 3. For straight passages, directions must be opposite and either x or y must align
+        if (sx == ex or sy == ey):
+            opposite_dirs = {
+                RoomDirection.NORTH: RoomDirection.SOUTH,
+                RoomDirection.SOUTH: RoomDirection.NORTH,
+                RoomDirection.EAST: RoomDirection.WEST,
+                RoomDirection.WEST: RoomDirection.EAST
+            }
+            return end_direction == opposite_dirs.get(start_direction)
 
         # If we get here, an L-shaped passage should be possible
         return True
