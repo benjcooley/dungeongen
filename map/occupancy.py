@@ -1005,7 +1005,7 @@ class OccupancyGrid:
                     dx *= CELL_SIZE/2
                     dy *= CELL_SIZE/2
                     
-                    # Draw direction line in white
-                    paint = skia.Paint(Color=skia.Color(255, 255, 255), StrokeWidth=2)
+                    # Draw direction line in black
+                    paint = skia.Paint(Color=skia.Color(0, 0, 0), StrokeWidth=2)
                     canvas.drawLine(px, py, px + dx, py + dy, paint)
                         
