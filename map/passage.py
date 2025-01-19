@@ -89,21 +89,8 @@ class Passage(MapElement):
             x1, y1 = grid_points[i]
             x2, y2 = grid_points[i + 1]
             
-            # Convert grid coordinates to map coordinates
-            map_x1, map_y1 = grid_to_map(x1, y1)
-            map_x2, map_y2 = grid_to_map(x2, y2)
-            
-            # Create rectangle for this section
-            if x1 == x2:  # Vertical section
-                x = map_x1
-                y = min(map_y1, map_y2)
-                width = CELL_SIZE
-                height = abs(map_y2 - map_y1) + CELL_SIZE
-            else:  # Horizontal section
-                x = min(map_x1, map_x2)
-                y = map_y1
-                width = abs(map_x2 - map_x1) + CELL_SIZE
-                height = CELL_SIZE
+            # Convert grid line to map rectangle
+            x, y, width, height = grid_points_to_map_rect(x1, y1, x2, y2)
                 
             shapes.append(Rectangle(x, y, width, height))
             
