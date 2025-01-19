@@ -125,7 +125,6 @@ class GridProbe:
         self.x = x
         self.y = y
         self._facing = facing
-        self._cached_offsets = facing.get_offset()
         
     @property
     def facing(self) -> ProbeDirection:
@@ -134,20 +133,20 @@ class GridProbe:
         
     @facing.setter 
     def facing(self, value: ProbeDirection) -> None:
-        """Set the facing direction and update cached offsets."""
-        if value != self._facing:
-            self._facing = value
-            self._cached_offsets = value.get_offset()
+        """Set the facing direction."""
+        self._facing = value
     
     def move_forward(self) -> None:
         """Move one cell in the facing direction."""
-        self.x += self._cached_offsets[0]
-        self.y += self._cached_offsets[1]
+        dx, dy = self._facing.get_offset()
+        self.x += dx
+        self.y += dy
     
     def move_backward(self) -> None:
         """Move one cell opposite the facing direction."""
-        self.x -= self._cached_offsets[0]
-        self.y -= self._cached_offsets[1]
+        dx, dy = self._facing.get_offset()
+        self.x -= dx
+        self.y -= dy
     
     def turn_left(self) -> None:
         """Turn 90 degrees left."""
