@@ -53,16 +53,7 @@ class Passage(MapElement):
             if start_direction is None:
                 x1, y1 = grid_points[0]
                 x2, y2 = grid_points[1]
-                dx = x2 - x1
-                dy = y2 - y1
-                if dx > 0:
-                    self._start_direction = RoomDirection.EAST
-                elif dx < 0:
-                    self._start_direction = RoomDirection.WEST
-                elif dy > 0:
-                    self._start_direction = RoomDirection.SOUTH
-                else:
-                    self._start_direction = RoomDirection.NORTH
+                self._start_direction = OccupancyGrid.get_direction_between_points(x1, y1, x2, y2)
             else:
                 self._start_direction = start_direction
                 
@@ -70,16 +61,7 @@ class Passage(MapElement):
             if end_direction is None:
                 x1, y1 = grid_points[-2]
                 x2, y2 = grid_points[-1]
-                dx = x2 - x1
-                dy = y2 - y1
-                if dx > 0:
-                    self._end_direction = RoomDirection.EAST
-                elif dx < 0:
-                    self._end_direction = RoomDirection.WEST
-                elif dy > 0:
-                    self._end_direction = RoomDirection.SOUTH
-                else:
-                    self._end_direction = RoomDirection.NORTH
+                self._end_direction = OccupancyGrid.get_direction_between_points(x1, y1, x2, y2)
             else:
                 self._end_direction = end_direction
         

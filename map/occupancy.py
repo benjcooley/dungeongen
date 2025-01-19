@@ -896,6 +896,20 @@ class OccupancyGrid:
         }
         return direction_map[direction]
         
+    @staticmethod
+    def get_direction_between_points(x1: int, y1: int, x2: int, y2: int) -> RoomDirection:
+        """Get the RoomDirection from point 1 to point 2."""
+        dx = x2 - x1
+        dy = y2 - y1
+        if dx > 0:
+            return RoomDirection.EAST
+        elif dx < 0:
+            return RoomDirection.WEST
+        elif dy > 0:
+            return RoomDirection.SOUTH
+        else:
+            return RoomDirection.NORTH
+        
     def _get_direction_between_points(self, x1: int, y1: int, x2: int, y2: int) -> ProbeDirection:
         """Get the ProbeDirection from point 1 to point 2."""
         dx = x2 - x1
