@@ -245,20 +245,10 @@ class OccupancyGrid:
         self._origin_x = width // 2  # Center point
         self._origin_y = height // 2
         
-        # Pre-allocate arrays for passage validation
-        self._crossed_passages = array('H', [0] * self.MAX_PASSAGE_LENGTH)  # Passage indices (unsigned short)
-        
-        # Arrays for point coordinates and directions
-        self._line_x = array('h', [0] * self.MAX_PASSAGE_LENGTH)  # signed short
-        self._line_y = array('h', [0] * self.MAX_PASSAGE_LENGTH)
-        self._line_dir = array('B', [0] * self.MAX_PASSAGE_LENGTH)  # unsigned char
-        
-        self._all_x = array('h', [0] * (self.MAX_PASSAGE_LENGTH * 2))
-        self._all_y = array('h', [0] * (self.MAX_PASSAGE_LENGTH * 2))
-        self._all_dir = array('B', [0] * (self.MAX_PASSAGE_LENGTH * 2))
-        
-        self._line_count = 0
-        self._all_count = 0
+        # Pre-allocate array for passage validation points (x,y,dir as 16-bit ints)
+        self._points = array('h', [0] * (self.MAX_PASSAGE_LENGTH * 2 * 3))  # x,y,dir triplets
+        self._crossed_passages = []  # List of crossed passage indices
+        self._point_count = 0
         
     def _ensure_contains(self, grid_x: int, grid_y: int) -> None:
         """Resize grid if needed to contain the given grid coordinates."""
@@ -607,16 +597,18 @@ class OccupancyGrid:
             if x1 == x2:  # Vertical line
                 step = 1 if y2 > y1 else -1
                 for y in range(y1, y2 + step, step):
-                    self._line_x[points_count] = x1
-                    self._line_y[points_count] = y
-                    self._line_dir[points_count] = direction.value
+                    idx = points_count * 3
+                    self._points[idx] = x1
+                    self._points[idx + 1] = y  
+                    self._points[idx + 2] = direction.value
                     points_count += 1
             else:  # Horizontal line
                 step = 1 if x2 > x1 else -1
                 for x in range(x1, x2 + step, step):
-                    self._line_x[points_count] = x
-                    self._line_y[points_count] = y1
-                    self._line_dir[points_count] = direction.value
+                    idx = points_count * 3
+                    self._points[idx] = x
+                    self._points[idx + 1] = y1
+                    self._points[idx + 2] = direction.value
                     points_count += 1
             self._line_count = points_count
             
@@ -630,19 +622,15 @@ class OccupancyGrid:
             self._line_count = 0
             self._get_line_points(start[0], start[1], end[0], end[1], self._line_points)
             
-            # Copy line points to all points arrays
-            for i in range(self._line_count):
-                idx = self._all_count + i
-                self._all_x[idx] = self._line_x[i]
-                self._all_y[idx] = self._line_y[i]
-                self._all_dir[idx] = self._line_dir[i]
-            self._all_count += self._line_count
+            # Points already added by _get_line_points
+            pass
             
             # Check each point along the line
-            for i in range(self._all_count):
-                probe.x = self._all_x[i]
-                probe.y = self._all_y[i]
-                probe.facing = ProbeDirection(self._all_dir[i])
+            for i in range(self._point_count):
+                idx = i * 3
+                probe.x = self._points[idx]
+                probe.y = self._points[idx + 1]
+                probe.facing = ProbeDirection(self._points[idx + 2])
                 
                 # Quick side checks first (most common failure)
                 if not probe.check_left().is_empty or not probe.check_right().is_empty:
@@ -651,18 +639,19 @@ class OccupancyGrid:
             # Check if corner (direction change)
             is_corner = False
             if 0 < i < len(points) - 1:
-                next_dx = points[i+1][0] - self._all_x[i]
-                next_dy = points[i+1][1] - self._all_y[i]
+                idx = i * 3
+                next_dx = points[i+1][0] - self._points[idx]
+                next_dy = points[i+1][1] - self._points[idx + 1]
                 next_direction = (
                     ProbeDirection.EAST if next_dx > 0 else
                     ProbeDirection.WEST if next_dx < 0 else
                     ProbeDirection.SOUTH if next_dy > 0 else
                     ProbeDirection.NORTH
                 )
-                curr_direction = ProbeDirection(self._all_dir[i])
+                curr_direction = ProbeDirection(self._points[idx + 2])
                 if next_direction != curr_direction:
                     is_corner = True
-                    self._all_dir[i] = next_direction.value  # Update for next iteration
+                    self._points[idx + 2] = next_direction.value  # Update for next iteration
                 
                 # Only check relevant quadrant based on turn direction
                 turn_right = (curr_direction.value + 2) % 8 == next_direction.value
@@ -710,7 +699,8 @@ class OccupancyGrid:
                         return False, self._crossed_passages[:cross_count]
                     probe.move_backward()
                     
-                probe.x, probe.y = self._all_x[i], self._all_y[i]  # Reset position
+                idx = i * 3
+                probe.x, probe.y = self._points[idx], self._points[idx + 1]  # Reset position
                 
                 for _ in range(3):
                     probe.move_forward()
