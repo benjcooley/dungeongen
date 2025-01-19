@@ -675,7 +675,12 @@ class OccupancyGrid:
             curr_direction = ProbeDirection(self._points[idx + 2])
             probe.facing = curr_direction
             
-            # Check endpoints first
+            # Quick check for blocked cells first - must be at top
+            curr = probe.check_forward()
+            if curr.is_blocked:
+                return False, self._crossed_passages[:cross_count]
+
+            # Check endpoints
             if i == 0:
                 back = probe.check_backward()
                 if not (back.is_room or back.is_passage):
@@ -719,11 +724,6 @@ class OccupancyGrid:
                         return False, self._crossed_passages[:cross_count]
                         
                 continue
-            
-            # Quick check for blocked cells first
-            curr = probe.check_forward()
-            if curr.is_blocked:
-                return False, self._crossed_passages[:cross_count]
             
             # Track passage crossings
             if curr.is_passage:
