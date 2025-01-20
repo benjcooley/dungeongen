@@ -45,9 +45,7 @@ class TestRunner:
             tags: Set of tags indicating which tests to run
             options: Options instance to use for map creation
         """
-        # Create fresh map and enable debug visualization
         self.options = options or Options()
-        self.map = Map(self.options)
         debug_draw.enable(DebugDrawFlags.PASSAGE_CHECK)
         self.test_cases = []
         self.current_case = 0
