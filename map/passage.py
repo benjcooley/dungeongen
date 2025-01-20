@@ -302,13 +302,29 @@ class Passage(MapElement):
             grid: The occupancy grid to mark
             element_idx: Index of this element in the map
         """
-        # Mark each grid point as passage
-        for x, y in self._grid_points:
-            grid.mark_cell(x, y, ElementType.PASSAGE, element_idx)
+        # For straight passages, mark all cells between endpoints
+        if len(self._grid_points) == 2:
+            x1, y1 = self._grid_points[0]
+            x2, y2 = self._grid_points[-1]
+            
+            # Determine direction and step
+            dx = 1 if x2 > x1 else -1 if x2 < x1 else 0
+            dy = 1 if y2 > y1 else -1 if y2 < y1 else 0
+            
+            # Mark all cells along the path
+            x, y = x1, y1
+            while (x, y) != (x2 + dx, y2 + dy):  # +dx/dy to include endpoint
+                grid.mark_cell(x, y, ElementType.PASSAGE, element_idx)
+                x += dx
+                y += dy
+        else:
+            # For passages with corners, mark each point
+            for x, y in self._grid_points:
+                grid.mark_cell(x, y, ElementType.PASSAGE, element_idx)
             
         # Mark start and end points as blocked unless dead end
         if not self._allow_dead_end:
             grid.mark_cell(self._grid_points[0][0], self._grid_points[0][1], 
-                         ElementType.BLOCKED, element_idx, blocked=True)
+                         ElementType.PASSAGE, element_idx, blocked=True)
             grid.mark_cell(self._grid_points[-1][0], self._grid_points[-1][1],
-                         ElementType.BLOCKED, element_idx, blocked=True)
+                         ElementType.PASSAGE, element_idx, blocked=True)
