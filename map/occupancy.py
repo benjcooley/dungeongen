@@ -164,21 +164,23 @@ class GridProbe:
         self.grid = grid
         self.x = x
         self.y = y
-        self._facing = ProbeDirection(facing.value)  # Convert room direction to probe direction
+        self._facing = facing
         self._dx, self._dy = self._facing.get_offset()
         self._debug_points = debug_points
         
     @property
-    def facing(self) -> ProbeDirection:
+    def facing(self) -> RoomDirection:
         """Get the current facing direction."""
         return self._facing
         
     @facing.setter 
-    def facing(self, value: ProbeDirection) -> None:
+    def facing(self, value: RoomDirection) -> None:
         """Set the facing direction and update cached offsets."""
         if value != self._facing:
             self._facing = value
-            self._dx, self._dy = value.get_offset()
+            # Convert to probe direction to get offset
+            probe_dir = ProbeDirection(value.value)
+            self._dx, self._dy = probe_dir.get_offset()
     
     def move_forward(self) -> None:
         """Move one cell in the facing direction."""
