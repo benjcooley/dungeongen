@@ -194,6 +194,11 @@ class GridProbe:
         element_type, element_idx, blocked = self.grid.get_cell_info(self.x, self.y)
         return ProbeResult(element_type, element_idx, blocked)
 
+    def check_empty_here(self) -> bool:
+        """Check the cell in the probes current position."""
+        idx = self.grid._to_grid_index(self.x, self.y)
+        return idx is None or self.grid._grid[idx] == 0
+
     def check_direction(self, direction: ProbeDirection) -> ProbeResult:
         """Check the cell in the given direction without moving."""
         dx, dy = direction.relative_offset_from(self.facing)
@@ -272,23 +277,22 @@ class GridProbe:
         """Check if the cell diagonally backward-right is empty."""
         return self.check_direction_empty(ProbeDirection.BACK_RIGHT)
     
-    def add_debug_grid(self, direction: Optional[ProbeDirection], is_valid: bool) -> None:
+    def add_debug_grid(self, direction: Optional[int], is_valid: bool) -> None:
         """Add a debug visualization point for a grid position.
         
         Args:
             direction: Direction to check relative to current facing
             is_valid: Whether this point passed validation
         """
-        if self._debug_points is not None:
-            if direction:
-                dx, dy = direction.relative_offset_from(self.facing)
-                self.grid._debug_passage_points.append(
-                    PassageCheckPoint(self.x + dx, self.y + dy, direction, is_valid)
-                )
-            else:
-                self.grid._debug_passage_points.append(
-                    PassageCheckPoint(self.x, self.y, None, is_valid)
-                )
+        if direction:
+            dx, dy = _DIRECTION_OFFSETS[(self.facing + direction) % 8]
+            self.grid._debug_passage_points.append(
+                PassageCheckPoint(self.x + dx, self.y + dy, direction, is_valid)
+            )
+        else:
+            self.grid._debug_passage_points.append(
+                PassageCheckPoint(self.x, self.y, None, is_valid)
+            )
 
 class ElementType(IntFlag):
     """Element types for occupancy grid cells."""
@@ -681,7 +685,8 @@ class OccupancyGrid:
             idx = i * 3
             probe.x = self._points[idx]
             probe.y = self._points[idx + 1]
-            probe.facing = self._points[idx + 2]
+            curr_direction = self._points[idx + 2]
+            probe.facing = curr_direction
             
             # Quick check for blocked cells first - must be at top
             curr = probe.check_here()
@@ -693,13 +698,13 @@ class OccupancyGrid:
             # Check endpoints
             if i == 0:
                 back = probe.check_backward()
-                if not (back.is_room or back.is_passage):
+                if not curr.is_empty or not (back.is_room or back.is_passage):
                     if debug_enabled:
                         probe.add_debug_grid(ProbeDirection.BACK, False)
                     return False, self._crossed_passages[:cross_count]
-            elif i == len(points) - 1 and not allow_dead_end:
+            elif i == self._point_count - 1 and not allow_dead_end:
                 forward = probe.check_forward()
-                if not (forward.is_room or forward.is_passage):
+                if not curr.is_empty or not (forward.is_room or forward.is_passage):
                     if debug_enabled:
                         probe.add_debug_grid(ProbeDirection.FORWARD, False)
                     return False, self._crossed_passages[:cross_count]
@@ -738,7 +743,7 @@ class OccupancyGrid:
                         return False, self._crossed_passages[:cross_count]
                         
                 continue
-            
+
             # Check and track passage crossings
             if curr.is_passage:
                 self._crossed_passages[cross_count] = curr.element_idx
@@ -774,6 +779,8 @@ class OccupancyGrid:
             # Track valid point
             if debug_enabled:
                 probe.add_debug_grid(curr_direction, True)
+
+            prev_direction = curr_direction
                     
         return True, self._crossed_passages[:cross_count]
         
@@ -853,6 +860,12 @@ class OccupancyGrid:
         # For single point validation, treat NORTH as forward
         probe = GridProbe(self, x, y, facing=ProbeDirection.FORWARD)
         
+        # One space passages must be empty
+        if probe.check_empty_here():
+            if debug_enabled:
+                probe.add_debug_grid(None, False)
+            return False
+
         # Quick checks in order of likelihood
         if not probe.check_left_empty():
             if debug_enabled:
@@ -878,7 +891,8 @@ class OccupancyGrid:
                 return False
         
         if debug_enabled:
-            probe.add_debug_grid(probe.facing, True)
+            probe.add_debug_grid(None, True)
+
         return True
 
     @staticmethod
@@ -949,32 +963,8 @@ class OccupancyGrid:
             # First pass: Draw all cells
             for point in self._debug_passage_points:
                 # Purple for invalid points, blue for valid
-                if not point.is_valid:
-                    fill_color = skia.Color(200, 0, 200)  # Purple
-                    outline_color = skia.Color(255, 0, 255)  # Bright purple
+                if point.is_valid:
+                    debug_draw_grid_cell(point.x, point.y, skia.Color(50, 255, 80), alpha=128)
                 else:
-                    fill_color = skia.Color(0, 0, 200)  # Blue
-                    outline_color = skia.Color(0, 0, 255)  # Bright blue
-                
-                # Draw cell with outline, matching occupancy grid style
-                debug_draw_grid_cell(point.x, point.y, fill_color, alpha=128, blocked=False)
-                if outline_color:
-                    debug_draw_grid_cell(point.x, point.y, outline_color, alpha=200, blocked=True)
-            
-            # Second pass: Draw direction indicators on top
-            for point in self._debug_passage_points:
-                if point.direction is not None:
-                    # Convert grid to pixel coordinates
-                    px = point.x * CELL_SIZE + CELL_SIZE/2
-                    py = point.y * CELL_SIZE + CELL_SIZE/2
-                    
-                    # Get direction offset directly
-                    dx, dy = point.direction.get_offset()
-                    # Scale for visibility
-                    dx *= CELL_SIZE/2
-                    dy *= CELL_SIZE/2
-                    
-                    # Draw direction line in black
-                    paint = skia.Paint(Color=skia.Color(0, 0, 0), StrokeWidth=2)
-                    canvas.drawLine(px, py, px + dx, py + dy, paint)
+                    debug_draw_grid_cell(point.x, point.y, skia.Color(255, 180, 40), alpha=128)
                         

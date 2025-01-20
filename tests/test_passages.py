@@ -23,7 +23,7 @@ class TestPassages:
 
     @tag_test(TestTags.BASIC)
     def test_simple_passages(self) -> None:
-        """Test simple 2x5 vertical and horizontal passages."""
+        """Test simple linear vertical and horizontal passages."""
         # Use origin (0,0) for first test
         ox, oy = 0, 0
         
@@ -31,7 +31,7 @@ class TestPassages:
         self.runner.add_test_case(
             number=1,
             name="Simple Passages",
-            description="2x5 vertical and horizontal passages",
+            description="Test linear vertical and horizontal passages",
             location=(ox, oy),
             text_offset=(20, -20)  # Moved text right to be more visible
         )
