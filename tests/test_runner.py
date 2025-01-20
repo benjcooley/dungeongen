@@ -70,46 +70,23 @@ class TestRunner:
             self.labels = []
         self.labels.append((text, position))
         
-    def draw_test_info(self, canvas: skia.Canvas, transform: skia.Matrix) -> None:
-        """Draw test case numbers and descriptions."""
+    def draw_test_info(self, canvas: skia.Canvas, test_name: str, test_desc: str) -> None:
+        """Draw test case info at top left of canvas."""
         text_paint = skia.Paint(
             AntiAlias=True,
             Color=skia.Color(0, 0, 0),
             Style=skia.Paint.kFill_Style
         )
         
-        text_font = skia.Font(None, 30.0)
-        bold_font = skia.Font(None, 30.0)
-        bold_font.setEmbolden(True)
+        title_font = skia.Font(None, 24.0)
+        title_font.setEmbolden(True)
+        desc_font = skia.Font(None, 18.0)
         
-        # Draw labels first
-        if hasattr(self, 'labels'):
-            for text, pos in self.labels:
-                x = pos[0] * CELL_SIZE
-                y = pos[1] * CELL_SIZE
-                points = [skia.Point(x, y)]
-                transform.mapPoints(points)
-                point = points[0]
-                blob = skia.TextBlob(text, bold_font)
-                canvas.drawTextBlob(blob, point.x(), point.y(), text_paint)  # Draw at room position
-        
-        for case in self.test_cases:
-            # Convert grid location to map coordinates
-            x = case.location[0] * CELL_SIZE
-            y = case.location[1] * CELL_SIZE
-            
-            # Apply transform to get canvas coordinates
-            points = [skia.Point(x, y)]
-            transform.mapPoints(points)
-            point = points[0]
-            
-            # Draw case info
-            x = point.x() + case.text_offset[0] + (4 * CELL_SIZE)
-            y = point.y() + case.text_offset[1] - (2 * CELL_SIZE)
-            title_blob = skia.TextBlob(f"{case.number}. {case.name}", text_font)
-            desc_blob = skia.TextBlob(case.description, text_font)
-            canvas.drawTextBlob(title_blob, x, y, text_paint)
-            canvas.drawTextBlob(desc_blob, x, y + 60, text_paint)
+        # Draw test name and description
+        title_blob = skia.TextBlob(test_name, title_font)
+        desc_blob = skia.TextBlob(test_desc, desc_font)
+        canvas.drawTextBlob(title_blob, 20, 30, text_paint)
+        canvas.drawTextBlob(desc_blob, 20, 60, text_paint)
             
     def run_tests(self, tags: Set[TestTags] | None = None) -> None:
         """Run all test cases matching the given tags.
@@ -130,11 +107,6 @@ class TestRunner:
         from rich import print as rprint
         rprint("\n[bold blue]Running passage tests...[/bold blue]")
         
-        # Create visualization surface
-        surface = skia.Surface(self.options.canvas_width, self.options.canvas_height)
-        canvas = surface.getCanvas()
-        canvas.clear(skia.Color(255, 255, 255))
-        
         failures = []
         
         # Run each test method if its tags match
@@ -148,10 +120,42 @@ class TestRunner:
             if TestTags.ALL in run_tags or any(tag in run_tags for tag in test_tags):
                 from rich import print as rprint
                 
+                # Create fresh map for each test
+                self.map = Map(self.options)
+                
+                # Create visualization surface
+                surface = skia.Surface(self.options.canvas_width, self.options.canvas_height)
+                canvas = surface.getCanvas()
+                canvas.clear(skia.Color(255, 255, 255))
+                
                 rprint(f"\n[bold]Running test:[/bold] {method}")
                 try:
                     test_func()
                     rprint(f"[green]PASSED ✅[/green]")
+                    
+                    # Calculate transform
+                    transform = self.map._calculate_default_transform(
+                        self.options.canvas_width, 
+                        self.options.canvas_height
+                    )
+                    
+                    # Draw test info
+                    self.draw_test_info(canvas, method, test_func.__doc__ or "")
+                    
+                    # Draw the map with transform
+                    self.map.render(canvas, transform)
+                    
+                    # Debug draw the occupancy grid
+                    debug_draw_init(canvas)
+                    canvas.save()
+                    canvas.concat(transform)
+                    self.map.occupancy.draw_debug(canvas)
+                    canvas.restore()
+                    
+                    # Save test case image
+                    image = surface.makeImageSnapshot()
+                    image.save(f'test_{method}.png', skia.kPNG)
+                    
                 except AssertionError as e:
                     import traceback
                     rprint(f"[red]FAILED ❌: {str(e)}[/red]")
@@ -163,23 +167,6 @@ class TestRunner:
                     rprint(f"[red]{traceback.format_exc()}[/red]")
                     failures.append((method, str(e)))
                 tests_run += 1
-                
-        # Calculate transform once
-        transform = self.map._calculate_default_transform(self.options.canvas_width, self.options.canvas_height)
-        
-        # Draw the map with transform
-        self.map.render(canvas, transform)
-        
-        # Debug draw the occupancy grid with same transform
-        debug_draw_init(canvas)
-        canvas.save()
-        canvas.concat(transform)
-        self.map.occupancy.draw_debug(canvas)
-        canvas.restore()
-        
-        # Save visualization
-        image = surface.makeImageSnapshot()
-        image.save('test_output.png', skia.kPNG)
         
         # Print summary using rich
         from rich import print as rprint
