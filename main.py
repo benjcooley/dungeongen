@@ -12,13 +12,13 @@ from debug_config import debug_draw, DebugDrawFlags
 from debug_draw import debug_draw_init
 from tests.test_passages import TestPassages, TestTags
 
-# Set to True to run passage tests instead of normal map generation
-RUN_PASSAGE_TESTS = True
+# Set to True to run tests instead of normal map generation
+RUN_TESTS = True
 
 def main():
-    if RUN_PASSAGE_TESTS:
-        tests = TestPassages()
-        tests.run_tests({TestTags.ALL})
+    if RUN_TESTS:
+        from tests.test_runner import run_tests
+        run_tests()
         return
 
     # Enable debug visualization and logging
