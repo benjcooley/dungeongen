@@ -981,8 +981,8 @@ class OccupancyGrid:
                     px = point.x * CELL_SIZE + CELL_SIZE/2
                     py = point.y * CELL_SIZE + CELL_SIZE/2
                     
-                    # Get direction offset
-                    dx, dy = point.direction.get_offset()
+                    # Get direction offset relative to NORTH (0)
+                    dx, dy = point.direction.relative_offset_from(RoomDirection.NORTH)
                     # Scale for visibility
                     dx *= CELL_SIZE/2
                     dy *= CELL_SIZE/2
