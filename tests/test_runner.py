@@ -134,29 +134,40 @@ class TestRunner:
                 try:
                     test_func()
                     rprint(f"[green]PASSED ✅[/green]")
-                    
-                    # Calculate transform
-                    transform = self.map._calculate_default_transform(
-                        self.options.canvas_width, 
-                        self.options.canvas_height
-                    )
-                    
-                    # Draw the map with transform
-                    self.map.render(canvas, transform)
-                    
-                    # Debug draw the occupancy grid
-                    debug_draw_init(canvas)
-                    canvas.save()
-                    canvas.concat(transform)
-                    self.map.occupancy.draw_debug(canvas)
-                    canvas.restore()
+                except (AssertionError, Exception) as e:
+                    if isinstance(e, AssertionError):
+                        rprint(f"[red]FAILED ❌: {str(e)}[/red]")
+                    else:
+                        rprint(f"[red]ERROR ❌: {str(e)}[/red]")
+                    rprint(f"[red]{traceback.format_exc()}[/red]")
+                    failures.append((method, str(e)))
+                
+                # Always draw and save visualization, even on failure
+                # Calculate transform
+                transform = self.map._calculate_default_transform(
+                    self.options.canvas_width, 
+                    self.options.canvas_height
+                )
+                
+                # Draw the map with transform
+                self.map.render(canvas, transform)
+                
+                # Debug draw the occupancy grid
+                debug_draw_init(canvas)
+                canvas.save()
+                canvas.concat(transform)
+                self.map.occupancy.draw_debug(canvas)
+                canvas.restore()
 
-                    # Draw test info with clean state
-                    self.draw_test_info(canvas, method, test_func.__doc__ or "")
+                # Draw test info with clean state
+                self.draw_test_info(canvas, method, test_func.__doc__ or "")
 
-                    # Save test case image
-                    image = surface.makeImageSnapshot()
-                    image.save(f'test_results/{method}.png', skia.kPNG)
+                # Save test case image
+                image = surface.makeImageSnapshot()
+                image.save(f'test_results/{method}.png', skia.kPNG)
+                
+                if isinstance(e, (AssertionError, Exception)):
+                    continue
                     
                 except AssertionError as e:
                     rprint(f"[red]FAILED ❌: {str(e)}[/red]")
