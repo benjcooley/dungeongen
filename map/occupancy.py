@@ -92,7 +92,7 @@ class ProbeDirection(Enum):
             return ProbeDirection.FORWARD
     
         
-    def offsets_relative_to(self, facing: RoomDirection) -> tuple[int, int]:
+    def relative_offset_from(self, facing: RoomDirection) -> tuple[int, int]:
         """Get grid offsets for this probe direction relative to this facing direction.
         
         Args:
@@ -102,12 +102,7 @@ class ProbeDirection(Enum):
             the dx, dy offsets of the probe direction relative to the facing direction
         """
         # Add facing value to get rotated direction
-        rotated = RoomDirection((self.value + facing.value) % 8)
-        return rotated.get_forward()
-
-    def relative_to(self, facing: RoomDirection) -> tuple[int, int]:
-        """Get this probe direction's offset relative to a facing direction."""
-        return self.get_relative_offsets(facing)[self.value]
+        return RoomDirection.OFFSETS[(self.value + facing.value) % 8]
 
 @dataclass
 class ProbeResult:
@@ -205,7 +200,7 @@ class GridProbe:
     
     def check_direction(self, direction: ProbeDirection) -> ProbeResult:
         """Check the cell in the given direction without moving."""
-        dx, dy = direction.offsets_relative_to(self._facing)
+        dx, dy = direction.relative_offset_from(self._facing)
         element_type, element_idx, blocked = self.grid.get_cell_info(
             self.x + dx, self.y + dy
         )
@@ -213,7 +208,7 @@ class GridProbe:
         
     def check_direction_empty(self, direction: ProbeDirection) -> bool:
         """Check if the cell in the given direction is empty."""
-        dx, dy = direction.offsets_relative_to(self._facing)
+        dx, dy = direction.relative_offset_from(self._facing)
         idx = self.grid._to_grid_index(self.x + dx, self.y + dy)
         return idx is None or self.grid._grid[idx] == 0
     
@@ -253,7 +248,7 @@ class GridProbe:
             is_valid: Whether this point passed validation
         """
         if self._debug_points is not None:
-            dx, dy = direction.offsets_relative_to(self.facing)
+            dx, dy = direction.relative_offset_from(self.facing)
             self._debug_points.append(
                 self.PassageCheckPoint(self.x + dx, self.y + dy, direction, is_valid)
             )

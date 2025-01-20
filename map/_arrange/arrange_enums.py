@@ -30,42 +30,33 @@ class RoomDirection(Enum):
     ]
 
     def get_forward(self) -> Tuple[int, int]:
-        """Get the (dx, dy) grid offset for this direction."""
+        """Get the (dx, dy) grid offset for the forward direction."""
         return self.OFFSETS[self.value]
         
     def get_left(self) -> Tuple[int, int]:
         """Gets the (dx, dy) grid offset for the left direction."""
-        if self == RoomDirection.NORTH:
-            return (-1, 0)
-        elif self == RoomDirection.SOUTH:
-            return (1, 0)
-        elif self == RoomDirection.EAST:
-            return (0, -1)
-        else:
-            return (0, 1)  
+        return self.OFFSETS((self.value + 6) % 8)
+    
+    def get_right(self) -> Tuple[int, int]:
+        """Gets the (dx, dy) grid offset for the right direction."""
+        return self.OFFSETS((self.value + 2) % 8)
 
     def get_opposite(self) -> 'RoomDirection':
         """Get the opposite direction."""
-        if self == RoomDirection.NORTH:
-            return RoomDirection.SOUTH
-        elif self == RoomDirection.SOUTH:
-            return RoomDirection.NORTH
-        elif self == RoomDirection.EAST:
-            return RoomDirection.WEST
-        else:
-            return RoomDirection.EAST
+        return RoomDirection((self.value + 4) % 8)
+    
+    @property
+    def is_cardinal(self) -> bool:
+        """True if direction is NORTH, SOUTH, EAST, WEST."""
+        return self.value % 2 == 0
             
     def is_perpendicular(self, other: 'RoomDirection') -> bool:
         """Check if this direction is perpendicular to another direction."""
-        return ((self in (RoomDirection.NORTH, RoomDirection.SOUTH) and 
-                other in (RoomDirection.EAST, RoomDirection.WEST)) or
-               (self in (RoomDirection.EAST, RoomDirection.WEST) and 
-                other in (RoomDirection.NORTH, RoomDirection.SOUTH)))
+        return self.value % 4 != other.value % 4
                 
     def is_parallel(self, other: 'RoomDirection') -> bool:
         """Check if this direction is parallel to another direction."""
-        return self in (RoomDirection.NORTH, RoomDirection.SOUTH) == \
-               other in (RoomDirection.NORTH, RoomDirection.SOUTH)
+        return self.value % 4 == other.value % 4
                
     @staticmethod
     def from_points(p1: tuple[int, int], p2: tuple[int, int]) -> Optional['RoomDirection']:
