@@ -3,6 +3,7 @@
 from typing import Set, List, Tuple, Optional
 import skia
 from dataclasses import dataclass
+from debug_draw import debug_draw_init
 from map.map import Map 
 from options import Options
 from debug_config import debug_draw, DebugDrawFlags
@@ -37,14 +38,14 @@ class TestRunner:
         if not hasattr(self, 'initialized'):
             self.initialized = True
             
-    def setup(self, tags: Set[TestTags] = {TestTags.ALL}) -> None:
+    def setup(self, tags: Set[TestTags] = { TestTags.ALL }, options: Options = None) -> None:
         """Setup test environment.
         
         Args:
             tags: Set of tags indicating which tests to run
         """
         # Create fresh map and enable debug visualization
-        options = Options()
+        options = options or Options()
         self.map = Map(options)
         debug_draw.enable(DebugDrawFlags.PASSAGE_CHECK)
         self.test_cases = []
@@ -128,7 +129,7 @@ class TestRunner:
         rprint("\n[bold blue]Running passage tests...[/bold blue]")
         
         # Create visualization surface
-        surface = skia.Surface(800, 600)
+        surface = skia.Surface(self.options.canvas_width, self.options.canvas_height)
         canvas = surface.getCanvas()
         canvas.clear(skia.Color(255, 255, 255))
         
@@ -159,17 +160,18 @@ class TestRunner:
                     failures.append((method, str(e)))
                 tests_run += 1
                 
-                # Draw debug visualization after each test
-                self.map.render(canvas)
-                if debug_draw.is_enabled(DebugDrawFlags.PASSAGE_CHECK):
-                    self.map.occupancy.draw_debug(canvas)
-                
-                # Calculate and apply transform
-                transform = self.map._calculate_default_transform(800, 600)
-                canvas.save()
-                canvas.concat(transform)
-                self.draw_test_info(canvas, transform)
-                canvas.restore()
+        # Calculate transform once
+        transform = self.map._calculate_default_transform(self.options.canvas_width, self.options.canvas_height)
+        
+        # Draw the map with transform
+        map.render(canvas, transform)
+        
+        # Debug draw the occupancy grid with same transform
+        debug_draw_init(canvas)
+        canvas.save()
+        canvas.concat(transform)
+        map.occupancy.draw_debug(canvas)
+        canvas.restore()
         
         # Save visualization
         image = surface.makeImageSnapshot()
