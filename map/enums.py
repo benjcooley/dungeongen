@@ -114,6 +114,18 @@ class RoomDirection(Enum):
         return self.value % 4 == other.value % 4
                
     @staticmethod
+    def from_delta(dx: int, dy: int) -> 'RoomDirection':
+        """Convert a delta to a cardinal direction."""
+        if dx > 0:
+            return RoomDirection.EAST
+        elif dx < 0:
+            return RoomDirection.WEST
+        elif dy > 0:
+            return RoomDirection.SOUTH
+        else:
+            return RoomDirection.NORTH
+            
+    @staticmethod
     def from_points(p1: tuple[int, int], p2: tuple[int, int]) -> Optional['RoomDirection']:
         """Get the direction from p1 to p2 assuming they form a straight line.
         
