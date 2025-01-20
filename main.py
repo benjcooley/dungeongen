@@ -10,8 +10,16 @@ from tags import Tags
 from logging_config import logger, LogTags
 from debug_config import debug_draw, DebugDrawFlags
 from debug_draw import debug_draw_init
+from tests.test_passages import TestPassages, TestTags
+
+# Set to True to run passage tests instead of normal map generation
+RUN_PASSAGE_TESTS = True
 
 def main():
+    if RUN_PASSAGE_TESTS:
+        tests = TestPassages()
+        tests.run_tests({TestTags.ALL})
+        return
 
     # Enable debug visualization and logging
     debug_draw.enable(DebugDrawFlags.OCCUPANCY, DebugDrawFlags.ELEMENT_NUMBERS)
