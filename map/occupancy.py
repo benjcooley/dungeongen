@@ -907,44 +907,6 @@ class OccupancyGrid:
         else:
             return RoomDirection.NORTH
         
-    def _get_direction_between_points(self, x1: int, y1: int, x2: int, y2: int) -> ProbeDirection:
-        """Get the ProbeDirection from point 1 to point 2."""
-        dx = x2 - x1
-        dy = y2 - y1
-        if dx > 0:
-            return ProbeDirection.RIGHT
-        elif dx < 0:
-            return ProbeDirection.LEFT
-        elif dy > 0:
-            return ProbeDirection.BACK
-        else:
-            return ProbeDirection.FORWARD
-            
-    def _get_probe_for_path_point(self, points: list[tuple[int, int]], index: int, 
-                                 curr_x: int, curr_y: int, start_direction: RoomDirection) -> GridProbe:
-        """Get a properly oriented probe for a point in the path."""
-        if index == 0:
-            # First point - use direction to next point
-            next_x, next_y = points[index + 1]
-            dx = next_x - curr_x
-            dy = next_y - curr_y
-        else:
-            # Other points - use direction from previous point
-            prev_x, prev_y = points[index - 1]
-            dx = curr_x - prev_x
-            dy = curr_y - prev_y
-            
-        # Convert delta to probe direction
-        if dx > 0:
-            direction = ProbeDirection.EAST
-        elif dx < 0:
-            direction = ProbeDirection.WEST
-        elif dy > 0:
-            direction = ProbeDirection.SOUTH
-        else:
-            direction = ProbeDirection.NORTH
-            
-        return GridProbe(self, curr_x, curr_y, facing=direction)
        
     def check_door(self, grid_x: int, grid_y: int) -> bool:
         """Check if a door can be placed at the given grid position.
