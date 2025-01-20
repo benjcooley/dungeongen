@@ -807,6 +807,8 @@ class OccupancyGrid:
         self._points[1] = points[0][1]
         # Direction will be set based on next point
         points_count += 1
+        print(f"\nExpanded points:")
+        print(f"Point {points_count}: ({points[0][0]}, {points[0][1]})")
         
         # Process each segment
         for i in range(len(points) - 1):
@@ -836,6 +838,7 @@ class OccupancyGrid:
                     self._points[idx + 1] = y
                     self._points[idx + 2] = direction.value
                     points_count += 1
+                    print(f"Point {points_count}: ({x1}, {y})")
                     y += step
             else:  # Horizontal  
                 step = 1 if x2 > x1 else -1
@@ -846,6 +849,7 @@ class OccupancyGrid:
                     self._points[idx + 1] = y1
                     self._points[idx + 2] = direction.value
                     points_count += 1
+                    print(f"Point {points_count}: ({x}, {y1})")
                     x += step
         
         # Set direction for last point based on approach direction
