@@ -20,6 +20,7 @@ class TestPassages:
     
     def __init__(self):
         self.runner = get_runner()
+        self.runner.setup()  # Initialize test environment
 
     @tag_test(TestTags.BASIC)
     def test_simple_passages(self) -> None:
