@@ -72,9 +72,9 @@ class Passage(MapElement):
                 
             # Determine end direction from last two points if not provided
             if end_direction is None:
-                x1, y1 = grid_points[-2]
-                x2, y2 = grid_points[-1]
-                # For end, use direction FROM second-to-last point TO last point
+                x1, y1 = grid_points[-1]  # Reversed: start from end point
+                x2, y2 = grid_points[-2]  # And look back to previous point
+                # For end, compute direction FROM end point looking BACK to previous point
                 self._end_direction = RoomDirection.from_delta(x2 - x1, y2 - y1)
                 print(f"Computed end direction: {self._end_direction} from ({x1},{y1}) to ({x2},{y2})")
             else:
