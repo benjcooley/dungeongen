@@ -25,6 +25,66 @@ class TestPassages:
     @tag_test(TestTags.BASIC)
     def test_simple_passages(self) -> None:
         """Test simple linear vertical and horizontal passages."""
+        self._test_simple_passages()
+
+    @tag_test(TestTags.BASIC)
+    def test_crossing_passages(self) -> None:
+        """Test passages that cross each other in a + pattern."""
+        # Use origin (0,0) for test
+        ox, oy = 0, 0
+        
+        # Create rooms in + pattern
+        north_room = self.runner.map.create_rectangular_room(ox + 3, oy, 3, 3)
+        south_room = self.runner.map.create_rectangular_room(ox + 3, oy + 6, 3, 3)
+        west_room = self.runner.map.create_rectangular_room(ox, oy + 3, 3, 3)
+        east_room = self.runner.map.create_rectangular_room(ox + 6, oy + 3, 3, 3)
+        
+        # Create vertical passage points
+        vertical_points = [
+            north_room.get_exit(RoomDirection.SOUTH),
+            south_room.get_exit(RoomDirection.NORTH)
+        ]
+        
+        # First validate and create vertical passage
+        is_valid_vertical, crossed_vertical = self.runner.map.occupancy.check_passage(
+            vertical_points,
+            RoomDirection.SOUTH
+        )
+        assert is_valid_vertical and not crossed_vertical, "Vertical passage should be valid"
+        
+        # Create and connect vertical passage
+        vertical_passage = Passage.from_grid_path(vertical_points)
+        self.runner.map.add_element(vertical_passage)
+        north_room.connect_to(vertical_passage)
+        south_room.connect_to(vertical_passage)
+        
+        # Create horizontal passage points
+        horizontal_points = [
+            west_room.get_exit(RoomDirection.EAST),
+            east_room.get_exit(RoomDirection.WEST)
+        ]
+        
+        # Now validate horizontal passage - should cross vertical
+        is_valid_horizontal, crossed_horizontal = self.runner.map.occupancy.check_passage(
+            horizontal_points,
+            RoomDirection.EAST
+        )
+        assert is_valid_horizontal, "Horizontal passage should be valid"
+        assert crossed_horizontal, "Horizontal passage should cross vertical passage"
+        assert len(crossed_horizontal) == 1, "Should cross exactly one passage"
+        assert crossed_horizontal[0] == vertical_passage, "Should cross the vertical passage"
+        
+        # Create and connect horizontal passage
+        horizontal_passage = Passage.from_grid_path(horizontal_points)
+        self.runner.map.add_element(horizontal_passage)
+        west_room.connect_to(horizontal_passage)
+        east_room.connect_to(horizontal_passage)
+        
+        # Connect crossing passages
+        horizontal_passage.connect_to(vertical_passage)
+
+    def _test_simple_passages(self) -> None:
+        """Test simple linear vertical and horizontal passages."""
         # Use origin (0,0) for first test
         ox, oy = 0, 0
         
