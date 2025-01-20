@@ -5,6 +5,7 @@ from enum import Enum, auto
 import skia
 from typing import Tuple, Optional
 from graphics.math import Point2D
+from graphics.conversions import grid_to_map
 from constants import CELL_SIZE, DEBUG_FONT_FAMILY, DEBUG_FONT_SIZE
 
 
