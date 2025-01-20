@@ -6,7 +6,7 @@ from map.mapelement import MapElement
 from graphics.conversions import grid_to_map, grid_points_to_map_rect, map_to_grid_rect
 from constants import CELL_SIZE
 from typing import TYPE_CHECKING, List, Tuple, Optional
-from map.occupancy import ElementType, ProbeDirection
+from map.occupancy import ElementType, ProbeDirection, OccupancyGrid
 from map.enums import RoomDirection
 
 if TYPE_CHECKING:
