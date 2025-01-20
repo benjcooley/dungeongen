@@ -219,7 +219,7 @@ class GridProbe:
 
     def check_forward_empty(self) -> bool:
         """Check the cell in front is empty."""
-        return self.check_direction_epty(ProbeDirection.FORWARD)
+        return self.check_direction_empty(ProbeDirection.FORWARD)
 
     def check_backward(self) -> ProbeResult:
         """Check the cell behind without moving."""
