@@ -43,6 +43,10 @@ class TestPassages:
         room3 = self.runner.map.create_rectangular_room(ox + 5, oy + 3, 3, 3)  # Left room  
         room4 = self.runner.map.create_rectangular_room(ox + 11, oy + 3, 3, 3)  # Right room
         
+        # Add debug text labels
+        self.runner.add_test_label("Vertical", (ox, oy - 1))
+        self.runner.add_test_label("Horizontal", (ox + 5, oy + 2))
+        
         # Create vertical passage points (just start and end)
         vertical_points = [(ox + 1, oy + 3), (ox + 1, oy + 6)]
         

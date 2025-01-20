@@ -61,6 +61,12 @@ class TestRunner:
             text_offset=text_offset
         ))
         
+    def add_test_label(self, text: str, position: Tuple[int, int]) -> None:
+        """Add a text label at grid coordinates."""
+        if not hasattr(self, 'labels'):
+            self.labels = []
+        self.labels.append((text, position))
+        
     def draw_test_info(self, canvas: skia.Canvas, transform: skia.Matrix) -> None:
         """Draw test case numbers and descriptions."""
         text_paint = skia.Paint(
@@ -68,6 +74,21 @@ class TestRunner:
             AntiAlias=True,
             TextSize=14
         )
+        
+        # Draw labels first
+        if hasattr(self, 'labels'):
+            label_paint = skia.Paint(
+                Color=skia.Color(0, 0, 0),
+                AntiAlias=True,
+                TextSize=12
+            )
+            for text, pos in self.labels:
+                x = pos[0] * CELL_SIZE
+                y = pos[1] * CELL_SIZE
+                points = [skia.Point(x, y)]
+                transform.mapPoints(points)
+                cx, cy = points[0].x, points[0].y
+                canvas.drawString(text, cx, cy, label_paint)
         
         for case in self.test_cases:
             # Convert grid location to map coordinates
