@@ -41,6 +41,10 @@ class RoomDirection(Enum):
         """Gets the (dx, dy) grid offset for the right direction."""
         return self.OFFSETS((self.value + 2) % 8)
 
+    def get_back(self) -> Tuple[int, int]:
+        """Gets the (dx, dy) grid offset for the back direction."""
+        return self.OFFSETS((self.value +4) % 8)
+
     def get_opposite(self) -> 'RoomDirection':
         """Get the opposite direction."""
         return RoomDirection((self.value + 4) % 8)

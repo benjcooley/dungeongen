@@ -158,9 +158,7 @@ class GridProbe:
             raise ValueError("GridProbe facing must be a cardinal direction (NORTH, EAST, SOUTH, WEST)")
         self._facing = facing
         
-        # Convert to probe direction to get offset
-        probe_dir = ProbeDirection(facing.value)
-        self._dx, self._dy = probe_dir.get_offset()
+        # A cached reference to debug point list in OccupancyGrid class
         self._debug_points = debug_points
         
     @property
@@ -177,28 +175,32 @@ class GridProbe:
             
         if value != self._facing:
             self._facing = value
-            # Get the FORWARD offset relative to our facing direction
-            self._dx, self._dy = ProbeDirection.FORWARD.relative_offset_from(value)
     
     def move_forward(self) -> None:
         """Move one cell in the facing direction."""
-        self.x += self._dx
-        self.y += self._dy
+        dx, dy = self._facing.get_forward()
+        self.x += dx
+        self.y += dy
     
     def move_backward(self) -> None:
         """Move one cell opposite the facing direction."""
-        self.x -= self._dx
-        self.y -= self._dy
+        dx, dy = self._facing.get_back()
+        self.x += dx
+        self.y += dy
     
     def turn_left(self) -> None:
         """Turn 90 degrees left."""
-        self.facing = self.facing.turn_left()
+        dx, dy = self._facing.get_left()
+        self.x += dx
+        self.y += dy
     
     def turn_right(self) -> None:
         """Turn 90 degrees right."""
-        self.facing = self.facing.turn_right()
+        dx, dy = self._facing.get_right()
+        self.x += dx
+        self.y += dy
     
-    def check_direction(self, direction: ProbeDirection) -> ProbeResult:
+    def check_direction(self, direction: int) -> ProbeResult:
         """Check the cell in the given direction without moving."""
         dx, dy = direction.relative_offset_from(self._facing)
         element_type, element_idx, blocked = self.grid.get_cell_info(
@@ -206,7 +208,7 @@ class GridProbe:
         )
         return ProbeResult(element_type, element_idx, blocked)
         
-    def check_direction_empty(self, direction: ProbeDirection) -> bool:
+    def check_direction_empty(self, direction: int) -> bool:
         """Check if the cell in the given direction is empty."""
         dx, dy = direction.relative_offset_from(self._facing)
         idx = self.grid._to_grid_index(self.x + dx, self.y + dy)
@@ -214,31 +216,35 @@ class GridProbe:
     
     def check_forward(self) -> ProbeResult:
         """Check the cell in front without moving."""
-        return self.check_direction(self.facing)
-    
+        return self.check_direction(ProbeDirection.FORWARD)
+
+    def check_forward_empty(self) -> bool:
+        """Check the cell in front is empty."""
+        return self.check_direction_epty(ProbeDirection.FORWARD)
+
     def check_backward(self) -> ProbeResult:
         """Check the cell behind without moving."""
-        return self.check_direction(self.facing.turn_around())
+        return self.check_direction(ProbeDirection.BACK)
         
     def check_backward_empty(self) -> bool:
         """Check if the cell behind is empty."""
-        return self.check_direction_empty(self.facing.turn_around())
+        return self.check_direction_empty(ProbeDirection.BACK)
     
     def check_left(self) -> ProbeResult:
         """Check the cell to the left without moving."""
-        return self.check_direction(self.facing.turn_left())
+        return self.check_direction(ProbeDirection.LEFT)
         
     def check_left_empty(self) -> bool:
         """Check if the cell to the left is empty."""
-        return self.check_direction_empty(self.facing.turn_left())
+        return self.check_direction_empty(ProbeDirection.LEFT)
     
     def check_right(self) -> ProbeResult:
         """Check the cell to the right without moving."""
-        return self.check_direction(self.facing.turn_right())
+        return self.check_direction(ProbeDirection.RIGHT)
         
     def check_right_empty(self) -> bool:
         """Check if the cell to the right is empty."""
-        return self.check_direction_empty(self.facing.turn_right())
+        return self.check_direction_empty(ProbeDirection.RIGHT)
         
     def add_debug_grid(self, direction: ProbeDirection, is_valid: bool) -> None:
         """Add a debug visualization point for a grid position.
@@ -255,35 +261,35 @@ class GridProbe:
         
     def check_forward_left(self) -> ProbeResult:
         """Check the cell diagonally forward-left without moving."""
-        return self.check_direction(ProbeDirection((self.facing.value - 1) % 8))
+        return self.check_direction(ProbeDirection.FORWARD_LEFT)
         
     def check_forward_left_empty(self) -> bool:
         """Check if the cell diagonally forward-left is empty."""
-        return self.check_direction_empty(ProbeDirection((self.facing.value - 1) % 8))
+        return self.check_direction_empty(ProbeDirection.FORWARD_LEFT)
         
     def check_forward_right(self) -> ProbeResult:
         """Check the cell diagonally forward-right without moving."""
-        return self.check_direction(ProbeDirection((self.facing.value + 1) % 8))
+        return self.check_direction(ProbeDirection.FORWARD_RIGHT)
         
     def check_forward_right_empty(self) -> bool:
         """Check if the cell diagonally forward-right is empty."""
-        return self.check_direction_empty(ProbeDirection((self.facing.value + 1) % 8))
+        return self.check_direction_empty(ProbeDirection.FORWARD_RIGHT)
         
     def check_backward_left(self) -> ProbeResult:
         """Check the cell diagonally backward-left without moving."""
-        return self.check_direction(ProbeDirection((self.facing.value - 3) % 8))
+        return self.check_direction(ProbeDirection.BACK_LEFT)
         
     def check_backward_left_empty(self) -> bool:
         """Check if the cell diagonally backward-left is empty."""
-        return self.check_direction_empty(ProbeDirection((self.facing.value - 3) % 8))
+        return self.check_direction_empty(ProbeDirection.BACK_LEFT)
         
     def check_backward_right(self) -> ProbeResult:
         """Check the cell diagonally backward-right without moving."""
-        return self.check_direction(ProbeDirection((self.facing.value + 3) % 8))
+        return self.check_direction(ProbeDirection.BACK_RIGHT)
         
     def check_backward_right_empty(self) -> bool:
         """Check if the cell diagonally backward-right is empty."""
-        return self.check_direction_empty(ProbeDirection((self.facing.value + 3) % 8))
+        return self.check_direction_empty(ProbeDirection.BACK_RIGHT)
 
 class ElementType(IntFlag):
     """Element types for occupancy grid cells."""
