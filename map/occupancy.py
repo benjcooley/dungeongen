@@ -18,7 +18,7 @@ import skia
 from logging_config import logger, LogTags
 from graphics.shapes import Rectangle, Circle
 from constants import CELL_SIZE
-from graphics.conversions import map_to_grid, map_rect_to_grid_points, map_to_grid_rect, grid_to_map
+from graphics.conversions import map_to_grid_rect
 from map.enums import RoomDirection
 from options import Options
 from debug_draw import debug_draw_grid_cell
@@ -671,10 +671,6 @@ class OccupancyGrid:
             
         # Reset crossed passages tracking
         cross_count = 0
-        
-        # Clear debug visualization if enabled
-        if debug_enabled:
-            self._debug_passage_points.clear()
         
         # Reuse a single probe for all checks
         # For passage validation, treat NORTH as forward
