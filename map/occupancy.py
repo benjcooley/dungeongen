@@ -743,7 +743,7 @@ class OccupancyGrid:
                 for direction in check_dirs:
                     result = probe.check_direction(direction)
                     if result.is_passage:
-                        self._crossed_passages[cross_count] = result.element_idx
+                        self._crossed_passages[cross_count] = (probe.x, probe.y, result.element_idx)
                         cross_count += 1
                         if debug_enabled:
                             probe.add_debug_grid(probe.facing, False)
