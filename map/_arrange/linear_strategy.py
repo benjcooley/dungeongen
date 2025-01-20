@@ -6,9 +6,9 @@ import random
 from typing import List, Optional, Tuple
 
 from map.room import Room
+from map.enums import RoomDirection
 from map._arrange.strategy import Strategy, StrategyParams
 from map._arrange.room_distribution import get_random_room_shape
-from map._arrange.arrange_utils import RoomDirection, get_room_exit_grid_position
 from map._arrange.passage_distribution import get_random_passage_config
 from map._arrange.arrange_rooms import try_create_connected_room
 from map._arrange.arrange_enums import GrowDirection
@@ -65,8 +65,7 @@ class LinearStrategy(Strategy):
         # Calculate an alignment position to align all the other passages with. It's just used
         # to align passages in a straight liene so it can be on either side of the room, we
         # don't care.
-        align_to_pos = get_room_exit_grid_position(
-            source_room,
+        align_to_pos = source_room.get_exit(
             direction,
             wall_pos=0.5
         )

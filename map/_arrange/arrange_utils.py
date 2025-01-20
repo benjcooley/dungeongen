@@ -8,9 +8,9 @@ from logging_config import logger, LogTags
 from graphics.math import Matrix2D, Point2D
 from graphics.shapes import Rectangle
 from map.room import Room, RoomType
+from map.enums import RoomDirection
 from constants import CELL_SIZE
 from graphics.aliases import Point
-from map._arrange.arrange_enums import RoomDirection
 
 def grid_points_to_grid_rect(grid_x1: int, grid_y1: int, grid_x2: int, grid_y2: int) -> Tuple[int, int, int, int]:
     """Convert grid points to a rectangle"""
@@ -59,58 +59,6 @@ def get_room_direction(room1: Room, room2: Room) -> RoomDirection:
     else:
         return RoomDirection.SOUTH if dy > 0 else RoomDirection.NORTH
 
-def get_room_exit_grid_position(room: Room, direction: RoomDirection, wall_pos: float = 0.5, align_to: Point = None) -> Tuple[int, int]:
-    """Get a grid position for exiting this room in the given direction.
-    
-    Args:
-        room: The room to exit from
-        direction: Which side of the room to exit from
-        wall_pos: Position along the wall to exit from (0.0 to 1.0)
-        align_to: Optional coordinate to snap to. For vertical passages (NORTH/SOUTH),
-                 uses the x-coordinate. For horizontal passages (EAST/WEST), uses
-                 the y-coordinate.
-        
-    Returns:
-        Tuple of (grid_x, grid_y) for the exit point one cell outside the room
-    """
-    # Get room bounds in grid coordinates
-    grid_x = int(room.bounds.x / CELL_SIZE)
-    grid_y = int(room.bounds.y / CELL_SIZE)
-    grid_width = int(room.bounds.width / CELL_SIZE)
-    grid_height = int(room.bounds.height / CELL_SIZE)
-    
-    logger.debug(LogTags.ARRANGEMENT, 
-        f"\nCalculating exit position:\n"
-        f"  Room bounds: x={room.bounds.x}, y={room.bounds.y}, w={room.bounds.width}, h={room.bounds.height}\n"
-        f"  Grid bounds: x={grid_x}, y={grid_y}, w={grid_width}, h={grid_height}")
-
-    # For circular rooms, always exit from center
-    if room.room_type == RoomType.CIRCULAR:
-        wall_pos = 0.5
-
-    # Calculate exit point along the wall
-    if direction == RoomDirection.NORTH:
-        x = grid_x + int((grid_width - 1) * wall_pos)
-        y = grid_y - 1
-    elif direction == RoomDirection.SOUTH:
-        x = grid_x + int((grid_width - 1) * wall_pos)
-        y = grid_y + grid_height
-    elif direction == RoomDirection.EAST:
-        x = grid_x + grid_width
-        y = grid_y + int((grid_height - 1) * wall_pos)
-    else:  # WEST
-        x = grid_x - 1
-        y = grid_y + int((grid_height - 1) * wall_pos)
-
-    # If we have an align_to point, snap to its coordinate based on passage direction
-    if align_to is not None:
-        if direction in (RoomDirection.NORTH, RoomDirection.SOUTH):
-            x = align_to[0]  # Vertical passages snap to x coordinate
-        else:  # EAST, WEST
-            y = align_to[1]  # Horizontal passages snap to y coordinate
-            
-    return (x, y)
-
 def make_room_transform(room: Room, direction: RoomDirection, wall_pos: float = 0.5,
                        align_to: Optional[Tuple[int, int]] = None) -> Matrix2D:
     """Create a transform matrix for positioning relative to a room's exit.
@@ -130,7 +78,7 @@ def make_room_transform(room: Room, direction: RoomDirection, wall_pos: float = 
         Matrix2D configured for the local coordinate space
     """
     # Get exit point and direction vectors
-    exit_pos = get_room_exit_grid_position(room, direction, wall_pos, align_to=align_to)
+    exit_pos = room.get_exit(direction, wall_pos, align_to=align_to)
     forward = direction.get_forward()
     left = direction.get_left()
     

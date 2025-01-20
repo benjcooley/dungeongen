@@ -26,14 +26,13 @@ from graphics.conversions import map_to_grid
 from graphics.math import Point2D
 from graphics.shapes import Circle, Rectangle
 from map._arrange.arrange_utils import (
-    get_room_direction, get_room_exit_grid_position,
-    grid_points_to_grid_rect, grid_line_to_grid_deltas,
-    grid_line_dist, get_adjacent_room_rect, RoomDirection
+    get_room_direction, grid_points_to_grid_rect, grid_line_to_grid_deltas,
+    grid_line_dist, get_adjacent_room_rect
 )
 from map._arrange.passage_distribution import PassageConfig
 from map._arrange.room_distribution import RoomShape, get_random_room_shape
 from map.door import Door, DoorOrientation, DoorType
-from map.enums import Direction
+from map.enums import Direction, RoomDirection
 from map.map import Map
 from map.mapelement import MapElement
 from map.occupancy import ElementType
@@ -89,11 +88,11 @@ def try_connect_rooms(
 
         # Get connection points in grid coordinates
         if align_to is not None:
-            r1_x, r1_y = get_room_exit_grid_position(room1, r1_dir, align_to=align_to)
-            r2_x, r2_y = get_room_exit_grid_position(room2, r2_dir, align_to=align_to)
+            r1_x, r1_y = room1.get_exit(r1_dir, align_to=align_to)
+            r2_x, r2_y = room2.get_exit(r2_dir, align_to=align_to)
         else:
-            r1_x, r1_y = get_room_exit_grid_position(room1, r1_dir, wall_pos=random.random())
-            r2_x, r2_y = get_room_exit_grid_position(room2, r2_dir, align_to=(r1_x, r1_y))
+            r1_x, r1_y = room1.get_exit(r1_dir, wall_pos=random.random())
+            r2_x, r2_y = room2.get_exit(r2_dir, align_to=(r1_x, r1_y))
 
         dist = grid_line_dist(r1_x, r1_y, r2_x, r2_y)
 

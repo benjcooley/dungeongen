@@ -5,9 +5,9 @@ import random
 from typing import List, Optional, Tuple, Set
 
 from map.room import Room
+from map.enums import RoomDirection
 from map._arrange.strategy import Strategy, StrategyParams
 from map._arrange.room_distribution import get_random_room_shape
-from map._arrange.arrange_utils import RoomDirection, get_room_exit_grid_position
 from map._arrange.passage_distribution import get_random_passage_config
 from map._arrange.arrange_rooms import try_create_connected_room
 

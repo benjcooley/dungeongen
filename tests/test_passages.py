@@ -3,7 +3,7 @@
 from typing import Tuple
 from map.room import Room
 from map.passage import Passage
-from map._arrange.arrange_enums import RoomDirection
+from map.enums import RoomDirection
 from tests.test_runner import get_runner
 from tests.test_tags import TestTags
 
@@ -48,11 +48,11 @@ class TestPassages:
         self.runner.add_test_label("Horizontal", (ox + 5, oy + 2))
         
         # Create vertical passage points (just start and end)
-        vertical_points = [(ox + 1, oy + 3), (ox + 1, oy + 5)]  # Shortened to avoid overlap
+        vertical_points = [room1.get_exit(RoomDirection.SOUTH), room2.get_exit(RoomDirection.NORTH)]  # Shortened to avoid overlap
         print(f"\nTesting vertical passage points: {vertical_points}")
         
         # Create horizontal passage points (just start and end)
-        horizontal_points = [(ox + 8, oy + 4), (ox + 10, oy + 4)]  # Shortened to avoid overlap
+        horizontal_points = [room3.get_exit(RoomDirection.EAST), room3.get_exit(RoomDirection.WEST)]  # Shortened to avoid overlap
         
         # First validate the passages
         print("\nChecking vertical passage...")
@@ -69,19 +69,18 @@ class TestPassages:
         # Check horizontal passage
         is_valid_horizontal, crossed_horizontal = self.runner.map.occupancy.check_passage(
             horizontal_points,
-            RoomDirection.EAST,
-            allow_dead_end=True
+            RoomDirection.EAST
         )
         print(f"Horizontal passage valid: {is_valid_horizontal}, crossed: {crossed_horizontal}")
 
         # Create and connect passages after validation
-        vertical_passage = Passage.from_grid_path(vertical_points, RoomDirection.SOUTH, RoomDirection.SOUTH)
+        vertical_passage = Passage.from_grid_path(vertical_points)
         self.runner.map.add_element(vertical_passage)
         # Connect vertical passage to rooms
         room1.connect_to(vertical_passage)
         room2.connect_to(vertical_passage)
 
-        horizontal_passage = Passage.from_grid_path(horizontal_points, RoomDirection.EAST, RoomDirection.EAST)
+        horizontal_passage = Passage.from_grid_path(horizontal_points)
         self.runner.map.add_element(horizontal_passage)
         # Connect horizontal passage to rooms
         room3.connect_to(horizontal_passage)

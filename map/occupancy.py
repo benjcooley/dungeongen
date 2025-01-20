@@ -19,7 +19,7 @@ from logging_config import logger, LogTags
 from graphics.shapes import Rectangle, Circle
 from constants import CELL_SIZE
 from graphics.conversions import map_to_grid, map_rect_to_grid_points, map_to_grid_rect, grid_to_map
-from map._arrange.arrange_enums import RoomDirection
+from map.enums import RoomDirection
 from options import Options
 from debug_draw import debug_draw_grid_cell
 from debug_config import debug_draw, DebugDrawFlags

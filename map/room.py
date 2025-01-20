@@ -5,6 +5,7 @@ from enum import Enum, auto
 import math
 from typing import List, TYPE_CHECKING, Tuple, Optional
 import random
+from altair import Point
 import skia
 from map.occupancy import ElementType
 from logging_config import logger, LogTags
@@ -13,7 +14,7 @@ from logging_config import logger, LogTags
 from graphics.math import Point2D
 from graphics.shapes import Rectangle, Circle, Shape
 from graphics.conversions import grid_to_map, map_to_grid_rect
-from map.enums import Layers
+from map.enums import Layers, RoomDirection
 from map.mapelement import MapElement
 from constants import CELL_SIZE
 
@@ -45,7 +46,7 @@ class RoomType(Enum):
 
 @dataclass
 class RoomShape:
-    """Defines the shape and dimensions of a room."""
+    """Defines the shape and dimensions of a self."""
     room_type: RoomType
     breadth: int  # Width relative to forward direction
     depth: int    # Length relative to forward direction
@@ -126,7 +127,7 @@ class Room(MapElement):
         canvas.drawPath(path, corner_paint)
 
     def draw_corners(self, canvas: skia.Canvas) -> None:
-        """Draw corner decorations if this is a rectangular room."""
+        """Draw corner decorations if this is a rectangular self."""
         if not isinstance(self._shape, Rectangle):
             return
             
@@ -193,3 +194,54 @@ class Room(MapElement):
             element_idx: Index of this element in the map
         """
         grid.mark_rectangle(self._shape, ElementType.ROOM, element_idx)
+
+    def get_exit(self, direction: RoomDirection, wall_pos: float = 0.5, align_to: Point = None) -> Tuple[int, int]:
+        """Get a grid position for exiting this room in the given direction.
+        
+        Args:
+            direction: Which side of the room to exit from
+            wall_pos: Position along the wall to exit from (0.0 to 1.0)
+            align_to: Optional coordinate to snap to. For vertical passages (NORTH/SOUTH),
+                    uses the x-coordinate. For horizontal passages (EAST/WEST), uses
+                    the y-coordinate.
+            
+        Returns:
+            Tuple of (grid_x, grid_y) for the exit point one cell outside the room
+        """
+        # Get room bounds in grid coordinates
+        grid_x = int(self.bounds.x / CELL_SIZE)
+        grid_y = int(self.bounds.y / CELL_SIZE)
+        grid_width = int(self.bounds.width / CELL_SIZE)
+        grid_height = int(self.bounds.height / CELL_SIZE)
+        
+        logger.debug(LogTags.ARRANGEMENT, 
+            f"\nCalculating exit position:\n"
+            f"  Room bounds: x={self.bounds.x}, y={self.bounds.y}, w={self.bounds.width}, h={self.bounds.height}\n"
+            f"  Grid bounds: x={grid_x}, y={grid_y}, w={grid_width}, h={grid_height}")
+
+        # For circular rooms, always exit from center
+        if self.room_type == RoomType.CIRCULAR:
+            wall_pos = 0.5
+
+        # Calculate exit point along the wall
+        if direction == RoomDirection.NORTH:
+            x = grid_x + int((grid_width - 1) * wall_pos)
+            y = grid_y - 1
+        elif direction == RoomDirection.SOUTH:
+            x = grid_x + int((grid_width - 1) * wall_pos)
+            y = grid_y + grid_height
+        elif direction == RoomDirection.EAST:
+            x = grid_x + grid_width
+            y = grid_y + int((grid_height - 1) * wall_pos)
+        else:  # WEST
+            x = grid_x - 1
+            y = grid_y + int((grid_height - 1) * wall_pos)
+
+        # If we have an align_to point, snap to its coordinate based on passage direction
+        if align_to is not None:
+            if direction in (RoomDirection.NORTH, RoomDirection.SOUTH):
+                x = align_to[0]  # Vertical passages snap to x coordinate
+            else:  # EAST, WEST
+                y = align_to[1]  # Horizontal passages snap to y coordinate
+                
+        return (x, y)
