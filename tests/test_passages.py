@@ -100,8 +100,8 @@ def tag_test(*tags: TestTags):
         return func
     return decorator
 
-@tag_test(TestTags.BASIC)
-def test_simple_passages(self, origin: tuple[int, int] = (0, 0)) -> tuple[int, int]:
+    @tag_test(TestTags.BASIC)
+    def test_simple_passages(self, origin: tuple[int, int] = (0, 0)) -> tuple[int, int]:
         """Test simple 2x5 vertical and horizontal passages.
         
         Args:
