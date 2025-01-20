@@ -134,14 +134,15 @@ class TestPassages:
             RoomDirection.EAST
         )
         
-        assert is_valid, "Generated passage should be valid"
-        assert not crossed, "Generated passage should not cross others"
-        
-        # Create and connect passage
+        # Create and connect passage regardless of validation
         passage = Passage.from_grid_path(passage_points)
         self.runner.map.add_element(passage)
         room1.connect_to(passage)
         room2.connect_to(passage)
+
+        # Now do the assertions
+        assert is_valid, "Generated passage should be valid"
+        assert not crossed, "Generated passage should not cross others"
 
     @tag_test(TestTags.BASIC)
     def test_horizontal_left_below(self) -> None:
@@ -170,14 +171,15 @@ class TestPassages:
             RoomDirection.EAST
         )
         
-        assert is_valid, "Generated passage should be valid"
-        assert not crossed, "Generated passage should not cross others"
-        
-        # Create and connect passage
+        # Create and connect passage regardless of validation
         passage = Passage.from_grid_path(passage_points)
         self.runner.map.add_element(passage)
         room1.connect_to(passage)
         room2.connect_to(passage)
+
+        # Now do the assertions
+        assert is_valid, "Generated passage should be valid"
+        assert not crossed, "Generated passage should not cross others"
 
     @tag_test(TestTags.BASIC)
     def test_vertical_left_top(self) -> None:
@@ -206,14 +208,15 @@ class TestPassages:
             RoomDirection.SOUTH
         )
         
-        assert is_valid, "Generated passage should be valid"
-        assert not crossed, "Generated passage should not cross others"
-        
-        # Create and connect passage
+        # Create and connect passage regardless of validation
         passage = Passage.from_grid_path(passage_points)
         self.runner.map.add_element(passage)
         room1.connect_to(passage)
         room2.connect_to(passage)
+
+        # Now do the assertions
+        assert is_valid, "Generated passage should be valid"
+        assert not crossed, "Generated passage should not cross others"
 
     @tag_test(TestTags.BASIC)
     def test_vertical_right_top(self) -> None:
@@ -242,14 +245,15 @@ class TestPassages:
             RoomDirection.SOUTH
         )
         
-        assert is_valid, "Generated passage should be valid"
-        assert not crossed, "Generated passage should not cross others"
-        
-        # Create and connect passage
+        # Create and connect passage regardless of validation
         passage = Passage.from_grid_path(passage_points)
         self.runner.map.add_element(passage)
         room1.connect_to(passage)
         room2.connect_to(passage)
+
+        # Now do the assertions
+        assert is_valid, "Generated passage should be valid"
+        assert not crossed, "Generated passage should not cross others"
 
     def _create_offset_room_pair(self, ox: int, oy: int, config: str) -> tuple[Room, Room]:
         """Create a pair of rooms in the specified offset configuration.
