@@ -131,10 +131,12 @@ class TestRunner:
                 canvas.clear(skia.Color(255, 255, 255))
                 
                 rprint(f"\n[bold]Running test:[/bold] {method}")
+                error = None
                 try:
                     test_func()
                     rprint(f"[green]PASSED ✅[/green]")
                 except (AssertionError, Exception) as e:
+                    error = e
                     if isinstance(e, AssertionError):
                         rprint(f"[red]FAILED ❌: {str(e)}[/red]")
                     else:
@@ -166,18 +168,10 @@ class TestRunner:
                 image = surface.makeImageSnapshot()
                 image.save(f'test_results/{method}.png', skia.kPNG)
                 
-                if isinstance(e, (AssertionError, Exception)):
-                    continue
-                    
-                except AssertionError as e:
-                    rprint(f"[red]FAILED ❌: {str(e)}[/red]")
-                    rprint(f"[red]{traceback.format_exc()}[/red]")
-                    failures.append((method, str(e)))
-                except Exception as e:
-                    rprint(f"[red]ERROR ❌: {str(e)}[/red]")
-                    rprint(f"[red]{traceback.format_exc()}[/red]")
-                    failures.append((method, str(e)))
                 tests_run += 1
+                
+                if error:
+                    continue
         
         summary = []
         summary.append(Text("\nPassageTests Summary", style="bold"))
