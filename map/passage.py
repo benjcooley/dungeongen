@@ -17,9 +17,12 @@ if TYPE_CHECKING:
 class Passage(MapElement):
     """A passage connecting two map elements.
     
-    Passages are grid-based paths that can include corners and straight sections.
+    Passages are defined by a list of corner points that determine their path.
+    Only two points are required to define a passage - the start and end points.
+    Additional points can be added to create corners in the passage.
+    
     Each grid point represents a 1x1 cell in the map coordinate system.
-    The passage shape is composed of rectangles for each straight section.
+    The passage shape is composed of rectangles for each straight section between corners.
     """
     
     def __init__(self, grid_points: List[Tuple[int, int]], 
@@ -28,13 +31,17 @@ class Passage(MapElement):
                  allow_dead_end: bool = False,
                  min_segment_length: int = 2,
                  max_subdivisions: int = 3) -> None:
-        """Create a passage from a list of grid points.
+        """Create a passage from a list of corner points.
         
         Args:
-            grid_points: List of (x,y) grid coordinates defining the passage path
+            grid_points: List of (x,y) grid coordinates for passage corners. Only two points
+                        are required - the start and end points. Additional points create
+                        corners in the passage path.
             start_direction: Direction at start of passage (optional if can be determined from points)
-            end_direction: Direction at end of passage (optional if can be determined from points)
+            end_direction: Direction at end of passage (optional if can be determined from points) 
             allow_dead_end: Whether this passage can end without connecting to anything
+            min_segment_length: Minimum grid cells between corners
+            max_subdivisions: Maximum number of subdivisions per straight run
             
         Raises:
             ValueError: If directions cannot be determined from points and aren't provided
