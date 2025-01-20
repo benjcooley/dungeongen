@@ -89,7 +89,9 @@ class Passage(MapElement):
             print(f"Grid points: ({x1},{y1}) to ({x2},{y2})")
             x, y, width, height = grid_points_to_map_rect(x1, y1, x2, y2)
             print(f"Map rect: x={x}, y={y}, w={width}, h={height}")
+            print(f"Creating Rectangle with: x={x}, y={y}, width={width}, height={height}")
             shape = Rectangle(x, y, width, height)
+            print(f"Created shape: {shape}")
         else:
             # For passages with corners, create shapes for each straight section
             shapes = []
