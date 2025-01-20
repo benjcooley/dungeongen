@@ -22,7 +22,7 @@ def main():
         # Get singleton test runner and run specific test
         runner = get_runner()
         runner.setup(tags={TestTags.BASIC})
-        runner.run_tests(test_names=["test_one_grid_passages"])
+        runner.run_tests() # run_tests(test_names=["test_one_grid_passages"])
         return
 
     # Enable debug visualization and logging

@@ -203,7 +203,7 @@ class GridProbe:
 
     def check_direction(self, direction: ProbeDirection) -> ProbeResult:
         """Check the cell in the given direction without moving."""
-        dx, dy = _DIRECTION_OFFSETS[(self.facing + direction.value) % 8]
+        dx, dy = _DIRECTION_OFFSETS[(self.facing.value + direction.value) % 8]
         element_type, element_idx, blocked = self.grid.get_cell_info(
             self.x + dx, self.y + dy
         )
@@ -211,7 +211,7 @@ class GridProbe:
         
     def check_direction_empty(self, direction: ProbeDirection) -> bool:
         """Check if the cell in the given direction is empty."""
-        dx, dy = _DIRECTION_OFFSETS[(self.facing + direction.value) % 8]
+        dx, dy = _DIRECTION_OFFSETS[(self.facing.value + direction.value) % 8]
         idx = self.grid._to_grid_index(self.x + dx, self.y + dy)
         return idx is None or self.grid._grid[idx] == 0
     
@@ -678,11 +678,9 @@ class OccupancyGrid:
         probe = GridProbe(self)
         
         # Handle single point case efficiently 
-        if len(points) == 1:
+        if len(points) == 2 and points[0] == points[1]:
             x, y = points[0]
-            print(f"Checking single point passage at ({x},{y})")
-            result = self._check_single_point(x, y, allow_dead_end, debug_enabled)
-            print(f"Single point check result: {result}")
+            result = self._check_single_point(x, y, start_direction, allow_dead_end, debug_enabled)
             return result, []
             
         # Expand corner points into full grid point sequence
@@ -859,8 +857,8 @@ class OccupancyGrid:
             
         return points_count
 
-    def _check_single_point(self, x: int, y: int, allow_dead_end: bool = False, 
-                           debug_enabled: bool = False) -> bool:
+    def _check_single_point(self, x: int, y: int, start_direction: RoomDirection,
+                            allow_dead_end: bool = False, debug_enabled: bool = False) -> bool:
         """Check if a single point passage is valid.
         
         Single point passages must have:
@@ -869,10 +867,10 @@ class OccupancyGrid:
         - Room/passage ahead (unless allow_dead_end=True)
         """
         # For single point validation, treat NORTH as forward
-        probe = GridProbe(self, x, y, facing=ProbeDirection.FORWARD)
+        probe = GridProbe(self, x, y, facing=start_direction)
         
         # One space passages must be empty
-        if probe.check_empty_here():
+        if not probe.check_empty_here():
             if debug_enabled:
                 probe.add_debug_grid(None, False)
             return False

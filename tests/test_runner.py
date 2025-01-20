@@ -128,60 +128,59 @@ class TestRunner:
             
             # Skip if tags don't match (unless specific test was requested)
             run_tags = tags if tags is not None else self.tags
-            if test_names is None and not (TestTags.ALL in run_tags or any(tag in run_tags for tag in test_tags)):
+            if not (TestTags.ALL in run_tags or any(tag in run_tags for tag in test_tags)):
                 continue
                 
-            # Run the test
-                # Create fresh map for each test
-                self.map = Map(self.options)
-                
-                # Create visualization surface
-                surface = skia.Surface(self.options.canvas_width, self.options.canvas_height)
-                canvas = surface.getCanvas()
-                canvas.clear(skia.Color(255, 255, 255))
-                
-                rprint(f"\n[bold]Running test:[/bold] {method}")
-                error = None
-                try:
-                    test_func()
-                    rprint(f"[green]PASSED ✅[/green]")
-                except (AssertionError, Exception) as e:
-                    error = e
-                    if isinstance(e, AssertionError):
-                        rprint(f"[red]FAILED ❌: {str(e)}[/red]")
-                    else:
-                        rprint(f"[red]ERROR ❌: {str(e)}[/red]")
-                    rprint(f"[red]{traceback.format_exc()}[/red]")
-                    failures.append((method, str(e)))
-                
-                # Always draw and save visualization, even on failure
-                # Calculate transform
-                transform = self.map._calculate_default_transform(
-                    self.options.canvas_width, 
-                    self.options.canvas_height
-                )
-                
-                # Draw the map with transform
-                self.map.render(canvas, transform)
-                
-                # Debug draw the occupancy grid
-                debug_draw_init(canvas)
-                canvas.save()
-                canvas.concat(transform)
-                self.map.occupancy.draw_debug(canvas)
-                canvas.restore()
+            # Create fresh map for each test
+            self.map = Map(self.options)
+            
+            # Create visualization surface
+            surface = skia.Surface(self.options.canvas_width, self.options.canvas_height)
+            canvas = surface.getCanvas()
+            canvas.clear(skia.Color(255, 255, 255))
+            
+            rprint(f"\n[bold]Running test:[/bold] {method}")
+            error = None
+            try:
+                test_func()
+                rprint(f"[green]PASSED ✅[/green]")
+            except (AssertionError, Exception) as e:
+                error = e
+                if isinstance(e, AssertionError):
+                    rprint(f"[red]FAILED ❌: {str(e)}[/red]")
+                else:
+                    rprint(f"[red]ERROR ❌: {str(e)}[/red]")
+                rprint(f"[red]{traceback.format_exc()}[/red]")
+                failures.append((method, str(e)))
+            
+            # Always draw and save visualization, even on failure
+            # Calculate transform
+            transform = self.map._calculate_default_transform(
+                self.options.canvas_width, 
+                self.options.canvas_height
+            )
+            
+            # Draw the map with transform
+            self.map.render(canvas, transform)
+            
+            # Debug draw the occupancy grid
+            debug_draw_init(canvas)
+            canvas.save()
+            canvas.concat(transform)
+            self.map.occupancy.draw_debug(canvas)
+            canvas.restore()
 
-                # Draw test info with clean state
-                self.draw_test_info(canvas, method, test_func.__doc__ or "")
+            # Draw test info with clean state
+            self.draw_test_info(canvas, method, test_func.__doc__ or "")
 
-                # Save test case image
-                image = surface.makeImageSnapshot()
-                image.save(f'test_results/{method}.png', skia.kPNG)
-                
-                tests_run += 1
-                
-                if error:
-                    continue
+            # Save test case image
+            image = surface.makeImageSnapshot()
+            image.save(f'test_results/{method}.png', skia.kPNG)
+            
+            tests_run += 1
+            
+            if error:
+                continue
         
         summary = []
         summary.append(Text("\nPassageTests Summary", style="bold"))

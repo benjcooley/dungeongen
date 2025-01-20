@@ -54,7 +54,8 @@ class TestPassages:
         )
         
         # Create and connect vertical passage
-        vertical_passage = Passage.from_grid_path(vertical_points)
+        vertical_passage = Passage.from_grid_path(vertical_points, 
+            start_direction=RoomDirection.SOUTH, end_direction=RoomDirection.NORTH)
         self.runner.map.add_element(vertical_passage)
         room1.connect_to(vertical_passage)
         room2.connect_to(vertical_passage)
@@ -66,7 +67,8 @@ class TestPassages:
         )
         
         # Create and connect horizontal passage
-        horizontal_passage = Passage.from_grid_path(horizontal_points)
+        horizontal_passage = Passage.from_grid_path(horizontal_points, 
+            start_direction=RoomDirection.EAST, end_direction=RoomDirection.WEST)
         self.runner.map.add_element(horizontal_passage)
         room3.connect_to(horizontal_passage)
         room4.connect_to(horizontal_passage)

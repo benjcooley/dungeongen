@@ -28,9 +28,7 @@ class Passage(MapElement):
     def __init__(self, grid_points: List[Tuple[int, int]], 
                  start_direction: Optional[RoomDirection] = None,
                  end_direction: Optional[RoomDirection] = None,
-                 allow_dead_end: bool = False,
-                 min_segment_length: int = 2,
-                 max_subdivisions: int = 3) -> None:
+                 allow_dead_end: bool = False) -> None:
         """Create a passage from a list of corner points.
         
         Args:
@@ -53,7 +51,7 @@ class Passage(MapElement):
         self._allow_dead_end = allow_dead_end
         
         # For single point passages, both directions must be provided
-        if len(grid_points) == 1:
+        if len(grid_points) == 2 and grid_points[0] == grid_points[1]:
             if start_direction is None or end_direction is None:
                 raise ValueError("Single point passages must specify both start and end directions")
             self._start_direction = start_direction
@@ -318,7 +316,7 @@ class Passage(MapElement):
         # 1. The passage cell itself
         # 2. The cell in the start room
         # 3. The cell in the end room
-        if len(self._grid_points) == 1:
+        if len(self._grid_points) == 2 and self._grid_points[0] == self._grid_points[1]:
             x, y = start_x, start_y
             
             # Block the passage cell itself
@@ -329,10 +327,11 @@ class Passage(MapElement):
             grid.mark_blocked(x + back_dx, y + back_dy)
             
             # Block cell in end room (using direction of end)
-            dx, dy = self._end_direction.get_forward()
+            dx, dy = self._end_direction.get_back()
             grid.mark_blocked(x + dx, y + dy)
-        # For longer passages, block endpoints unless dead end
-        elif not self._allow_dead_end:
+
+        # For longer passages, block cells at start and end of passage
+        else:
             # Block start position and cell just inside start room
             grid.mark_blocked(start_x, start_y)  # Block passage start
             back_dx, back_dy = self._start_direction.get_back()
@@ -340,5 +339,8 @@ class Passage(MapElement):
             
             # Block end position and cell just inside end room
             grid.mark_blocked(end_x, end_y)  # Block passage end
-            back_dx, back_dy = self._end_direction.get_back()
-            grid.mark_blocked(end_x + back_dx, end_y + back_dy)  # Block inside end room
+
+            # Only block inside end room if not a dead end
+            if not self._allow_dead_end:
+                back_dx, back_dy = self._end_direction.get_back()
+                grid.mark_blocked(end_x + back_dx, end_y + back_dy)  # Block inside end room
