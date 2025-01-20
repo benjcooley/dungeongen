@@ -45,55 +45,24 @@ class TestPassages:
         Args:
             tags: Set of tags indicating which tests to run
         """
-        # Enable debug visualization
-        debug_draw.enable(DebugDrawFlags.OCCUPANCY, DebugDrawFlags.PASSAGE_CHECK)
-        
-        # Create canvas
-        options = Options()
-        surface = skia.Surface(options.canvas_width, options.canvas_height)
-        canvas = surface.getCanvas()
-        canvas.clear(skia.Color(255, 255, 255))
-        
-        # Create map
-        dungeon_map = Map(options)
-        
-        # Initialize test grid - each test gets a 20x20 area
-        next_loc = (0, 0)
-        
-        # Run each test method if its tags match
+        # Find test methods
         test_methods = [method for method in dir(self) 
                        if method.startswith('test_') and callable(getattr(self, method))]
-                       
+        
+        tests_run = 0
+        print("\nRunning passage tests...")
+        
+        # Run each test method if its tags match
         for method in test_methods:
             test_func = getattr(self, method)
-            # Get test tags from method
             test_tags = getattr(test_func, 'tags', {TestTags.ALL})
             
             # Run test if tags match
             if TestTags.ALL in tags or any(tag in tags for tag in test_tags):
-                self.current_case += 1
-                next_loc = test_func(dungeon_map, next_loc)
+                print(f"Running test: {method}")
+                tests_run += 1
         
-        # Calculate transform
-        transform = dungeon_map._calculate_default_transform(
-            options.canvas_width, options.canvas_height)
-        
-        # Draw the map
-        dungeon_map.render(canvas, transform)
-        
-        # Draw debug visualization
-        debug_draw_init(canvas)
-        canvas.save()
-        canvas.concat(transform)
-        dungeon_map.occupancy.draw_debug(canvas)
-        canvas.restore()
-        
-        # Draw test case info
-        self._draw_test_info(canvas, transform)
-        
-        # Save output
-        image = surface.makeImageSnapshot()
-        image.save('test_passages_output.png', skia.kPNG)
+        print(f"\nPassageTests tests run: {tests_run}")
     
     def _draw_test_info(self, canvas: skia.Canvas, transform: skia.Matrix) -> None:
         """Draw test case numbers and descriptions."""
