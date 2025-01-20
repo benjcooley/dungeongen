@@ -246,19 +246,6 @@ class GridProbe:
         """Check if the cell to the right is empty."""
         return self.check_direction_empty(ProbeDirection.RIGHT)
         
-    def add_debug_grid(self, direction: ProbeDirection, is_valid: bool) -> None:
-        """Add a debug visualization point for a grid position.
-        
-        Args:
-            direction: Direction to check relative to current facing
-            is_valid: Whether this point passed validation
-        """
-        if self._debug_points is not None:
-            dx, dy = direction.relative_offset_from(self.facing)
-            self._debug_points.append(
-                self.PassageCheckPoint(self.x + dx, self.y + dy, direction, is_valid)
-            )
-        
     def check_forward_left(self) -> ProbeResult:
         """Check the cell diagonally forward-left without moving."""
         return self.check_direction(ProbeDirection.FORWARD_LEFT)
@@ -290,6 +277,19 @@ class GridProbe:
     def check_backward_right_empty(self) -> bool:
         """Check if the cell diagonally backward-right is empty."""
         return self.check_direction_empty(ProbeDirection.BACK_RIGHT)
+    
+    def add_debug_grid(self, direction: ProbeDirection, is_valid: bool) -> None:
+        """Add a debug visualization point for a grid position.
+        
+        Args:
+            direction: Direction to check relative to current facing
+            is_valid: Whether this point passed validation
+        """
+        if self._debug_points is not None:
+            dx, dy = direction.relative_offset_from(self.facing)
+            self._debug_points.append(
+                self.PassageCheckPoint(self.x + dx, self.y + dy, direction, is_valid)
+            )    
 
 class ElementType(IntFlag):
     """Element types for occupancy grid cells."""
