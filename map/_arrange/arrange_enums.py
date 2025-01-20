@@ -2,6 +2,18 @@
 from enum import Enum, auto
 from typing import Tuple, Optional
 
+# Pre-computed direction offsets
+_DIRECTION_OFFSETS = [
+    (0, -1),   # NORTH
+    (1, -1),   # NORTHEAST
+    (1, 0),    # EAST
+    (1, 1),    # SOUTHEAST
+    (0, 1),    # SOUTH
+    (-1, 1),   # SOUTHWEST
+    (-1, 0),   # WEST
+    (-1, -1)   # NORTHWEST
+]
+
 class RoomDirection(Enum):
     """Direction in map space.
     
@@ -16,18 +28,6 @@ class RoomDirection(Enum):
     SOUTHWEST = 5
     WEST = 6
     NORTHWEST = 7
-        
-    # Pre-computed direction offsets
-    _offsets = [
-        (0, -1),   # NORTH
-        (1, -1),   # NORTHEAST
-        (1, 0),    # EAST
-        (1, 1),    # SOUTHEAST
-        (0, 1),    # SOUTH
-        (-1, 1),   # SOUTHWEST
-        (-1, 0),   # WEST
-        (-1, -1)   # NORTHWEST
-    ]
 
     @classmethod
     def get_offset(cls, direction_value: int) -> Tuple[int, int]:
@@ -36,19 +36,19 @@ class RoomDirection(Enum):
 
     def get_forward(self) -> Tuple[int, int]:
         """Get the (dx, dy) grid offset for the forward direction."""
-        return self._offsets[self.value]
+        return _DIRECTION_OFFSETS[self.value]
         
     def get_left(self) -> Tuple[int, int]:
         """Gets the (dx, dy) grid offset for the left direction."""
-        return self._offsets[(self.value + 6) % 8]
+        return _DIRECTION_OFFSETS[(self.value + 6) % 8]
     
     def get_right(self) -> Tuple[int, int]:
         """Gets the (dx, dy) grid offset for the right direction."""
-        return self._offsets[(self.value + 2) % 8]
+        return _DIRECTION_OFFSETS[(self.value + 2) % 8]
 
     def get_back(self) -> Tuple[int, int]:
         """Gets the (dx, dy) grid offset for the back direction."""
-        return self._offsets[(self.value + 4) % 8]
+        return _DIRECTION_OFFSETS[(self.value + 4) % 8]
 
     def get_opposite(self) -> 'RoomDirection':
         """Get the opposite direction."""

@@ -18,6 +18,18 @@ from debug_config import debug_draw, DebugDrawFlags
 if TYPE_CHECKING:
     from map.mapelement import MapElement
 
+# Pre-computed direction offsets
+_DIRECTION_OFFSETS = [
+    (0, -1),  # NORTH
+    (1, -1),  # NORTH_EAST
+    (1, 0),   # EAST
+    (1, 1),   # SOUTH_EAST
+    (0, 1),   # SOUTH
+    (-1, 1),  # SOUTH_WEST
+    (-1, 0),  # WEST
+    (-1, -1)  # NORTH_WEST
+]
+
 class ProbeDirection(Enum):
     """Directions for grid navigation probe.
     
@@ -39,18 +51,6 @@ class ProbeDirection(Enum):
     BACK_LEFT = 5
     LEFT = 6
     FORWARD_LEFT = 7
-    
-    # Pre-computed direction offsets
-    _offsets = [
-        (0, -1),  # NORTH
-        (1, -1),  # NORTH_EAST
-        (1, 0),   # EAST
-        (1, 1),   # SOUTH_EAST
-        (0, 1),   # SOUTH
-        (-1, 1),  # SOUTH_WEST
-        (-1, 0),  # WEST
-        (-1, -1)  # NORTH_WEST
-    ]
     
     def turn_left(self) -> 'ProbeDirection':
         """Return the direction 90 degrees to the left."""
@@ -101,7 +101,7 @@ class ProbeDirection(Enum):
             the dx, dy offsets of the probe direction relative to the facing direction
         """
         # Add facing value to get rotated direction
-        return self._offsets[(self.value + facing.value) % 8]
+        return _DIRECTION_OFFSETS[(self.value + facing.value) % 8]
 
 @dataclass
 class ProbeResult:
