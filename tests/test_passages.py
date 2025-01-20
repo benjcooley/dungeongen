@@ -55,6 +55,11 @@ class TestPassages:
         horizontal_points = [(ox + 8, oy + 4), (ox + 10, oy + 4)]  # Shortened to avoid overlap
         
         # Test and create vertical passage
+        print("\nChecking vertical passage...")
+        print(f"Start point: {vertical_points[0]}")
+        print(f"End point: {vertical_points[1]}")
+        print(f"Direction: {RoomDirection.SOUTH}")
+        
         is_valid, crossed = self.runner.map.occupancy.check_passage(
             vertical_points,
             RoomDirection.SOUTH

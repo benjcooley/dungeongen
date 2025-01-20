@@ -684,10 +684,14 @@ class OccupancyGrid:
         # Handle single point case efficiently 
         if len(points) == 1:
             x, y = points[0]
-            return self._check_single_point(x, y, allow_dead_end, debug_enabled), []
+            print(f"Checking single point passage at ({x},{y})")
+            result = self._check_single_point(x, y, allow_dead_end, debug_enabled)
+            print(f"Single point check result: {result}")
+            return result, []
             
         # Expand corner points into full grid point sequence
         self._point_count = self._expand_passage_points(points)
+        print(f"\nExpanded {len(points)} points into {self._point_count} grid points")
 
         # Process each point
         prev_direction = None
