@@ -14,8 +14,6 @@ from options import Options
 from debug_config import debug_draw, DebugDrawFlags
 from constants import CELL_SIZE
 from tests.test_tags import TestTags
-from tests.test_passages import TestPassages
-
 @dataclass
 class TestCase:
     """Information about a test case."""
@@ -103,6 +101,7 @@ class TestRunner:
         
         self.setup(tags)
         
+        from tests.test_passages import TestPassages
         passage_tests = TestPassages()
         
         # Find test methods
