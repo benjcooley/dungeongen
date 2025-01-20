@@ -34,10 +34,10 @@ class TestPassages:
         ox, oy = 0, 0
         
         # Create rooms in + pattern
-        north_room = self.runner.map.create_rectangular_room(ox + 3, oy, 3, 3)
-        south_room = self.runner.map.create_rectangular_room(ox + 3, oy + 8, 3, 3)
-        west_room = self.runner.map.create_rectangular_room(ox, oy + 3, 3, 3)
-        east_room = self.runner.map.create_rectangular_room(ox + 8, oy + 3, 3, 3)
+        north_room = self.runner.map.create_rectangular_room(ox + 4, oy, 3, 3)
+        south_room = self.runner.map.create_rectangular_room(ox + 4, oy + 8, 3, 3)
+        west_room = self.runner.map.create_rectangular_room(ox, oy + 4, 3, 3)
+        east_room = self.runner.map.create_rectangular_room(ox + 8, oy + 4, 3, 3)
         
         # Create vertical passage points
         vertical_points = [
