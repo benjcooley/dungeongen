@@ -107,6 +107,86 @@ class TestPassages:
         # Verify passage is invalid
         assert not is_valid, "Passage through room should be invalid"
         
+    @tag_test(TestTags.BASIC)
+    def test_offset_passages(self) -> None:
+        """Test passage generation between offset rooms."""
+        # Test each offset configuration
+        configs = [
+            "horizontal_left_above",
+            "horizontal_left_below", 
+            "vertical_left_top",
+            "vertical_right_top"
+        ]
+        
+        ox = 0
+        for i, config in enumerate(configs):
+            # Space tests horizontally
+            test_ox = ox + (i * 15)
+            
+            # Create room pair in specified configuration
+            room1, room2 = self._create_offset_room_pair(test_ox, 0, config)
+            
+            # Try to generate passage points
+            points = [
+                room1.get_exit(RoomDirection.EAST if "horizontal" in config else RoomDirection.SOUTH),
+                room2.get_exit(RoomDirection.WEST if "horizontal" in config else RoomDirection.NORTH)
+            ]
+            
+            # Generate full passage point sequence
+            passage_points = Passage.generate_passage_points(
+                points[0],
+                RoomDirection.EAST if "horizontal" in config else RoomDirection.SOUTH,
+                points[1], 
+                RoomDirection.WEST if "horizontal" in config else RoomDirection.NORTH
+            )
+            
+            assert passage_points is not None, f"Failed to generate passage points for {config}"
+            
+            # Validate passage
+            is_valid, crossed = self.runner.map.occupancy.check_passage(
+                passage_points,
+                RoomDirection.EAST if "horizontal" in config else RoomDirection.SOUTH
+            )
+            
+            assert is_valid, f"Generated passage invalid for {config}"
+            assert not crossed, f"Generated passage should not cross others for {config}"
+            
+            # Create and connect passage
+            passage = Passage.from_grid_path(passage_points)
+            self.runner.map.add_element(passage)
+            room1.connect_to(passage)
+            room2.connect_to(passage)
+
+    def _create_offset_room_pair(self, ox: int, oy: int, config: str) -> tuple[Room, Room]:
+        """Create a pair of rooms in the specified offset configuration.
+        
+        Args:
+            ox: Origin x coordinate
+            oy: Origin y coordinate
+            config: One of:
+                - horizontal_left_above: Left room above right room
+                - horizontal_left_below: Left room below right room
+                - vertical_left_top: Top room to left of bottom room
+                - vertical_right_top: Top room to right of bottom room
+                
+        Returns:
+            Tuple of (room1, room2) positioned according to config
+        """
+        if config == "horizontal_left_above":
+            room1 = self.runner.map.create_rectangular_room(ox, oy, 3, 3)
+            room2 = self.runner.map.create_rectangular_room(ox + 8, oy + 4, 3, 3)
+        elif config == "horizontal_left_below":
+            room1 = self.runner.map.create_rectangular_room(ox, oy + 4, 3, 3)
+            room2 = self.runner.map.create_rectangular_room(ox + 8, oy, 3, 3)
+        elif config == "vertical_left_top":
+            room1 = self.runner.map.create_rectangular_room(ox, oy, 3, 3)
+            room2 = self.runner.map.create_rectangular_room(ox + 4, oy + 8, 3, 3)
+        else:  # vertical_right_top
+            room1 = self.runner.map.create_rectangular_room(ox + 4, oy, 3, 3)
+            room2 = self.runner.map.create_rectangular_room(ox, oy + 8, 3, 3)
+            
+        return room1, room2
+
     def _test_simple_passages(self) -> None:
         """Test simple linear vertical and horizontal passages."""
         # Use origin (0,0) for first test
