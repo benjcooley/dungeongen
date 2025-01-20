@@ -156,7 +156,7 @@ class TestRunner:
 
                     # Save test case image
                     image = surface.makeImageSnapshot()
-                    image.save(f'test_results/test_{method}.png', skia.kPNG)
+                    image.save(f'test_results/{method}.png', skia.kPNG)
                     
                 except AssertionError as e:
                     rprint(f"[red]FAILED ❌: {str(e)}[/red]")
