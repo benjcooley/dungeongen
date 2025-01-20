@@ -32,7 +32,7 @@ class RoomDirection(Enum):
     @classmethod
     def get_offset(cls, direction_value: int) -> Tuple[int, int]:
         """Get the offset tuple for a direction value."""
-        return cls._offsets[direction_value % 8]
+        return _DIRECTION_OFFSETS[direction_value % 8]
 
     def get_forward(self) -> Tuple[int, int]:
         """Get the (dx, dy) grid offset for the forward direction."""
