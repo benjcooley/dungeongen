@@ -40,16 +40,16 @@ class ProbeDirection(Enum):
     LEFT = 6
     FORWARD_LEFT = 7
     
-    # Pre-computed direction offsets relative to FORWARD direction
-    OFFSETS = [
-        (0, -1),  # FORWARD
-        (1, -1),  # FORWARD_RIGHT
-        (1, 0),   # RIGHT
-        (1, 1),   # BACK_RIGHT
-        (0, 1),   # BACK
-        (-1, 1),  # BACK_LEFT
-        (-1, 0),  # LEFT
-        (-1, -1)  # FORWARD_LEFT
+    # Pre-computed direction offsets
+    _offsets = [
+        (0, -1),  # NORTH
+        (1, -1),  # NORTH_EAST
+        (1, 0),   # EAST
+        (1, 1),   # SOUTH_EAST
+        (0, 1),   # SOUTH
+        (-1, 1),  # SOUTH_WEST
+        (-1, 0),  # WEST
+        (-1, -1)  # NORTH_WEST
     ]
     
     def turn_left(self) -> 'ProbeDirection':
@@ -90,7 +90,6 @@ class ProbeDirection(Enum):
             return ProbeDirection.BACK
         else:
             return ProbeDirection.FORWARD
-    
         
     def relative_offset_from(self, facing: RoomDirection) -> tuple[int, int]:
         """Get grid offsets for this probe direction relative to this facing direction.
@@ -102,7 +101,7 @@ class ProbeDirection(Enum):
             the dx, dy offsets of the probe direction relative to the facing direction
         """
         # Add facing value to get rotated direction
-        return RoomDirection.OFFSETS[(self.value + facing.value) % 8]
+        return ProbeDirection._offsets[(self.value + facing.value) % 8]
 
 @dataclass
 class ProbeResult:
