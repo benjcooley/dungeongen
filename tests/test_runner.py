@@ -88,7 +88,7 @@ class TestRunner:
                 transform.mapPoints(points)
                 point = points[0]
                 blob = skia.TextBlob(text, bold_font)
-                canvas.drawTextBlob(blob, point.x(), point.y() - 25, text_paint)  # Offset up slightly
+                canvas.drawTextBlob(blob, point.x() + (8 * CELL_SIZE), point.y() - (3 * CELL_SIZE), text_paint)  # Offset right and up
         
         for case in self.test_cases:
             # Convert grid location to map coordinates
@@ -101,8 +101,8 @@ class TestRunner:
             point = points[0]
             
             # Draw case info
-            x = point.x() + case.text_offset[0]
-            y = point.y() + case.text_offset[1]
+            x = point.x() + case.text_offset[0] + (8 * CELL_SIZE)
+            y = point.y() + case.text_offset[1] - (3 * CELL_SIZE)
             title_blob = skia.TextBlob(f"{case.number}. {case.name}", text_font)
             desc_blob = skia.TextBlob(case.description, text_font)
             canvas.drawTextBlob(title_blob, x, y, text_paint)
