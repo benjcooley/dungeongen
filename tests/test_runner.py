@@ -92,6 +92,10 @@ class TestRunner:
         Args:
             tags: Set of tags indicating which tests to run
         """
+        # Ensure test results directory exists
+        import os
+        os.makedirs('test_results', exist_ok=True)
+        
         self.setup(tags)
         
         from tests.test_passages import TestPassages
