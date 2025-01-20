@@ -45,6 +45,11 @@ class TestPassages:
         Args:
             tags: Set of tags indicating which tests to run
         """
+        # Create map and enable debug visualization
+        options = Options()
+        self.map = Map(options)
+        debug_draw.enable(DebugDrawFlags.PASSAGE_CHECK)
+        
         # Find test methods
         test_methods = [method for method in dir(self) 
                        if method.startswith('test_') and callable(getattr(self, method))]
@@ -94,3 +99,47 @@ def tag_test(*tags: TestTags):
         setattr(func, 'tags', set(tags))
         return func
     return decorator
+
+    @tag_test(TestTags.BASIC)
+    def test_simple_passages(self, origin: tuple[int, int] = (0, 0)) -> tuple[int, int]:
+        """Test simple 2x5 vertical and horizontal passages.
+        
+        Args:
+            origin: Starting grid coordinates for test area
+            
+        Returns:
+            Origin coordinates for next test
+        """
+        ox, oy = origin
+        
+        # Add test case info
+        self.test_cases.append(TestCase(
+            number=1,
+            name="Simple Passages",
+            description="2x5 vertical and horizontal passages",
+            location=(ox, oy),
+            text_offset=(0, -20)
+        ))
+        
+        # Create vertical passage points (2 wide x 5 tall)
+        vertical_points = [(ox + 2, y) for y in range(oy, oy + 5)]
+        
+        # Create horizontal passage points (5 wide x 2 tall, offset to not intersect)
+        horizontal_points = [(x, oy + 7) for x in range(ox, ox + 5)]
+        
+        # Test vertical passage
+        is_valid, crossed = self.map.occupancy.check_passage(
+            vertical_points,
+            RoomDirection.NORTH
+        )
+        assert is_valid and not crossed, "Vertical passage should be valid"
+        
+        # Test horizontal passage
+        is_valid, crossed = self.map.occupancy.check_passage(
+            horizontal_points,
+            RoomDirection.EAST
+        )
+        assert is_valid and not crossed, "Horizontal passage should be valid"
+        
+        # Return origin for next test (moved right and down)
+        return ox + 7, oy + 10
