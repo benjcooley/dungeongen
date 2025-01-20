@@ -106,7 +106,7 @@ class TestRunner:
             title_blob = skia.TextBlob(f"{case.number}. {case.name}", text_font)
             desc_blob = skia.TextBlob(case.description, text_font)
             canvas.drawTextBlob(title_blob, x, y, text_paint)
-            canvas.drawTextBlob(desc_blob, x, y + 40, text_paint)
+            canvas.drawTextBlob(desc_blob, x, y + 60, text_paint)
             
     def run_tests(self, tags: Set[TestTags] = {TestTags.ALL}) -> None:
         """Run all test cases matching the given tags.
