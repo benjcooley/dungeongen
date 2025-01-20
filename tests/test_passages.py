@@ -121,10 +121,10 @@ def tag_test(*tags: TestTags):
             text_offset=(0, -20)
         ))
         
-        # Create vertical passage points (2 wide x 5 tall)
+        # Create vertical passage points (1 wide x 5 tall)
         vertical_points = [(ox + 2, y) for y in range(oy, oy + 5)]
         
-        # Create horizontal passage points (5 wide x 2 tall, offset to not intersect)
+        # Create horizontal passage points (5 wide x 1 tall, offset to not intersect)
         horizontal_points = [(x, oy + 7) for x in range(ox, ox + 5)]
         
         # Test vertical passage
