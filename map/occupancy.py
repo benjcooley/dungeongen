@@ -807,8 +807,6 @@ class OccupancyGrid:
         self._points[1] = points[0][1]
         # Direction will be set based on next point
         points_count += 1
-        print(f"\nExpanded points:")
-        print(f"Point {points_count}: ({points[0][0]}, {points[0][1]})")
         
         # Process each segment
         for i in range(len(points) - 1):
@@ -838,7 +836,6 @@ class OccupancyGrid:
                     self._points[idx + 1] = y
                     self._points[idx + 2] = direction.value
                     points_count += 1
-                    print(f"Point {points_count}: ({x1}, {y})")
                     y += step
             else:  # Horizontal  
                 step = 1 if x2 > x1 else -1
@@ -849,7 +846,6 @@ class OccupancyGrid:
                     self._points[idx + 1] = y1
                     self._points[idx + 2] = direction.value
                     points_count += 1
-                    print(f"Point {points_count}: ({x}, {y1})")
                     x += step
         
         # Set direction for last point based on approach direction
@@ -969,17 +965,11 @@ class OccupancyGrid:
                     
                     # Add to row output
                     row_cells.append(f"({grid_x}, {grid_y})")
-            
-            # Print row if any cells were occupied
-            if row_cells:
-                print(f"Row {grid_y}: {', '.join(row_cells)}")
-
                         
         # Draw passage check debug visualization if enabled
         debug_enabled = debug_draw.is_enabled(DebugDrawFlags.PASSAGE_CHECK)
         if debug_enabled and self._debug_passage_points:
             # First pass: Draw all cells
             for point in self._debug_passage_points:
-                print(f"Drawing passage check at ({point.x}, {point.y})")
                 debug_draw_passage_check(point.x, point.y, point.is_valid)
                         
