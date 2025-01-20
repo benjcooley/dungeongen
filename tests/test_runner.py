@@ -101,8 +101,8 @@ class TestRunner:
             point = points[0]
             
             # Draw case info
-            x = point.x() + case.text_offset[0] + (8 * CELL_SIZE)
-            y = point.y() + case.text_offset[1] - (3 * CELL_SIZE)
+            x = point.x() + case.text_offset[0] + (4 * CELL_SIZE)
+            y = point.y() + case.text_offset[1] + (3 * CELL_SIZE)
             title_blob = skia.TextBlob(f"{case.number}. {case.name}", text_font)
             desc_blob = skia.TextBlob(case.description, text_font)
             canvas.drawTextBlob(title_blob, x, y, text_paint)
