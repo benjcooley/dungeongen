@@ -79,6 +79,34 @@ class TestPassages:
         cross_x, cross_y, cross_idx = crossed_horizontal[0]
         assert cross_idx == vertical_passage.get_map_index(), "Should cross the vertical passage"
 
+    @tag_test(TestTags.BASIC)
+    def test_passage_through_room(self) -> None:
+        """Test that passages cannot pass through rooms."""
+        # Use origin (0,0) for test
+        ox, oy = 0, 0
+        
+        # Create three rooms:
+        # [Room1]   [Room3]   [Room2]
+        # Where Room3 blocks passage between Room1 and Room2
+        room1 = self.runner.map.create_rectangular_room(ox, oy, 3, 3)  # Left room
+        room2 = self.runner.map.create_rectangular_room(ox + 8, oy, 3, 3)  # Right room
+        room3 = self.runner.map.create_rectangular_room(ox + 4, oy, 3, 3)  # Center room (blocking)
+        
+        # Try to create passage points through the middle room
+        passage_points = [
+            room1.get_exit(RoomDirection.EAST),
+            room2.get_exit(RoomDirection.WEST)
+        ]
+        
+        # Check passage - should fail because room3 blocks it
+        is_valid, crossed = self.runner.map.occupancy.check_passage(
+            passage_points,
+            RoomDirection.EAST
+        )
+        
+        # Verify passage is invalid
+        assert not is_valid, "Passage through room should be invalid"
+        
     def _test_simple_passages(self) -> None:
         """Test simple linear vertical and horizontal passages."""
         # Use origin (0,0) for first test
