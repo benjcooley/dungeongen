@@ -701,6 +701,16 @@ class OccupancyGrid:
                     probe.add_debug_grid(None, False)
                 return False, self._crossed_passages[:cross_count]
 
+            # Debug print grid values around current point
+            print(f"\nGrid values around ({probe.x}, {probe.y}):")
+            for dy in [-1, 0, 1]:
+                row = []
+                for dx in [-1, 0, 1]:
+                    idx = self._to_grid_index(probe.x + dx, probe.y + dy)
+                    val = self._grid[idx] if idx is not None else 'X'
+                    row.append(f"{val:3}")
+                print(" ".join(row))
+
             # Check endpoints
             if i == 0:
                 back = probe.check_backward()
