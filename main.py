@@ -19,10 +19,11 @@ RUN_TESTS = True
 def main():
     if RUN_TESTS:
         from tests.test_runner import get_runner
-        # Get singleton test runner and run tests
+        # Get singleton test runner and run single test
         runner = get_runner()
         runner.setup(tags={TestTags.BASIC})
-        runner.run_tests({TestTags.BASIC})
+        test_passages = TestPassages()
+        test_passages.test_one_grid_passages()
         return
 
     # Enable debug visualization and logging
