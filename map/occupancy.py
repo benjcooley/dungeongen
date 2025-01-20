@@ -975,8 +975,10 @@ class OccupancyGrid:
                     fill_color = skia.Color(0, 0, 200)  # Blue
                     outline_color = skia.Color(0, 0, 255)  # Bright blue
                 
-                # Draw cell with outline
-                debug_draw_grid_cell(point.x, point.y, fill_color, outline_color=outline_color, alpha=128)
+                # Draw cell with outline, matching occupancy grid style
+                debug_draw_grid_cell(point.x, point.y, fill_color, alpha=128, blocked=False)
+                if outline_color:
+                    debug_draw_grid_cell(point.x, point.y, outline_color, alpha=200, blocked=True)
             
             # Second pass: Draw direction indicators on top
             for point in self._debug_passage_points:
