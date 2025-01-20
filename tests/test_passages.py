@@ -6,6 +6,7 @@ from map.passage import Passage
 from map.enums import RoomDirection
 from tests.test_runner import get_runner
 from tests.test_tags import TestTags
+from debug_config import debug_draw, DebugDrawFlags
 
 def tag_test(*tags: TestTags):
     """Decorator to tag test methods with test categories."""
@@ -54,6 +55,9 @@ class TestPassages:
         # Create horizontal passage points (just start and end)
         horizontal_points = [room3.get_exit(RoomDirection.EAST), room4.get_exit(RoomDirection.WEST)]  # Shortened to avoid overlap
         
+        # Enable debug visualization
+        debug_draw.enable(DebugDrawFlags.PASSAGE_CHECK)
+
         # First validate the passages
         print("\nChecking vertical passage...")
         print(f"Start point: {vertical_points[0]}")
