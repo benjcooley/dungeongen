@@ -148,10 +148,14 @@ class TestRunner:
                     test_func()
                     rprint(f"[green]PASSED ✅[/green]")
                 except AssertionError as e:
+                    import traceback
                     rprint(f"[red]FAILED ❌: {str(e)}[/red]")
+                    rprint(f"[red]{traceback.format_exc()}[/red]")
                     failures.append((method, str(e)))
                 except Exception as e:
+                    import traceback
                     rprint(f"[red]ERROR ❌: {str(e)}[/red]")
+                    rprint(f"[red]{traceback.format_exc()}[/red]")
                     failures.append((method, str(e)))
                 tests_run += 1
                 
