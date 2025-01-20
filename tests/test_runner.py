@@ -88,7 +88,7 @@ class TestRunner:
                 points = [skia.Point(x, y)]
                 transform.mapPoints(points)
                 cx, cy = points[0].x, points[0].y
-                canvas.drawString(text, cx, cy, label_paint)
+                canvas.drawString(text, cx, cy - 10, label_paint)  # Offset up slightly
         
         for case in self.test_cases:
             # Convert grid location to map coordinates
@@ -157,6 +157,13 @@ class TestRunner:
                 self.map.render(canvas)
                 if debug_draw.is_enabled(DebugDrawFlags.PASSAGE_CHECK):
                     self.map.occupancy.draw_debug(canvas)
+                
+                # Calculate and apply transform
+                transform = self.map._calculate_default_transform(800, 600)
+                canvas.save()
+                canvas.concat(transform)
+                self.draw_test_info(canvas, transform)
+                canvas.restore()
         
         # Save visualization
         image = surface.makeImageSnapshot()

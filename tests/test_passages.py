@@ -48,10 +48,10 @@ class TestPassages:
         self.runner.add_test_label("Horizontal", (ox + 5, oy + 2))
         
         # Create vertical passage points (just start and end)
-        vertical_points = [(ox + 1, oy + 3), (ox + 1, oy + 6)]
+        vertical_points = [(ox + 1, oy + 3), (ox + 1, oy + 5)]  # Shortened to avoid overlap
         
         # Create horizontal passage points (just start and end)
-        horizontal_points = [(ox + 8, oy + 4), (ox + 11, oy + 4)]
+        horizontal_points = [(ox + 8, oy + 4), (ox + 10, oy + 4)]  # Shortened to avoid overlap
         
         # Test and create vertical passage
         is_valid, crossed = self.runner.map.occupancy.check_passage(
