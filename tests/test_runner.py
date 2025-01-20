@@ -75,8 +75,8 @@ class TestRunner:
             Style=skia.Paint.kFill_Style
         )
         
-        text_font = skia.Font(None, 12.0)
-        bold_font = skia.Font(None, 12.0)
+        text_font = skia.Font(None, 60.0)
+        bold_font = skia.Font(None, 60.0)
         bold_font.setEmbolden(True)
         
         # Draw labels first
@@ -88,7 +88,7 @@ class TestRunner:
                 transform.mapPoints(points)
                 point = points[0]
                 blob = skia.TextBlob(text, bold_font)
-                canvas.drawTextBlob(blob, point.x(), point.y() - 10, text_paint)  # Offset up slightly
+                canvas.drawTextBlob(blob, point.x(), point.y() - 50, text_paint)  # Offset up slightly
         
         for case in self.test_cases:
             # Convert grid location to map coordinates
@@ -106,7 +106,7 @@ class TestRunner:
             title_blob = skia.TextBlob(f"{case.number}. {case.name}", text_font)
             desc_blob = skia.TextBlob(case.description, text_font)
             canvas.drawTextBlob(title_blob, x, y, text_paint)
-            canvas.drawTextBlob(desc_blob, x, y + 16, text_paint)
+            canvas.drawTextBlob(desc_blob, x, y + 80, text_paint)
             
     def run_tests(self, tags: Set[TestTags] = {TestTags.ALL}) -> None:
         """Run all test cases matching the given tags.
