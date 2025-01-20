@@ -137,9 +137,6 @@ class TestRunner:
                         self.options.canvas_height
                     )
                     
-                    # Draw test info
-                    self.draw_test_info(canvas, method, test_func.__doc__ or "")
-                    
                     # Draw the map with transform
                     self.map.render(canvas, transform)
                     
@@ -149,7 +146,10 @@ class TestRunner:
                     canvas.concat(transform)
                     self.map.occupancy.draw_debug(canvas)
                     canvas.restore()
-                    
+
+                    # Draw test info
+                    self.draw_test_info(canvas, method, test_func.__doc__ or "")
+
                     # Save test case image
                     image = surface.makeImageSnapshot()
                     image.save(f'test_{method}.png', skia.kPNG)
