@@ -302,25 +302,21 @@ class Passage(MapElement):
             grid: The occupancy grid to mark
             element_idx: Index of this element in the map
         """
-        # For straight passages, mark all cells between endpoints
+        # For straight passages, mark rectangle between endpoints
         if len(self._grid_points) == 2:
             x1, y1 = self._grid_points[0]
             x2, y2 = self._grid_points[-1]
-            
-            # Determine direction and step
-            dx = 1 if x2 > x1 else -1 if x2 < x1 else 0
-            dy = 1 if y2 > y1 else -1 if y2 < y1 else 0
-            
-            # Mark all cells along the path
-            x, y = x1, y1
-            while (x, y) != (x2 + dx, y2 + dy):  # +dx/dy to include endpoint
-                grid.mark_cell(x, y, ElementType.PASSAGE, element_idx)
-                x += dx
-                y += dy
+            x, y, w, h = grid_points_to_map_rect(x1, y1, x2, y2)
+            rect = Rectangle(x, y, w, h)
+            grid.mark_rectangle(rect, ElementType.PASSAGE, element_idx)
         else:
-            # For passages with corners, mark each point
-            for x, y in self._grid_points:
-                grid.mark_cell(x, y, ElementType.PASSAGE, element_idx)
+            # For passages with corners, mark rectangles between each pair of points
+            for i in range(len(self._grid_points) - 1):
+                x1, y1 = self._grid_points[i]
+                x2, y2 = self._grid_points[i + 1]
+                x, y, w, h = grid_points_to_map_rect(x1, y1, x2, y2)
+                rect = Rectangle(x, y, w, h)
+                grid.mark_rectangle(rect, ElementType.PASSAGE, element_idx)
             
         # Mark start and end points as blocked unless dead end
         if not self._allow_dead_end:
