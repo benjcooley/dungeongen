@@ -120,6 +120,9 @@ class TestRunner:
             
         # Run each matching test method
         for method in test_methods:
+            # Create fresh map for each test
+            self.map = Map(self.options)
+            
             test_func = getattr(passage_tests, method)
             test_tags = getattr(test_func, 'tags', {TestTags.ALL})
             
