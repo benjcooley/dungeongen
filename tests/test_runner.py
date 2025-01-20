@@ -70,26 +70,25 @@ class TestRunner:
     def draw_test_info(self, canvas: skia.Canvas, transform: skia.Matrix) -> None:
         """Draw test case numbers and descriptions."""
         text_paint = skia.Paint(
+            AntiAlias=True,
             Color=skia.Color(0, 0, 0),
-            AntiAlias=True
+            Style=skia.Paint.kFill_Style
         )
-        text_paint.setTextSize(12.0)
+        
+        text_font = skia.Font(None, 12.0)
+        bold_font = skia.Font(None, 12.0)
+        bold_font.setEmbolden(True)
         
         # Draw labels first
         if hasattr(self, 'labels'):
-            label_paint = skia.Paint(
-                Color=skia.Color(0, 0, 0),
-                AntiAlias=True
-            )
-            label_paint.setTextSize(12.0)
-            label_paint.setFakeBoldText(True)
             for text, pos in self.labels:
                 x = pos[0] * CELL_SIZE
                 y = pos[1] * CELL_SIZE
                 points = [skia.Point(x, y)]
                 transform.mapPoints(points)
                 cx, cy = points[0].x, points[0].y
-                canvas.drawString(text, cx, cy - 10, label_paint)  # Offset up slightly
+                blob = skia.TextBlob(text, bold_font)
+                canvas.drawTextBlob(blob, cx, cy - 10, text_paint)  # Offset up slightly
         
         for case in self.test_cases:
             # Convert grid location to map coordinates
@@ -104,8 +103,10 @@ class TestRunner:
             # Draw case info
             cx += case.text_offset[0]
             cy += case.text_offset[1]
-            canvas.drawString(f"{case.number}. {case.name}", cx, cy, text_paint)
-            canvas.drawString(case.description, cx, cy + 16, text_paint)
+            title_blob = skia.TextBlob(f"{case.number}. {case.name}", text_font)
+            desc_blob = skia.TextBlob(case.description, text_font)
+            canvas.drawTextBlob(title_blob, cx, cy, text_paint)
+            canvas.drawTextBlob(desc_blob, cx, cy + 16, text_paint)
             
     def run_tests(self, tags: Set[TestTags] = {TestTags.ALL}) -> None:
         """Run all test cases matching the given tags.
