@@ -83,7 +83,10 @@ class TestPassages:
         assert is_valid_horizontal, "Horizontal passage should be valid"
         assert crossed_horizontal, "Horizontal passage should cross vertical passage"
         assert len(crossed_horizontal) == 1, "Should cross exactly one passage"
-        assert crossed_horizontal[0] == vertical_passage, "Should cross the vertical passage"
+        cross_x, cross_y, cross_idx = crossed_horizontal[0]
+        assert cross_idx == vertical_passage, "Should cross the vertical passage"
+        # Verify crossing point is at expected location
+        assert cross_x == ox + 3 and cross_y == oy + 3, "Crossing should occur at center point"
 
     def _test_simple_passages(self) -> None:
         """Test simple linear vertical and horizontal passages."""

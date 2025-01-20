@@ -612,6 +612,11 @@ class OccupancyGrid:
         It uses a single reused probe and optimized checks to validate passage placement.
         
         Debug visualization can be enabled with DebugDrawFlags.PASSAGE_CHECK.
+        
+        Returns:
+            Tuple of (is_valid, crossed_passages) where:
+            - is_valid: True if path is valid
+            - crossed_passages: List of tuples (x, y, passage_idx) for each crossing point
         """
         # Set debug flag once at start of method
         debug_enabled = debug_draw.is_enabled(DebugDrawFlags.PASSAGE_CHECK)
@@ -750,9 +755,9 @@ class OccupancyGrid:
                         
                 continue
 
-            # Check and track passage crossings
+            # Check and track passage crossings with position
             if curr.is_passage:
-                self._crossed_passages[cross_count] = curr.element_idx
+                self._crossed_passages[cross_count] = (probe.x, probe.y, curr.element_idx)
                 cross_count += 1
                 
                 # Check 3 cells behind and ahead are empty using optimized empty checks
