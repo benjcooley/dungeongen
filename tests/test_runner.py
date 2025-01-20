@@ -7,7 +7,7 @@ from map.map import Map
 from options import Options
 from debug_config import debug_draw, DebugDrawFlags
 from constants import CELL_SIZE
-from tests.test_passages import TestTags
+from tests.test_tags import TestTags
 
 @dataclass
 class TestCase:

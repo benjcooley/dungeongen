@@ -10,7 +10,8 @@ from tags import Tags
 from logging_config import logger, LogTags
 from debug_config import debug_draw, DebugDrawFlags
 from debug_draw import debug_draw_init
-from tests.test_passages import TestPassages, TestTags
+from tests.test_passages import TestPassages
+from tests.test_tags import TestTags
 
 # Set to True to run tests instead of normal map generation
 RUN_TESTS = True

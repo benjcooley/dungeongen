@@ -1,21 +1,11 @@
 """Test cases for passage generation and validation."""
 
-from enum import Enum, auto
 from typing import Tuple
 from map.room import Room
 from map.passage import Passage
 from map._arrange.arrange_enums import RoomDirection
 from tests.test_runner import get_runner
-
-class TestTags(Enum):
-    """Tags for grouping test cases."""
-    ALL = auto()
-    BASIC = auto()
-    CORNERS = auto()
-    INTERSECTIONS = auto()
-    DEAD_ENDS = auto()
-    PARALLEL = auto()
-    INVALID = auto()
+from tests.test_tags import TestTags
 
 def tag_test(*tags: TestTags):
     """Decorator to tag test methods with test categories."""
