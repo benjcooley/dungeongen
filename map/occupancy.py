@@ -1,6 +1,15 @@
 """Grid-based occupancy tracking for map elements."""
 
 from typing import List, Optional, Set, Tuple, TYPE_CHECKING, NamedTuple
+from dataclasses import dataclass
+
+@dataclass
+class PassageCheckPoint:
+    """Debug visualization point for passage validation."""
+    x: int
+    y: int
+    direction: 'ProbeDirection'
+    is_valid: bool
 from array import array
 from enum import IntFlag, auto, Enum
 from dataclasses import dataclass
@@ -287,7 +296,7 @@ class GridProbe:
         if self._debug_points is not None:
             dx, dy = direction.relative_offset_from(self.facing)
             self._debug_points.append(
-                self.PassageCheckPoint(self.x + dx, self.y + dy, direction, is_valid)
+                PassageCheckPoint(self.x + dx, self.y + dy, direction, is_valid)
             )    
 
 class ElementType(IntFlag):
@@ -343,16 +352,7 @@ class OccupancyGrid:
         self._point_count = 0
         
         # Debug visualization storage
-        from dataclasses import dataclass
-        
-        @dataclass
-        class PassageCheckPoint:
-            x: int
-            y: int
-            direction: ProbeDirection
-            is_valid: bool
-            
-        self._debug_passage_points: list[PassageCheckPoint] = []
+        self._debug_passage_points: list['PassageCheckPoint'] = []
         
     def _ensure_contains(self, grid_x: int, grid_y: int) -> None:
         """Resize grid if needed to contain the given grid coordinates."""
