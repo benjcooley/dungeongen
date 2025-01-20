@@ -76,9 +76,9 @@ class TestRunner:
             Style=skia.Paint.kFill_Style
         )
         
-        title_font = skia.Font(None, 24.0)
+        title_font = skia.Font(None, 72.0)
         title_font.setEmbolden(True)
-        desc_font = skia.Font(None, 18.0)
+        desc_font = skia.Font(None, 54.0)
         
         # Draw test name and description
         title_blob = skia.TextBlob(test_name, title_font)
@@ -152,7 +152,7 @@ class TestRunner:
 
                     # Save test case image
                     image = surface.makeImageSnapshot()
-                    image.save(f'test_{method}.png', skia.kPNG)
+                    image.save(f'test_results/test_{method}.png', skia.kPNG)
                     
                 except AssertionError as e:
                     import traceback
