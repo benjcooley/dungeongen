@@ -310,12 +310,24 @@ class Passage(MapElement):
                 rect = Rectangle(x, y, w, h)
                 grid.mark_rectangle(rect, ElementType.PASSAGE, element_idx)
             
-        # Mark start and end points as blocked unless dead end
-        if not self._allow_dead_end:
-            # Get passage endpoints
-            start_x, start_y = self._grid_points[0]
-            end_x, end_y = self._grid_points[-1]
+        # Mark passage points and adjacent room spaces as blocked
+        start_x, start_y = self._grid_points[0]
+        end_x, end_y = self._grid_points[-1]
+        
+        # For single grid passages, block the passage cell and adjacent room cells
+        if len(self._grid_points) == 1:
+            # Block the passage cell itself
+            grid.mark_blocked(start_x, start_y)
             
+            # Block cell in start room (using opposite of start direction)
+            back_dx, back_dy = self._start_direction.get_back()
+            grid.mark_blocked(start_x + back_dx, start_y + back_dy)
+            
+            # Block cell in end room (using opposite of end direction)
+            back_dx, back_dy = self._end_direction.get_back()
+            grid.mark_blocked(start_x + back_dx, start_y + back_dy)
+        # For longer passages, block endpoints unless dead end
+        elif not self._allow_dead_end:
             # Block start position and cell just inside start room
             grid.mark_blocked(start_x, start_y)  # Block passage start
             back_dx, back_dy = self._start_direction.get_back()
