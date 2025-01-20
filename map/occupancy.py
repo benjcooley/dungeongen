@@ -159,7 +159,7 @@ class GridProbe:
     """
     
     def __init__(self, grid: 'OccupancyGrid', x: int, y: int, 
-                 facing: ProbeDirection = ProbeDirection.NORTH,
+                 facing: ProbeDirection = ProbeDirection.FORWARD,
                  debug_points: Optional[list['OccupancyGrid.PassageCheckPoint']] = None):
         self.grid = grid
         self.x = x
@@ -921,13 +921,13 @@ class OccupancyGrid:
         dx = x2 - x1
         dy = y2 - y1
         if dx > 0:
-            return ProbeDirection.EAST
+            return ProbeDirection.RIGHT
         elif dx < 0:
-            return ProbeDirection.WEST
+            return ProbeDirection.LEFT
         elif dy > 0:
-            return ProbeDirection.SOUTH
+            return ProbeDirection.BACK
         else:
-            return ProbeDirection.NORTH
+            return ProbeDirection.FORWARD
             
     def _get_probe_for_path_point(self, points: list[tuple[int, int]], index: int, 
                                  curr_x: int, curr_y: int, start_direction: RoomDirection) -> GridProbe:
