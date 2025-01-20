@@ -95,11 +95,11 @@ class ProbeDirection(Enum):
         """Get the grid coordinate offset for this direction relative to FORWARD."""
         return self.OFFSETS[self.value]
         
-    def relative_to(self, facing: 'ProbeDirection') -> tuple[int, int]:
+    def relative_to(self, facing: RoomDirection) -> tuple[int, int]:
         """Get offset relative to a facing direction.
         
         Args:
-            facing: The direction being faced
+            facing: The map direction being faced
             
         Returns:
             Tuple of (dx, dy) grid coordinate offsets
