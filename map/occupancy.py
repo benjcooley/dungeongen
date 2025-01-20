@@ -199,7 +199,7 @@ class GridProbe:
         self.x += dx
         self.y += dy
     
-    def check_direction(self, direction: int) -> ProbeResult:
+    def check_direction(self, direction: ProbeDirection) -> ProbeResult:
         """Check the cell in the given direction without moving."""
         dx, dy = direction.relative_offset_from(self._facing)
         element_type, element_idx, blocked = self.grid.get_cell_info(
@@ -207,7 +207,7 @@ class GridProbe:
         )
         return ProbeResult(element_type, element_idx, blocked)
         
-    def check_direction_empty(self, direction: int) -> bool:
+    def check_direction_empty(self, direction: ProbeDirection) -> bool:
         """Check if the cell in the given direction is empty."""
         dx, dy = direction.relative_offset_from(self._facing)
         idx = self.grid._to_grid_index(self.x + dx, self.y + dy)
