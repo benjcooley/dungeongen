@@ -1,15 +1,20 @@
 """Test runner for all test cases."""
 
 import os
+import traceback
 from typing import Set, List, Tuple, Optional
 import skia
 from dataclasses import dataclass
+from rich import print as rprint
+from rich.panel import Panel
+from rich.text import Text
 from debug_draw import debug_draw_init
 from map.map import Map 
 from options import Options
 from debug_config import debug_draw, DebugDrawFlags
 from constants import CELL_SIZE
 from tests.test_tags import TestTags
+from tests.test_passages import TestPassages
 
 @dataclass
 class TestCase:
@@ -99,7 +104,6 @@ class TestRunner:
         
         self.setup(tags)
         
-        from tests.test_passages import TestPassages
         passage_tests = TestPassages()
         
         # Find test methods
@@ -107,7 +111,6 @@ class TestRunner:
                        if method.startswith('test_') and callable(getattr(passage_tests, method))]
         
         tests_run = 0
-        from rich import print as rprint
         rprint("\n[bold blue]Running passage tests...[/bold blue]")
         
         failures = []
@@ -121,8 +124,6 @@ class TestRunner:
             test_tags = getattr(test_func, 'tags', {TestTags.ALL})
             run_tags = tags if tags is not None else self.tags
             if TestTags.ALL in run_tags or any(tag in run_tags for tag in test_tags):
-                from rich import print as rprint
-                
                 # Create fresh map for each test
                 self.map = Map(self.options)
                 
@@ -160,22 +161,15 @@ class TestRunner:
                     image.save(f'test_results/test_{method}.png', skia.kPNG)
                     
                 except AssertionError as e:
-                    import traceback
                     rprint(f"[red]FAILED ❌: {str(e)}[/red]")
                     rprint(f"[red]{traceback.format_exc()}[/red]")
                     failures.append((method, str(e)))
                 except Exception as e:
-                    import traceback
                     rprint(f"[red]ERROR ❌: {str(e)}[/red]")
                     rprint(f"[red]{traceback.format_exc()}[/red]")
                     failures.append((method, str(e)))
                 tests_run += 1
         
-        # Print summary using rich
-        from rich import print as rprint
-        from rich.panel import Panel
-        from rich.text import Text
-
         summary = []
         summary.append(Text("\nPassageTests Summary", style="bold"))
         summary.append(f"Tests run: {tests_run}")
