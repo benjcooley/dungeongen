@@ -90,11 +90,12 @@ class TestRunner:
         canvas.drawTextBlob(title_blob, 60, 90, text_paint)
         canvas.drawTextBlob(desc_blob, 60, 180, text_paint)
             
-    def run_tests(self, tags: Set[TestTags] | None = None) -> None:
-        """Run all test cases matching the given tags.
+    def run_tests(self, tags: Set[TestTags] | None = None, test_names: List[str] | None = None) -> None:
+        """Run test cases matching the given criteria.
         
         Args:
             tags: Set of tags indicating which tests to run
+            test_names: List of specific test names to run. If None, run all matching tags.
         """
         # Ensure test results directory exists
         os.makedirs('test_results', exist_ok=True)
@@ -113,15 +114,21 @@ class TestRunner:
         
         failures = []
         
-        # Run each test method if its tags match
+        # Filter test methods
+        if test_names:
+            test_methods = [m for m in test_methods if m in test_names]
+            
+        # Run each matching test method
         for method in test_methods:
             test_func = getattr(passage_tests, method)
             test_tags = getattr(test_func, 'tags', {TestTags.ALL})
             
-            # Run test if tags match
-            test_tags = getattr(test_func, 'tags', {TestTags.ALL})
+            # Skip if tags don't match (unless specific test was requested)
             run_tags = tags if tags is not None else self.tags
-            if TestTags.ALL in run_tags or any(tag in run_tags for tag in test_tags):
+            if test_names is None and not (TestTags.ALL in run_tags or any(tag in run_tags for tag in test_tags)):
+                continue
+                
+            # Run the test
                 # Create fresh map for each test
                 self.map = Map(self.options)
                 
