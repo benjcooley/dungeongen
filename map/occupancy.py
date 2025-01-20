@@ -19,6 +19,8 @@ from debug_config import debug_draw, DebugDrawFlags
 if TYPE_CHECKING:
     from map.mapelement import MapElement
 
+MAX_PASSAGE_LENGTH = 100
+
 @dataclass
 class PassageCheckPoint:
     """Debug visualization point for passage validation."""
@@ -201,7 +203,7 @@ class GridProbe:
 
     def check_direction(self, direction: ProbeDirection) -> ProbeResult:
         """Check the cell in the given direction without moving."""
-        dx, dy = direction.relative_offset_from(self.facing)
+        dx, dy = _DIRECTION_OFFSETS[(self.facing + direction.value) % 8]
         element_type, element_idx, blocked = self.grid.get_cell_info(
             self.x + dx, self.y + dy
         )
@@ -209,7 +211,7 @@ class GridProbe:
         
     def check_direction_empty(self, direction: ProbeDirection) -> bool:
         """Check if the cell in the given direction is empty."""
-        dx, dy = direction.relative_offset_from(self.facing)
+        dx, dy = _DIRECTION_OFFSETS[(self.facing + direction.value) % 8]
         idx = self.grid._to_grid_index(self.x + dx, self.y + dy)
         return idx is None or self.grid._grid[idx] == 0
     
@@ -330,9 +332,6 @@ class OccupancyGrid:
     TYPE_SHIFT = 26
     INDEX_SHIFT = 0
     
-    # Maximum length of a passage in grid cells
-    MAX_PASSAGE_LENGTH = 100
-    
     def __init__(self, width: int, height: int) -> None:
         """Initialize an empty occupancy grid with default size."""
         self._grid = array('L', [0] * (width * height))  # Using unsigned long
@@ -342,8 +341,8 @@ class OccupancyGrid:
         self._origin_y = height // 2
         
         # Pre-allocate array for passage validation points (x,y,dir as 16-bit ints)
-        self._points = array('h', [0] * (self.MAX_PASSAGE_LENGTH * 2 * 3))  # x,y,dir triplets
-        self._crossed_passages = [(0, 0, 0)] * self.MAX_PASSAGE_LENGTH  # List of (x,y,idx) tuples for crossed passages
+        self._points = array('h', [0] * (MAX_PASSAGE_LENGTH * 2 * 3))  # x,y,dir triplets
+        self._crossed_passages = [(0, 0, 0)] * MAX_PASSAGE_LENGTH  # List of (x,y,idx) tuples for crossed passages
         self._point_count = 0
         
         # Debug visualization storage
@@ -756,7 +755,7 @@ class OccupancyGrid:
                 continue
 
             # Check and track passage crossings with position
-            if curr.is_passage and cross_count < len(self._crossed_passages):
+            if curr.is_passage and cross_count < MAX_PASSAGE_LENGTH:
                 self._crossed_passages[cross_count] = (probe.x, probe.y, curr.element_idx)
                 cross_count += 1
                 
