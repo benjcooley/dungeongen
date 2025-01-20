@@ -343,7 +343,7 @@ class OccupancyGrid:
         
         # Pre-allocate array for passage validation points (x,y,dir as 16-bit ints)
         self._points = array('h', [0] * (self.MAX_PASSAGE_LENGTH * 2 * 3))  # x,y,dir triplets
-        self._crossed_passages = []  # List of crossed passage indices
+        self._crossed_passages = [(0, 0, 0)] * self.MAX_PASSAGE_LENGTH  # List of (x,y,idx) tuples for crossed passages
         self._point_count = 0
         
         # Debug visualization storage
