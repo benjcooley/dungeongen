@@ -147,8 +147,11 @@ class TestRunner:
                     self.map.occupancy.draw_debug(canvas)
                     canvas.restore()
 
-                    # Draw test info
+                    # Draw test info with clean state
+                    canvas.save()
+                    canvas.resetMatrix()
                     self.draw_test_info(canvas, method, test_func.__doc__ or "")
+                    canvas.restore()
 
                     # Save test case image
                     image = surface.makeImageSnapshot()
