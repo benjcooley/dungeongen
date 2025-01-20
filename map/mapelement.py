@@ -127,7 +127,19 @@ class MapElement:
         # Remove from map
         if self._map is not None:
             self._map.remove_element(self)
-    
+
+    def get_map_index(self) -> int:
+        """Get this element's index in the map.
+        
+        Returns:
+            The element's index, or -1 if not in a map
+        """
+        if self._map is None:
+            return -1
+        try:
+            return self._map._elements.index(self)
+        except ValueError:
+            return -1
 
     @classmethod
     def is_decoration(cls) -> bool:
