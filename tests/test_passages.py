@@ -84,7 +84,7 @@ class TestPassages:
         assert crossed_horizontal, "Horizontal passage should cross vertical passage"
         assert len(crossed_horizontal) == 1, "Should cross exactly one passage"
         cross_x, cross_y, cross_idx = crossed_horizontal[0]
-        assert cross_idx == vertical_passage, "Should cross the vertical passage"
+        assert cross_idx == vertical_passage.get_map_index(), "Should cross the vertical passage"
         # Verify crossing point is at expected location
         assert cross_x == ox + 3 and cross_y == oy + 3, "Crossing should occur at center point"
 

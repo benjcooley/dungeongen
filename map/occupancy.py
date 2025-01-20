@@ -742,7 +742,7 @@ class OccupancyGrid:
                 
                 for direction in check_dirs:
                     result = probe.check_direction(direction)
-                    if result.is_passage:
+                    if result.is_passage and cross_count < len(self._crossed_passages):
                         self._crossed_passages[cross_count] = (probe.x, probe.y, result.element_idx)
                         cross_count += 1
                         if debug_enabled:
@@ -756,7 +756,7 @@ class OccupancyGrid:
                 continue
 
             # Check and track passage crossings with position
-            if curr.is_passage:
+            if curr.is_passage and cross_count < len(self._crossed_passages):
                 self._crossed_passages[cross_count] = (probe.x, probe.y, curr.element_idx)
                 cross_count += 1
                 
