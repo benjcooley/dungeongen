@@ -92,26 +92,31 @@ class ProbeDirection(Enum):
             return ProbeDirection.FORWARD
     
         
-    def relative_to(self, facing: RoomDirection) -> tuple[int, int]:
-        """Get offset relative to a facing direction.
+    @staticmethod
+    def get_relative_offsets(facing: RoomDirection) -> list[tuple[int, int]]:
+        """Get all probe direction offsets relative to a facing direction.
         
         Args:
             facing: The map direction being faced
             
         Returns:
-            Tuple of (dx, dy) grid coordinate offsets
+            List of (dx, dy) offsets rotated to match facing direction
         """
         # Calculate how many 45-degree rotations needed
-        rotation = facing.value * 2
+        rotation = facing.value
         
-        # Get base offset
-        dx, dy = self.get_offset()
+        # Start with base offsets
+        offsets = list(RoomDirection.OFFSETS)
         
-        # Rotate offset by facing direction
+        # Rotate all offsets by facing direction
         for _ in range(rotation):
-            dx, dy = -dy, dx
+            offsets = [(-dy, dx) for dx, dy in offsets]
             
-        return dx, dy
+        return offsets
+
+    def relative_to(self, facing: RoomDirection) -> tuple[int, int]:
+        """Get this probe direction's offset relative to a facing direction."""
+        return self.get_relative_offsets(facing)[self.value]
 
 @dataclass
 class ProbeResult:
@@ -186,7 +191,8 @@ class GridProbe:
             
         if value != self._facing:
             self._facing = value
-            self._dx, self._dy = value.get_forward()
+            # Get the FORWARD offset relative to our facing direction
+            self._dx, self._dy = ProbeDirection.get_relative_offsets(value)[ProbeDirection.FORWARD.value]
     
     def move_forward(self) -> None:
         """Move one cell in the facing direction."""
