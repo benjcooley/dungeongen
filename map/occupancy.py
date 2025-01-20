@@ -441,6 +441,12 @@ class OccupancyGrid:
         blocked = bool(value & self.BLOCKED_MASK)
         return element_type, element_idx, blocked
     
+    def mark_blocked(self, grid_x: int, grid_y: int) -> None:
+        """Mark a grid cell as blocked without changing its type."""
+        idx = self._to_grid_index(grid_x, grid_y)
+        if idx is not None:
+            self._grid[idx] |= self.BLOCKED_MASK
+            
     def mark_cell(self, grid_x: int, grid_y: int, element_type: ElementType, 
                   element_idx: int, blocked: bool = False) -> None:
         """Mark a grid cell with element info."""
