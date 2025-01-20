@@ -71,7 +71,7 @@ def main():
     # Save as PNG with size tag in filename
     size_tag = next((tag for tag in options.tags if tag in ('small', 'medium', 'large')), 'medium')
     image = surface.makeImageSnapshot()
-    image.save('map_output.png', skia.kPNG)
+    image.save('test_output.png', skia.kPNG)
     
     # # Save as PDF
     # stream = skia.FILEWStream('map_output.pdf')
