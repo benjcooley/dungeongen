@@ -92,8 +92,7 @@ class ProbeDirection(Enum):
             return ProbeDirection.FORWARD
     
         
-    @staticmethod
-    def offsets_relative_to(facing: RoomDirection) -> tuple[int, int]:
+    def offsets_relative_to(self, facing: RoomDirection) -> tuple[int, int]:
         """Get grid offsets for this probe direction relative to this facing direction.
         
         Args:
