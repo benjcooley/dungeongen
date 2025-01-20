@@ -49,6 +49,7 @@ class TestPassages:
         
         # Create vertical passage points (just start and end)
         vertical_points = [(ox + 1, oy + 3), (ox + 1, oy + 5)]  # Shortened to avoid overlap
+        print(f"\nTesting vertical passage points: {vertical_points}")
         
         # Create horizontal passage points (just start and end)
         horizontal_points = [(ox + 8, oy + 4), (ox + 10, oy + 4)]  # Shortened to avoid overlap
