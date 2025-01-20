@@ -88,7 +88,7 @@ class TestRunner:
                 transform.mapPoints(points)
                 point = points[0]
                 blob = skia.TextBlob(text, bold_font)
-                canvas.drawTextBlob(blob, point.x() + (8 * CELL_SIZE), point.y() - (3 * CELL_SIZE), text_paint)  # Offset right and up
+                canvas.drawTextBlob(blob, point.x(), point.y(), text_paint)  # Draw at room position
         
         for case in self.test_cases:
             # Convert grid location to map coordinates
