@@ -81,19 +81,27 @@ class Passage(MapElement):
             else:
                 self._end_direction = end_direction
         
-        # Create shapes for each straight section
-        shapes = []
-        for i in range(len(grid_points) - 1):
-            x1, y1 = grid_points[i]
-            x2, y2 = grid_points[i + 1]
-            
-            # Convert grid line to map rectangle
+        # Create passage shape
+        if len(grid_points) == 2:
+            # For straight passages, use a single rectangle
+            x1, y1 = grid_points[0]
+            x2, y2 = grid_points[1]
             x, y, width, height = grid_points_to_map_rect(x1, y1, x2, y2)
+            shape = Rectangle(x, y, width, height)
+        else:
+            # For passages with corners, create shapes for each straight section
+            shapes = []
+            for i in range(len(grid_points) - 1):
+                x1, y1 = grid_points[i]
+                x2, y2 = grid_points[i + 1]
                 
-            shapes.append(Rectangle(x, y, width, height))
+                # Convert grid line to map rectangle
+                x, y, width, height = grid_points_to_map_rect(x1, y1, x2, y2)
+                shapes.append(Rectangle(x, y, width, height))
             
-        # Combine shapes into a single shape group
-        shape = ShapeGroup.combine(shapes)
+            # Combine shapes into a single shape group
+            shape = ShapeGroup.combine(shapes)
+            
         super().__init__(shape=shape)
         
     @property
