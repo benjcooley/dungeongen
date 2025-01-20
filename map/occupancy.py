@@ -2,14 +2,6 @@
 
 from typing import List, Optional, Set, Tuple, TYPE_CHECKING, NamedTuple
 from dataclasses import dataclass
-
-@dataclass
-class PassageCheckPoint:
-    """Debug visualization point for passage validation."""
-    x: int
-    y: int
-    direction: 'ProbeDirection'
-    is_valid: bool
 from array import array
 from enum import IntFlag, auto, Enum
 from dataclasses import dataclass
@@ -26,6 +18,14 @@ from debug_config import debug_draw, DebugDrawFlags
 
 if TYPE_CHECKING:
     from map.mapelement import MapElement
+
+@dataclass
+class PassageCheckPoint:
+    """Debug visualization point for passage validation."""
+    x: int
+    y: int
+    direction: Optional['ProbeDirection']
+    is_valid: bool
 
 # Pre-computed direction offsets
 _DIRECTION_OFFSETS = [
@@ -114,7 +114,7 @@ class ProbeDirection(Enum):
             the dx, dy offsets of the probe direction relative to the facing direction
         """
         # Add facing value to get rotated direction
-        return _DIRECTION_OFFSETS[(self.value + facing.value) % 8]
+        return _DIRECTION_OFFSETS[(self.value + facing) % 8]
 
 @dataclass
 class ProbeResult:
@@ -158,63 +158,45 @@ class GridProbe:
     - Follow passages
     """
     
-    def __init__(self, grid: 'OccupancyGrid', x: int, y: int, 
-                 facing: RoomDirection = RoomDirection.NORTH,
-                 debug_points: Optional[list['OccupancyGrid.PassageCheckPoint']] = None):
+    def __init__(self, grid: 'OccupancyGrid', x: int = 0, y: int = 0, 
+                 facing: RoomDirection = RoomDirection.NORTH):
         self.grid = grid
         self.x = x
         self.y = y
-        
-        # Validate facing is a cardinal direction
-        if facing.value % 2 != 0:  # Odd values are diagonal
-            raise ValueError("GridProbe facing must be a cardinal direction (NORTH, EAST, SOUTH, WEST)")
-        self._facing = facing
-        
-        # A cached reference to debug point list in OccupancyGrid class
-        self._debug_points = debug_points
-        
-    @property
-    def facing(self) -> RoomDirection:
-        """Get the current facing direction."""
-        return self._facing
-        
-    @facing.setter 
-    def facing(self, value: RoomDirection) -> None:
-        """Set the facing direction and update cached offsets."""
-        # Validate facing is a cardinal direction
-        if value.value % 2 != 0:  # Odd values are diagonal
-            raise ValueError("GridProbe facing must be a cardinal direction (NORTH, EAST, SOUTH, WEST)")
-            
-        if value != self._facing:
-            self._facing = value
+        self.facing = facing
     
     def move_forward(self) -> None:
         """Move one cell in the facing direction."""
-        dx, dy = self._facing.get_forward()
+        dx, dy = self.facing.get_forward()
         self.x += dx
         self.y += dy
     
     def move_backward(self) -> None:
         """Move one cell opposite the facing direction."""
-        dx, dy = self._facing.get_back()
+        dx, dy = self.facing.get_back()
         self.x += dx
         self.y += dy
     
     def turn_left(self) -> None:
         """Turn 90 degrees left."""
-        dx, dy = self._facing.get_left()
+        dx, dy = self.facing.get_left()
         self.x += dx
         self.y += dy
     
     def turn_right(self) -> None:
         """Turn 90 degrees right."""
-        dx, dy = self._facing.get_right()
+        dx, dy = self.facing.get_right()
         self.x += dx
         self.y += dy
     
+    def check_here(self) -> ProbeResult:
+        """Check the cell in the probes current position."""
+        element_type, element_idx, blocked = self.grid.get_cell_info(self.x, self.y)
+        return ProbeResult(element_type, element_idx, blocked)
+
     def check_direction(self, direction: ProbeDirection) -> ProbeResult:
         """Check the cell in the given direction without moving."""
-        dx, dy = direction.relative_offset_from(self._facing)
+        dx, dy = direction.relative_offset_from(self.facing)
         element_type, element_idx, blocked = self.grid.get_cell_info(
             self.x + dx, self.y + dy
         )
@@ -222,7 +204,7 @@ class GridProbe:
         
     def check_direction_empty(self, direction: ProbeDirection) -> bool:
         """Check if the cell in the given direction is empty."""
-        dx, dy = direction.relative_offset_from(self._facing)
+        dx, dy = direction.relative_offset_from(self.facing)
         idx = self.grid._to_grid_index(self.x + dx, self.y + dy)
         return idx is None or self.grid._grid[idx] == 0
     
@@ -290,7 +272,7 @@ class GridProbe:
         """Check if the cell diagonally backward-right is empty."""
         return self.check_direction_empty(ProbeDirection.BACK_RIGHT)
     
-    def add_debug_grid(self, direction: ProbeDirection, is_valid: bool) -> None:
+    def add_debug_grid(self, direction: Optional[ProbeDirection], is_valid: bool) -> None:
         """Add a debug visualization point for a grid position.
         
         Args:
@@ -298,10 +280,15 @@ class GridProbe:
             is_valid: Whether this point passed validation
         """
         if self._debug_points is not None:
-            dx, dy = direction.relative_offset_from(self.facing)
-            self._debug_points.append(
-                PassageCheckPoint(self.x + dx, self.y + dy, direction, is_valid)
-            )    
+            if direction:
+                dx, dy = direction.relative_offset_from(self.facing)
+                self.grid._debug_passage_points.append(
+                    PassageCheckPoint(self.x + dx, self.y + dy, direction, is_valid)
+                )
+            else:
+                self.grid._debug_passage_points.append(
+                    PassageCheckPoint(self.x, self.y, None, is_valid)
+                )
 
 class ElementType(IntFlag):
     """Element types for occupancy grid cells."""
@@ -674,8 +661,7 @@ class OccupancyGrid:
         
         # Reuse a single probe for all checks
         # For passage validation, treat NORTH as forward
-        probe = GridProbe(self, 0, 0, facing=ProbeDirection.FORWARD,
-                         debug_points=self._debug_passage_points if debug_enabled else None)
+        probe = GridProbe(self)
         
         # Handle single point case efficiently 
         if len(points) == 1:
@@ -695,14 +681,13 @@ class OccupancyGrid:
             idx = i * 3
             probe.x = self._points[idx]
             probe.y = self._points[idx + 1]
-            curr_direction = ProbeDirection(self._points[idx + 2])
-            probe.facing = curr_direction
+            probe.facing = self._points[idx + 2]
             
             # Quick check for blocked cells first - must be at top
-            curr = probe.check_forward()
+            curr = probe.check_here()
             if curr.is_blocked:
                 if debug_enabled:
-                    probe.add_debug_grid(ProbeDirection.FORWARD, False)
+                    probe.add_debug_grid(None, False)
                 return False, self._crossed_passages[:cross_count]
 
             # Check endpoints
