@@ -86,9 +86,9 @@ class TestRunner:
                 y = pos[1] * CELL_SIZE
                 points = [skia.Point(x, y)]
                 transform.mapPoints(points)
-                cx, cy = points[0].x, points[0].y
+                point = points[0]
                 blob = skia.TextBlob(text, bold_font)
-                canvas.drawTextBlob(blob, cx, cy - 10, text_paint)  # Offset up slightly
+                canvas.drawTextBlob(blob, point.x(), point.y() - 10, text_paint)  # Offset up slightly
         
         for case in self.test_cases:
             # Convert grid location to map coordinates
@@ -98,15 +98,15 @@ class TestRunner:
             # Apply transform to get canvas coordinates
             points = [skia.Point(x, y)]
             transform.mapPoints(points)
-            cx, cy = points[0].x, points[0].y
+            point = points[0]
             
             # Draw case info
-            cx += case.text_offset[0]
-            cy += case.text_offset[1]
+            x = point.x() + case.text_offset[0]
+            y = point.y() + case.text_offset[1]
             title_blob = skia.TextBlob(f"{case.number}. {case.name}", text_font)
             desc_blob = skia.TextBlob(case.description, text_font)
-            canvas.drawTextBlob(title_blob, cx, cy, text_paint)
-            canvas.drawTextBlob(desc_blob, cx, cy + 16, text_paint)
+            canvas.drawTextBlob(title_blob, x, y, text_paint)
+            canvas.drawTextBlob(desc_blob, x, y + 16, text_paint)
             
     def run_tests(self, tags: Set[TestTags] = {TestTags.ALL}) -> None:
         """Run all test cases matching the given tags.
