@@ -52,7 +52,7 @@ class TestPassages:
         print(f"\nTesting vertical passage points: {vertical_points}")
         
         # Create horizontal passage points (just start and end)
-        horizontal_points = [room3.get_exit(RoomDirection.EAST), room3.get_exit(RoomDirection.WEST)]  # Shortened to avoid overlap
+        horizontal_points = [room3.get_exit(RoomDirection.EAST), room4.get_exit(RoomDirection.WEST)]  # Shortened to avoid overlap
         
         # First validate the passages
         print("\nChecking vertical passage...")
