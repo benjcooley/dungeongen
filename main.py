@@ -17,11 +17,10 @@ RUN_TESTS = True
 
 def main():
     if RUN_TESTS:
-        from tests.test_runner import run_tests
-        # Enable debug visualization for tests
-        debug_draw.enable(DebugDrawFlags.PASSAGE_CHECK)
-        # Run passage tests with basic tag
-        run_tests({TestTags.BASIC})
+        from tests.test_runner import get_runner
+        # Get singleton test runner and run tests
+        runner = get_runner()
+        runner.run_tests({TestTags.BASIC})
         return
 
     # Enable debug visualization and logging
