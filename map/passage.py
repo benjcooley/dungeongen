@@ -326,10 +326,14 @@ class Passage(MapElement):
             
             # For start point, use opposite of start direction to get cell inside room
             back_dx, back_dy = self._start_direction.get_back()
-            grid.mark_cell(start_x + back_dx, start_y + back_dy,
-                         ElementType.PASSAGE, element_idx, blocked=True)
+            # Just mark as blocked without changing type
+            idx = grid._to_grid_index(start_x + back_dx, start_y + back_dy)
+            if idx is not None:
+                grid._grid[idx] |= grid.BLOCKED_MASK
             
             # For end point, use opposite of end direction to get cell inside room  
             back_dx, back_dy = self._end_direction.get_back()
-            grid.mark_cell(end_x + back_dx, end_y + back_dy,
-                         ElementType.PASSAGE, element_idx, blocked=True)
+            # Just mark as blocked without changing type
+            idx = grid._to_grid_index(end_x + back_dx, end_y + back_dy)
+            if idx is not None:
+                grid._grid[idx] |= grid.BLOCKED_MASK
