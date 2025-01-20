@@ -760,19 +760,19 @@ class OccupancyGrid:
                 cross_count += 1
                 
                 # Check 3 cells behind and ahead are empty using optimized empty checks
-                for offset in range(1, 4):
+                for offset in range(0, 3):
                     # Check cells behind
-                    if not probe.check_direction_empty(ProbeDirection((probe.facing + 4 + offset) % 8)):
+                    ahead_dir = ProbeDirection((7 + offset) % 8)
+                    if not probe.check_direction_empty(ahead_dir):
                         if debug_enabled:
-                            direction = ProbeDirection((probe.facing.value + 4 + offset) % 8)
-                            probe.add_debug_grid(direction, False)
+                            probe.add_debug_grid(ahead_dir, False)
                         return False, self._crossed_passages[:cross_count]
                         
                     # Check cells ahead
-                    if not probe.check_direction_empty(ProbeDirection((probe.facing + offset) % 8)):
+                    behind_dir = ProbeDirection((3 + offset) % 8)
+                    if not probe.check_direction_empty(behind_dir):
                         if debug_enabled:
-                            direction = ProbeDirection((probe.facing.value + offset) % 8)
-                            probe.add_debug_grid(direction, False)
+                            probe.add_debug_grid(behind_dir, False)
                         return False, self._crossed_passages[:cross_count]
 
             # Normal point validation (must be last)
