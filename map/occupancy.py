@@ -277,7 +277,7 @@ class GridProbe:
         """Check if the cell diagonally backward-right is empty."""
         return self.check_direction_empty(ProbeDirection.BACK_RIGHT)
     
-    def add_debug_grid(self, direction: Optional[int], is_valid: bool) -> None:
+    def add_debug_grid(self, direction: Optional[ProbeDirection], is_valid: bool) -> None:
         """Add a debug visualization point for a grid position.
         
         Args:
@@ -285,7 +285,7 @@ class GridProbe:
             is_valid: Whether this point passed validation
         """
         if direction:
-            dx, dy = _DIRECTION_OFFSETS[(self.facing + direction) % 8]
+            dx, dy = _DIRECTION_OFFSETS[(self.facing + direction.value) % 8]
             self.grid._debug_passage_points.append(
                 PassageCheckPoint(self.x + dx, self.y + dy, direction, is_valid)
             )
