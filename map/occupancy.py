@@ -964,7 +964,7 @@ class OccupancyGrid:
 
                         
         # Draw passage check debug visualization if enabled
-        debug_enabled = False # debug_draw.is_enabled(DebugDrawFlags.PASSAGE_CHECK)
+        debug_enabled = debug_draw.is_enabled(DebugDrawFlags.PASSAGE_CHECK)
         if debug_enabled and self._debug_passage_points:
             # First pass: Draw all cells
             for point in self._debug_passage_points:
