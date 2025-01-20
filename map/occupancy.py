@@ -101,7 +101,7 @@ class ProbeDirection(Enum):
             the dx, dy offsets of the probe direction relative to the facing direction
         """
         # Add facing value to get rotated direction
-        return ProbeDirection._offsets[(self.value + facing.value) % 8]
+        return self._offsets[(self.value + facing.value) % 8]
 
 @dataclass
 class ProbeResult:
