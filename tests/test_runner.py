@@ -72,7 +72,7 @@ class TestRunner:
         text_paint = skia.Paint(
             Color=skia.Color(0, 0, 0),
             AntiAlias=True,
-            TextSize=14
+            TextSize=14.0
         )
         
         # Draw labels first
@@ -80,7 +80,7 @@ class TestRunner:
             label_paint = skia.Paint(
                 Color=skia.Color(0, 0, 0),
                 AntiAlias=True,
-                TextSize=12
+                TextSize=12.0
             )
             for text, pos in self.labels:
                 x = pos[0] * CELL_SIZE
