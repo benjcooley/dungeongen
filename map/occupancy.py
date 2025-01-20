@@ -13,7 +13,7 @@ from constants import CELL_SIZE
 from graphics.conversions import map_to_grid_rect
 from map.enums import RoomDirection
 from options import Options
-from debug_draw import debug_draw_grid_cell
+from debug_draw import debug_draw_grid_cell, debug_draw_passage_check
 from debug_config import debug_draw, DebugDrawFlags
 
 if TYPE_CHECKING:
