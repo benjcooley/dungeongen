@@ -159,13 +159,13 @@ class GridProbe:
     """
     
     def __init__(self, grid: 'OccupancyGrid', x: int, y: int, 
-                 facing: ProbeDirection = ProbeDirection.FORWARD,
+                 facing: RoomDirection = RoomDirection.NORTH,
                  debug_points: Optional[list['OccupancyGrid.PassageCheckPoint']] = None):
         self.grid = grid
         self.x = x
         self.y = y
-        self._facing = facing
-        self._dx, self._dy = facing.get_offset()
+        self._facing = ProbeDirection(facing.value)  # Convert room direction to probe direction
+        self._dx, self._dy = self._facing.get_offset()
         self._debug_points = debug_points
         
     @property

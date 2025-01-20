@@ -3,11 +3,15 @@ from enum import Enum, auto
 from typing import Tuple, Optional
 
 class RoomDirection(Enum):
-    """Direction to generate rooms."""
-    NORTH = auto()
-    SOUTH = auto()
-    EAST = auto()
-    WEST = auto()
+    """Direction in map space.
+    
+    Has both a cardinal direction (NORTH, SOUTH, etc) and a numeric facing value (0-7)
+    that aligns with ProbeDirection values for consistent orientation handling.
+    """
+    NORTH = 0  # Matches ProbeDirection.FORWARD
+    EAST = 2   # Matches ProbeDirection.RIGHT
+    SOUTH = 4  # Matches ProbeDirection.BACK  
+    WEST = 6   # Matches ProbeDirection.LEFT
         
     def get_forward(self) -> Tuple[int, int]:
         """Get the (dx, dy) grid offset for this direction."""
