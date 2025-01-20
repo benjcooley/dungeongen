@@ -100,8 +100,8 @@ def tag_test(*tags: TestTags):
         return func
     return decorator
 
-    @tag_test(TestTags.BASIC)
-    def test_simple_passages(self, origin: tuple[int, int] = (0, 0)) -> tuple[int, int]:
+@tag_test(TestTags.BASIC)
+def test_simple_passages(self, origin: tuple[int, int] = (0, 0)) -> tuple[int, int]:
         """Test simple 2x5 vertical and horizontal passages.
         
         Args:
@@ -121,16 +121,22 @@ def tag_test(*tags: TestTags):
             text_offset=(0, -20)
         ))
         
-        # Create vertical passage points (1 wide x 5 tall)
-        vertical_points = [(ox + 2, y) for y in range(oy, oy + 5)]
+        # Create rooms to connect passages to
+        room1 = self.map.create_rectangular_room(ox, oy, 3, 3)
+        room2 = self.map.create_rectangular_room(ox, oy + 5, 3, 3)
+        room3 = self.map.create_rectangular_room(ox + 7, oy + 7, 3, 3)
+        room4 = self.map.create_rectangular_room(ox + 12, oy + 7, 3, 3)
         
-        # Create horizontal passage points (5 wide x 1 tall, offset to not intersect)
-        horizontal_points = [(x, oy + 7) for x in range(ox, ox + 5)]
+        # Create vertical passage points (just start and end)
+        vertical_points = [(ox + 1, oy + 2), (ox + 1, oy + 5)]
+        
+        # Create horizontal passage points (just start and end, offset to not intersect)
+        horizontal_points = [(ox + 9, oy + 8), (ox + 12, oy + 8)]
         
         # Test vertical passage
         is_valid, crossed = self.map.occupancy.check_passage(
             vertical_points,
-            RoomDirection.NORTH
+            RoomDirection.SOUTH
         )
         assert is_valid and not crossed, "Vertical passage should be valid"
         
