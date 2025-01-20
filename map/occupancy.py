@@ -178,7 +178,7 @@ class GridProbe:
         if value != self._facing:
             self._facing = value
             # Get the FORWARD offset relative to our facing direction
-            self._dx, self._dy = ProbeDirection.get_relative_offsets(value)[ProbeDirection.FORWARD.value]
+            self._dx, self._dy = ProbeDirection.FORWARD.relative_offset_from(value)
     
     def move_forward(self) -> None:
         """Move one cell in the facing direction."""
