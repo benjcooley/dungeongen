@@ -142,13 +142,14 @@ def debug_draw_grid_cell(x: int, y: int, fill_color: int, outline_color: Optiona
         )
         _debug_canvas.drawRect(rect, outline_paint)
     
-    # Draw X if blocked
+    # Draw X if blocked - always at full opacity
     if blocked:
         x_paint = skia.Paint(
             Color=skia.Color(255, 0, 0),  # Red
             Style=skia.Paint.kStroke_Style,
             StrokeWidth=2,
-            AntiAlias=True
+            AntiAlias=True,
+            Alpha=255  # Full opacity for blocking lines
         )
         # Draw X from corner to corner
         _debug_canvas.drawLine(px + 4, py + 4, px + CELL_SIZE - 4, py + CELL_SIZE - 4, x_paint)
