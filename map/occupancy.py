@@ -962,6 +962,7 @@ class OccupancyGrid:
         
         # Draw each occupied cell
         for grid_y in range(-self._origin_y, self.height - self._origin_y):
+            row_cells = []
             for grid_x in range(-self._origin_x, self.width - self._origin_x):
                 if self.is_occupied(grid_x, grid_y):
                     # Get cell info
@@ -975,6 +976,13 @@ class OccupancyGrid:
 
                     # Draw semi-transparent rectangle
                     debug_draw_grid_cell(grid_x, grid_y, color, alpha=alpha, blocked=blocked)
+                    
+                    # Add to row output
+                    row_cells.append(f"({grid_x}, {grid_y})")
+            
+            # Print row if any cells were occupied
+            if row_cells:
+                print(f"Row {grid_y}: {', '.join(row_cells)}")
 
                         
         # Draw passage check debug visualization if enabled
