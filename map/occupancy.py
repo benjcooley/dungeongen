@@ -102,10 +102,9 @@ class ProbeDirection(Enum):
         Returns:
             the dx, dy offsets of the probe direction relative to the facing direction
         """
-        
-        #TODO: AI FIX ME!
-            
-        return offsets
+        # Add facing value to get rotated direction
+        rotated = RoomDirection((self.value + facing.value) % 8)
+        return rotated.get_forward()
 
     def relative_to(self, facing: RoomDirection) -> tuple[int, int]:
         """Get this probe direction's offset relative to a facing direction."""
