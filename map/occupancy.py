@@ -968,9 +968,5 @@ class OccupancyGrid:
         if debug_enabled and self._debug_passage_points:
             # First pass: Draw all cells
             for point in self._debug_passage_points:
-                # Purple for invalid points, blue for valid
-                if point.is_valid:
-                    debug_draw_grid_cell(point.x, point.y, skia.Color(50, 255, 80), alpha=128)
-                else:
-                    debug_draw_grid_cell(point.x, point.y, skia.Color(255, 180, 40), alpha=128)
+                debug_draw_passage_check(point.x, point.y, point.is_valid)
                         

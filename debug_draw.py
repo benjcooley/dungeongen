@@ -102,7 +102,7 @@ def debug_draw_grid_label(x: int, y: int, text: str, color: str = 'DARK_BLUE') -
         return
 
 
-def debug_draw_grid_cell(x: int, y: int, fill_color: int, outline_color: Optional[int] = None, 
+def debug_draw_grid_cell(x: int, y: int, fill_color: int, outline_color: Optional[int] = None,
                         blocked: bool = False, alpha: int = 128) -> None:
     """Draw a filled grid cell with optional outline.
     
@@ -154,6 +154,33 @@ def debug_draw_grid_cell(x: int, y: int, fill_color: int, outline_color: Optiona
         # Draw X from corner to corner
         _debug_canvas.drawLine(px + 4, py + 4, px + CELL_SIZE - 4, py + CELL_SIZE - 4, x_paint)
         _debug_canvas.drawLine(px + CELL_SIZE - 4, py + 4, px + 4, py + CELL_SIZE - 4, x_paint)
+
+def debug_draw_passage_check(x: int, y: int, is_valid: bool) -> None:
+    """Draw a circle indicating passage validation state.
+    
+    Args:
+        x: Grid x coordinate
+        y: Grid y coordinate
+        is_valid: Whether this point passed validation
+    """
+    if _debug_canvas is None:
+        return
+        
+    # Convert grid coords to pixels
+    px = x * CELL_SIZE + CELL_SIZE/2
+    py = y * CELL_SIZE + CELL_SIZE/2
+    
+    # Use bluish for valid, orangish for invalid
+    color = skia.Color(100, 180, 255) if is_valid else skia.Color(255, 180, 100)
+    
+    # Draw semi-transparent circle
+    paint = skia.Paint(
+        Color4f=skia.Color4f.FromColor(color),
+        Style=skia.Paint.kFill_Style,
+        AntiAlias=True,
+        Alpha=200  # More opaque than occupancy grid
+    )
+    _debug_canvas.drawCircle(px, py, CELL_SIZE/3, paint)
 
 def debug_draw_map_label(x: float, y: float, text: str, color: str = 'DARK_BLUE') -> None:
     """Draw text label at map coordinates."""
