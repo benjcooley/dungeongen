@@ -91,9 +91,6 @@ class ProbeDirection(Enum):
         else:
             return ProbeDirection.FORWARD
     
-    def get_offset(self) -> tuple[int, int]:
-        """Get the grid coordinate offset for this direction relative to FORWARD."""
-        return self.OFFSETS[self.value]
         
     def relative_to(self, facing: RoomDirection) -> tuple[int, int]:
         """Get offset relative to a facing direction.
@@ -189,9 +186,7 @@ class GridProbe:
             
         if value != self._facing:
             self._facing = value
-            # Convert to probe direction to get offset
-            probe_dir = ProbeDirection(value.value)
-            self._dx, self._dy = probe_dir.get_offset()
+            self._dx, self._dy = value.get_forward()
     
     def move_forward(self) -> None:
         """Move one cell in the facing direction."""

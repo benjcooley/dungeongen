@@ -19,14 +19,18 @@ class RoomDirection(Enum):
         
     def get_forward(self) -> Tuple[int, int]:
         """Get the (dx, dy) grid offset for this direction."""
-        if self == RoomDirection.NORTH:
-            return (0, -1)
-        elif self == RoomDirection.SOUTH:
-            return (0, 1)
-        elif self == RoomDirection.EAST:
-            return (1, 0)
-        else:  # WEST
-            return (-1, 0)
+        # Pre-computed direction offsets
+        OFFSETS = [
+            (0, -1),   # NORTH
+            (1, -1),   # NORTHEAST
+            (1, 0),    # EAST
+            (1, 1),    # SOUTHEAST
+            (0, 1),    # SOUTH
+            (-1, 1),   # SOUTHWEST
+            (-1, 0),   # WEST
+            (-1, -1)   # NORTHWEST
+        ]
+        return OFFSETS[self.value]
         
     def get_left(self) -> Tuple[int, int]:
         """Gets the (dx, dy) grid offset for the left direction."""
