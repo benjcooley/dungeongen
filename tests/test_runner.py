@@ -71,17 +71,17 @@ class TestRunner:
         """Draw test case numbers and descriptions."""
         text_paint = skia.Paint(
             Color=skia.Color(0, 0, 0),
-            AntiAlias=True,
-            TextSize=14
+            AntiAlias=True
         )
+        text_paint.TextSize = 14
         
         # Draw labels first
         if hasattr(self, 'labels'):
             label_paint = skia.Paint(
                 Color=skia.Color(0, 0, 0),
-                AntiAlias=True,
-                TextSize=12
+                AntiAlias=True
             )
+            label_paint.TextSize = 12
             for text, pos in self.labels:
                 x = pos[0] * CELL_SIZE
                 y = pos[1] * CELL_SIZE
