@@ -689,9 +689,9 @@ class OccupancyGrid:
         prev_direction = None
         for i in range(self._point_count):
             idx = i * 3
-            probe.x = self._points[idx]
-            probe.y = self._points[idx + 1]
-            curr_direction = self._points[idx + 2]
+            probe.x = int(self._points[idx])
+            probe.y = int(self._points[idx + 1])
+            curr_direction = int(self._points[idx + 2])
             probe.facing = curr_direction
             
             # Quick check for blocked cells first - must be at top
@@ -784,7 +784,7 @@ class OccupancyGrid:
             
             # Track valid point
             if debug_enabled:
-                probe.add_debug_grid(curr_direction, True)
+                probe.add_debug_grid(None, True)
 
             prev_direction = curr_direction
                     
@@ -980,5 +980,6 @@ class OccupancyGrid:
         if debug_enabled and self._debug_passage_points:
             # First pass: Draw all cells
             for point in self._debug_passage_points:
+                print(f"Drawing passage check at ({point.x}, {point.y})")
                 debug_draw_passage_check(point.x, point.y, point.is_valid)
                         

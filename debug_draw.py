@@ -167,8 +167,9 @@ def debug_draw_passage_check(x: int, y: int, is_valid: bool) -> None:
     if _debug_canvas is None:
         return
         
-    # Convert grid coords to map coordinates
-    map_x, map_y = grid_to_map(x, y)
+    # Convert grid coords to pixels
+    px = x * CELL_SIZE
+    py = y * CELL_SIZE
     
     # Use bluish for valid, orangish for invalid
     color = skia.Color(100, 180, 255) if is_valid else skia.Color(255, 180, 100)
@@ -180,7 +181,7 @@ def debug_draw_passage_check(x: int, y: int, is_valid: bool) -> None:
         AntiAlias=True,
         Alpha=200  # More opaque than occupancy grid
     )
-    _debug_canvas.drawCircle(map_x + CELL_SIZE/2, map_y + CELL_SIZE/2, CELL_SIZE/3, paint)
+    _debug_canvas.drawCircle(px + CELL_SIZE / 2, py + CELL_SIZE / 2, CELL_SIZE/3, paint)
 
 def debug_draw_map_label(x: float, y: float, text: str, color: str = 'DARK_BLUE') -> None:
     """Draw text label at map coordinates."""
