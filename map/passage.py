@@ -314,18 +314,23 @@ class Passage(MapElement):
         start_x, start_y = self._grid_points[0]
         end_x, end_y = self._grid_points[-1]
         
-        # For single grid passages, block the passage cell and adjacent room cells
+        # For single grid passages, block three cells:
+        # 1. The passage cell itself
+        # 2. The cell in the start room
+        # 3. The cell in the end room
         if len(self._grid_points) == 1:
+            x, y = start_x, start_y
+            
             # Block the passage cell itself
-            grid.mark_blocked(start_x, start_y)
+            grid.mark_blocked(x, y)
             
             # Block cell in start room (using opposite of start direction)
             back_dx, back_dy = self._start_direction.get_back()
-            grid.mark_blocked(start_x + back_dx, start_y + back_dy)
+            grid.mark_blocked(x + back_dx, y + back_dy)
             
-            # Block cell in end room (using opposite of end direction)
-            back_dx, back_dy = self._end_direction.get_back()
-            grid.mark_blocked(start_x + back_dx, start_y + back_dy)
+            # Block cell in end room (using direction of end)
+            dx, dy = self._end_direction.get_forward()
+            grid.mark_blocked(x + dx, y + dy)
         # For longer passages, block endpoints unless dead end
         elif not self._allow_dead_end:
             # Block start position and cell just inside start room
