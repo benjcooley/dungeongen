@@ -75,19 +75,17 @@ class TestPassages:
         print(f"Horizontal passage valid: {is_valid_horizontal}, crossed: {crossed_horizontal}")
 
         # Create and connect passages after validation
-        if is_valid_vertical and not crossed_vertical:
-            vertical_passage = Passage.from_grid_path(vertical_points, RoomDirection.SOUTH, RoomDirection.SOUTH)
-            self.runner.map.add_element(vertical_passage)
-            # Connect vertical passage to rooms
-            room1.connect_to(vertical_passage)
-            room2.connect_to(vertical_passage)
+        vertical_passage = Passage.from_grid_path(vertical_points, RoomDirection.SOUTH, RoomDirection.SOUTH)
+        self.runner.map.add_element(vertical_passage)
+        # Connect vertical passage to rooms
+        room1.connect_to(vertical_passage)
+        room2.connect_to(vertical_passage)
 
-        if is_valid_horizontal and not crossed_horizontal:
-            horizontal_passage = Passage.from_grid_path(horizontal_points, RoomDirection.EAST, RoomDirection.EAST)
-            self.runner.map.add_element(horizontal_passage)
-            # Connect horizontal passage to rooms
-            room3.connect_to(horizontal_passage)
-            room4.connect_to(horizontal_passage)
+        horizontal_passage = Passage.from_grid_path(horizontal_points, RoomDirection.EAST, RoomDirection.EAST)
+        self.runner.map.add_element(horizontal_passage)
+        # Connect horizontal passage to rooms
+        room3.connect_to(horizontal_passage)
+        room4.connect_to(horizontal_passage)
 
         # Finally do the assertions
         assert is_valid_vertical and not crossed_vertical, "Vertical passage should be valid"
