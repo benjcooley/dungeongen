@@ -45,12 +45,11 @@ class TestPassages:
             south_room.get_exit(RoomDirection.NORTH)
         ]
         
-        # First validate and create vertical passage
+        # Check vertical passage
         is_valid_vertical, crossed_vertical = self.runner.map.occupancy.check_passage(
             vertical_points,
             RoomDirection.SOUTH
         )
-        assert is_valid_vertical and not crossed_vertical, "Vertical passage should be valid"
         
         # Create and connect vertical passage
         vertical_passage = Passage.from_grid_path(vertical_points)
@@ -64,15 +63,11 @@ class TestPassages:
             east_room.get_exit(RoomDirection.WEST)
         ]
         
-        # Now validate horizontal passage - should cross vertical
+        # Check horizontal passage
         is_valid_horizontal, crossed_horizontal = self.runner.map.occupancy.check_passage(
             horizontal_points,
             RoomDirection.EAST
         )
-        assert is_valid_horizontal, "Horizontal passage should be valid"
-        assert crossed_horizontal, "Horizontal passage should cross vertical passage"
-        assert len(crossed_horizontal) == 1, "Should cross exactly one passage"
-        assert crossed_horizontal[0] == vertical_passage, "Should cross the vertical passage"
         
         # Create and connect horizontal passage
         horizontal_passage = Passage.from_grid_path(horizontal_points)
@@ -82,6 +77,13 @@ class TestPassages:
         
         # Connect crossing passages
         horizontal_passage.connect_to(vertical_passage)
+
+        # Verify all passage checks after setup is complete
+        assert is_valid_vertical and not crossed_vertical, "Vertical passage should be valid"
+        assert is_valid_horizontal, "Horizontal passage should be valid"
+        assert crossed_horizontal, "Horizontal passage should cross vertical passage"
+        assert len(crossed_horizontal) == 1, "Should cross exactly one passage"
+        assert crossed_horizontal[0] == vertical_passage, "Should cross the vertical passage"
 
     def _test_simple_passages(self) -> None:
         """Test simple linear vertical and horizontal passages."""
@@ -151,6 +153,6 @@ class TestPassages:
         room3.connect_to(horizontal_passage)
         room4.connect_to(horizontal_passage)
 
-        # Finally do the assertions
+        # Do assertions after all elements are added
         assert is_valid_vertical and not crossed_vertical, "Vertical passage should be valid"
         assert is_valid_horizontal and not crossed_horizontal, "Horizontal passage should be valid"
