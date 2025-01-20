@@ -776,15 +776,16 @@ class OccupancyGrid:
                         return False, self._crossed_passages[:cross_count]
 
             # Normal point validation (must be last)
-            if not probe.check_left_empty():
-                if debug_enabled:
-                    probe.add_debug_grid(ProbeDirection.LEFT, False)
-                return False, self._crossed_passages[:cross_count]
-                
-            if not probe.check_right_empty():
-                if debug_enabled:
-                    probe.add_debug_grid(ProbeDirection.RIGHT, False)
-                return False, self._crossed_passages[:cross_count]
+            else:
+                if not probe.check_left_empty():
+                    if debug_enabled:
+                        probe.add_debug_grid(ProbeDirection.LEFT, False)
+                    return False, self._crossed_passages[:cross_count]
+                    
+                if not probe.check_right_empty():
+                    if debug_enabled:
+                        probe.add_debug_grid(ProbeDirection.RIGHT, False)
+                    return False, self._crossed_passages[:cross_count]
             
             # Track valid point
             if debug_enabled:
