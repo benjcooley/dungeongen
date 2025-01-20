@@ -100,6 +100,10 @@ class ProbeDirection(Enum):
         else:
             return ProbeDirection.FORWARD
         
+    def get_offset(self) -> tuple[int, int]:
+        """Get the (dx, dy) grid offset for this direction."""
+        return _DIRECTION_OFFSETS[self.value]
+
     def relative_offset_from(self, facing: RoomDirection) -> tuple[int, int]:
         """Get grid offsets for this probe direction relative to this facing direction.
         
