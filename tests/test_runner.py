@@ -165,13 +165,13 @@ class TestRunner:
         transform = self.map._calculate_default_transform(self.options.canvas_width, self.options.canvas_height)
         
         # Draw the map with transform
-        map.render(canvas, transform)
+        self.map.render(canvas, transform)
         
         # Debug draw the occupancy grid with same transform
         debug_draw_init(canvas)
         canvas.save()
         canvas.concat(transform)
-        map.occupancy.draw_debug(canvas)
+        self.map.occupancy.draw_debug(canvas)
         canvas.restore()
         
         # Save visualization

@@ -21,6 +21,7 @@ def main():
         from tests.test_runner import get_runner
         # Get singleton test runner and run tests
         runner = get_runner()
+        runner.setup(tags={TestTags.BASIC})
         runner.run_tests({TestTags.BASIC})
         return
 
