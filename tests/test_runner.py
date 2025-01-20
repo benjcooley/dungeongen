@@ -103,6 +103,13 @@ class TestRunner:
         tests_run = 0
         print("\nRunning passage tests...")
         
+        # Create visualization surface
+        surface = skia.Surface(800, 600)
+        canvas = surface.getCanvas()
+        canvas.clear(skia.Color(255, 255, 255))
+        
+        failures = []
+        
         # Run each test method if its tags match
         for method in test_methods:
             test_func = getattr(passage_tests, method)
@@ -110,11 +117,35 @@ class TestRunner:
             
             # Run test if tags match
             if TestTags.ALL in tags or any(tag in tags for tag in test_tags):
-                print(f"Running test: {method}")
-                test_func()
+                print(f"\nRunning test: {method}")
+                try:
+                    test_func()
+                except AssertionError as e:
+                    print(f"FAILED: {str(e)}")
+                    failures.append((method, str(e)))
+                except Exception as e:
+                    print(f"ERROR: {str(e)}")
+                    failures.append((method, str(e)))
                 tests_run += 1
+                
+                # Draw debug visualization after each test
+                self.map.render(canvas)
+                if debug_draw.is_enabled(DebugDrawFlags.PASSAGE_CHECK):
+                    self.map.occupancy.draw_debug(canvas)
         
-        print(f"\nPassageTests tests run: {tests_run}")
+        # Save visualization
+        image = surface.makeImageSnapshot()
+        image.save('test_output.png', skia.kPNG)
+        
+        # Print summary
+        print(f"\nPassageTests summary:")
+        print(f"Tests run: {tests_run}")
+        if failures:
+            print(f"Failures: {len(failures)}")
+            for test, error in failures:
+                print(f"  {test}: {error}")
+        else:
+            print("All tests passed!")
 
 def get_runner() -> TestRunner:
     """Get the singleton test runner instance."""

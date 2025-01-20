@@ -55,10 +55,13 @@ class TestPassages:
             RoomDirection.SOUTH
         )
         print(f"Vertical passage valid: {is_valid}, crossed: {crossed}")
+        assert is_valid and not crossed, "Vertical passage should be valid"
         
         # Test horizontal passage
         is_valid, crossed = self.runner.map.occupancy.check_passage(
             horizontal_points,
-            RoomDirection.EAST
+            RoomDirection.EAST,
+            allow_dead_end=True
         )
         print(f"Horizontal passage valid: {is_valid}, crossed: {crossed}")
+        assert is_valid and not crossed, "Horizontal passage should be valid"
