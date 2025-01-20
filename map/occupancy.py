@@ -164,8 +164,15 @@ class GridProbe:
         self.grid = grid
         self.x = x
         self.y = y
+        
+        # Validate facing is a cardinal direction
+        if facing.value % 2 != 0:  # Odd values are diagonal
+            raise ValueError("GridProbe facing must be a cardinal direction (NORTH, EAST, SOUTH, WEST)")
         self._facing = facing
-        self._dx, self._dy = self._facing.get_offset()
+        
+        # Convert to probe direction to get offset
+        probe_dir = ProbeDirection(facing.value)
+        self._dx, self._dy = probe_dir.get_offset()
         self._debug_points = debug_points
         
     @property
@@ -176,6 +183,10 @@ class GridProbe:
     @facing.setter 
     def facing(self, value: RoomDirection) -> None:
         """Set the facing direction and update cached offsets."""
+        # Validate facing is a cardinal direction
+        if value.value % 2 != 0:  # Odd values are diagonal
+            raise ValueError("GridProbe facing must be a cardinal direction (NORTH, EAST, SOUTH, WEST)")
+            
         if value != self._facing:
             self._facing = value
             # Convert to probe direction to get offset
