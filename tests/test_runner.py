@@ -51,6 +51,7 @@ class TestRunner:
         debug_draw.enable(DebugDrawFlags.PASSAGE_CHECK)
         self.test_cases = []
         self.current_case = 0
+        self.tags = tags
         
     def add_test_case(self, number: int, name: str, description: str,
                       location: Tuple[int, int], text_offset: Tuple[int, int]) -> None:
@@ -110,7 +111,7 @@ class TestRunner:
             canvas.drawTextBlob(title_blob, x, y, text_paint)
             canvas.drawTextBlob(desc_blob, x, y + 60, text_paint)
             
-    def run_tests(self, tags: Set[TestTags] = {TestTags.ALL}) -> None:
+    def run_tests(self, tags: Set[TestTags] | None = None) -> None:
         """Run all test cases matching the given tags.
         
         Args:
@@ -142,7 +143,9 @@ class TestRunner:
             test_tags = getattr(test_func, 'tags', {TestTags.ALL})
             
             # Run test if tags match
-            if TestTags.ALL in tags or any(tag in tags for tag in test_tags):
+            test_tags = getattr(test_func, 'tags', {TestTags.ALL})
+            run_tags = tags if tags is not None else self.tags
+            if TestTags.ALL in run_tags or any(tag in run_tags for tag in test_tags):
                 from rich import print as rprint
                 
                 rprint(f"\n[bold]Running test:[/bold] {method}")
