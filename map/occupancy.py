@@ -668,14 +668,14 @@ class OccupancyGrid:
             self._debug_passage_points.clear()
         
         # Reuse a single probe for all checks
-        probe = GridProbe(self, 0, 0, facing=self._room_to_probe_dir(start_direction),
+        # For passage validation, treat NORTH as forward
+        probe = GridProbe(self, 0, 0, facing=ProbeDirection.FORWARD,
                          debug_points=self._debug_passage_points if debug_enabled else None)
         
         # Handle single point case efficiently 
         if len(points) == 1:
             x, y = points[0]
-            return self._check_single_point(x, y, self._room_to_probe_dir(start_direction), 
-                                         allow_dead_end, debug_enabled), []
+            return self._check_single_point(x, y, allow_dead_end, debug_enabled), []
             
         # Expand corner points into full grid point sequence
         self._point_count = self._expand_passage_points(points)
@@ -847,8 +847,8 @@ class OccupancyGrid:
             
         return points_count
 
-    def _check_single_point(self, x: int, y: int, direction: ProbeDirection, 
-                           allow_dead_end: bool = False, debug_enabled: bool = False) -> bool:
+    def _check_single_point(self, x: int, y: int, allow_dead_end: bool = False, 
+                           debug_enabled: bool = False) -> bool:
         """Check if a single point passage is valid.
         
         Single point passages must have:
@@ -856,7 +856,8 @@ class OccupancyGrid:
         - Empty spaces on both sides
         - Room/passage ahead (unless allow_dead_end=True)
         """
-        probe = GridProbe(self, x, y, facing=direction)
+        # For single point validation, treat NORTH as forward
+        probe = GridProbe(self, x, y, facing=ProbeDirection.FORWARD)
         
         # Quick checks in order of likelihood
         if not probe.check_left_empty():
@@ -886,16 +887,6 @@ class OccupancyGrid:
             probe.add_debug_grid(probe.facing, True)
         return True
 
-    def _room_to_probe_dir(self, direction: RoomDirection) -> ProbeDirection:
-        """Convert RoomDirection to ProbeDirection."""
-        direction_map = {
-            RoomDirection.NORTH: ProbeDirection.FORWARD,
-            RoomDirection.SOUTH: ProbeDirection.BACK,
-            RoomDirection.EAST: ProbeDirection.RIGHT,
-            RoomDirection.WEST: ProbeDirection.LEFT
-        }
-        return direction_map[direction]
-        
     @staticmethod
     def get_direction_between_points(x1: int, y1: int, x2: int, y2: int) -> Optional[RoomDirection]:
         """Get the RoomDirection from point 1 to point 2.
