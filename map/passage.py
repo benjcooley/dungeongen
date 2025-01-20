@@ -65,10 +65,8 @@ class Passage(MapElement):
                 x2, y2 = grid_points[1]
                 # For start, use direction FROM first point TO second point
                 self._start_direction = RoomDirection.from_delta(x2 - x1, y2 - y1)
-                print(f"Computed start direction: {self._start_direction} from ({x1},{y1}) to ({x2},{y2})")
             else:
                 self._start_direction = start_direction
-                print(f"Using provided start direction: {self._start_direction}")
                 
             # Determine end direction from last two points if not provided
             if end_direction is None:
@@ -76,22 +74,16 @@ class Passage(MapElement):
                 x2, y2 = grid_points[-2]  # And look back to previous point
                 # For end, compute direction FROM end point looking BACK to previous point
                 self._end_direction = RoomDirection.from_delta(x2 - x1, y2 - y1)
-                print(f"Computed end direction: {self._end_direction} from ({x1},{y1}) to ({x2},{y2})")
             else:
                 self._end_direction = end_direction
-                print(f"Using provided end direction: {self._end_direction}")
         
         # Create passage shape
         if len(grid_points) == 2:
             # For straight passages, use a single rectangle
             x1, y1 = grid_points[0]
             x2, y2 = grid_points[1]
-            print(f"Grid points: ({x1},{y1}) to ({x2},{y2})")
             x, y, width, height = grid_points_to_map_rect(x1, y1, x2, y2)
-            print(f"Map rect: x={x}, y={y}, w={width}, h={height}")
-            print(f"Creating Rectangle with: x={x}, y={y}, width={width}, height={height}")
             shape = Rectangle(x, y, width, height)
-            print(f"Created shape: {shape}")
         else:
             # For passages with corners, create shapes for each straight section
             shapes = []
