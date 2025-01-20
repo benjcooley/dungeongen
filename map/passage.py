@@ -320,7 +320,16 @@ class Passage(MapElement):
             
         # Mark start and end points as blocked unless dead end
         if not self._allow_dead_end:
-            grid.mark_cell(self._grid_points[0][0], self._grid_points[0][1], 
+            # Get the cell just inside each room by using the opposite of passage direction
+            start_x, start_y = self._grid_points[0]
+            end_x, end_y = self._grid_points[-1]
+            
+            # For start point, use opposite of start direction to get cell inside room
+            back_dx, back_dy = self._start_direction.get_back()
+            grid.mark_cell(start_x + back_dx, start_y + back_dy,
                          ElementType.PASSAGE, element_idx, blocked=True)
-            grid.mark_cell(self._grid_points[-1][0], self._grid_points[-1][1],
+            
+            # For end point, use opposite of end direction to get cell inside room  
+            back_dx, back_dy = self._end_direction.get_back()
+            grid.mark_cell(end_x + back_dx, end_y + back_dy,
                          ElementType.PASSAGE, element_idx, blocked=True)
