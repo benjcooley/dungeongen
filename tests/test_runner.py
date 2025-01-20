@@ -101,7 +101,8 @@ class TestRunner:
                        if method.startswith('test_') and callable(getattr(passage_tests, method))]
         
         tests_run = 0
-        print("\nRunning passage tests...")
+        from rich import print as rprint
+        rprint("\n[bold blue]Running passage tests...[/bold blue]")
         
         # Create visualization surface
         surface = skia.Surface(800, 600)
@@ -117,14 +118,17 @@ class TestRunner:
             
             # Run test if tags match
             if TestTags.ALL in tags or any(tag in tags for tag in test_tags):
-                print(f"\nRunning test: {method}")
+                from rich import print as rprint
+                
+                rprint(f"\n[bold]Running test:[/bold] {method}")
                 try:
                     test_func()
+                    rprint(f"[green]PASSED ✅[/green]")
                 except AssertionError as e:
-                    print(f"FAILED: {str(e)}")
+                    rprint(f"[red]FAILED ❌: {str(e)}[/red]")
                     failures.append((method, str(e)))
                 except Exception as e:
-                    print(f"ERROR: {str(e)}")
+                    rprint(f"[red]ERROR ❌: {str(e)}[/red]")
                     failures.append((method, str(e)))
                 tests_run += 1
                 
@@ -137,15 +141,23 @@ class TestRunner:
         image = surface.makeImageSnapshot()
         image.save('test_output.png', skia.kPNG)
         
-        # Print summary
-        print(f"\nPassageTests summary:")
-        print(f"Tests run: {tests_run}")
+        # Print summary using rich
+        from rich import print as rprint
+        from rich.panel import Panel
+        from rich.text import Text
+
+        summary = []
+        summary.append(Text("\nPassageTests Summary", style="bold"))
+        summary.append(f"Tests run: {tests_run}")
+        
         if failures:
-            print(f"Failures: {len(failures)}")
+            summary.append(Text(f"\nFailures: {len(failures)} ❌", style="red bold"))
             for test, error in failures:
-                print(f"  {test}: {error}")
+                summary.append(Text(f"  • {test}: {error}", style="red"))
         else:
-            print("All tests passed!")
+            summary.append(Text("\nAll tests passed! ✅", style="green bold"))
+            
+        rprint(Panel.fit("\n".join(str(line) for line in summary)))
 
 def get_runner() -> TestRunner:
     """Get the singleton test runner instance."""
