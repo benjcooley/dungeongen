@@ -54,7 +54,15 @@ class TestPassages:
         # Create horizontal passage points (just start and end)
         horizontal_points = [(ox + 8, oy + 4), (ox + 10, oy + 4)]  # Shortened to avoid overlap
         
-        # Test and create vertical passage
+        # Create vertical passage
+        vertical_passage = Passage.from_grid_path(vertical_points, RoomDirection.SOUTH, RoomDirection.SOUTH)
+        self.runner.map.add_element(vertical_passage)
+
+        # Create horizontal passage
+        horizontal_passage = Passage.from_grid_path(horizontal_points, RoomDirection.EAST, RoomDirection.EAST)
+        self.runner.map.add_element(horizontal_passage)
+
+        # Now validate the passages
         print("\nChecking vertical passage...")
         print(f"Start point: {vertical_points[0]}")
         print(f"End point: {vertical_points[1]}")
@@ -67,11 +75,7 @@ class TestPassages:
         print(f"Vertical passage valid: {is_valid}, crossed: {crossed}")
         assert is_valid and not crossed, "Vertical passage should be valid"
         
-        if is_valid:
-            passage = Passage.from_grid_path(vertical_points, RoomDirection.SOUTH, RoomDirection.SOUTH)
-            self.runner.map.add_element(passage)
-        
-        # Test and create horizontal passage
+        # Check horizontal passage
         is_valid, crossed = self.runner.map.occupancy.check_passage(
             horizontal_points,
             RoomDirection.EAST,
@@ -79,7 +83,3 @@ class TestPassages:
         )
         print(f"Horizontal passage valid: {is_valid}, crossed: {crossed}")
         assert is_valid and not crossed, "Horizontal passage should be valid"
-        
-        if is_valid:
-            passage = Passage.from_grid_path(horizontal_points, RoomDirection.EAST, RoomDirection.EAST)
-            self.runner.map.add_element(passage)
