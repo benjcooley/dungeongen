@@ -183,84 +183,13 @@ class Passage(MapElement):
         points.append(end)
         return points
 
-        def _unused_subdivide_run(start_pt: tuple[int, int], end_pt: tuple[int, int]) -> list[tuple[int, int]]:
-            """Subdivide a straight run into smaller segments."""
-            x1, y1 = start_pt
-            x2, y2 = end_pt
-            
-            # Calculate run length
-            run_length = abs(x2 - x1) if x1 != x2 else abs(y2 - y1)
-            
-            # If run is too short for subdivision, return endpoints
-            if run_length < 2 * min_segment_length:
-                return [start_pt, end_pt]
-            
-            # Get unit direction vector
-            dx = 1 if x2 > x1 else -1 if x2 < x1 else 0
-            dy = 1 if y2 > y1 else -1 if y2 < y1 else 0
-            
-            points = [start_pt]
-            curr_x, curr_y = x1, y1
-            remaining = run_length
-            subdivisions = 0
-            
-            while remaining >= 2 * min_segment_length and subdivisions < max_subdivisions:
-                # Choose random length for this segment
-                d = random.randint(min_segment_length, remaining - min_segment_length)
-                
-                # Move in current direction
-                curr_x += dx * d
-                curr_y += dy * d
-                points.append((curr_x, curr_y))
-                
-                remaining -= d
-                subdivisions += 1
-            
-            # Add final point if not at end
-            if (curr_x, curr_y) != end_pt:
-                points.append(end_pt)
-                
-            return points
-
-        # Determine intermediate points based on directions
-        corner_points = []
+        # Convert bend positions to grid points
+        points = [start]
+        current = start
         
-        # For parallel but opposite directions (zig-zag)
-        if start_direction.is_parallel(end_direction):
-            # Calculate offset for middle section
-            offset = 2 * min_segment_length
-            
-            # Add two corners to create zig-zag
-            if start_direction in (RoomDirection.NORTH, RoomDirection.SOUTH):
-                mid_x = min(sx, ex) + offset if start_direction == RoomDirection.EAST else max(sx, ex) - offset
-                corner_points = [(mid_x, sy), (mid_x, ey)]
-            else:
-                mid_y = min(sy, ey) + offset if start_direction == RoomDirection.SOUTH else max(sy, ey) - offset
-                corner_points = [(sx, mid_y), (ex, mid_y)]
-                
-        # For perpendicular directions (L-shape)
-        elif start_direction.is_perpendicular(end_direction):
-            # Add single corner point
-            corner_x, corner_y = sx, sy
-            if start_direction in (RoomDirection.NORTH, RoomDirection.SOUTH):
-                corner_y = ey
-            else:
-                corner_x = ex
-            corner_points = [(corner_x, corner_y)]
-            
-        # Subdivide each straight run
-        points = []
-        prev_point = start
+        # TODO: Implement grid point generation from bend positions
         
-        # Process each segment including final run to end point
-        for corner in corner_points + [end]:
-            segment = subdivide_run(prev_point, corner)
-            points.extend(segment[:-1])  # Don't add corner yet
-            prev_point = corner
-            
-        # Add final point
         points.append(end)
-        
         return points
 
     @staticmethod
