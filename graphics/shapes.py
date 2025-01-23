@@ -1,17 +1,16 @@
 """Shape definitions for the crosshatch pattern generator."""
 
+from abc import ABC
 import math
 import skia
-from typing import List, Optional, Protocol, Sequence, TypeAlias
+from typing import Any, List, Optional, Protocol, Sequence, TypeAlias
 from graphics.aliases import Point
 from graphics.math import Matrix2D
 from graphics.rotation import Rotation
 from constants import CELL_SIZE
 
-# Forward declaration of Rectangle type
-Rectangle: TypeAlias = 'Rectangle'
+class Shape(ABC):
 
-class Shape(Protocol):
     """Protocol defining the interface for shapes."""
     @property
     def inflate(self) -> float:
@@ -76,19 +75,8 @@ class Shape(Protocol):
     def is_valid(self) -> bool:
         """Check if this shape is valid and can be rendered."""
         ...
-        
-    def intersects(self, other: 'Shape') -> bool:
-        """Check if this shape intersects with another shape.
-        
-        Args:
-            other: Another shape to test intersection with
-            
-        Returns:
-            True if the shapes intersect, False otherwise
-        """
-        ...
 
-class ShapeGroup:
+class ShapeGroup(Shape):
     """A group of shapes that can be combined to create complex shapes."""
     
     def __init__(self, includes: Sequence[Shape], excludes: Sequence[Shape]) -> None:
@@ -96,6 +84,7 @@ class ShapeGroup:
         self.excludes = list(excludes)
         self._bounds: Rectangle | None = None
         self._bounds_dirty = True
+        self._cached_path: skia.Path | None = None
         self._inflate: float = 0.0
 
     @property
@@ -191,7 +180,7 @@ class ShapeGroup:
         else:  # angle == 270, Bottom half (exclude top)
             rect = Rectangle(cx - rect_size, cy - rect_size, rect_size * 2, rect_size)
             
-        return cls(includes=[circle], excludes=[rect])
+        return cls(includes=[circle], excludes=[rect]) #type: ignore
     
     def contains(self, px: float, py: float) -> bool:
         """Check if a point is contained within this shape group."""
@@ -199,14 +188,6 @@ class ShapeGroup:
             any(shape.contains(px, py) for shape in self.includes) and
             not any(shape.contains(px, py) for shape in self.excludes)
         )
-    
-    def __init__(self, includes: Sequence[Shape], excludes: Sequence[Shape]) -> None:
-        self.includes = list(includes)
-        self.excludes = list(excludes)
-        self._bounds: Rectangle | None = None
-        self._bounds_dirty = True
-        self._cached_path: skia.Path | None = None
-        self._inflate: float = 0.0
         
     @property
     def path(self) -> skia.Path:
@@ -319,11 +300,6 @@ class ShapeGroup:
         return len(self.includes) > 0
         
     def intersects(self, other: 'Shape') -> bool:
-        """Check if this shape group intersects with another shape."""
-        from algorithms.intersections import shape_group_intersect
-        return shape_group_intersect(self, other)
-        
-    def intersects(self, other: 'Shape') -> bool:
         """Test if this shape group intersects with another shape."""
         # Get bounds once to avoid recursion
         my_bounds = self.bounds
@@ -340,15 +316,15 @@ class ShapeGroup:
         return shape_intersects(self, other)
     
     @property
-    def bounds(self) -> Rectangle:
+    def bounds(self) -> 'Rectangle':
         """Get the current bounding rectangle, recalculating if needed."""
         if not self.is_valid:
             return Rectangle(0, 0, 0, 0)
         if self._bounds_dirty or self._bounds is None:
             self._recalculate_bounds()
-        return self._bounds
+        return self._bounds or Rectangle(0, 0, 0, 0)
 
-class Rectangle:
+class Rectangle(Shape):
     """A rectangle that can be inflated to create a rounded rectangle effect.
     
     When inflated, the rectangle's corners become rounded with radius equal to
@@ -380,26 +356,6 @@ class Rectangle:
         
     def __str__(self) -> str:
         return f"Rectangle(x={self.x:.1f}, y={self.y:.1f}, w={self.width:.1f}, h={self.height:.1f})"
-
-    @property
-    def inflate(self) -> float:
-        """Get the inflation amount for this rectangle."""
-        return self._inflate
-
-    @property
-    def inflated(self) -> 'Rectangle':
-        """Return a new Rectangle instance with the inflated dimensions.
-        
-        Note: The inflated rectangle effectively becomes a rounded rectangle,
-        where the corner radius equals the inflation amount. This is because
-        the contains() method uses a distance check that creates rounded corners.
-        """
-        return Rectangle(
-            self._inflated_x,
-            self._inflated_y,
-            self._inflated_width,
-            self._inflated_height
-        )
 
     def contains(self, px: float, py: float) -> bool:
         """Check if a point is contained within this rectangle.
@@ -443,7 +399,7 @@ class Rectangle:
         if self._cached_path is None:
             self._cached_path = skia.Path()
             if self._inflate > 0:
-                self._cached_path.addRRect(
+                self._cached_path.addRRect( #type: ignore
                     skia.RRect.MakeRectXY(
                         skia.Rect.MakeXYWH(
                             self._inflated_x,
@@ -456,7 +412,7 @@ class Rectangle:
                     )
                 )
             else:
-                self._cached_path.addRect(
+                self._cached_path.addRect( #type: ignore
                     skia.Rect.MakeXYWH(
                         self._inflated_x,
                         self._inflated_y,
@@ -515,7 +471,7 @@ class Rectangle:
         center_y = self.y + self.height / 2
         
         # Get rotation angle in radians
-        angle = math.pi * rotation / 180
+        angle = math.pi * rotation / 180 #type: ignore
             
         # Rotate center point around origin
         new_center_x = center_x * math.cos(angle) - center_y * math.sin(angle)
@@ -667,6 +623,10 @@ class Rectangle:
         """Test if this rectangle intersects with another shape."""
         return shape_intersects(self, other)
     
+    def intersection(self, other: 'Rectangle') -> 'Rectangle':
+        """Get the intersection of this rectangle with another rectangle."""
+        return rect_rect_intersection(self, other)
+
     @classmethod
     def centered_grid(cls, grid_width: float, grid_height: float) -> 'Rectangle':
         """Create a rectangle centered at (0,0) with dimensions in grid units.
@@ -702,12 +662,14 @@ class Rectangle:
             return cls(center_x - height / 2, center_y - width / 2, height, width, inflate)
         return cls(center_x - width / 2, center_y - height / 2, width, height, inflate)
 
-class Circle:
+class Circle(Shape):
     def __init__(self, cx: float, cy: float, radius: float, inflate: float = 0) -> None:
         self.cx = cx
         self.cy = cy
         self.radius = radius  # Original radius
         self._inflate = inflate
+        self._inflated_radius = radius + inflate
+        self._cached_path: Any = None
         
     def __str__(self) -> str:
         return f"Circle(cx={self.cx:.1f}, cy={self.cy:.1f}, r={self.radius:.1f})"
@@ -716,11 +678,6 @@ class Circle:
     def inflate(self) -> float:
         """Get the inflation amount for this circle."""
         return self._inflate
-
-    @property
-    def inflated(self) -> 'Circle':
-        """Return a new Circle instance with the inflated radius."""
-        return Circle(self.cx, self.cy, self._inflated_radius)
 
     def contains(self, px: float, py: float) -> bool:
         return math.sqrt((px - self.cx)**2 + (py - self.cy)**2) <= self._inflated_radius
@@ -746,14 +703,6 @@ class Circle:
             self._inflated_radius * 2
         )
     
-    def __init__(self, cx: float, cy: float, radius: float, inflate: float = 0) -> None:
-        self.cx = cx
-        self.cy = cy
-        self.radius = radius  # Original radius
-        self._inflate = inflate
-        self._inflated_radius = radius + inflate
-        self._cached_path: skia.Path | None = None
-        
     @property
     def path(self) -> skia.Path:
         """Get the cached Skia path for this circle."""

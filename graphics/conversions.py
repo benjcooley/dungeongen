@@ -1,8 +1,8 @@
 """Utility functions for converting between grid and drawing coordinates."""
 
-from typing import Tuple, TYPE_CHECKING
+from typing import TYPE_CHECKING
 
-from altair import Point
+from graphics.aliases import Point
 from constants import CELL_SIZE
 import math
 from graphics.shapes import Rectangle

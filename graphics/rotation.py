@@ -20,11 +20,11 @@ class Rotation:
         rot = Rotation.from_radians(math.pi/4)  # 45 degrees
     """
     
-    # Cardinal direction constants
-    ROT_0 = None  # Will be set after class definition
-    ROT_90 = None
-    ROT_180 = None
-    ROT_270 = None
+    # Cardinal direction constants (set after class def)
+    ROT_0: 'Rotation' = None  # type: ignore
+    ROT_90: 'Rotation' = None  # type: ignore
+    ROT_180: 'Rotation' = None  # type: ignore
+    ROT_270: 'Rotation' = None  # type: ignore
     
     def __init__(self, degrees: float) -> None:
         """Initialize with angle in degrees.

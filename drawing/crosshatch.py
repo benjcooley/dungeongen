@@ -162,10 +162,9 @@ def draw_crosshatches(
     # Sample points
     points = sampler.sample()
     
-    # Calculate center point
+    # Calculate center point (infer shape center if not provided)
     if hasattr(shape, 'x') and hasattr(shape, 'width') and hasattr(shape, 'y') and hasattr(shape, 'height'):
-        center_point = (shape.x + shape.width / 2,
-                       shape.y + shape.height / 2)
+        center_point = (shape.x + shape.width / 2, shape.y + shape.height / 2) #type: ignore
     else:
         center_point = (options.canvas_width / 2, options.canvas_height / 2)
     

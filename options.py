@@ -5,6 +5,8 @@ from dataclasses import dataclass, field
 from typing import Set
 from map.enums import GridStyle
 
+_invalid_options: 'Options'
+
 @dataclass
 class Options:
     """Configuration options for the crosshatch pattern generator."""
@@ -76,4 +78,13 @@ class Options:
     border_width: float = 6.0  # Width of region borders in pixels
     door_stroke_width: float = 4.0  # Width of door border strokes (2/3 of border_width)
     map_border_cells: float = 4.0  # Number of cells padding around the map
+
+    @staticmethod
+    def get_invalid_options() -> 'Options':
+        return _invalid_options
     
+    @property
+    def is_invalid(self) -> bool:
+        return self == _invalid_options
+
+_invalid_options = Options()

@@ -193,9 +193,9 @@ class Room(MapElement):
             grid: The occupancy grid to mark
             element_idx: Index of this element in the map
         """
-        grid.mark_rectangle(self._shape, ElementType.ROOM, element_idx)
+        grid.mark_rectangle(self._shape, ElementType.ROOM, element_idx) #type: ignore
 
-    def get_exit(self, direction: RoomDirection, wall_pos: float = 0.5, align_to: Point = None) -> Tuple[int, int]:
+    def get_exit(self, direction: RoomDirection, wall_pos: float = 0.5, align_to: Optional[Point] = None) -> Tuple[int, int]:
         """Get a grid position for exiting this room in the given direction.
         
         Args:

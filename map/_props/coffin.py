@@ -2,9 +2,11 @@
 
 import skia
 from typing import TYPE_CHECKING
+from graphics.shapes import Rectangle
 from map._props.prop import Prop, PropType #type: ignore
 from graphics.rotation import Rotation
 from graphics.conversions import grid_to_map
+from map.enums import Layers
 
 if TYPE_CHECKING:
     from map.map import Map
@@ -14,9 +16,11 @@ COFFIN_PROP_TYPE = PropType(is_decoration=True)
 class Coffin(Prop):
     """A coffin-shaped prop with nested polygons."""
     
-    def draw(self, canvas: skia.Canvas) -> None:
-        canvas.save()
-        self._apply_rotation(canvas)  # Apply rotation transform
+    def _draw_content(self, canvas: skia.Canvas, bounds: Rectangle, layer: Layers) -> None:
+        """Draw the coffin shape."""
+        if layer != Layers.PROPS:
+            return
+
         """Draw the coffin shape."""
         # Calculate points for outer coffin shape
         x, y = self._bounds.x, self._bounds.y

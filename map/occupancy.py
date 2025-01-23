@@ -75,20 +75,17 @@ class ProbeDirection(Enum):
         """Return the opposite direction."""
         return ProbeDirection((self.value + 4) % 8)
         
-    def get_turn_direction(self, next_dir: 'ProbeDirection') -> Optional['ProbeDirection']:
+    @staticmethod
+    def get_turn_direction(prev_dir: RoomDirection, next_dir: RoomDirection) -> Optional['ProbeDirection']:
         """Get the turn direction from this direction to next_dir.
         
         Returns:
             ProbeDirection.RIGHT for right turns
             ProbeDirection.LEFT for left turns
+            ProbeDirection.BACK for 180-degree turns
             None if directions are the same or opposite
         """
-        diff = (next_dir.value - self.value) % 8
-        if diff == 2:
-            return ProbeDirection.RIGHT
-        elif diff == 6:
-            return ProbeDirection.LEFT
-        return None
+        return ProbeDirection((next_dir.value - prev_dir.value + 8) % 8)
         
     @staticmethod
     def from_delta(dx: int, dy: int) -> 'ProbeDirection':
@@ -116,7 +113,7 @@ class ProbeDirection(Enum):
             the dx, dy offsets of the probe direction relative to the facing direction
         """
         # Add facing value to get rotated direction
-        return _DIRECTION_OFFSETS[(self.value + facing) % 8]
+        return _DIRECTION_OFFSETS[(self.value + facing.value) % 8]
 
 @dataclass
 class ProbeResult:
@@ -287,7 +284,7 @@ class GridProbe:
             is_valid: Whether this point passed validation
         """
         if direction:
-            dx, dy = _DIRECTION_OFFSETS[(self.facing + direction.value) % 8]
+            dx, dy = _DIRECTION_OFFSETS[(self.facing.value + direction.value) % 8]
             self.grid._debug_passage_points.append(
                 PassageCheckPoint(self.x + dx, self.y + dy, direction, is_valid)
             )
@@ -604,7 +601,7 @@ class OccupancyGrid:
         return True
 
     def check_passage(self, points: list[tuple[int, int]], start_direction: RoomDirection, 
-                     allow_dead_end: bool = False) -> tuple[bool, list[int]]:
+                     allow_dead_end: bool = False) -> tuple[bool, list[Tuple[int, int, int]]]:
         """Check if a passage can be placed along a series of grid points.
         
         This is a performance-critical method used frequently during dungeon generation.
@@ -688,12 +685,12 @@ class OccupancyGrid:
         print(f"\nExpanded {len(points)} points into {self._point_count} grid points")
 
         # Process each point
-        prev_direction = None
+        curr_direction = prev_direction = start_direction
         for i in range(self._point_count):
             idx = i * 3
             probe.x = int(self._points[idx])
             probe.y = int(self._points[idx + 1])
-            curr_direction = int(self._points[idx + 2])
+            curr_direction = RoomDirection(self._points[idx + 2])
             probe.facing = curr_direction
             
             # Quick check for blocked cells first - must be at top
@@ -719,13 +716,12 @@ class OccupancyGrid:
             
             # Check if corner (direction changes from previous point)
             if i > 0 and curr_direction != prev_direction:
-                turn = prev_direction.get_turn_direction(curr_direction)
+                turn = ProbeDirection.get_turn_direction(prev_direction,curr_direction)
                 # Fail if not a valid 90-degree turn (no backtracking)
-                if not turn:
+                if turn != ProbeDirection.LEFT and turn != ProbeDirection.RIGHT:
                     if debug_enabled:
                         # For invalid turns, mark both positions
-                        probe.add_debug_grid(prev_direction, False)
-                        probe.add_debug_grid(curr_direction, False)
+                        probe.add_debug_grid(turn, False)
                     return False, self._crossed_passages[:cross_count]
                     
                 # When turning, we need to check the cells in the direction of the turn
@@ -743,13 +739,14 @@ class OccupancyGrid:
                         self._crossed_passages[cross_count] = (probe.x, probe.y, result.element_idx)
                         cross_count += 1
                         if debug_enabled:
-                            probe.add_debug_grid(probe.facing, False)
+                            probe.add_debug_grid(turn, False)
                         return False, self._crossed_passages[:cross_count]
                     if not probe.check_direction_empty(direction):
                         if debug_enabled:
                             probe.add_debug_grid(direction, False)
                         return False, self._crossed_passages[:cross_count]
                         
+                prev_direction = curr_direction
                 continue
 
             # Check and track passage crossings with position
@@ -878,25 +875,25 @@ class OccupancyGrid:
         # Quick checks in order of likelihood
         if not probe.check_left_empty():
             if debug_enabled:
-                probe.add_debug_grid(probe.facing.turn_left(), False)
+                probe.add_debug_grid(ProbeDirection.LEFT, False)
             return False
             
         if not probe.check_right_empty():
             if debug_enabled:
-                probe.add_debug_grid(probe.facing.turn_right(), False)
+                probe.add_debug_grid(ProbeDirection.RIGHT, False)
             return False
             
         back = probe.check_backward()
         if not (back.is_room or back.is_passage):
             if debug_enabled:
-                probe.add_debug_grid(probe.facing.turn_around(), False)
+                probe.add_debug_grid(ProbeDirection.BACK, False)
             return False
             
         if not allow_dead_end:
             forward = probe.check_forward()
             if not (forward.is_room or forward.is_passage):
                 if debug_enabled:
-                    probe.add_debug_grid(probe.facing, False)
+                    probe.add_debug_grid(ProbeDirection.BACK, False)
                 return False
         
         if debug_enabled:

@@ -22,15 +22,15 @@ def main():
         # Get singleton test runner and run specific test
         runner = get_runner()
         runner.setup(tags={TestTags.BASIC})
-        runner.run_tests() # run_tests(test_names=["test_one_grid_passages"])
+        runner.run_tests() # (test_names=["test_simple_passages"])
         return
 
     # Enable debug visualization and logging
     debug_draw.enable(DebugDrawFlags.OCCUPANCY, DebugDrawFlags.ELEMENT_NUMBERS)
     logger.enable_tags(LogTags.GENERATION, LogTags.ARRANGEMENT, LogTags.OCCUPANCY)
     logger.set_level(7)
-    logger.debug_enabled = True
-    logger.log_to_console = True  # Ensure console output is enabled
+    logger.debug_enabled = True # type: ignore
+    logger.log_to_console = True  # type: ignore
 
     # Get seed from environment variable or use default
     # seed = random.randint(1, 400000) 

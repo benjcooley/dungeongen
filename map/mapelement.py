@@ -6,14 +6,16 @@ import skia
 from map.enums import Layers
 from constants import CELL_SIZE
 from debug_config import debug_draw, DebugDrawFlags
+from options import Options
 
 if TYPE_CHECKING:
     from map.map import Map
-    from options import Options
     from map._props.prop import Prop
     from map.occupancy import OccupancyGrid
 from graphics.shapes import Rectangle, Circle
 from graphics.shapes import Shape
+
+_invalid_map_element: 'MapElement'
 
 class MapElement:
     """Base class for all map elements.
@@ -25,12 +27,26 @@ class MapElement:
     """
     
     def __init__(self, shape: Shape) -> None:
+        from map.map import Map
         self._shape = shape
-        self._map = None
-        self._options = None
+        self._map = Map.get_invalid_map()
+        self._options = Options.get_invalid_options()
         self._bounds = self._shape.bounds
         self._connections: List['MapElement'] = []
         self._props: List['Prop'] = []
+
+    @staticmethod
+    def get_invalid_map_element() -> 'MapElement':
+        """Get the placeholder 'invalid' map element"""
+        global _invalid_map_element
+        if _invalid_map_element is None:
+            _invalid_map_element = MapElement(Rectangle(0, 0, 0, 0))
+        return _invalid_map_element
+    
+    @property
+    def is_invalid(self) -> bool:
+        """Check if this element is the 'invalid' element."""
+        return self == MapElement.get_invalid_map_element()
 
     @property
     def bounds(self) -> Rectangle:
@@ -79,7 +95,10 @@ class MapElement:
         Args:
             prop: The prop to add
         """
-        if prop.container is not None:
+        if self.is_invalid:
+            raise ValueError("Cannot add prop to 'invalid' map element")
+                
+        if not prop.container.is_invalid:
             prop.container.remove_prop(prop)
             
         prop._container = self
@@ -89,10 +108,12 @@ class MapElement:
 
     def remove_prop(self, prop: 'Prop') -> None:
         """Remove a prop from this element."""
+        if self.is_invalid:
+            raise ValueError("Cannot remove prop from 'invalid' map element")
         if prop in self._props:
             self._props.remove(prop)
-            prop._container = None
-            prop._map = None
+            prop._container = MapElement.get_invalid_map_element()
+            prop._map = Map.get_invalid_map()
     
     def recalculate_bounds(self) -> Rectangle:
         """Calculate the bounding rectangle that encompasses the shape."""
@@ -199,7 +220,7 @@ class MapElement:
         """
         intersecting = []
         for existing_prop in self._props:
-            if not existing_prop.is_decoration:
+            if not existing_prop.prop_type.is_decoration:
                 # Check bounding box intersection first
                 if (prop.bounds.x < existing_prop.bounds.x + existing_prop.bounds.width and
                     prop.bounds.x + prop.bounds.width > existing_prop.bounds.x and

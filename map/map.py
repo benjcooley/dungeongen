@@ -20,6 +20,7 @@ from map.mapelement import MapElement
 from map.occupancy import ElementType, OccupancyGrid
 from map.region import Region
 from map.room import Room, RoomType
+from options import Options
 
 if TYPE_CHECKING:
     from map._arrange.arrange_utils import RoomDirection
@@ -27,11 +28,12 @@ if TYPE_CHECKING:
     from map.room import Room, RoomType
     from map.passage import Passage
     from map.stairs import Stairs
-    from options import Options
 
 REGION_INFLATE = CELL_SIZE * 0.025
 
-TMapElement = TypeVar('T', bound='MapElement')
+TMapElement = TypeVar('TMapElement', bound='MapElement')
+
+_invalid_map: Optional['Map'] = None
 
 class Map:
     """Container for all map elements with type-specific access."""
@@ -43,6 +45,19 @@ class Map:
         self._bounds_dirty: bool = True
         self.occupancy = OccupancyGrid(200, 200)  # Initialize with default size
     
+    @staticmethod
+    def get_invalid_map() -> 'Map':
+        """Get a shared instance of the 'invalid' map. Used instead of None for field defaults."""
+        global _invalid_map
+        if not _invalid_map:
+            _invalid_map = Map(Options.get_invalid_options())
+        return _invalid_map
+    
+    @property
+    def is_invalid(self) -> bool:
+        """Check if this map is the 'invalid' map."""
+        return self == Map.get_invalid_map()
+
     @property
     def elements(self) -> Sequence[MapElement]:
         """Read only access to map elements."""
@@ -65,7 +80,7 @@ class Map:
             self._recalculate_bounds()
         return self._bounds
 
-    def add_element(self, element: Generic[TMapElement]) -> TMapElement:
+    def add_element(self, element: TMapElement) -> TMapElement:
         """Add a map element.
         
         Args:
@@ -77,6 +92,9 @@ class Map:
         Raises:
             ValueError: If the element's bounds exceed reasonable limits
         """
+        if self.is_invalid:
+            raise ValueError("Cannot add elements to the 'invalid' map")
+        
         # Validate element bounds
         bounds = element.bounds
         MAX_DIMENSION = 100 * CELL_SIZE  # 100 grid cells
@@ -90,7 +108,10 @@ class Map:
                 f"pos=({bounds.x}, {bounds.y}), "
                 f"size={bounds.width}x{bounds.height}"
             )
-            
+
+        if not element.map.is_invalid:
+            element.map.remove_element(element)
+
         element._map = self
         element._options = self._options
         self._elements.append(element)
@@ -100,11 +121,13 @@ class Map:
 
         return element
     
-    def remove_element(self, element: Generic[TMapElement]) -> TMapElement:
+    def remove_element(self, element: MapElement) -> None:
         """Remove a map element."""
+        if self.is_invalid:
+            raise ValueError("Cannot remove elements from the 'invalid' map")        
         if element in self._elements:
             self._elements.remove(element)
-            element._map = None
+            element._map = Map.get_invalid_map()
             self._bounds_dirty = True
             self.recalculate_occupied()
     
@@ -144,7 +167,7 @@ class Map:
         for connection in element.connections:
             # If connection is a closed door, add its side shape but don't traverse
             if isinstance(connection, Door) and not connection.open:
-                region.append(connection.get_side_shape(element))
+                region.append(element)
                 continue
             self._trace_connected_region(connection, visited, region)
     
@@ -270,6 +293,8 @@ class Map:
         Returns:
             The created Room instance
         """
+        if self.is_invalid:
+            raise ValueError("Cannot create room in the 'invalid' map")
         from map.room import Room, RoomType
         return self.add_element(Room.from_grid(grid_x, grid_y, grid_width, grid_height, room_type=RoomType.RECTANGULAR))
     
@@ -284,6 +309,8 @@ class Map:
         Returns:
             The created Room instance
         """
+        if self.is_invalid:
+            raise ValueError("Cannot create room in the 'invalid' map")
         from map.room import Room, RoomType
         return self.add_element(Room.from_grid(grid_x, grid_y, grid_diameter, grid_diameter, room_type=RoomType.CIRCULAR))
     
@@ -299,18 +326,23 @@ class Map:
         end_door_type: Optional['DoorType'] = None
     ) -> Tuple['Room', Optional['Door'], 'Passage', Optional['Door']]:
         """Create a new room connected to an existing room via a passage."""
+        if self.is_invalid:
+            raise ValueError("Cannot connect a room in the 'invalid' map")        
         # Verify source room belongs to this map
         if source_room.map is not self:
             raise ValueError("Source room must belong to this map")
             
-        from map._arrange.arrange_rooms import create_connected_room
-        return create_connected_room(
+        from map._arrange.arrange_rooms import try_create_connected_room
+        return try_create_connected_room(
             source_room, direction, distance,
             room_width, room_height, room_type,
             start_door_type, end_door_type
         )
 
     def generate(self) -> None:
+        if self.is_invalid:
+            raise ValueError("Cannot generate() the 'invalid' map")
+
         # Import here to avoid circular dependencies
         from map._arrange.arrange_rooms import arrange_rooms, try_connect_nearby_rooms
         from map._props.decorate_room import decorate_room
@@ -398,6 +430,8 @@ class Map:
             transform: Optional Skia Matrix transform.
                       If None, calculates a transform to fit the map in the canvas.
         """
+        if self.is_invalid:
+            raise ValueError("Cannot render the 'invalid' map")          
         # Get canvas dimensions
         canvas_width = canvas.imageInfo().width()
         canvas_height = canvas.imageInfo().height()

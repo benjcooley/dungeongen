@@ -113,10 +113,10 @@ class Point2D:
         """Create a Point2D from a Point tuple."""
         return cls(point[0], point[1])
     
-    def __add__(self, other: Point) -> 'Point2D':
+    def __add__(self, other: 'Point2D') -> 'Point2D':
         return Point2D(self.x + other.x, self.y + other.y)
         
-    def __sub__(self, other: Point) -> 'Point2D':
+    def __sub__(self, other: 'Point2D') -> 'Point2D':
         return Point2D(self.x - other.x, self.y - other.y)
         
     def __mul__(self, scalar: float) -> 'Point2D':
@@ -129,7 +129,7 @@ class Point2D:
         """Return negated vector (-x, -y)."""
         return Point2D(-self.x, -self.y)
         
-    def dot(self, other: Point) -> float:
+    def dot(self, other: 'Point2D') -> float:
         """Compute dot product with another vector."""
         return self.x * other.x + self.y * other.y
         

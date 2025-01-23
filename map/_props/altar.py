@@ -51,7 +51,7 @@ class Altar(Prop):
             return
             
         # Draw right facing version (this is moved, rotated by draw() method)
-        rect = self.prop_type.boundary_shape #type: Rectangle
+        rect: Rectngle = self.prop_type.boundary_shape #type: ignore
 
         # Draw fill
         fill_paint = skia.Paint(
@@ -59,7 +59,7 @@ class Altar(Prop):
             Style=skia.Paint.kFill_Style,
             Color=self._map.options.prop_fill_color
         )
-        rect.draw(canvas, fill_paint)
+        rect.draw(canvas, fill_paint) #type: ignore
         
         # Draw outline
         outline_paint = skia.Paint(
@@ -68,7 +68,7 @@ class Altar(Prop):
             StrokeWidth=self._map.options.prop_stroke_width,
             Color=self._map.options.prop_outline_color
         )
-        rect.draw(canvas, outline_paint)
+        rect.draw(canvas, outline_paint) #type: ignore
         
         # Draw candle dots
         dot_paint = skia.Paint(
@@ -104,7 +104,8 @@ class Altar(Prop):
     @classmethod
     def grid_size(cls) -> Point:
         """Get the size of this prop in grid units."""
-        return Point(1, 1)
+        return (1, 1)
+    
     @classmethod
     def create(cls, rotation: Rotation = Rotation.ROT_0) -> 'Altar':
         """Create an altar prop at origin with optional rotation."""

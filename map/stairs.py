@@ -1,6 +1,7 @@
 """Stairs map element definition."""
 
 import skia
+from graphics.rotation import Rotation
 from graphics.shapes import Rectangle, Shape
 from map.mapelement import MapElement
 from graphics.conversions import grid_to_map
@@ -18,7 +19,7 @@ class Stairs(MapElement):
     indicating the steps. They can be rotated in 90-degree increments.
     """
     
-    def __init__(self, x: float, y: float, rotation: float = 0.0) -> None:
+    def __init__(self, x: float, y: float, rotation: Rotation = Rotation.ROT_0) -> None:
         """Initialize stairs with position and rotation.
         
         Args:
@@ -39,10 +40,10 @@ class Stairs(MapElement):
         if layer == Layers.PROPS:
             with canvas.save():
                 # Apply rotation around center
-                cx = self._x + self._map.CELL_SIZE / 2
-                cy = self._y + self._map.CELL_SIZE / 2
+                cx = self._x + CELL_SIZE / 2
+                cy = self._y + CELL_SIZE / 2
                 canvas.translate(cx, cy)
-                canvas.rotate(self._rotation * 180 / 3.14159)  # Convert radians to degrees
+                canvas.rotate(self._rotation.degrees * 180 / 3.14159)  # Convert radians to degrees
                 canvas.translate(-cx, -cy)
                 
                 # Draw step lines
@@ -50,26 +51,26 @@ class Stairs(MapElement):
                     AntiAlias=True,
                     Style=skia.Paint.kStroke_Style,
                     StrokeWidth=self._map.options.prop_stroke_width,
-                    Color=self._map.options.prop_dark_color
+                    Color=self._map.options.border_color
                 )
                 
                 # Number of steps
                 num_steps = 5
-                step_spacing = self._map.CELL_SIZE / (num_steps + 1)
+                step_spacing = CELL_SIZE / (num_steps + 1)
                 
                 # Draw each step line
                 for i in range(num_steps):
                     y = self._y + step_spacing * (i + 1)
                     canvas.drawLine(
-                        self._x + self._map.CELL_SIZE * 0.2,  # Start 20% in
+                        self._x + CELL_SIZE * 0.2,  # Start 20% in
                         y,
-                        self._x + self._map.CELL_SIZE * 0.8,  # End 80% across
+                        self._x + CELL_SIZE * 0.8,  # End 80% across
                         y,
                         step_paint
                     )
 
     @classmethod
-    def from_grid(cls, grid_x: float, grid_y: float, map_: 'Map', rotation: float = 0.0) -> 'Stairs':
+    def from_grid(cls, grid_x: float, grid_y: float, map_: 'Map', rotation: Rotation = Rotation.ROT_0) -> 'Stairs':
         """Create stairs using grid coordinates.
         
         Args:
@@ -82,4 +83,4 @@ class Stairs(MapElement):
             A new Stairs instance
         """
         x, y = grid_to_map(grid_x, grid_y)
-        return cls(x, y, map_, rotation)
+        return cls(x, y, rotation)

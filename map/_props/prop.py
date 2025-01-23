@@ -65,7 +65,7 @@ class Prop(ABC):
             grid_size = prop_type.grid_size
         self._prop_type = prop_type
         # First rotate the boundary shape
-        self._boundary_shape = boundary_shape.make_rotated(rotation)
+        self._boundary_shape = boundary_shape.make_rotated(rotation) #type: ignore
         
         # Calculate bounds before any translation
         self._bounds = self._boundary_shape.bounds
@@ -110,7 +110,7 @@ class Prop(ABC):
         """Get the bounding rectangle of this prop."""
         return self._bounds
 
-    @classmethod
+    @property
     def grid_size(self) -> Point | None:
         """Get the size in grid units of this prop.
         
@@ -365,7 +365,7 @@ class Prop(ABC):
         Returns:
             Position of s
         """
-        return self._grid_bounds.p1 if self._grid_bounds is not None else (self.x, self.y)
+        return self._grid_bounds.p1 if self._grid_bounds is not None else (0, 0)
     
     @grid_position.setter
     def grid_position(self, pos: Point) -> None:
@@ -381,8 +381,8 @@ class Prop(ABC):
             self.position = (pos[0] * CELL_SIZE, pos[1] * CELL_SIZE)
             return
             
-        offset_x = self._x - self._grid_bounds.x
-        offset_y = self._y - self._grid_bounds.y
+        offset_x = self.position[0] - self._grid_bounds.x #type: ignore
+        offset_y = self.position[1] - self._grid_bounds.y #type: ignore
 
         self.position = (pos[0] * CELL_SIZE + offset_x, pos[1] * CELL_SIZE + offset_y)
     
@@ -390,7 +390,7 @@ class Prop(ABC):
     def center(self) -> Point:
         """Get the center position of the prop."""
         bounds = self._grid_bounds if self._grid_bounds is not None else self._bounds
-        return bounds.center()
+        return bounds.center() #type: ignore
         
     @center.setter
     def center(self, pos: tuple[float, float]) -> None:
@@ -400,11 +400,11 @@ class Prop(ABC):
             pos: Tuple of (x,y) coordinates for the new center position
         """
         bounds = self._grid_bounds if self._grid_bounds is not None else self._bounds
-        dx = pos[0] - bounds.center()[0]
-        dy = pos[1] - bounds.center()[1]
+        dx = pos[0] - bounds.center()[0] #type: ignore
+        dy = pos[1] - bounds.center()[1] #type: ignore
         self.position = (self.position[0] + dx, self.position[1] + dy)
 
-    def is_valid_position(self, x: float, y: float, rotation: Rotation = None, container: 'MapElement' = None) -> bool:
+    def is_valid_position(self, x: float, y: float, rotation: Rotation = Rotation.ROT_0, container: Optional['MapElement'] = None) -> bool:
         """Check if current position is valid.
 
         Returns:
