@@ -164,15 +164,35 @@ class Passage(MapElement):
         if sx == ex and sy == ey:
             return [start]
 
-        # Calculate total Manhattan distance and axis distances
-        D_total = abs(ex - sx) + abs(ey - sy)
+        # Calculate distances along each axis
         dx = abs(ex - sx)
         dy = abs(ey - sy)
         
-        # Validate number of bends doesn't exceed minimum axis distance
-        max_bends_allowed = min(dx, dy)
+        # Determine main and secondary axes based on direction alignment
+        if start_direction.is_parallel(end_direction):
+            # For parallel directions, subtract 2 from main axis for start/end segments
+            if start_direction in (RoomDirection.EAST, RoomDirection.WEST):
+                main_length = dx - 2
+                secondary_length = dy
+            else:
+                main_length = dy - 2
+                secondary_length = dx
+        else:
+            # For perpendicular directions, subtract 1 from both axes for start/end segments
+            main_length = max(dx, dy) - 1
+            secondary_length = min(dx, dy) - 1
+            
+        # Calculate maximum allowed bends based on adjusted lengths
+        max_bends_allowed = min(main_length, secondary_length)
+        if max_bends_allowed < 0:
+            max_bends_allowed = 0
+            
+        # Validate number of bends
         if len(bend_positions) > max_bends_allowed:
             raise ValueError(f"Number of bends ({len(bend_positions)}) exceeds maximum allowed ({max_bends_allowed})")
+            
+        # Calculate total Manhattan distance for bend position validation
+        D_total = dx + dy
             
         # Sort bend positions in ascending order
         bend_positions = sorted(bend_positions)
