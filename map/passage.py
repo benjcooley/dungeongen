@@ -124,10 +124,18 @@ class Passage(MapElement):
         start_direction: RoomDirection,
         end: Tuple[int, int],
         end_direction: RoomDirection,
-        min_segment_length: int = 2,
-        max_subdivisions: int = 3
+        bend_positions: Optional[List[int]] = None,
+        min_run_length: int = 1
     ) -> Optional[List[Tuple[int, int]]]:
-        """Generate a list of grid points for a passage with optional random turns.
+        """Generate a list of grid points for a passage using specified bend positions.
+
+        Algorithm:
+            1. Calculate total Manhattan distance.
+            2. Validate bend positions.
+            3. Determine movement directions.
+            4. Generate segment lengths.
+            5. Construct the path by moving along axes.
+            6. Handle passage types (L-shaped or Zig-Zag).
         
         Following the segment-and-turn algorithm:
         1. Identify the straight runs needed to connect the points
