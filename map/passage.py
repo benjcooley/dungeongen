@@ -174,22 +174,51 @@ class Passage(MapElement):
         if len(bend_positions) > max_bends_allowed:
             raise ValueError(f"Number of bends ({len(bend_positions)}) exceeds maximum allowed ({max_bends_allowed})")
             
-        # Convert bend positions to grid points
+        # Sort bend positions in ascending order
+        bend_positions = sorted(bend_positions)
+        
+        # Initialize tracking variables
         points = [start]
         current = start
+        current_direction = start_direction
+        distance_covered = 0
         
-        # TODO: Implement grid point generation from bend positions
+        # Get movement vectors for each axis
+        dx = 1 if ex > sx else -1 if ex < sx else 0
+        dy = 1 if ey > sy else -1 if ey < sy else 0
         
-        points.append(end)
-        return points
-
-        # Convert bend positions to grid points
-        points = [start]
-        current = start
-        
-        # TODO: Implement grid point generation from bend positions
-        
-        points.append(end)
+        # Process each bend position
+        for bend_pos in bend_positions:
+            # Validate bend position
+            if bend_pos <= distance_covered or bend_pos >= D_total:
+                raise ValueError(f"Invalid bend position {bend_pos}")
+            
+            # Calculate distance to move before turning
+            distance = bend_pos - distance_covered
+            
+            # Move in current direction
+            cx, cy = current
+            if current_direction in (RoomDirection.EAST, RoomDirection.WEST):
+                cx += dx * distance
+            else:
+                cy += dy * distance
+                
+            # Add point at bend
+            current = (cx, cy)
+            points.append(current)
+            
+            # Switch direction
+            if current_direction in (RoomDirection.NORTH, RoomDirection.SOUTH):
+                current_direction = RoomDirection.EAST if dx > 0 else RoomDirection.WEST
+            else:
+                current_direction = RoomDirection.SOUTH if dy > 0 else RoomDirection.NORTH
+                
+            distance_covered = bend_pos
+            
+        # Add final segment to end point if needed
+        if current != end:
+            points.append(end)
+            
         return points
 
     @staticmethod
