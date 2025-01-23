@@ -124,25 +124,24 @@ class Passage(MapElement):
         start_direction: RoomDirection,
         end: Tuple[int, int],
         end_direction: RoomDirection,
-        bend_positions: Optional[List[int]] = None,
+        bend_positions: List[int],
         min_run_length: int = 1
-    ) -> Optional[List[Tuple[int, int]]]:
+    ) -> List[Tuple[int, int]]:
         """Generate a list of grid points for a passage using specified bend positions.
 
-        Algorithm:
-            1. Calculate total Manhattan distance.
-            2. Validate bend positions.
-            3. Determine movement directions.
-            4. Generate segment lengths.
-            5. Construct the path by moving along axes.
-            6. Handle passage types (L-shaped or Zig-Zag).
+        The passage is constructed by following the bend positions provided. Each bend position
+        represents a distance along the Manhattan path from start to end where a turn occurs.
         
-        Following the segment-and-turn algorithm:
-        1. Identify the straight runs needed to connect the points
-        2. For each run longer than 2*min_segment_length:
-           - Subdivide into random length pieces (at least min_segment_length each)
-           - Add turns between pieces
-        3. Connect the runs together
+        The number of bends cannot exceed the minimum distance along either axis.
+        For example, in an L-shaped passage of 4x2, only 1 bend would be allowed since min(4,2) = 2.
+
+        Args:
+            start: Starting grid point (x,y)
+            start_direction: Direction to exit start point 
+            end: Ending grid point (x,y)
+            end_direction: Direction to enter end point
+            bend_positions: List of positions along Manhattan path where turns occur
+            min_run_length: Minimum length of each straight segment
         
         Args:
             start: Starting grid point (x,y)
@@ -157,7 +156,7 @@ class Passage(MapElement):
         """
         # First check if passage is possible
         if not Passage.can_connect(start, start_direction, end, end_direction):
-            return None
+            raise ValueError("Cannot connect points with given directions")
 
         # Handle single grid case
         sx, sy = start
@@ -165,7 +164,26 @@ class Passage(MapElement):
         if sx == ex and sy == ey:
             return [start]
 
-        def subdivide_run(start_pt: tuple[int, int], end_pt: tuple[int, int]) -> list[tuple[int, int]]:
+        # Calculate total Manhattan distance and axis distances
+        D_total = abs(ex - sx) + abs(ey - sy)
+        dx = abs(ex - sx)
+        dy = abs(ey - sy)
+        
+        # Validate number of bends doesn't exceed minimum axis distance
+        max_bends_allowed = min(dx, dy)
+        if len(bend_positions) > max_bends_allowed:
+            raise ValueError(f"Number of bends ({len(bend_positions)}) exceeds maximum allowed ({max_bends_allowed})")
+            
+        # Convert bend positions to grid points
+        points = [start]
+        current = start
+        
+        # TODO: Implement grid point generation from bend positions
+        
+        points.append(end)
+        return points
+
+        def _unused_subdivide_run(start_pt: tuple[int, int], end_pt: tuple[int, int]) -> list[tuple[int, int]]:
             """Subdivide a straight run into smaller segments."""
             x1, y1 = start_pt
             x2, y2 = end_pt
