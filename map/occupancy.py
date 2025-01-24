@@ -787,12 +787,13 @@ class OccupancyGrid:
                 probe.add_debug_grid(None, True)
                     
                 # Draw debug info if available and canvas is set
-                if hasattr(points, 'manhattan_distances') and debug_draw.is_enabled(DebugDrawFlags.PASSAGE_CHECK):
+                if debug_draw.is_enabled(DebugDrawFlags.PASSAGE_CHECK):
                     from tests.test_draw import draw_passage_debug
+                    from map.passage import PassagePoints
                     canvas = getattr(debug_draw, '_canvas', None)
-                    if canvas:
+                    if canvas and isinstance(points, PassagePoints):
                         draw_passage_debug(
-                            points,
+                            points.points,
                             points.manhattan_distances,
                             points.bend_positions,
                             canvas
