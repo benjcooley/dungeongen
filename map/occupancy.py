@@ -796,7 +796,7 @@ class OccupancyGrid:
                             
                             # Draw Manhattan distances
                             paint = skia.Paint(Color=skia.ColorGREEN)
-                            font = skia.Font(None, 16)
+                            font = skia.Font(None, 32)  # Increased from 16 to 32
                             
                             for i, dist in enumerate(points.manhattan_distances):
                                 if i < len(points.points) - 1:  # Skip last point
@@ -805,8 +805,8 @@ class OccupancyGrid:
                                     blob = skia.TextBlob(text, font)
                                     canvas.drawTextBlob(blob, px + 10, py - 10, paint)
                             
-                            # Draw bend positions text
-                            paint = skia.Paint(Color=skia.ColorBLUE)
+                            # Draw bend positions text with darker blue
+                            paint = skia.Paint(Color=skia.ColorSetRGB(0, 0, 200))  # Darker blue
                             if points.bend_positions:
                                 px, py = grid_to_map(points.points[0][0], points.points[0][1])
                                 bend_text = f"bends at: {', '.join(map(str, points.bend_positions))}"
