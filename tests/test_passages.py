@@ -168,12 +168,13 @@ class TestPassages:
             room2.get_exit(RoomDirection.WEST)
         ]
         
-        # Generate full passage point sequence
+        # Generate full passage point sequence with one bend
         passage_points = Passage.generate_passage_points(
             points[0],
             RoomDirection.EAST,
             points[1],
-            RoomDirection.WEST
+            RoomDirection.WEST,
+            bend_positions=[2]  # Place bend after initial segment
         )
         
         assert passage_points is not None, "Failed to generate passage points"
@@ -242,12 +243,13 @@ class TestPassages:
             room2.get_exit(RoomDirection.NORTH)
         ]
         
-        # Generate full passage point sequence
+        # Generate full passage point sequence with one bend
         passage_points = Passage.generate_passage_points(
             points[0],
             RoomDirection.SOUTH,
             points[1],
-            RoomDirection.NORTH
+            RoomDirection.NORTH,
+            bend_positions=[2]  # Place bend after initial segment
         )
         
         assert passage_points is not None, "Failed to generate passage points"
@@ -361,12 +363,28 @@ class TestPassages:
         self.runner.add_test_label("Vertical", (ox, oy - 1))
         self.runner.add_test_label("Horizontal", (ox + 5, oy + 2))
         
-        # Create vertical passage points (just start and end)
-        vertical_points = [room1.get_exit(RoomDirection.SOUTH), room2.get_exit(RoomDirection.NORTH)]  # Shortened to avoid overlap
+        # Generate vertical passage points with no bends (straight)
+        vertical_start = room1.get_exit(RoomDirection.SOUTH)
+        vertical_end = room2.get_exit(RoomDirection.NORTH)
+        vertical_points = Passage.generate_passage_points(
+            vertical_start,
+            RoomDirection.SOUTH,
+            vertical_end,
+            RoomDirection.NORTH,
+            bend_positions=[]  # No bends for straight passage
+        )
         print(f"\nTesting vertical passage points: {vertical_points}")
         
-        # Create horizontal passage points (just start and end)
-        horizontal_points = [room3.get_exit(RoomDirection.EAST), room4.get_exit(RoomDirection.WEST)]  # Shortened to avoid overlap
+        # Generate horizontal passage points with no bends (straight)
+        horizontal_start = room3.get_exit(RoomDirection.EAST)
+        horizontal_end = room4.get_exit(RoomDirection.WEST)
+        horizontal_points = Passage.generate_passage_points(
+            horizontal_start,
+            RoomDirection.EAST,
+            horizontal_end,
+            RoomDirection.WEST,
+            bend_positions=[]  # No bends for straight passage
+        )
         
         # Enable debug visualization
         debug_draw.enable(DebugDrawFlags.PASSAGE_CHECK)
