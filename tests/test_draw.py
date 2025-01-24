@@ -1,7 +1,10 @@
 """Helper functions for debug visualization in tests."""
 
 from typing import List, Tuple
-from map.enums import RoomDirection
+from typing import List, Tuple, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    import skia
 
 def draw_passage_debug(
     points: List[Tuple[int, int]], 

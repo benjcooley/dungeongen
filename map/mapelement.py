@@ -6,16 +6,18 @@ import skia
 from map.enums import Layers
 from constants import CELL_SIZE
 from debug_config import debug_draw, DebugDrawFlags
-from options import Options
 
 if TYPE_CHECKING:
     from map.map import Map
     from map._props.prop import Prop
     from map.occupancy import OccupancyGrid
+    from options import Options
 from graphics.shapes import Rectangle, Circle
 from graphics.shapes import Shape
 
-_invalid_map_element: 'MapElement'
+_invalid_map: Optional['Map'] = None
+_invalid_options: Optional['Options'] = None
+_invalid_map_element: Optional['MapElement'] = None
 
 class MapElement:
     """Base class for all map elements.
@@ -27,10 +29,16 @@ class MapElement:
     """
     
     def __init__(self, shape: Shape) -> None:
-        from map.map import Map
+        global _invalid_map, _invalid_options
+        if _invalid_map is None:
+            from map.map import Map
+            _invalid_map = Map.get_invalid_map()
+        if _invalid_options is None:
+            from options import Options
+            _invalid_options = Options.get_invalid_options()
         self._shape = shape
-        self._map = Map.get_invalid_map()
-        self._options = Options.get_invalid_options()
+        self._map = _invalid_map
+        self._options = _invalid_options
         self._bounds = self._shape.bounds
         self._connections: List['MapElement'] = []
         self._props: List['Prop'] = []

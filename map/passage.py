@@ -1,6 +1,6 @@
 """Passage map element definition."""
 
-import random
+from dataclasses import dataclass
 from graphics.shapes import Rectangle, Shape, ShapeGroup
 from map.mapelement import MapElement
 from graphics.conversions import grid_to_map, grid_points_to_map_rect, map_to_grid_rect
@@ -13,6 +13,24 @@ if TYPE_CHECKING:
     from map.map import Map
     from options import Options
     from map.occupancy import OccupancyGrid
+
+@dataclass
+class PassagePoints:
+    points: list[tuple[int, int]]
+    manhattan_distances: list[int]
+    bend_positions: list[int]
+    
+    def __len__(self):
+        return len(self.points)
+        
+    def __getitem__(self, idx):
+        return self.points[idx]
+        
+    def __iter__(self):
+        return iter(self.points)
+        
+    def __str__(self):
+        return str(self.points)
 
 class Passage(MapElement):
     """A passage connecting two map elements.
@@ -137,7 +155,7 @@ class Passage(MapElement):
         end_direction: RoomDirection,
         bend_positions: List[int],
         min_run_length: int = 1
-    ) -> List[Tuple[int, int]]:
+    ) -> PassagePoints:
         """Generate a list of grid points for a passage using specified bend positions.
 
         The passage is constructed by following the bend positions provided. Each bend position
@@ -270,27 +288,6 @@ class Passage(MapElement):
         if current != end:
             points.append(end)
             
-        # Create PassagePoints object to hold points and debug info
-        from dataclasses import dataclass
-        
-        @dataclass
-        class PassagePoints:
-            points: list[tuple[int, int]]
-            manhattan_distances: list[int]
-            bend_positions: list[int]
-            
-            def __len__(self):
-                return len(self.points)
-                
-            def __getitem__(self, idx):
-                return self.points[idx]
-                
-            def __iter__(self):
-                return iter(self.points)
-                
-            def __str__(self):
-                return str(self.points)
-        
         # Calculate Manhattan distances for each point
         manhattan_distances = []
         current_dist = 0
