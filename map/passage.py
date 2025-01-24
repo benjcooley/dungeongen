@@ -270,7 +270,19 @@ class Passage(MapElement):
         if current != end:
             points.append(end)
             
+        # Calculate Manhattan distances for each point
+        manhattan_distances = []
+        current_dist = 0
+        for i in range(1, len(points)):
+            current_dist += abs(points[i][0] - points[i-1][0]) + abs(points[i][1] - points[i-1][1])
+            manhattan_distances.append(current_dist)
+            
         print(f"Final passage points: {points}")
+        print(f"Manhattan distances: {manhattan_distances}")
+            
+        # Store debug info in the points list metadata
+        points.manhattan_distances = manhattan_distances  # type: ignore
+        points.bend_positions = bend_positions  # type: ignore
         return points
 
     @staticmethod
