@@ -329,8 +329,8 @@ class TestPassages:
             room1 = self.runner.map.create_rectangular_room(ox, oy + 4, 3, 3)
             room2 = self.runner.map.create_rectangular_room(ox + 8, oy, 3, 3)
         elif config == "vertical_left_top":
-            room1 = self.runner.map.create_rectangular_room(ox, oy, 3, 3)
-            room2 = self.runner.map.create_rectangular_room(ox + 4, oy + 8, 3, 3)
+            room1 = self.runner.map.create_rectangular_room(ox + 20, oy + 20, 3, 3)
+            room2 = self.runner.map.create_rectangular_room(ox + 24, oy + 28, 3, 3)
         else:  # vertical_right_top
             room1 = self.runner.map.create_rectangular_room(ox + 4, oy, 3, 3)
             room2 = self.runner.map.create_rectangular_room(ox, oy + 8, 3, 3)
