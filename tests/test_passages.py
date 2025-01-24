@@ -206,12 +206,13 @@ class TestPassages:
             room2.get_exit(RoomDirection.WEST)
         ]
         
-        # Generate full passage point sequence
+        # Generate full passage point sequence with one bend
         passage_points = Passage.generate_passage_points(
             points[0],
             RoomDirection.EAST,
             points[1],
-            RoomDirection.WEST
+            RoomDirection.WEST,
+            bend_positions=[2]  # Add bend after initial segment
         )
         
         assert passage_points is not None, "Failed to generate passage points"
@@ -281,12 +282,13 @@ class TestPassages:
             room2.get_exit(RoomDirection.NORTH)
         ]
         
-        # Generate full passage point sequence
+        # Generate full passage point sequence with one bend
         passage_points = Passage.generate_passage_points(
             points[0],
             RoomDirection.SOUTH,
             points[1],
-            RoomDirection.NORTH
+            RoomDirection.NORTH,
+            bend_positions=[2]  # Add bend after initial segment
         )
         
         assert passage_points is not None, "Failed to generate passage points"
