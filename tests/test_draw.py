@@ -32,5 +32,5 @@ def draw_test_label(text: str, position: Tuple[float, float]) -> None:
     
     debug_draw.submit_debug_draw(
         lambda canvas: canvas.drawString(text, x, y - CELL_SIZE/2, paint),
-        layer=1
+        layer=DebugLayer.GRID
     )

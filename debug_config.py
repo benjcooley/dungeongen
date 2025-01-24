@@ -29,7 +29,8 @@ class DebugDrawFlags(Flag):
     OCCUPANCY = auto()        # Draw occupied grid cells
     ELEMENT_NUMBERS = auto()  # Draw element index numbers
     PASSAGE_CHECK = auto()    # Draw passage validation visualization
-    ALL = (PROP_BOUNDS | GRID | GRID_BOUNDS | OCCUPANCY | ELEMENT_NUMBERS | PASSAGE_CHECK)
+    LABELS = auto()          # Draw debug text labels
+    ALL = (PROP_BOUNDS | GRID | GRID_BOUNDS | OCCUPANCY | ELEMENT_NUMBERS | PASSAGE_CHECK | LABELS)
 
 class DebugDraw:
     """Centralized debug drawing configuration."""
