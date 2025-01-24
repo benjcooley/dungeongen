@@ -191,7 +191,7 @@ class Passage(MapElement):
         sx, sy = start
         ex, ey = end
         if sx == ex and sy == ey:
-            return [start]
+            return PassagePoints([start], [0], [])
 
         # Calculate distances along each axis
         dx = abs(ex - sx)
