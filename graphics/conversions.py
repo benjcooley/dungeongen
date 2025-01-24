@@ -1,6 +1,6 @@
 """Utility functions for converting between grid and drawing coordinates."""
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Union
 
 from graphics.aliases import Point
 from constants import CELL_SIZE
@@ -103,7 +103,7 @@ def grid_rect_from_points(start_x: float, start_y: float, end_x: float, end_y: f
     
     return (x, y, width, height)
 
-def map_to_grid_rect(rect: Rectangle | tuple[float, float, float, float]) -> tuple[float, float, float, float]:
+def map_to_grid_rect(rect: Union[Rectangle, tuple[float, float, float, float]]) -> tuple[float, float, float, float]:
     """Convert a map rectangle to grid coordinates.
     
     Args:
@@ -123,7 +123,7 @@ def map_to_grid_rect(rect: Rectangle | tuple[float, float, float, float]) -> tup
     grid_height = math.ceil((y + height) / CELL_SIZE) - grid_y
     return (grid_x, grid_y, grid_width, grid_height)
 
-def grid_to_map_rect(rect: Rectangle | tuple[float, float, float, float]) -> tuple[float, float, float, float]:
+def grid_to_map_rect(rect: Union[Rectangle, tuple[float, float, float, float]]) -> tuple[float, float, float, float]:
     """Convert a grid rectangle to map coordinates.
     
     Args:
