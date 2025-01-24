@@ -785,6 +785,16 @@ class OccupancyGrid:
             # Track valid point
             if debug_enabled:
                 probe.add_debug_grid(None, True)
+                    
+                # Draw debug info if available
+                if hasattr(points, 'manhattan_distances') and debug_draw._canvas:
+                    from tests.test_draw import draw_passage_debug
+                    draw_passage_debug(
+                        points,
+                        points.manhattan_distances,
+                        points.bend_positions,
+                        debug_draw._canvas
+                    )
 
             prev_direction = curr_direction
                     
