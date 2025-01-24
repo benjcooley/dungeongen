@@ -134,10 +134,11 @@ class TestRunner:
             # Create fresh map for each test
             self.map = Map(self.options)
             
-            # Create visualization surface
+            # Create visualization surface and initialize debug drawing
             surface = skia.Surface(self.options.canvas_width, self.options.canvas_height)
             canvas = surface.getCanvas()
             canvas.clear(skia.Color(255, 255, 255))
+            debug_draw.set_canvas(canvas)
             
             rprint(f"\n[bold]Running test:[/bold] {method}")
             error = None
@@ -163,11 +164,12 @@ class TestRunner:
             # Draw the map with transform
             self.map.render(canvas, transform)
             
-            # Debug draw the occupancy grid
+            # Execute debug draws with transform
             debug_draw_init(canvas)
             canvas.save()
             canvas.concat(transform)
             self.map.occupancy.draw_debug(canvas)
+            debug_draw.execute_debug_draws()
             canvas.restore()
 
             # Draw test info with clean state

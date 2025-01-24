@@ -11,6 +11,15 @@ class HatchPattern(Enum):
     VERTICAL = auto()      # Vertical lines
     GRID = auto()         # Grid pattern
 
+class DebugLayer(Enum):
+    """Layers for ordering debug visualization."""
+    BACKGROUND = 0
+    GRID = 1
+    OCCUPANCY = 2
+    PASSAGES = 3
+    PROPS = 4
+    OVERLAY = 5
+
 class DebugDrawFlags(Flag):
     """Flags controlling different aspects of debug visualization."""
     NONE = 0
@@ -37,6 +46,8 @@ class DebugDraw:
         if not DebugDraw._initialized:
             self.enabled_flags: DebugDrawFlags = DebugDrawFlags.NONE
             self.hatch_pattern: HatchPattern = HatchPattern.DIAGONAL
+            self._canvas = None
+            self._draw_closures = []  # List of (layer, closure) tuples
             DebugDraw._initialized = True
 
     def create_hatch_paint(self, color: int, spacing: float = 4.0) -> 'skia.Paint':
@@ -107,6 +118,34 @@ class DebugDraw:
     def is_enabled(self, flag: DebugDrawFlags) -> bool:
         """Check if a specific debug drawing flag is enabled."""
         return bool(self.enabled_flags & flag)
+        
+    def set_canvas(self, canvas: 'skia.Canvas') -> None:
+        """Set the canvas for debug drawing."""
+        self._canvas = canvas
+        
+    def submit_debug_draw(self, draw_closure: callable, layer: DebugLayer) -> None:
+        """Submit a debug draw closure to be executed later.
+        
+        Args:
+            draw_closure: Callable that takes a canvas parameter
+            layer: Debug layer to draw on
+        """
+        self._draw_closures.append((layer, draw_closure))
+        
+    def execute_debug_draws(self) -> None:
+        """Execute all submitted debug draw closures in layer order."""
+        if not self._canvas:
+            return
+            
+        # Sort by layer
+        self._draw_closures.sort(key=lambda x: x[0].value)
+        
+        # Execute each closure
+        for layer, closure in self._draw_closures:
+            closure(self._canvas)
+            
+        # Clear closures after drawing
+        self._draw_closures = []
 
 # Global debug draw instance
 debug_draw = DebugDraw()
