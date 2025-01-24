@@ -181,12 +181,12 @@ class TestPassages:
         
         # Validate passage
         is_valid, crossed = self.runner.map.occupancy.check_passage(
-            passage_points,
+            passage_points.points,  # Access the points list from PassagePoints
             RoomDirection.EAST
         )
         
         # Create and connect passage regardless of validation
-        passage = Passage.from_grid_path(passage_points)
+        passage = Passage.from_grid_path(passage_points.points)  # Access the points list
         self.runner.map.add_element(passage)
         room1.connect_to(passage)
         room2.connect_to(passage)
@@ -219,12 +219,12 @@ class TestPassages:
         
         # Validate passage
         is_valid, crossed = self.runner.map.occupancy.check_passage(
-            passage_points,
+            passage_points.points,  # Access the points list from PassagePoints
             RoomDirection.EAST
         )
         
         # Create and connect passage regardless of validation
-        passage = Passage.from_grid_path(passage_points)
+        passage = Passage.from_grid_path(passage_points.points)  # Access the points list
         self.runner.map.add_element(passage)
         room1.connect_to(passage)
         room2.connect_to(passage)
@@ -257,12 +257,12 @@ class TestPassages:
         
         # Validate passage
         is_valid, crossed = self.runner.map.occupancy.check_passage(
-            passage_points,
+            passage_points.points,  # Access the points list from PassagePoints
             RoomDirection.SOUTH
         )
         
         # Create and connect passage regardless of validation
-        passage = Passage.from_grid_path(passage_points)
+        passage = Passage.from_grid_path(passage_points.points)  # Access the points list
         self.runner.map.add_element(passage)
         room1.connect_to(passage)
         room2.connect_to(passage)
@@ -295,12 +295,12 @@ class TestPassages:
         
         # Validate passage
         is_valid, crossed = self.runner.map.occupancy.check_passage(
-            passage_points,
+            passage_points.points,  # Access the points list from PassagePoints
             RoomDirection.SOUTH
         )
         
         # Create and connect passage regardless of validation
-        passage = Passage.from_grid_path(passage_points)
+        passage = Passage.from_grid_path(passage_points.points)  # Access the points list
         self.runner.map.add_element(passage)
         room1.connect_to(passage)
         room2.connect_to(passage)
@@ -398,26 +398,26 @@ class TestPassages:
         print(f"Direction: {RoomDirection.SOUTH}")
         
         is_valid_vertical, crossed_vertical = self.runner.map.occupancy.check_passage(
-            vertical_points,
+            vertical_points.points,  # Access the points list from PassagePoints
             RoomDirection.SOUTH
         )
         print(f"Vertical passage valid: {is_valid_vertical}, crossed: {crossed_vertical}")
         
         # Check horizontal passage
         is_valid_horizontal, crossed_horizontal = self.runner.map.occupancy.check_passage(
-            horizontal_points,
+            horizontal_points.points,  # Access the points list from PassagePoints
             RoomDirection.EAST
         )
         print(f"Horizontal passage valid: {is_valid_horizontal}, crossed: {crossed_horizontal}")
 
         # Create and connect passages after validation
-        vertical_passage = Passage.from_grid_path(vertical_points)
+        vertical_passage = Passage.from_grid_path(vertical_points.points)  # Access the points list
         self.runner.map.add_element(vertical_passage)
         # Connect vertical passage to rooms
         room1.connect_to(vertical_passage)
         room2.connect_to(vertical_passage)
 
-        horizontal_passage = Passage.from_grid_path(horizontal_points)
+        horizontal_passage = Passage.from_grid_path(horizontal_points.points)  # Access the points list
         self.runner.map.add_element(horizontal_passage)
         # Connect horizontal passage to rooms
         room3.connect_to(horizontal_passage)
