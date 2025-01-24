@@ -81,6 +81,7 @@ class Passage(MapElement):
             x1, y1 = grid_points[0]
             x2, y2 = grid_points[1]
             x, y, width, height = grid_points_to_map_rect(x1, y1, x2, y2)
+            print(f"DEBUG: Creating straight passage shape with dimensions: {width/CELL_SIZE}x{height/CELL_SIZE} cells")
             shape = Rectangle(x, y, width, height)
         else:
             # For passages with corners, create shapes for each straight section
@@ -207,11 +208,17 @@ class Passage(MapElement):
         dx = 1 if ex > sx else -1 if ex < sx else 0
         dy = 1 if ey > sy else -1 if ey < sy else 0
         
+        print(f"\nDEBUG: Generating passage points:")
+        print(f"Start: {start} direction: {start_direction}")
+        print(f"End: {end} direction: {end_direction}")
+        print(f"Bend positions: {bend_positions}")
+        
         # Process each bend position
         for bend_pos in bend_positions:
             # Validate bend position
             if bend_pos <= distance_covered or bend_pos >= D_total:
                 raise ValueError(f"Invalid bend position {bend_pos}")
+            print(f"Processing bend at position {bend_pos}")
             
             # Calculate distance to move before turning
             distance = bend_pos - distance_covered
@@ -239,6 +246,7 @@ class Passage(MapElement):
         if current != end:
             points.append(end)
             
+        print(f"Final passage points: {points}")
         return points
 
     @staticmethod
