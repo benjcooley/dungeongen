@@ -1,6 +1,7 @@
 """Debug drawing configuration."""
 
 from enum import Flag, auto, Enum
+from typing import Callable
 import skia
 
 class HatchPattern(Enum):
@@ -124,7 +125,7 @@ class DebugDraw:
         """Set the canvas for debug drawing."""
         self._canvas = canvas
         
-    def submit_debug_draw(self, draw_closure: callable, layer: DebugLayer) -> None:
+    def submit_debug_draw(self, draw_closure: Callable[[skia.Canvas], None], layer: DebugLayer) -> None:
         """Submit a debug draw closure to be executed later.
         
         Args:
