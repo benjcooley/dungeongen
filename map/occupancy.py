@@ -788,16 +788,22 @@ class OccupancyGrid:
                     
                 # Draw debug info if available and canvas is set
                 if debug_draw.is_enabled(DebugDrawFlags.PASSAGE_CHECK):
+                    print("\nDEBUG Occupancy: Attempting to draw passage debug")
+                    print(f"DEBUG Occupancy: Points type: {type(points)}")
                     from tests.test_draw import draw_passage_debug
                     from map.passage import PassagePoints
                     canvas = getattr(debug_draw, '_canvas', None)
+                    print(f"DEBUG Occupancy: Canvas available: {canvas is not None}")
                     if canvas and isinstance(points, PassagePoints):
+                        print("DEBUG Occupancy: Drawing passage debug info")
                         draw_passage_debug(
                             points.points,
                             points.manhattan_distances,
                             points.bend_positions,
                             canvas
                         )
+                    else:
+                        print("DEBUG Occupancy: Skipping debug draw - conditions not met")
 
             prev_direction = curr_direction
                     

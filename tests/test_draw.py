@@ -12,6 +12,10 @@ def draw_passage_debug(
     bend_positions: List[int],
     canvas: 'skia.Canvas'
 ) -> None:
+    print("\nDEBUG TestDraw: Drawing passage debug")
+    print(f"DEBUG TestDraw: Points: {points}")
+    print(f"DEBUG TestDraw: Manhattan distances: {manhattan_distances}")
+    print(f"DEBUG TestDraw: Bend positions: {bend_positions}")
     """Draw debug visualization for passage points.
     
     Args:
