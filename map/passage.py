@@ -270,6 +270,27 @@ class Passage(MapElement):
         if current != end:
             points.append(end)
             
+        # Create PassagePoints object to hold points and debug info
+        from dataclasses import dataclass
+        
+        @dataclass
+        class PassagePoints:
+            points: list[tuple[int, int]]
+            manhattan_distances: list[int]
+            bend_positions: list[int]
+            
+            def __len__(self):
+                return len(self.points)
+                
+            def __getitem__(self, idx):
+                return self.points[idx]
+                
+            def __iter__(self):
+                return iter(self.points)
+                
+            def __str__(self):
+                return str(self.points)
+        
         # Calculate Manhattan distances for each point
         manhattan_distances = []
         current_dist = 0
@@ -280,10 +301,8 @@ class Passage(MapElement):
         print(f"Final passage points: {points}")
         print(f"Manhattan distances: {manhattan_distances}")
             
-        # Store debug info in the points list metadata
-        points.manhattan_distances = manhattan_distances  # type: ignore
-        points.bend_positions = bend_positions  # type: ignore
-        return points
+        # Return PassagePoints object with all the data
+        return PassagePoints(points, manhattan_distances, bend_positions)
 
     @staticmethod
     def can_connect(
