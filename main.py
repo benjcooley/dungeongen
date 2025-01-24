@@ -19,10 +19,10 @@ RUN_TESTS = True
 def main():
     if RUN_TESTS:
         from tests.test_runner import get_runner
-        # Get singleton test runner and run specific test
+        # Get singleton test runner and run all tests
         runner = get_runner()
-        runner.setup(tags={TestTags.BASIC})
-        runner.run_tests(test_names=["test_vertical_right_top"])
+        runner.setup()  # No tags means run all tests
+        runner.run_tests()  # No test_names means run all tests
         return
 
     # Enable debug visualization and logging
