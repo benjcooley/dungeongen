@@ -786,24 +786,32 @@ class OccupancyGrid:
             if debug_enabled:
                 probe.add_debug_grid(None, True)
                     
-                # Draw debug info if available and canvas is set
+                # Submit debug draw closure if enabled
                 if debug_draw.is_enabled(DebugDrawFlags.PASSAGE_CHECK):
-                    print("\nDEBUG Occupancy: Attempting to draw passage debug")
-                    print(f"DEBUG Occupancy: Points type: {type(points)}")
-                    from tests.test_draw import draw_passage_debug
                     from map.passage import PassagePoints
-                    canvas = getattr(debug_draw, '_canvas', None)
-                    print(f"DEBUG Occupancy: Canvas available: {canvas is not None}")
-                    if canvas and isinstance(points, PassagePoints):
-                        print("DEBUG Occupancy: Drawing passage debug info")
-                        draw_passage_debug(
-                            points.points,
-                            points.manhattan_distances,
-                            points.bend_positions,
-                            canvas
-                        )
-                    else:
-                        print("DEBUG Occupancy: Skipping debug draw - conditions not met")
+                    if isinstance(points, PassagePoints):
+                        def draw_passage_debug(canvas):
+                            from graphics.conversions import grid_to_map
+                            import skia
+                            
+                            # Draw Manhattan distances
+                            paint = skia.Paint(Color=skia.ColorGREEN)
+                            paint.setTextSize(16)
+                            
+                            for i, dist in enumerate(points.manhattan_distances):
+                                if i < len(points.points) - 1:  # Skip last point
+                                    px, py = grid_to_map(points.points[i+1][0], points.points[i+1][1])
+                                    canvas.drawString(f"d={dist}", px + 10, py - 10, paint)
+                            
+                            # Draw bend positions text
+                            paint = skia.Paint(Color=skia.ColorBLUE)
+                            paint.setTextSize(16)
+                            if points.bend_positions:
+                                px, py = grid_to_map(points.points[0][0], points.points[0][1])
+                                bend_text = f"bends at: {', '.join(map(str, points.bend_positions))}"
+                                canvas.drawString(bend_text, px - 20, py - 30, paint)
+                                
+                        debug_draw.submit_debug_draw(draw_passage_debug, DebugLayer.PASSAGES)
 
             prev_direction = curr_direction
                     
