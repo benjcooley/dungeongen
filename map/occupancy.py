@@ -805,13 +805,16 @@ class OccupancyGrid:
                                     blob = skia.TextBlob(text, font)
                                     canvas.drawTextBlob(blob, px + 5, py + 40, paint)
                             
-                            # Draw bend positions text with darker blue
+                            # Draw bend positions text in lower left corner
                             paint = skia.Paint(Color=skia.ColorSetRGB(0, 0, 200))  # Darker blue
                             if points.bend_positions:
-                                px, py = grid_to_map(points.points[0][0], points.points[0][1])
+                                # Get leftmost and bottom points to position text
+                                min_x = min(p[0] for p in points.points)
+                                max_y = max(p[1] for p in points.points)
+                                px, py = grid_to_map(min_x - 1, max_y + 2)
                                 bend_text = f"bends at: {', '.join(map(str, points.bend_positions))}"
                                 blob = skia.TextBlob(bend_text, font)
-                                canvas.drawTextBlob(blob, px - 20, py - 30, paint)
+                                canvas.drawTextBlob(blob, px, py, paint)
                                 
                         debug_draw.submit_debug_draw(draw_passage_debug, DebugLayer.PASSAGES)
 
