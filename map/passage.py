@@ -235,30 +235,34 @@ class Passage(MapElement):
             
             # Move in current direction to create orthogonal segments
             cx, cy = current
-            
+                
             # First create a point that shares one coordinate with previous point
             if current_direction in (RoomDirection.EAST, RoomDirection.WEST):
                 # Moving horizontally, so keep same y coordinate
                 cx += dx * distance
                 current = (cx, cy)
                 points.append(current)
-                
+                    
                 # Switch to vertical direction
                 current_direction = RoomDirection.SOUTH if ey > cy else RoomDirection.NORTH
-                
-                # Then move vertically to align with target y
+                    
+                # Then create another point for vertical movement
                 cy = ey
+                current = (cx, cy)
+                points.append(current)
             else:
                 # Moving vertically, so keep same x coordinate
                 cy += dy * distance
                 current = (cx, cy)
                 points.append(current)
-                
+                    
                 # Switch to horizontal direction
                 current_direction = RoomDirection.EAST if ex > cx else RoomDirection.WEST
-                
-                # Then move horizontally to align with target x
+                    
+                # Then create another point for horizontal movement
                 cx = ex
+                current = (cx, cy)
+                points.append(current)
                 
             distance_covered = bend_pos
             
