@@ -99,7 +99,6 @@ class Passage(MapElement):
             x1, y1 = grid_points[0]
             x2, y2 = grid_points[1]
             x, y, width, height = grid_points_to_map_rect(x1, y1, x2, y2)
-            print(f"DEBUG: Creating straight passage shape with dimensions: {width/CELL_SIZE}x{height/CELL_SIZE} cells")
             
             # Validate one dimension is exactly one cell width
             if not (abs(width - CELL_SIZE) < 0.001 or abs(height - CELL_SIZE) < 0.001):
@@ -244,18 +243,11 @@ class Passage(MapElement):
         dx = 1 if ex > sx else -1 if ex < sx else 0
         dy = 1 if ey > sy else -1 if ey < sy else 0
         
-        print(f"\nDEBUG: Generating passage points:")
-        print(f"Start: {start} direction: {start_direction}")
-        print(f"End: {end} direction: {end_direction}")
-        print(f"Bend positions: {bend_positions}")
-        
         # Process each bend position
         for bend_pos in bend_positions:
             # Validate bend position
             if bend_pos <= distance_covered or bend_pos >= D_total:
                 raise ValueError(f"Invalid bend position {bend_pos}")
-            print(f"Processing bend at position {bend_pos}")
-            
             # Calculate distance to move before turning
             distance = bend_pos - distance_covered
             
@@ -302,9 +294,6 @@ class Passage(MapElement):
         for i in range(1, len(points)):
             current_dist += abs(points[i][0] - points[i-1][0]) + abs(points[i][1] - points[i-1][1])
             manhattan_distances.append(current_dist)
-            
-        print(f"Final passage points: {points}")
-        print(f"Manhattan distances: {manhattan_distances}")
             
         # Return PassagePoints object with all the data
         return PassagePoints(points, manhattan_distances, bend_positions)
