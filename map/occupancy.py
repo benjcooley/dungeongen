@@ -803,7 +803,7 @@ class OccupancyGrid:
                                     px, py = grid_to_map(points.points[i+1][0], points.points[i+1][1])
                                     text = f"d={dist}"
                                     blob = skia.TextBlob(text, font)
-                                    canvas.drawTextBlob(blob, px + 20, py + 40, paint)
+                                    canvas.drawTextBlob(blob, px + 5, py + 40, paint)
                             
                             # Draw bend positions text with darker blue
                             paint = skia.Paint(Color=skia.ColorSetRGB(0, 0, 200))  # Darker blue
