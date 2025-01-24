@@ -22,7 +22,7 @@ def main():
         # Get singleton test runner and run specific test
         runner = get_runner()
         runner.setup(tags={TestTags.BASIC})
-        runner.run_tests(test_names=["test_vertical_left_top"])
+        runner.run_tests(test_names=["test_vertical_right_top"])
         return
 
     # Enable debug visualization and logging
