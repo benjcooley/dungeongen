@@ -98,12 +98,17 @@ class Passage(MapElement):
             # For straight passages, use a single rectangle
             x1, y1 = grid_points[0]
             x2, y2 = grid_points[1]
-            x, y, width, height = grid_points_to_map_rect(x1, y1, x2, y2)
+            # Get rectangle dimensions, ensuring positive width/height
+            x, y, width, height = grid_points_to_map_rect(min(x1, x2), min(y1, y2), max(x1, x2), max(y1, y2))
             print(f"DEBUG: Creating straight passage shape with dimensions: {width/CELL_SIZE}x{height/CELL_SIZE} cells")
             
             # Validate one dimension is exactly one cell width
             if not (abs(width - CELL_SIZE) < 0.001 or abs(height - CELL_SIZE) < 0.001):
                 raise ValueError(f"Passage must be exactly one cell wide. Got {width/CELL_SIZE}x{height/CELL_SIZE} cells")
+            
+            # Validate dimensions are positive and non-zero
+            if width <= 0 or height <= 0:
+                raise ValueError(f"Invalid passage dimensions: {width}x{height}")
                 
             shape = Rectangle(x, y, width, height)
         else:
@@ -114,11 +119,16 @@ class Passage(MapElement):
                 x2, y2 = grid_points[i + 1]
                 
                 # Convert grid line to map rectangle
-                x, y, width, height = grid_points_to_map_rect(x1, y1, x2, y2)
+                # Get rectangle dimensions, ensuring positive width/height
+                x, y, width, height = grid_points_to_map_rect(min(x1, x2), min(y1, y2), max(x1, x2), max(y1, y2))
                 
                 # Validate one dimension is exactly one cell width
                 if not (abs(width - CELL_SIZE) < 0.001 or abs(height - CELL_SIZE) < 0.001):
                     raise ValueError(f"Passage segment must be exactly one cell wide. Got {width/CELL_SIZE}x{height/CELL_SIZE} cells")
+                
+                # Validate dimensions are positive and non-zero
+                if width <= 0 or height <= 0:
+                    raise ValueError(f"Invalid passage dimensions: {width}x{height}")
                     
                 shapes.append(Rectangle(x, y, width, height))
             
