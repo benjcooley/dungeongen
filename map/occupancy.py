@@ -795,7 +795,7 @@ class OccupancyGrid:
                             import skia
                             
                             # Draw Manhattan distances
-                            paint = skia.Paint(Color=skia.ColorGREEN)
+                            paint = skia.Paint(Color=skia.ColorSetRGB(0, 128, 0))  # Dark green
                             font = skia.Font(None, 32)  # Increased from 16 to 32
                             
                             for i, dist in enumerate(points.manhattan_distances):
