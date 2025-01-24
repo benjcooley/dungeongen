@@ -65,18 +65,11 @@ def grid_points_to_map_rect(grid_x1: float, grid_y1: float, grid_x2: float, grid
         Tuple of (rect_x, rect_y, rect_width, rect_height) in map units.
         Grid points define corners, so width/height will be (grid_points + 1) * CELL_SIZE.
     """
-    # Convert min points to map coordinates for position
-    min_x = min(grid_x1, grid_x2)
-    min_y = min(grid_y1, grid_y2)
-    p1 = grid_to_map(min_x, min_y)
-    
-    # Convert max points (+1 for exclusive range) to map coordinates for size
-    max_x = max(grid_x1, grid_x2) + 1
-    max_y = max(grid_y1, grid_y2) + 1
-    p2 = grid_to_map(max_x, max_y)
-    
-    # Calculate width and height from min/max points
-    return (p1[0], p1[1], p2[0] - p1[0], p2[1] - p1[1])
+    x = min(grid_x1, grid_x2) * CELL_SIZE
+    y = min(grid_y1, grid_y2) * CELL_SIZE
+    width = (abs(grid_x2 - grid_x1) + 1) * CELL_SIZE
+    height = (abs(grid_y2 - grid_y1) + 1) * CELL_SIZE
+    return (x, y, width, height)
 
 def grid_rect_from_points(start_x: float, start_y: float, end_x: float, end_y: float) -> tuple[float, float, float, float]:
     """Convert two grid points into a proper grid-aligned rectangle.
