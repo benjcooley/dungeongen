@@ -233,22 +233,32 @@ class Passage(MapElement):
             # Calculate distance to move before turning
             distance = bend_pos - distance_covered
             
-            # Move in current direction
+            # Move in current direction to create orthogonal segments
             cx, cy = current
-            if current_direction in (RoomDirection.EAST, RoomDirection.WEST):
-                cx += dx * distance
-            else:
-                cy += dy * distance
-                
-            # Add point at bend
-            current = (cx, cy)
-            points.append(current)
             
-            # Switch direction
-            if current_direction in (RoomDirection.NORTH, RoomDirection.SOUTH):
-                current_direction = RoomDirection.EAST if dx > 0 else RoomDirection.WEST
+            # First create a point that shares one coordinate with previous point
+            if current_direction in (RoomDirection.EAST, RoomDirection.WEST):
+                # Moving horizontally, so keep same y coordinate
+                cx += dx * distance
+                current = (cx, cy)
+                points.append(current)
+                
+                # Switch to vertical direction
+                current_direction = RoomDirection.SOUTH if ey > cy else RoomDirection.NORTH
+                
+                # Then move vertically to align with target y
+                cy = ey
             else:
-                current_direction = RoomDirection.SOUTH if dy > 0 else RoomDirection.NORTH
+                # Moving vertically, so keep same x coordinate
+                cy += dy * distance
+                current = (cx, cy)
+                points.append(current)
+                
+                # Switch to horizontal direction
+                current_direction = RoomDirection.EAST if ex > cx else RoomDirection.WEST
+                
+                # Then move horizontally to align with target x
+                cx = ex
                 
             distance_covered = bend_pos
             
