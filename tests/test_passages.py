@@ -314,10 +314,10 @@ class TestPassages:
         # Base configuration is north-east (first room at top, second room to right)
         # Other configurations are rotations of this base setup
         base_positions = {
-            "l_north_east": ((0, 0), (diagonal_dist, diagonal_dist)),  # No rotation
-            "l_north_west": ((0, 0), (-diagonal_dist, diagonal_dist)), # Mirror X
-            "l_south_east": ((0, diagonal_dist), (diagonal_dist, 0)),  # Mirror Y
-            "l_south_west": ((0, diagonal_dist), (-diagonal_dist, 0))  # Mirror both
+            "l_north_east": ((0, 0), (diagonal_dist, diagonal_dist)),       # No rotation
+            "l_north_west": ((0, 0), (-diagonal_dist, diagonal_dist)),      # Mirror X
+            "l_south_east": ((0, 0), (diagonal_dist, -diagonal_dist)),      # Mirror Y
+            "l_south_west": ((0, 0), (-diagonal_dist, -diagonal_dist))      # Mirror both
         }
         
         # Get base positions and directions for this configuration
@@ -331,9 +331,9 @@ class TestPassages:
         start_dir, end_dir = directions[config]
         
         # Create rooms using base position + offsets
-        room1_x = ox + diagonal_dist + room1_offset[0]
+        room1_x = ox + room1_offset[0]
         room1_y = oy + room1_offset[1]
-        room2_x = ox + diagonal_dist + room2_offset[0]
+        room2_x = ox + room2_offset[0]
         room2_y = oy + room2_offset[1]
         
         room1 = self.runner.map.create_rectangular_room(room1_x, room1_y, 3, 3)
@@ -372,9 +372,9 @@ class TestPassages:
         """Test basic L-shaped passage generation in all 4 configurations."""
         configs = ["l_north_east", "l_north_west", "l_south_east", "l_south_west"]
         for i, config in enumerate(configs):
-            x_offset = (i % 2) * 10  # Alternate between 0 and 10
-            y_offset = (i // 2) * 10  # First row 0, second row 10
-            self._test_l_shaped_passage(x_offset, y_offset, config, 3)
+            x_offset = (i % 2) * 30  # Alternate between 0 and 30
+            y_offset = (i // 2) * 30  # First row 0, second row 30
+            self._test_l_shaped_passage(x_offset, y_offset, config, diagonal_dist=3)
 
     @tag_test(TestTags.BASIC)
     def test_l_shaped_passages_with_bends(self) -> None:
