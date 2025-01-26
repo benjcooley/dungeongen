@@ -312,10 +312,62 @@ class TestPassages:
     @tag_test(TestTags.BASIC)
     def test_l_shaped_passages(self) -> None:
         """Test L-shaped passages in all 4 configurations."""
+        self._test_basic_l_shaped_passages()
+        
+    @tag_test(TestTags.BASIC)
+    def test_l_shaped_passages_with_bends(self) -> None:
+        """Test L-shaped passages with multiple bends."""
+        # Use origin (0,0) for test with more space between rooms
+        ox, oy = 0, 0
+        
+        # Create rooms with 5 grid diagonal spacing
+        room1 = self.runner.map.create_rectangular_room(ox + 5, oy, 3, 3)      # North room
+        room2 = self.runner.map.create_rectangular_room(ox, oy + 5, 3, 3)      # West room
+        
+        # Get exit points
+        start_dir = RoomDirection.SOUTH
+        end_dir = RoomDirection.EAST
+        
+        points = [
+            room1.get_exit(start_dir),
+            room2.get_exit(end_dir)
+        ]
+        
+        # Generate passage with 2 bends
+        passage_points = Passage.generate_passage_points(
+            points[0],
+            start_dir,
+            points[1],
+            end_dir,
+            bend_positions=[2, 4]  # Two bends with more space between them
+        )
+        
+        assert passage_points is not None, "Failed to generate passage points"
+        
+        # Validate passage
+        is_valid, crossed = self.runner.map.occupancy.check_passage(
+            passage_points.points,
+            start_dir
+        )
+        
+        # Create and connect passage
+        passage = Passage.from_grid_path(passage_points.points)
+        self.runner.map.add_element(passage)
+        room1.connect_to(passage)
+        room2.connect_to(passage)
+        
+        # Add debug label
+        self.runner.add_test_label("L-shape with bends", (ox, oy - 1))
+
+        # Verify passage
+        assert is_valid, "Generated passage should be valid"
+        assert not crossed, "Generated passage should not cross others"
+
+    def _test_basic_l_shaped_passages(self) -> None:
         # Use origin (0,0) for test
         ox, oy = 0, 0
         
-        # Test all 4 L-shaped configurations
+        # Test basic L-shaped configurations
         configs = ["l_north_east", "l_north_west", "l_south_east", "l_south_west"]
         
         for i, config in enumerate(configs):
