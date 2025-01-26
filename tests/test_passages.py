@@ -309,127 +309,64 @@ class TestPassages:
         assert is_valid, "Generated passage should be valid"
         assert not crossed, "Generated passage should not cross others"
 
-    def _create_l_shaped_rooms(self, ox: int, oy: int, diagonal_dist: int) -> tuple[Room, Room]:
-        """Create a pair of rooms separated by the given diagonal distance.
+    def _test_l_shaped_passage(self, ox: int, oy: int, config: str, diagonal_dist: int, bend_positions: list[int] = None) -> None:
+        """Test L-shaped passage with given configuration and diagonal spacing."""
+        # Get directions based on configuration
+        directions = {
+            "l_north_east": (RoomDirection.SOUTH, RoomDirection.WEST),
+            "l_north_west": (RoomDirection.SOUTH, RoomDirection.EAST),
+            "l_south_east": (RoomDirection.NORTH, RoomDirection.WEST),
+            "l_south_west": (RoomDirection.NORTH, RoomDirection.EAST)
+        }
+        start_dir, end_dir = directions[config]
         
-        Args:
-            ox: Origin x coordinate
-            oy: Origin y coordinate
-            diagonal_dist: Number of grid cells diagonally between rooms
-            
-        Returns:
-            Tuple of (north_room, west_room)
-        """
         # Create rooms with specified diagonal spacing
-        north_room = self.runner.map.create_rectangular_room(ox + diagonal_dist, oy, 3, 3)
-        west_room = self.runner.map.create_rectangular_room(ox, oy + diagonal_dist, 3, 3)
-        return north_room, west_room
-
-    @tag_test(TestTags.BASIC)
-    def test_l_shaped_passages(self) -> None:
-        """Test basic L-shaped passage generation in all 4 configurations."""
-        # Use origin (0,0) for test
-        ox, oy = 0, 0
+        x_offset = (diagonal_dist if "east" in config else 0)
+        y_offset = (diagonal_dist if "south" in config else 0)
+        room1 = self.runner.map.create_rectangular_room(ox + diagonal_dist, oy + y_offset, 3, 3)
+        room2 = self.runner.map.create_rectangular_room(ox + x_offset, oy + diagonal_dist, 3, 3)
         
-        # Test all 4 L-shaped configurations
-        configs = [
-            ("l_north_east", RoomDirection.SOUTH, RoomDirection.WEST),
-            ("l_north_west", RoomDirection.SOUTH, RoomDirection.EAST),
-            ("l_south_east", RoomDirection.NORTH, RoomDirection.WEST),
-            ("l_south_west", RoomDirection.NORTH, RoomDirection.EAST)
-        ]
-        
-        for i, (config, start_dir, end_dir) in enumerate(configs):
-            # Offset each configuration to avoid overlap
-            x_offset = (i % 2) * 15  # Alternate between 0 and 15
-            y_offset = (i // 2) * 15  # First row 0, second row 15
-            
-            # Create rooms for this configuration
-            room1, room2 = self._create_l_shaped_pair(ox + x_offset, oy + y_offset, config)
-            
-            # Get exit points
-            points = [
-                room1.get_exit(start_dir),
-                room2.get_exit(end_dir)
-            ]
-            
-            # Generate passage point sequence for L-shape
-            passage_points = Passage.generate_passage_points(
-                points[0],
-                start_dir,
-                points[1],
-                end_dir,
-                bend_positions=[]  # No manual bends needed for L-shape
-            )
-            
-            assert passage_points is not None, f"Failed to generate passage points for {config}"
-            
-            # Validate passage
-            is_valid, crossed = self.runner.map.occupancy.check_passage(
-                passage_points.points,
-                start_dir
-            )
-            
-            # Create and connect passage
-            passage = Passage.from_grid_path(passage_points.points)
-            self.runner.map.add_element(passage)
-            room1.connect_to(passage)
-            room2.connect_to(passage)
-            
-            # Add debug label
-            self.runner.add_test_label(config, (ox + x_offset, oy + y_offset - 1))
-
-            # Verify passage
-            assert is_valid, f"Generated passage should be valid for {config}"
-            assert not crossed, f"Generated passage should not cross others for {config}"
-        
-    @tag_test(TestTags.BASIC)
-    def test_l_shaped_passages_with_bends(self) -> None:
-        """Test L-shaped passage generation with 5-grid diagonal spacing and multiple bends."""
-        # Use origin (0,0) for test with more space between rooms
-        ox, oy = 0, 0
-        
-        # Create rooms with 5-grid diagonal spacing
-        room1, room2 = self._create_l_shaped_rooms(ox, oy, 5)
-        
-        # Get exit points
-        start_dir = RoomDirection.SOUTH
-        end_dir = RoomDirection.EAST
-        
-        points = [
-            room1.get_exit(start_dir),
-            room2.get_exit(end_dir)
-        ]
-        
-        # Generate passage with 2 bends, avoiding first and last steps
+        # Generate and validate passage
+        points = [room1.get_exit(start_dir), room2.get_exit(end_dir)]
         passage_points = Passage.generate_passage_points(
-            points[0],
-            start_dir,
-            points[1],
-            end_dir,
-            bend_positions=[2, 3]  # Two bends in middle of path
+            points[0], start_dir, points[1], end_dir,
+            bend_positions=bend_positions or []
         )
         
-        assert passage_points is not None, "Failed to generate passage points"
+        assert passage_points is not None, f"Failed to generate passage points for {config}"
         
-        # Validate passage
-        is_valid, crossed = self.runner.map.occupancy.check_passage(
-            passage_points.points,
-            start_dir
-        )
-        
-        # Create and connect passage
+        # Validate and create passage
+        is_valid, crossed = self.runner.map.occupancy.check_passage(passage_points.points, start_dir)
         passage = Passage.from_grid_path(passage_points.points)
         self.runner.map.add_element(passage)
         room1.connect_to(passage)
         room2.connect_to(passage)
         
         # Add debug label
-        self.runner.add_test_label("L-shape with bends", (ox, oy - 1))
-
+        label = f"{config}" + (" with bends" if bend_positions else "")
+        self.runner.add_test_label(label, (ox, oy - 1))
+        
         # Verify passage
-        assert is_valid, "Generated passage should be valid"
-        assert not crossed, "Generated passage should not cross others"
+        assert is_valid, f"Generated passage should be valid for {config}"
+        assert not crossed, f"Generated passage should not cross others for {config}"
+
+    @tag_test(TestTags.BASIC)
+    def test_l_shaped_passages(self) -> None:
+        """Test basic L-shaped passage generation in all 4 configurations."""
+        configs = ["l_north_east", "l_north_west", "l_south_east", "l_south_west"]
+        for i, config in enumerate(configs):
+            x_offset = (i % 2) * 15  # Alternate between 0 and 15
+            y_offset = (i // 2) * 15  # First row 0, second row 15
+            self._test_l_shaped_passage(x_offset, y_offset, config, 3)
+
+    @tag_test(TestTags.BASIC)
+    def test_l_shaped_passages_with_bends(self) -> None:
+        """Test L-shaped passage generation with bends in all 4 configurations."""
+        configs = ["l_north_east", "l_north_west", "l_south_east", "l_south_west"]
+        for i, config in enumerate(configs):
+            x_offset = (i % 2) * 15  # Alternate between 0 and 15
+            y_offset = (i // 2) * 15  # First row 0, second row 15
+            self._test_l_shaped_passage(x_offset, y_offset, config, 5, [2, 3])
 
     def _create_l_shaped_pair(self, ox: int, oy: int, config: str) -> tuple[Room, Room]:
         """Create a pair of rooms in L-shaped configuration.
