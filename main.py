@@ -19,10 +19,11 @@ RUN_TESTS = True
 def main():
     if RUN_TESTS:
         from tests.test_runner import get_runner
-        # Get singleton test runner and run all tests
+        from tests.test_tags import TestTags
+        # Get singleton test runner and run specific test
         runner = get_runner()
-        runner.setup()  # No tags means run all tests
-        runner.run_tests()  # No test_names means run all tests
+        runner.setup({TestTags.BASIC})  # Only run BASIC tests
+        runner.run_tests(test_names=["test_l_shaped_passages"])  # Only run L-shaped test
         return
 
     # Enable debug visualization and logging
