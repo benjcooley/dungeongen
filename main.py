@@ -20,6 +20,9 @@ def main():
     if RUN_TESTS:
         from tests.test_runner import get_runner
         from tests.test_tags import TestTags
+        # Enable debug visualization
+        debug_draw.enable(DebugDrawFlags.OCCUPANCY, DebugDrawFlags.ELEMENT_NUMBERS)
+        
         # Get singleton test runner and run specific test
         runner = get_runner()
         runner.setup({TestTags.BASIC})  # Only run BASIC tests

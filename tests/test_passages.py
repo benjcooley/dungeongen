@@ -324,15 +324,27 @@ class TestPassages:
         if config == "l_north_east":
             room1 = self.runner.map.create_rectangular_room(ox + diagonal_dist, oy, 3, 3)  # North room
             room2 = self.runner.map.create_rectangular_room(ox + diagonal_dist * 2, oy + diagonal_dist, 3, 3)  # East room
+            print(f"\nL-NORTH-EAST:")
+            print(f"Room1 at ({ox + diagonal_dist}, {oy})")
+            print(f"Room2 at ({ox + diagonal_dist * 2}, {oy + diagonal_dist})")
         elif config == "l_north_west":
             room1 = self.runner.map.create_rectangular_room(ox + diagonal_dist, oy, 3, 3)  # North room
             room2 = self.runner.map.create_rectangular_room(ox, oy + diagonal_dist, 3, 3)  # West room
+            print(f"\nL-NORTH-WEST:")
+            print(f"Room1 at ({ox + diagonal_dist}, {oy})")
+            print(f"Room2 at ({ox}, {oy + diagonal_dist})")
         elif config == "l_south_east":
             room1 = self.runner.map.create_rectangular_room(ox + diagonal_dist, oy + diagonal_dist * 2, 3, 3)  # South room
             room2 = self.runner.map.create_rectangular_room(ox + diagonal_dist * 2, oy + diagonal_dist, 3, 3)  # East room
+            print(f"\nL-SOUTH-EAST:")
+            print(f"Room1 at ({ox + diagonal_dist}, {oy + diagonal_dist * 2})")
+            print(f"Room2 at ({ox + diagonal_dist * 2}, {oy + diagonal_dist})")
         else:  # l_south_west
             room1 = self.runner.map.create_rectangular_room(ox + diagonal_dist, oy + diagonal_dist * 2, 3, 3)  # South room
             room2 = self.runner.map.create_rectangular_room(ox, oy + diagonal_dist, 3, 3)  # West room
+            print(f"\nL-SOUTH-WEST:")
+            print(f"Room1 at ({ox + diagonal_dist}, {oy + diagonal_dist * 2})")
+            print(f"Room2 at ({ox}, {oy + diagonal_dist})")
         
         # Generate and validate passage
         points = [room1.get_exit(start_dir), room2.get_exit(end_dir)]
