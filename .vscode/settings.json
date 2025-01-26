@@ -1,4 +1,19 @@
 {
     "aider-composer.pythonPath": "/Users/benjamincooley/.pyenv/versions/3.12.5/bin/python",
     "python.analysis.typeCheckingMode": "basic"
+}{
+    "python.defaultInterpreterPath": "/Users/benjamincooley/.pyenv/versions/3.12.5/bin/python",
+    "python.analysis.typeCheckingMode": "basic",
+    "python.analysis.diagnosticMode": "workspace",
+    "python.analysis.autoImportCompletions": true,
+    "python.analysis.importFormat": "absolute",
+    "editor.formatOnSave": true,
+    "python.formatting.provider": "black",
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.python",
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": true
+        }
+    }
 }
