@@ -372,8 +372,8 @@ class TestPassages:
         """Test basic L-shaped passage generation in all 4 configurations."""
         configs = ["l_north_east", "l_north_west", "l_south_east", "l_south_west"]
         for i, config in enumerate(configs):
-            x_offset = (i % 2) * 20  # Alternate between 0 and 20
-            y_offset = (i // 2) * 20  # First row 0, second row 20
+            x_offset = (i % 2) * 10  # Alternate between 0 and 10
+            y_offset = (i // 2) * 10  # First row 0, second row 10
             self._test_l_shaped_passage(x_offset, y_offset, config, 3)
 
     @tag_test(TestTags.BASIC)
