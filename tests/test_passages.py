@@ -384,8 +384,8 @@ class TestPassages:
         
         # First create all rooms
         for i, config in enumerate(configs):
-            x_offset = (i % 2) * 20  # Alternate between 0 and 20
-            y_offset = (i // 2) * 20  # First row 0, second row 20
+            x_offset = (i % 2) * 50  # Alternate between 0 and 50
+            y_offset = (i // 2) * 50  # First row 0, second row 50
             
             # Get base positions and directions for this configuration
             base_positions = {
