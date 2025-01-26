@@ -320,11 +320,19 @@ class TestPassages:
         }
         start_dir, end_dir = directions[config]
         
-        # Create rooms with specified diagonal spacing
-        x_offset = (diagonal_dist if "east" in config else 0)
-        y_offset = (diagonal_dist if "south" in config else 0)
-        room1 = self.runner.map.create_rectangular_room(ox + diagonal_dist, oy + y_offset, 3, 3)
-        room2 = self.runner.map.create_rectangular_room(ox + x_offset, oy + diagonal_dist, 3, 3)
+        # Create rooms with specified diagonal spacing based on configuration
+        if config == "l_north_east":
+            room1 = self.runner.map.create_rectangular_room(ox + diagonal_dist, oy, 3, 3)  # North room
+            room2 = self.runner.map.create_rectangular_room(ox + diagonal_dist * 2, oy + diagonal_dist, 3, 3)  # East room
+        elif config == "l_north_west":
+            room1 = self.runner.map.create_rectangular_room(ox + diagonal_dist, oy, 3, 3)  # North room
+            room2 = self.runner.map.create_rectangular_room(ox, oy + diagonal_dist, 3, 3)  # West room
+        elif config == "l_south_east":
+            room1 = self.runner.map.create_rectangular_room(ox + diagonal_dist, oy + diagonal_dist * 2, 3, 3)  # South room
+            room2 = self.runner.map.create_rectangular_room(ox + diagonal_dist * 2, oy + diagonal_dist, 3, 3)  # East room
+        else:  # l_south_west
+            room1 = self.runner.map.create_rectangular_room(ox + diagonal_dist, oy + diagonal_dist * 2, 3, 3)  # South room
+            room2 = self.runner.map.create_rectangular_room(ox, oy + diagonal_dist, 3, 3)  # West room
         
         # Generate and validate passage
         points = [room1.get_exit(start_dir), room2.get_exit(end_dir)]
