@@ -339,7 +339,8 @@ class TestPassages:
                 points[0],
                 start_dir,
                 points[1],
-                end_dir
+                end_dir,
+                bend_positions=[]  # No manual bends needed for L-shape
             )
             
             assert passage_points is not None, f"Failed to generate passage points for {config}"
