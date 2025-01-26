@@ -243,30 +243,73 @@ class Passage(MapElement):
         dx = 1 if ex > sx else -1 if ex < sx else 0
         dy = 1 if ey > sy else -1 if ey < sy else 0
         
-        # For L-shaped passages, we alternate between x and y movements
+        # For L-shaped passages, we need to handle the bend point
         cx, cy = current
         
-        # Determine which axis to change first based on start direction
-        if start_direction in (RoomDirection.EAST, RoomDirection.WEST):
-            # Move horizontally first
-            cx = ex  # Move all the way to target x
-            current = (cx, cy)
-            points.append(current)
+        # Calculate total distances for each axis
+        total_dx = abs(ex - sx)
+        total_dy = abs(ey - sy)
+        
+        # If bend positions are provided, use first bend point
+        if bend_positions:
+            # Calculate bend position as fraction of total Manhattan distance
+            bend_dist = bend_positions[0]
             
-            # Then move vertically to target
-            cy = ey
-            current = (cx, cy)
-            points.append(current)
+            # Determine which axis to change first based on start direction
+            if start_direction in (RoomDirection.EAST, RoomDirection.WEST):
+                # Move horizontally by bend distance
+                cx = sx + (dx * min(bend_dist, total_dx))
+                current = (cx, cy)
+                points.append(current)
+                
+                # Then move vertically to target y
+                cy = ey
+                current = (cx, cy)
+                points.append(current)
+                
+                # Finally move to target x if needed
+                if cx != ex:
+                    cx = ex
+                    current = (cx, cy)
+                    points.append(current)
+            else:
+                # Move vertically by bend distance
+                cy = sy + (dy * min(bend_dist, total_dy))
+                current = (cx, cy)
+                points.append(current)
+                
+                # Then move horizontally to target x
+                cx = ex
+                current = (cx, cy)
+                points.append(current)
+                
+                # Finally move to target y if needed
+                if cy != ey:
+                    cy = ey
+                    current = (cx, cy)
+                    points.append(current)
         else:
-            # Move vertically first
-            cy = ey  # Move all the way to target y
-            current = (cx, cy)
-            points.append(current)
-            
-            # Then move horizontally to target
-            cx = ex
-            current = (cx, cy)
-            points.append(current)
+            # No bend positions provided, use default L-shape
+            if start_direction in (RoomDirection.EAST, RoomDirection.WEST):
+                # Move horizontally first
+                cx = ex
+                current = (cx, cy)
+                points.append(current)
+                
+                # Then move vertically to target
+                cy = ey
+                current = (cx, cy)
+                points.append(current)
+            else:
+                # Move vertically first
+                cy = ey
+                current = (cx, cy)
+                points.append(current)
+                
+                # Then move horizontally to target
+                cx = ex
+                current = (cx, cy)
+                points.append(current)
             
         # Add final segment to end point if needed
         if current != end:
