@@ -252,13 +252,14 @@ class Passage(MapElement):
         
         # If bend positions are provided, use first bend point
         if bend_positions:
-            # Calculate bend position as fraction of total Manhattan distance
-            bend_dist = bend_positions[0]
+            # Use first bend position as number of steps along Manhattan path
+            steps_remaining = bend_positions[0]
             
             # Determine which axis to change first based on start direction
             if start_direction in (RoomDirection.EAST, RoomDirection.WEST):
-                # Move horizontally by bend distance
-                cx = sx + (dx * min(bend_dist, total_dx))
+                # Move horizontally by number of steps
+                steps = min(steps_remaining, total_dx)
+                cx = sx + (dx * steps)
                 current = (cx, cy)
                 points.append(current)
                 
@@ -273,8 +274,9 @@ class Passage(MapElement):
                     current = (cx, cy)
                     points.append(current)
             else:
-                # Move vertically by bend distance
-                cy = sy + (dy * min(bend_dist, total_dy))
+                # Move vertically by number of steps
+                steps = min(steps_remaining, total_dy)
+                cy = sy + (dy * steps)
                 current = (cx, cy)
                 points.append(current)
                 
