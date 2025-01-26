@@ -330,8 +330,95 @@ class TestPassages:
         # Use origin (0,0) for test
         ox, oy = 0, 0
         
-        # Test basic L-shaped configurations
-        configs = ["l_north_east", "l_north_west", "l_south_east", "l_south_west"]
+        # Create rooms with 3-grid diagonal spacing
+        room1, room2 = self._create_l_shaped_rooms(ox, oy, 3)
+        
+        # Get exit points
+        start_dir = RoomDirection.SOUTH
+        end_dir = RoomDirection.EAST
+        
+        points = [
+            room1.get_exit(start_dir),
+            room2.get_exit(end_dir)
+        ]
+        
+        # Generate passage point sequence for L-shape
+        passage_points = Passage.generate_passage_points(
+            points[0],
+            start_dir,
+            points[1],
+            end_dir,
+            bend_positions=[]  # No manual bends needed for L-shape
+        )
+        
+        assert passage_points is not None, "Failed to generate passage points"
+        
+        # Validate passage
+        is_valid, crossed = self.runner.map.occupancy.check_passage(
+            passage_points.points,
+            start_dir
+        )
+        
+        # Create and connect passage
+        passage = Passage.from_grid_path(passage_points.points)
+        self.runner.map.add_element(passage)
+        room1.connect_to(passage)
+        room2.connect_to(passage)
+        
+        # Add debug label
+        self.runner.add_test_label("Basic L-shape", (ox, oy - 1))
+
+        # Verify passage
+        assert is_valid, "Generated passage should be valid"
+        assert not crossed, "Generated passage should not cross others"
+        
+    @tag_test(TestTags.BASIC)
+    def test_l_shaped_passages_with_bends(self) -> None:
+        """Test L-shaped passages with multiple bends."""
+        # Use origin (0,0) for test with more space between rooms
+        ox, oy = 0, 0
+        
+        # Create rooms with 5-grid diagonal spacing
+        room1, room2 = self._create_l_shaped_rooms(ox, oy, 5)
+        
+        # Get exit points
+        start_dir = RoomDirection.SOUTH
+        end_dir = RoomDirection.EAST
+        
+        points = [
+            room1.get_exit(start_dir),
+            room2.get_exit(end_dir)
+        ]
+        
+        # Generate passage with 2 bends, avoiding first and last steps
+        passage_points = Passage.generate_passage_points(
+            points[0],
+            start_dir,
+            points[1],
+            end_dir,
+            bend_positions=[2, 3]  # Two bends in middle of path
+        )
+        
+        assert passage_points is not None, "Failed to generate passage points"
+        
+        # Validate passage
+        is_valid, crossed = self.runner.map.occupancy.check_passage(
+            passage_points.points,
+            start_dir
+        )
+        
+        # Create and connect passage
+        passage = Passage.from_grid_path(passage_points.points)
+        self.runner.map.add_element(passage)
+        room1.connect_to(passage)
+        room2.connect_to(passage)
+        
+        # Add debug label
+        self.runner.add_test_label("L-shape with bends", (ox, oy - 1))
+
+        # Verify passage
+        assert is_valid, "Generated passage should be valid"
+        assert not crossed, "Generated passage should not cross others"
         
         for i, config in enumerate(configs):
             # Offset each configuration to avoid overlap
