@@ -380,10 +380,68 @@ class TestPassages:
     def test_l_shaped_passages_with_bends(self) -> None:
         """Test L-shaped passage generation with bends in all 4 configurations."""
         configs = ["l_north_east", "l_north_west", "l_south_east", "l_south_west"]
+        results = []
+        
+        # First create all rooms
         for i, config in enumerate(configs):
             x_offset = (i % 2) * 20  # Alternate between 0 and 20
             y_offset = (i // 2) * 20  # First row 0, second row 20
-            self._test_l_shaped_passage(x_offset, y_offset, config, 5, [2, 3])
+            
+            # Get base positions and directions for this configuration
+            base_positions = {
+                "l_north_east": ((0, 0), (5, 5)),  # No rotation
+                "l_north_west": ((0, 0), (-5, 5)), # Mirror X
+                "l_south_east": ((0, 5), (5, 0)),  # Mirror Y
+                "l_south_west": ((0, 5), (-5, 0))  # Mirror both
+            }
+            room1_offset, room2_offset = base_positions[config]
+            directions = {
+                "l_north_east": (RoomDirection.SOUTH, RoomDirection.WEST),
+                "l_north_west": (RoomDirection.SOUTH, RoomDirection.EAST),
+                "l_south_east": (RoomDirection.NORTH, RoomDirection.WEST),
+                "l_south_west": (RoomDirection.NORTH, RoomDirection.EAST)
+            }
+            start_dir, end_dir = directions[config]
+            
+            # Create rooms using base position + offsets
+            room1_x = x_offset + 5 + room1_offset[0]
+            room1_y = y_offset + room1_offset[1]
+            room2_x = x_offset + 5 + room2_offset[0]
+            room2_y = y_offset + room2_offset[1]
+            
+            room1 = self.runner.map.create_rectangular_room(room1_x, room1_y, 3, 3)
+            room2 = self.runner.map.create_rectangular_room(room2_x, room2_y, 3, 3)
+            
+            print(f"\n{config.upper()}:")
+            print(f"Room1 at ({room1_x}, {room1_y})")
+            print(f"Room2 at ({room2_x}, {room2_y})")
+            
+            # Generate and validate passage
+            points = [room1.get_exit(start_dir), room2.get_exit(end_dir)]
+            passage_points = Passage.generate_passage_points(
+                points[0], start_dir, points[1], end_dir,
+                bend_positions=[2, 3]
+            )
+            
+            assert passage_points is not None, f"Failed to generate passage points for {config}"
+            
+            # Validate and create passage
+            is_valid, crossed = self.runner.map.occupancy.check_passage(passage_points.points, start_dir)
+            passage = Passage.from_grid_path(passage_points.points)
+            self.runner.map.add_element(passage)
+            room1.connect_to(passage)
+            room2.connect_to(passage)
+            
+            # Add debug label
+            self.runner.add_test_label(f"{config} with bends", (x_offset, y_offset - 1))
+            
+            # Store result for later assertion
+            results.append((config, is_valid, crossed))
+            
+        # Now verify all passages at once
+        for config, is_valid, crossed in results:
+            assert is_valid, f"Generated passage should be valid for {config}"
+            assert not crossed, f"Generated passage should not cross others for {config}"
 
     def _create_l_shaped_pair(self, ox: int, oy: int, config: str) -> tuple[Room, Room]:
         """Create a pair of rooms in L-shaped configuration.
