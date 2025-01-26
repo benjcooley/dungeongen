@@ -243,46 +243,30 @@ class Passage(MapElement):
         dx = 1 if ex > sx else -1 if ex < sx else 0
         dy = 1 if ey > sy else -1 if ey < sy else 0
         
-        # Process each bend position
-        for bend_pos in bend_positions:
-            # Validate bend position
-            if bend_pos <= distance_covered or bend_pos >= D_total:
-                raise ValueError(f"Invalid bend position {bend_pos}")
-            # Calculate distance to move before turning
-            distance = bend_pos - distance_covered
+        # For L-shaped passages, we alternate between x and y movements
+        cx, cy = current
+        
+        # Determine which axis to change first based on start direction
+        if start_direction in (RoomDirection.EAST, RoomDirection.WEST):
+            # Move horizontally first
+            cx = ex  # Move all the way to target x
+            current = (cx, cy)
+            points.append(current)
             
-            # Move in current direction to create orthogonal segments
-            cx, cy = current
-                
-            # First create a point that shares one coordinate with previous point
-            if current_direction in (RoomDirection.EAST, RoomDirection.WEST):
-                # Moving horizontally, so keep same y coordinate
-                cx += dx * distance
-                current = (cx, cy)
-                points.append(current)
-                    
-                # Switch to vertical direction
-                current_direction = RoomDirection.SOUTH if ey > cy else RoomDirection.NORTH
-                    
-                # Then create another point for vertical movement
-                cy = ey
-                current = (cx, cy)
-                points.append(current)
-            else:
-                # Moving vertically, so keep same x coordinate
-                cy += dy * distance
-                current = (cx, cy)
-                points.append(current)
-                    
-                # Switch to horizontal direction
-                current_direction = RoomDirection.EAST if ex > cx else RoomDirection.WEST
-                    
-                # Then create another point for horizontal movement
-                cx = ex
-                current = (cx, cy)
-                points.append(current)
-                
-            distance_covered = bend_pos
+            # Then move vertically to target
+            cy = ey
+            current = (cx, cy)
+            points.append(current)
+        else:
+            # Move vertically first
+            cy = ey  # Move all the way to target y
+            current = (cx, cy)
+            points.append(current)
+            
+            # Then move horizontally to target
+            cx = ex
+            current = (cx, cy)
+            points.append(current)
             
         # Add final segment to end point if needed
         if current != end:
