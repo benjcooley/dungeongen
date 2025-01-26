@@ -309,7 +309,7 @@ class TestPassages:
         assert is_valid, "Generated passage should be valid"
         assert not crossed, "Generated passage should not cross others"
 
-    def _test_l_shaped_passage(self, ox: int, oy: int, config: str, diagonal_dist: int, bend_positions: list[int] = None) -> None:
+    def _test_l_shaped_passage(self, ox: int, oy: int, config: str, diagonal_dist: int, bend_positions: list[int] = []) -> None:
         """Test L-shaped passage with given configuration and diagonal spacing."""
         # Get directions based on configuration
         directions = {
