@@ -6,7 +6,7 @@
     "python.analysis.importFormat": "absolute",
     "editor.formatOnSave": true,
     "python.formatting.provider": "black",
-    "python.analysis.pythonVersion": "3.10",
+    "python.analysis.pythonVersion": "3.12",
     "[python]": {
         "editor.defaultFormatter": "ms-python.python",
         "editor.formatOnSave": true,
