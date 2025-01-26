@@ -384,9 +384,8 @@ class TestPassages:
         """Test L-shaped passage generation with bends in all 4 configurations."""
         configs = ["l_north_east", "l_north_west", "l_south_east", "l_south_west"]
         for i, config in enumerate(configs):
-            # Offset these tests to a different area than the basic tests
-            x_offset = 40 + (i % 2) * 20  # Start at x=40, alternate between 40 and 60
-            y_offset = (i // 2) * 20  # First row y=0, second row y=20
+            x_offset = (i % 2) * 20  # Alternate between 0 and 20
+            y_offset = (i // 2) * 20  # First row 0, second row 20
             self._test_l_shaped_passage(x_offset, y_offset, config, 5, [2, 3])
 
     def _create_l_shaped_pair(self, ox: int, oy: int, config: str) -> tuple[Room, Room]:
