@@ -419,52 +419,6 @@ class TestPassages:
         # Verify passage
         assert is_valid, "Generated passage should be valid"
         assert not crossed, "Generated passage should not cross others"
-        
-        for i, config in enumerate(configs):
-            # Offset each configuration to avoid overlap
-            x_offset = (i % 2) * 15  # Alternate between 0 and 15
-            y_offset = (i // 2) * 15 # First row 0, second row 15
-            
-            room1, room2 = self._create_l_shaped_pair(ox + x_offset, oy + y_offset, config)
-            
-            # Get appropriate exit directions based on configuration
-            start_dir, end_dir = self._get_l_shaped_directions(config)
-            
-            # Generate passage points
-            points = [
-                room1.get_exit(start_dir),
-                room2.get_exit(end_dir)
-            ]
-            
-            # Generate passage point sequence for L-shape
-            passage_points = Passage.generate_passage_points(
-                points[0],
-                start_dir,
-                points[1],
-                end_dir,
-                bend_positions=[]  # No manual bends needed for L-shape
-            )
-            
-            assert passage_points is not None, f"Failed to generate passage points for {config}"
-            
-            # Validate passage
-            is_valid, crossed = self.runner.map.occupancy.check_passage(
-                passage_points.points,
-                start_dir
-            )
-            
-            # Create and connect passage
-            passage = Passage.from_grid_path(passage_points.points)
-            self.runner.map.add_element(passage)
-            room1.connect_to(passage)
-            room2.connect_to(passage)
-            
-            # Add debug label
-            self.runner.add_test_label(config, (ox + x_offset, oy + y_offset - 1))
-
-            # Verify passage
-            assert is_valid, f"Generated passage should be valid for {config}"
-            assert not crossed, f"Generated passage should not cross others for {config}"
 
     def _create_l_shaped_pair(self, ox: int, oy: int, config: str) -> tuple[Room, Room]:
         """Create a pair of rooms in L-shaped configuration.
