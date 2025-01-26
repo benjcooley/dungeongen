@@ -1,11 +1,12 @@
 {
     "python.defaultInterpreterPath": "/Users/benjamincooley/.pyenv/versions/3.12.5/bin/python",
     "python.analysis.typeCheckingMode": "basic",
-    "python.analysis.diagnosticMode": "workspace", 
+    "python.analysis.diagnosticMode": "workspace",
     "python.analysis.autoImportCompletions": true,
     "python.analysis.importFormat": "absolute",
     "editor.formatOnSave": true,
     "python.formatting.provider": "black",
+    "python.analysis.pythonVersion": "3.10",
     "[python]": {
         "editor.defaultFormatter": "ms-python.python",
         "editor.formatOnSave": true,
