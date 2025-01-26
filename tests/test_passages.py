@@ -327,6 +327,7 @@ class TestPassages:
 
     @tag_test(TestTags.BASIC)
     def test_l_shaped_passages(self) -> None:
+        """Test basic L-shaped passage generation with 3-grid diagonal spacing."""
         # Use origin (0,0) for test
         ox, oy = 0, 0
         
@@ -374,7 +375,7 @@ class TestPassages:
         
     @tag_test(TestTags.BASIC)
     def test_l_shaped_passages_with_bends(self) -> None:
-        """Test L-shaped passages with multiple bends."""
+        """Test L-shaped passage generation with 5-grid diagonal spacing and multiple bends."""
         # Use origin (0,0) for test with more space between rooms
         ox, oy = 0, 0
         
