@@ -389,10 +389,10 @@ class TestPassages:
             
             # Get base positions and directions for this configuration
             base_positions = {
-                "l_north_east": ((0, 0), (5, 5)),  # No rotation
-                "l_north_west": ((0, 0), (-5, 5)), # Mirror X
-                "l_south_east": ((0, 5), (5, 0)),  # Mirror Y
-                "l_south_west": ((0, 5), (-5, 0))  # Mirror both
+                "l_north_east": ((0, 0), (2, 2)),  # No rotation
+                "l_north_west": ((0, 0), (-2, 2)), # Mirror X
+                "l_south_east": ((0, 2), (2, 0)),  # Mirror Y
+                "l_south_west": ((0, 2), (-2, 0))  # Mirror both
             }
             room1_offset, room2_offset = base_positions[config]
             directions = {
