@@ -3,7 +3,8 @@
 .pyc
 __pycache__
 .DS_Store
-.vscode
+.vscode/*
+!.vscode/settings.json
 /*.png
 /*.svg
 /*.pdf
