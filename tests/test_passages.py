@@ -334,13 +334,12 @@ class TestPassages:
                 room2.get_exit(end_dir)
             ]
             
-            # Generate full passage point sequence with one bend
+            # Generate passage point sequence for L-shape
             passage_points = Passage.generate_passage_points(
                 points[0],
                 start_dir,
                 points[1],
-                end_dir,
-                bend_positions=[2]  # Place bend after initial segment
+                end_dir
             )
             
             assert passage_points is not None, f"Failed to generate passage points for {config}"
