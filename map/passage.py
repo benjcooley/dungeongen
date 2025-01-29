@@ -252,24 +252,21 @@ class Passage(MapElement):
         
         # Process any intermediate bends first
         for i, bend_pos in enumerate(bend_positions):
-            # Calculate steps to this bend - use absolute positions
-            steps = bend_pos
+            # Calculate steps to this bend - relative to distance traveled so far
+            total_dist_so_far = abs(cx - sx) + abs(cy - sy)
+            steps = bend_pos - total_dist_so_far
             
             # Move along primary axis based on start direction
             if start_direction in (RoomDirection.EAST, RoomDirection.WEST):
-                # Calculate how far to move horizontally
-                target_x = sx + (dx * steps)
-                if target_x != cx:  # Only add point if we actually moved
-                    cx = target_x
-                    current = (cx, cy)
-                    points.append(current)
+                # Move horizontally by remaining steps
+                cx = cx + (dx * steps)
+                current = (cx, cy)
+                points.append(current)
             else:
-                # Calculate how far to move vertically
-                target_y = sy + (dy * steps)
-                if target_y != cy:  # Only add point if we actually moved
-                    cy = target_y
-                    current = (cx, cy)
-                    points.append(current)
+                # Move vertically by remaining steps
+                cy = cy + (dy * steps)
+                current = (cx, cy)
+                points.append(current)
             
             # Turn at the bend - move one step in secondary direction
             if start_direction in (RoomDirection.EAST, RoomDirection.WEST):
