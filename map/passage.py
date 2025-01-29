@@ -250,68 +250,47 @@ class Passage(MapElement):
         total_dx = abs(ex - sx)
         total_dy = abs(ey - sy)
         
-        # Track remaining distance on each axis
-        remaining_dx = total_dx
-        remaining_dy = total_dy
-
-        # Process each bend position if any are provided
+        # Process any intermediate bends first
         for i, bend_pos in enumerate(bend_positions):
             # Calculate steps to this bend
             steps = bend_pos if i == 0 else bend_pos - bend_positions[i-1]
-
+            
             # Move along primary axis based on start direction
             if start_direction in (RoomDirection.EAST, RoomDirection.WEST):
-                # Move horizontally first
-                steps_x = min(steps, remaining_dx)
-                cx = cx + (dx * steps_x)
-                remaining_dx -= steps_x
-                current = (cx, cy)
-                points.append(current)
-
-                # Move partially along minor axis
-                steps_y = min(remaining_dy // (len(bend_positions) - i), remaining_dy)
-                cy = cy + (dy * steps_y)
-                remaining_dy -= steps_y
-                current = (cx, cy)
-                points.append(current)
+                cx = cx + (dx * steps)
             else:
-                # Move vertically first
-                steps_y = min(steps, remaining_dy)
-                cy = cy + (dy * steps_y)
-                remaining_dy -= steps_y
-                current = (cx, cy)
-                points.append(current)
-
-                # Move partially along minor axis
-                steps_x = min(remaining_dx // (len(bend_positions) - i), remaining_dx)
-                cx = cx + (dx * steps_x)
-                remaining_dx -= steps_x
-                current = (cx, cy)
-                points.append(current)
-
-        # Final turn to reach end point
-        if start_direction in (RoomDirection.EAST, RoomDirection.WEST):
-            # Move to final y position
-            cy = ey
+                cy = cy + (dy * steps)
             current = (cx, cy)
             points.append(current)
             
-            # Then to final x if needed
-            if cx != ex:
-                cx = ex
-                current = (cx, cy)
-                points.append(current)
-        else:
-            # Move to final x position
+            # Turn at the bend
+            if start_direction in (RoomDirection.EAST, RoomDirection.WEST):
+                cy = cy + dy
+            else:
+                cx = cx + dx
+            current = (cx, cy)
+            points.append(current)
+
+        # Now handle the final passage+corner+passage sequence
+        # First move along primary axis to align with end point
+        if start_direction in (RoomDirection.EAST, RoomDirection.WEST):
             cx = ex
             current = (cx, cy)
             points.append(current)
             
-            # Then to final y if needed
-            if cy != ey:
-                cy = ey
-                current = (cx, cy)
-                points.append(current)
+            # Then move to final y position
+            cy = ey
+            current = (cx, cy)
+            points.append(current)
+        else:
+            cy = ey
+            current = (cx, cy)
+            points.append(current)
+            
+            # Then move to final x position
+            cx = ex
+            current = (cx, cy)
+            points.append(current)
             
         # Add final segment to end point if needed
         if current != end:
