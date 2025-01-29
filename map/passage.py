@@ -280,41 +280,31 @@ class Passage(MapElement):
             current = (cx, cy)
             points.append(current)
 
-        # Now handle the final passage+corner+passage sequence
-        # Calculate remaining distance to end
-        remaining_steps = (abs(ex - cx) + abs(ey - cy)) - total_steps
-        
-        # First move along primary axis
+        # Handle final L-shaped segment to reach target
         if start_direction in (RoomDirection.EAST, RoomDirection.WEST):
-            steps = abs(ex - cx)
-            if steps > 0:
+            # Move to target x first
+            if cx != ex:
                 cx = ex
                 current = (cx, cy)
                 points.append(current)
-                total_steps += steps
             
-            # Then move to final y position
-            steps = ey - cy
-            if steps != 0:
+            # Then to target y
+            if cy != ey:
                 cy = ey
                 current = (cx, cy)
                 points.append(current)
-                total_steps += abs(steps)
         else:
-            steps = ey - cy
-            if steps != 0:
+            # Move to target y first
+            if cy != ey:
                 cy = ey
                 current = (cx, cy)
                 points.append(current)
-                total_steps += abs(steps)
             
-            # Then move to final x position
-            steps = ex - cx
-            if steps > 0:
+            # Then to target x
+            if cx != ex:
                 cx = ex
                 current = (cx, cy)
                 points.append(current)
-                total_steps += steps
             
         # Add final segment to end point if needed
         if current != end:
