@@ -262,13 +262,13 @@ class Passage(MapElement):
                 cx = cx + (dx * steps)
                 current = (cx, cy)
                 points.append(current)
-                total_steps += abs(steps)
+                total_steps += steps
             else:
                 # Move vertically by remaining steps
                 cy = cy + (dy * steps)
                 current = (cx, cy)
                 points.append(current)
-                total_steps += abs(steps)
+                total_steps += steps
             
             # Turn at the bend - move one step in secondary direction
             if start_direction in (RoomDirection.EAST, RoomDirection.WEST):
@@ -294,22 +294,22 @@ class Passage(MapElement):
                 total_steps += steps
             
             # Then move to final y position
-            steps = abs(ey - cy)
-            if steps > 0:
+            steps = ey - cy
+            if steps != 0:
                 cy = ey
                 current = (cx, cy)
                 points.append(current)
-                total_steps += steps
+                total_steps += abs(steps)
         else:
-            steps = abs(ey - cy)
-            if steps > 0:
+            steps = ey - cy
+            if steps != 0:
                 cy = ey
                 current = (cx, cy)
                 points.append(current)
-                total_steps += steps
+                total_steps += abs(steps)
             
             # Then move to final x position
-            steps = abs(ex - cx)
+            steps = ex - cx
             if steps > 0:
                 cx = ex
                 current = (cx, cy)
