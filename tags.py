@@ -7,7 +7,4 @@ class Tags:
     SMALL = "small"
     MEDIUM = "medium"
     LARGE = "large"
-    
-    def __str__(self) -> str:
-        """Return the tag name in lowercase for use as a string."""
-        return self.name.lower()
+

@@ -16,6 +16,6 @@
     "useLibraryCodeForTypes": true,
     "reportMissingImports": true,
     "reportMissingTypeStubs": false,
-    "pythonVersion": "3.9",
+    "pythonVersion": "3.12",
     "pythonPlatform": "Darwin"
 }

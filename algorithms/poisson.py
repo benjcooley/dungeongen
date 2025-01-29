@@ -95,7 +95,7 @@ class PoissonDiskSampler:
 
                     if all(
                         self.grid[gx][gy] is None or
-                        math.dist((candidate_x, candidate_y), self.grid[gx][gy]) >= self.min_distance
+                        math.dist((candidate_x, candidate_y), self.grid[gx][gy]) >= self.min_distance #type: ignore
                         for gx in range(max(0, grid_x - 2), min(self.grid_width, grid_x + 3))
                         for gy in range(max(0, grid_y - 2), min(self.grid_height, grid_y + 3))
                     ):
@@ -122,7 +122,7 @@ def test_poisson_sampling():
     # Create a sampler with test parameters
     width = height = 100
     min_distance = 10
-    sampler = PoissonDiskSampler(width, height, min_distance)
+    sampler = PoissonDiskSampler(min_distance, Rectangle)
     
     # Sample points
     points = sampler.sample()

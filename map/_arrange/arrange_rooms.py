@@ -78,7 +78,7 @@ def try_connect_rooms(
                   room2.room_type == RoomType.CIRCULAR) or \
                   align_to is not None
 
-    crossed_passages: List[int] = []
+    crossed_passages: List[Tuple[int, int, int]] = []
 
     # Try to find an entry/exit point pair from the room that aren't blocked
     tries = 0
