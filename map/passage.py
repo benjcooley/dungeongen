@@ -342,16 +342,13 @@ class Passage(MapElement):
         else:  # 0.75-0.875 = 3-4 bends
             max_bends = min(max_bends, 4)
             
-        # Generate random number of bends within max
-        num_bends = random.randint(1, max_bends)
-        
         # Adjust for even/odd requirement
-        if needs_even and num_bends % 2 != 0:
-            num_bends -= 1
-        elif not needs_even and num_bends % 2 == 0:
-            num_bends -= 1
+        if needs_even and max_bends % 2 != 0:
+            max_bends -= 1
+        elif not needs_even and max_bends % 2 == 0:
+            max_bends -= 1
             
-        if num_bends <= 0:
+        if max_bends <= 0:
             return []
             
         # Generate unique manhattan distances
