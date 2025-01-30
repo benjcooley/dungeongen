@@ -327,36 +327,45 @@ class Passage(MapElement):
         # Determine if we need even or odd number of bends
         needs_even = not start_direction.is_parallel(end_direction)
         
-        # 50% chance of no bends
-        if max_bends > 0 and random.random() > 0.5:
-            # 25% chance of 1-2 bends
-            if random.random() > 0.5:
-                max_bends = min(max_bends, 2)
-            # 12.5% chance of 3-4 bends    
-            elif random.random() > 0.5:
-                max_bends = min(max_bends, 4)
-                
-            # Generate random number of bends within max
-            num_bends = random.randint(1, max_bends)
+        # Early exit if no bends possible
+        if max_bends <= 0:
+            return []
             
-            # Adjust for even/odd requirement
-            if needs_even and num_bends % 2 != 0:
-                num_bends -= 1
-            elif not needs_even and num_bends % 2 == 0:
-                num_bends -= 1
-                
-            if num_bends <= 0:
-                return []
-                
-            # Generate unique random positions
-            positions = set()
-            while len(positions) < num_bends:
-                pos = random.randint(1, manhattan_distance - 2)
-                positions.add(pos)
-                
-            return sorted(list(positions))
+        # Get random value between 0 and 0.875 (0.5 + 0.25 + 0.125)
+        r = random.random() * 0.875
+        
+        # Determine number of bends based on random value
+        if r <= 0.5:  # 0-0.5 = no bends
+            return []
+        elif r <= 0.75:  # 0.5-0.75 = 1-2 bends
+            max_bends = min(max_bends, 2)
+        else:  # 0.75-0.875 = 3-4 bends
+            max_bends = min(max_bends, 4)
             
-        return []  # No bends
+        # Generate random number of bends within max
+        num_bends = random.randint(1, max_bends)
+        
+        # Adjust for even/odd requirement
+        if needs_even and num_bends % 2 != 0:
+            num_bends -= 1
+        elif not needs_even and num_bends % 2 == 0:
+            num_bends -= 1
+            
+        if num_bends <= 0:
+            return []
+            
+        # Generate unique manhattan distances
+        positions = set()
+        attempts = 0
+        max_attempts = 100  # Prevent infinite loops
+        
+        while len(positions) < num_bends and attempts < max_attempts:
+            pos = random.randint(1, manhattan_distance - 2)
+            positions.add(pos)
+            attempts += 1
+            
+        # If we couldn't get enough unique positions, return what we have
+        return sorted(list(positions))
         
     @staticmethod
     def can_connect(
