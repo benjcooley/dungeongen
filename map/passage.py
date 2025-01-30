@@ -197,8 +197,13 @@ class Passage(MapElement):
         # Handle single grid case
         sx, sy = start
         ex, ey = end
-        if sx == ex and sy == ey:
-            return PassagePoints([start], [0], [])
+        if sx == ex: 
+            if sy == ey:
+                return PassagePoints([start], [0], [])
+            else:
+                return PassagePoints([start, end], [0, abs(ey - sy)], [])
+        elif sy == ey:
+            return PassagePoints([start, end], [0, abs(ex - sx)], [])
 
         # Calculate distances along each axis
         dx = abs(ex - sx)
@@ -215,29 +220,26 @@ class Passage(MapElement):
                 secondary_length = dx
         else:
             # For perpendicular directions, subtract 1 from both axes for start/end segments
-            main_length = max(dx, dy) - 1
-            secondary_length = min(dx, dy) - 1
+            # For parallel directions, subtract 2 from main axis for start/end segments
+            if start_direction in (RoomDirection.EAST, RoomDirection.WEST):
+                main_length = dx - 1
+                secondary_length = dy - 1
+            else:
+                main_length = dy - 1
+                secondary_length = dx - 1
             
         # Calculate maximum allowed bends based on adjusted lengths
-        max_bends_allowed = min(main_length, secondary_length)
+        max_bends_allowed = min(main_length, secondary_length) * 2
         if max_bends_allowed < 0:
             max_bends_allowed = 0
             
         # Validate number of bends
         if len(bend_positions) > max_bends_allowed:
             raise ValueError(f"Number of bends ({len(bend_positions)}) exceeds maximum allowed ({max_bends_allowed})")
-            
-        # Calculate total Manhattan distance for bend position validation
-        D_total = dx + dy
-            
-        # Sort bend positions in ascending order
-        bend_positions = sorted(bend_positions)
         
         # Initialize tracking variables
         points = [start]
         current = start
-        current_direction = start_direction
-        distance_covered = 0
         
         # Get movement vectors for each axis
         dx = 1 if ex > sx else -1 if ex < sx else 0
@@ -246,9 +248,9 @@ class Passage(MapElement):
         # For L-shaped passages, we need to handle the bend point
         cx, cy = current
         
+        cur_axis_x = start_direction == RoomDirection.EAST or start_direction == RoomDirection.WEST
+
         # Calculate total distances and initialize step counter
-        total_dx = abs(ex - sx)
-        total_dy = abs(ey - sy)
         total_steps = 0
         
         # Process any intermediate bends first
@@ -257,7 +259,7 @@ class Passage(MapElement):
             steps = bend_pos - total_steps
             
             # Move along primary axis based on start direction
-            if start_direction in (RoomDirection.EAST, RoomDirection.WEST):
+            if cur_axis_x:
                 # Move horizontally by remaining steps
                 cx = cx + (dx * steps)
                 current = (cx, cy)
@@ -270,45 +272,17 @@ class Passage(MapElement):
                 points.append(current)
                 total_steps += steps
             
-            # Turn at the bend - move one step in secondary direction
-            if start_direction in (RoomDirection.EAST, RoomDirection.WEST):
-                cy = cy + dy  # Move one step vertically
-                total_steps += 1
-            else:
-                cx = cx + dx  # Move one step horizontally
-                total_steps += 1
-            current = (cx, cy)
-            points.append(current)
+            cur_axis_x = not cur_axis_x
+        
+        # Note, we will always have an even number of bends for L-shaped passages
 
         # Handle final L-shaped segment to reach target
-        if start_direction in (RoomDirection.EAST, RoomDirection.WEST):
-            # Move to target x first
-            if cx != ex:
-                cx = ex
-                current = (cx, cy)
-                points.append(current)
-            
-            # Then to target y
-            if cy != ey:
-                cy = ey
-                current = (cx, cy)
-                points.append(current)
+        if cur_axis_x:
+            points.append((ex, cy))
         else:
-            # Move to target y first
-            if cy != ey:
-                cy = ey
-                current = (cx, cy)
-                points.append(current)
-            
-            # Then to target x
-            if cx != ex:
-                cx = ex
-                current = (cx, cy)
-                points.append(current)
-            
-        # Add final segment to end point if needed
-        if current != end:
-            points.append(end)
+            points.append((cx, ey))
+
+        points.append((ex, ey))
             
         # Calculate Manhattan distances for each point
         manhattan_distances = []

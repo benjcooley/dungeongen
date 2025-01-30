@@ -405,6 +405,22 @@ class TestPassages:
                 traceback.print_exc()
         assert not failed
 
+    @tag_test(TestTags.BASIC)
+    def test_l_shaped_passages_with_lotsa_bends(self) -> None:
+        """Test L-shaped passage generation with lots of bends in all 4 configurations."""
+        configs = ["l_north_west", "l_north_east", "l_south_west", "l_south_east"]
+        failed = False
+        bends = [1, 2, 3, 4, 5, 6]
+        for i, config in enumerate(configs):
+            x_offset = (i % 2) * 12 - 6 # Alternate between 0 and 30
+            y_offset = (i // 2) * 13 - 6 # First row 0, second row 30
+            try:
+                self._test_l_shaped_passage(x_offset, y_offset, config, bend_positions=bends, diagonal_dist=7)
+            except AssertionError as e:
+                failed = True
+                traceback.print_exc()
+        assert not failed        
+
     def _create_l_shaped_pair(self, ox: int, oy: int, config: str) -> tuple[Room, Room]:
         """Create a pair of rooms in L-shaped configuration.
         
