@@ -295,6 +295,69 @@ class Passage(MapElement):
         return PassagePoints(points, manhattan_distances, bend_positions)
 
     @staticmethod
+    def generate_random_bends(
+        start: Tuple[int, int],
+        start_direction: RoomDirection,
+        end: Tuple[int, int],
+        end_direction: RoomDirection,
+        manhattan_distance: int
+    ) -> List[int]:
+        """Generate random bend positions for a passage.
+        
+        Args:
+            start: Starting grid point (x,y)
+            start_direction: Direction to exit start point
+            end: Ending grid point (x,y) 
+            end_direction: Direction to enter end point
+            manhattan_distance: Total Manhattan distance between points
+            
+        Returns:
+            List of bend positions (empty list if no bends)
+        """
+        # Calculate distances along each axis
+        dx = abs(end[0] - start[0])
+        dy = abs(end[1] - start[1])
+        
+        # Calculate maximum allowed bends
+        max_bends = min(dx, dy) * 2 - 2
+        if max_bends < 0:
+            max_bends = 0
+            
+        # Determine if we need even or odd number of bends
+        needs_even = not start_direction.is_parallel(end_direction)
+        
+        # 50% chance of no bends
+        if max_bends > 0 and random.random() > 0.5:
+            # 25% chance of 1-2 bends
+            if random.random() > 0.5:
+                max_bends = min(max_bends, 2)
+            # 12.5% chance of 3-4 bends    
+            elif random.random() > 0.5:
+                max_bends = min(max_bends, 4)
+                
+            # Generate random number of bends within max
+            num_bends = random.randint(1, max_bends)
+            
+            # Adjust for even/odd requirement
+            if needs_even and num_bends % 2 != 0:
+                num_bends -= 1
+            elif not needs_even and num_bends % 2 == 0:
+                num_bends -= 1
+                
+            if num_bends <= 0:
+                return []
+                
+            # Generate unique random positions
+            positions = set()
+            while len(positions) < num_bends:
+                pos = random.randint(1, manhattan_distance - 2)
+                positions.add(pos)
+                
+            return sorted(list(positions))
+            
+        return []  # No bends
+        
+    @staticmethod
     def can_connect(
         start: Tuple[int, int],
         start_direction: RoomDirection,
