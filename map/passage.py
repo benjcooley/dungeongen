@@ -300,8 +300,7 @@ class Passage(MapElement):
         start: Tuple[int, int],
         start_direction: RoomDirection,
         end: Tuple[int, int],
-        end_direction: RoomDirection,
-        manhattan_distance: int
+        end_direction: RoomDirection
     ) -> List[int]:
         """Generate random bend positions for a passage.
         
@@ -310,7 +309,6 @@ class Passage(MapElement):
             start_direction: Direction to exit start point
             end: Ending grid point (x,y) 
             end_direction: Direction to enter end point
-            manhattan_distance: Total Manhattan distance between points
             
         Returns:
             List of bend positions (empty list if no bends)
@@ -318,6 +316,7 @@ class Passage(MapElement):
         # Calculate distances along each axis
         dx = abs(end[0] - start[0])
         dy = abs(end[1] - start[1])
+        manhattan_distance = dx + dy
         
         # Calculate maximum allowed bends
         max_bends = min(dx, dy) * 2 - 2
@@ -325,30 +324,33 @@ class Passage(MapElement):
             max_bends = 0
             
         # Determine if we need even or odd number of bends
-        needs_even = not start_direction.is_parallel(end_direction)
+        make_even = 1 if start_direction.is_perpendicular(end_direction) else 0
         
         # Early exit if no bends possible
         if max_bends <= 0:
             return []
             
-        # Get random value between 0 and 0.875 (0.5 + 0.25 + 0.125)
-        r = random.random() * 0.875
-        
-        # Determine number of bends based on random value
-        if r <= 0.5:  # 0-0.5 = no bends
-            return []
-        elif r <= 0.75:  # 0.5-0.75 = 1-2 bends
-            max_bends = min(max_bends, 2)
-        else:  # 0.75-0.875 = 3-4 bends
-            max_bends = min(max_bends, 4)
-            
-        # Adjust for even/odd requirement
-        if needs_even and max_bends % 2 != 0:
-            max_bends -= 1
-        elif not needs_even and max_bends % 2 == 0:
-            max_bends -= 1
-            
-        if max_bends <= 0:
+        # Get random bends
+        r = random.random()
+        if manhattan_distance <= 10:
+            if r <= 0.75:  # no bends
+                return []
+            elif r <= 0.95: # 1-2 bends
+                num_bends = min(max_bends, 1 + make_even)
+            else:  # 3-4 bends
+                num_bends = min(max_bends, 3 + make_even)
+        else:
+            r = random.random() * 0.875
+            if r <= 0.3:  # no bends
+                return []
+            elif r <= 0.7:  # 1-2 bends
+                num_bends = min(max_bends, 1 + make_even)
+            elif r <= 0.95:  # 3-4 bends
+                num_bends = min(max_bends, 3 + make_even)
+            else:  # 5-6 bends
+                num_bends = min(max_bends, 3 + make_even)
+
+        if num_bends <= 0:
             return []
             
         # Generate unique manhattan distances
