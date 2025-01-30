@@ -1,5 +1,6 @@
 """Test cases for passage generation and validation."""
 
+import random
 import traceback
 from typing import Tuple
 from map.room import Room
@@ -420,6 +421,95 @@ class TestPassages:
                 failed = True
                 traceback.print_exc()
         assert not failed        
+
+    @tag_test(TestTags.BASIC)
+    def test_random_passage_generation(self) -> None:
+        """Test random passage generation for both L-shaped and zig-zag configurations."""
+        # Set random seed for reproducible results
+        random.seed(42)
+        
+        # Test parameters
+        short_passages = 5  # Number of short passages to generate
+        long_passages = 5   # Number of long passages to generate
+        spacing = 4        # Vertical spacing between test areas
+        
+        # Starting position for tests
+        ox, oy = 0, 0
+        
+        # Add test info
+        self.runner.add_test_case(
+            number=1,
+            name="Random Passage Generation",
+            description="Test random passage generation for various configurations",
+            location=(ox, oy)
+        )
+        
+        # Generate short passages (manhattan distance < 10)
+        self.runner.add_test_label("Short Passages (<10)", (ox, oy - 1))
+        
+        for i in range(short_passages):
+            # Create L-shaped test area
+            l_rect = self.runner.map.create_rectangular_room(ox, oy + i * spacing, 4, 4)
+            l_rect2 = self.runner.map.create_rectangular_room(ox + 4, oy + i * spacing + 2, 4, 4)
+            
+            # Generate L-shaped passage
+            start = (ox + 2, oy + i * spacing + 2)
+            end = (ox + 6, oy + i * spacing + 4)
+            points = Passage.generate_passage_points(
+                start, RoomDirection.EAST,
+                end, RoomDirection.WEST
+            )
+            passage = Passage.from_grid_path(points.points)
+            self.runner.map.add_element(passage)
+            
+            # Create zig-zag test area (offset to right)
+            z_rect = self.runner.map.create_rectangular_room(ox + 12, oy + i * spacing, 4, 4)
+            z_rect2 = self.runner.map.create_rectangular_room(ox + 16, oy + i * spacing, 4, 4)
+            
+            # Generate zig-zag passage
+            start = (ox + 14, oy + i * spacing + 2)
+            end = (ox + 18, oy + i * spacing + 2)
+            points = Passage.generate_passage_points(
+                start, RoomDirection.EAST,
+                end, RoomDirection.WEST
+            )
+            passage = Passage.from_grid_path(points.points)
+            self.runner.map.add_element(passage)
+            
+        # Move down for long passages
+        oy += short_passages * spacing + 2
+        
+        # Generate long passages (manhattan distance > 10)
+        self.runner.add_test_label("Long Passages (>10)", (ox, oy - 1))
+        
+        for i in range(long_passages):
+            # Create L-shaped test area
+            l_rect = self.runner.map.create_rectangular_room(ox, oy + i * spacing, 6, 6)
+            l_rect2 = self.runner.map.create_rectangular_room(ox + 6, oy + i * spacing + 3, 6, 6)
+            
+            # Generate L-shaped passage
+            start = (ox + 3, oy + i * spacing + 3)
+            end = (ox + 9, oy + i * spacing + 6)
+            points = Passage.generate_passage_points(
+                start, RoomDirection.EAST,
+                end, RoomDirection.WEST
+            )
+            passage = Passage.from_grid_path(points.points)
+            self.runner.map.add_element(passage)
+            
+            # Create zig-zag test area (offset to right)
+            z_rect = self.runner.map.create_rectangular_room(ox + 16, oy + i * spacing, 6, 6)
+            z_rect2 = self.runner.map.create_rectangular_room(ox + 22, oy + i * spacing, 6, 6)
+            
+            # Generate zig-zag passage
+            start = (ox + 19, oy + i * spacing + 3)
+            end = (ox + 25, oy + i * spacing + 3)
+            points = Passage.generate_passage_points(
+                start, RoomDirection.EAST,
+                end, RoomDirection.WEST
+            )
+            passage = Passage.from_grid_path(points.points)
+            self.runner.map.add_element(passage)
 
     def _create_l_shaped_pair(self, ox: int, oy: int, config: str) -> tuple[Room, Room]:
         """Create a pair of rooms in L-shaped configuration.
