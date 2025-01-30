@@ -26,7 +26,11 @@ def main():
         # Get singleton test runner and run specific test
         runner = get_runner()
         runner.setup({TestTags.BASIC})  # Only run BASIC tests
-        runner.run_tests(test_names=["test_simple_passages"])
+        runner.run_tests(test_names=[
+            "test_l_shaped_passages",
+            "test_l_shaped_passages_with_bends",
+            "test_l_shaped_passages_with_lotsa_bends"
+        ])
         return
 
     # Enable debug visualization and logging
