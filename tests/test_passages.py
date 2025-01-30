@@ -463,6 +463,7 @@ class TestPassages:
                 bend_positions=None
             )
             passage = Passage.from_grid_path(points.points)
+            self._check_passage_bounds(passage)
             self.runner.map.add_element(passage)
             
             # Validate passage bounds
