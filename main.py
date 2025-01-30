@@ -27,9 +27,7 @@ def main():
         runner = get_runner()
         runner.setup({TestTags.BASIC})  # Only run BASIC tests
         runner.run_tests(test_names=[
-            "test_l_shaped_passages",
-            "test_l_shaped_passages_with_bends",
-            "test_l_shaped_passages_with_lotsa_bends"
+            "test_random_passage_generation"
         ])
         return
 

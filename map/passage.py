@@ -300,6 +300,26 @@ class Passage(MapElement):
         return PassagePoints(points, manhattan_distances, bend_positions)
 
     @staticmethod
+    def split_section(
+        start: Tuple[int, int],
+        end: Tuple[int, int],
+        points: List[Tuple[int, int]],
+    ) -> None:
+        dx = abs(end[0] - start[0])
+        dy = abs(end[1] - start[1])
+        if dx < 2 or dy < 2:
+            return
+        segment_len = dx + dy
+        split_chance = 0.5 + (0.95 - 0.5) * (segment_len / (segment_len + 30))
+        if random.random() > split_chance:
+            return
+        px = random.randint(1, dx - 1) + min(start[0], end[0])
+        py = random.randint(1, dy - 1) + min(start[1], end[1])
+        Passage.split_section(start, (px, py), points)
+        points.append((px, py))
+        Passage.split_section((px, py), end, points)
+
+    @staticmethod
     def generate_random_bends(
         start: Tuple[int, int],
         start_direction: RoomDirection,
@@ -316,59 +336,28 @@ class Passage(MapElement):
             
         Returns:
             List of bend positions (empty list if no bends)
-        """
-        # Calculate distances along each axis
-        dx = abs(end[0] - start[0])
-        dy = abs(end[1] - start[1])
-        manhattan_distance = dx + dy
-        
-        # Calculate maximum allowed bends
-        max_bends = min(dx, dy) * 2 - 2
-        if max_bends < 0:
-            max_bends = 0
-            
-        # Determine if we need even or odd number of bends
-        make_even = 1 if start_direction.is_perpendicular(end_direction) else 0
-        
-        # Early exit if no bends possible
-        if max_bends <= 0:
+        """        
+        points: List[Tuple[int, int]] = []
+        Passage.split_section(start, end, points)
+        if not points:
             return []
-            
-        # Get random bends
-        r = random.random()
-        if manhattan_distance <= 10:
-            if r <= 0.75:  # no bends
-                return []
-            elif r <= 0.95: # 1-2 bends
-                num_bends = min(max_bends, 1 + make_even)
-            else:  # 3-4 bends
-                num_bends = min(max_bends, 3 + make_even)
-        else:
-            r = random.random() * 0.875
-            if r <= 0.3:  # no bends
-                return []
-            elif r <= 0.7:  # 1-2 bends
-                num_bends = min(max_bends, 1 + make_even)
-            elif r <= 0.95:  # 3-4 bends
-                num_bends = min(max_bends, 3 + make_even)
-            else:  # 5-6 bends
-                num_bends = min(max_bends, 3 + make_even)
 
-        if num_bends <= 0:
-            return []
-            
-        # Generate unique manhattan distances
-        positions = set()
-        attempts = 0
-        max_attempts = 100  # Prevent infinite loops
-        
-        while len(positions) < num_bends and attempts < max_attempts:
-            pos = random.randint(1, manhattan_distance - 2)
-            positions.add(pos)
-            attempts += 1
-            
-        # If we couldn't get enough unique positions, return what we have
-        return sorted(list(positions))
+        axis = 0 if start_direction == RoomDirection.EAST or start_direction == RoomDirection.WEST else 1
+        bends: List[int] = []
+        p = (start[0], start[1])
+
+        pos = 0
+        for i in range(len(points)):
+            pos += abs(points[i][axis] - p[axis])
+            bends.append(pos)
+            p = (points[i][0], p[1]) if axis == 0 else (p[0], points[i][1])
+            axis = axis ^ 1
+            pos += abs(points[i][axis] - p[axis])
+            bends.append(pos)
+            p = (points[i][0], p[1]) if axis == 0 else (p[0], points[i][1])
+            axis = axis ^ 1
+
+        return bends
         
     @staticmethod
     def can_connect(
@@ -420,8 +409,8 @@ class Passage(MapElement):
         
     def _check_bounds_sanity(self) -> None:
         """Verify that passage bounds are within reasonable limits."""
-        bounds = self.shape.bounds()
-        if any(abs(x) > 100 * CELL_SIZE for x in bounds):
+        bounds = self.shape.bounds
+        if bounds.grid_width > 100 or bounds.grid_height > 100:
             raise ValueError(f"Passage bounds {bounds} exceed reasonable limits")
             
     def draw_occupied(self, grid: 'OccupancyGrid', element_idx: int) -> None:
