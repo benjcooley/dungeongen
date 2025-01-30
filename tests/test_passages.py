@@ -514,6 +514,7 @@ class TestPassages:
                 bend_positions=None
             )
             passage = Passage.from_grid_path(points.points)
+            self._check_passage_bounds(passage)
             self.runner.map.add_element(passage)
             
         # Move down for long passages
@@ -536,6 +537,7 @@ class TestPassages:
                 bend_positions=None
             )
             passage = Passage.from_grid_path(points.points)
+            self._check_passage_bounds(passage)
             self.runner.map.add_element(passage)
             
             # Create zig-zag test area (offset to right)
@@ -551,6 +553,7 @@ class TestPassages:
                 bend_positions=None
             )
             passage = Passage.from_grid_path(points.points)
+            self._check_passage_bounds(passage)
             self.runner.map.add_element(passage)
 
     def _create_l_shaped_pair(self, ox: int, oy: int, config: str) -> tuple[Room, Room]:
@@ -630,6 +633,16 @@ class TestPassages:
             room2 = self.runner.map.create_rectangular_room(ox, oy + 8, 3, 3)
             
         return room1, room2
+
+    def _check_passage_bounds(self, passage: Passage) -> None:
+        """Verify that passage bounds are reasonable."""
+        bounds = passage.bounds
+        # Check that bounds dimensions are positive and not too large
+        assert bounds.width > 0 and bounds.width < 100, f"Invalid passage width: {bounds.width}"
+        assert bounds.height > 0 and bounds.height < 100, f"Invalid passage height: {bounds.height}"
+        # Check that bounds are centered reasonably around origin
+        assert abs(bounds.left) < 100, f"Passage too far left: {bounds.left}"
+        assert abs(bounds.top) < 100, f"Passage too far up: {bounds.top}"
 
     def _test_simple_passages(self) -> None:
         """Test simple linear vertical and horizontal passages."""
