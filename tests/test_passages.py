@@ -473,7 +473,8 @@ class TestPassages:
             end = (ox + 18, oy + i * spacing + 2)
             points = Passage.generate_passage_points(
                 start, RoomDirection.EAST,
-                end, RoomDirection.WEST
+                end, RoomDirection.WEST,
+                bend_positions=None
             )
             passage = Passage.from_grid_path(points.points)
             self.runner.map.add_element(passage)
@@ -494,7 +495,8 @@ class TestPassages:
             end = (ox + 9, oy + i * spacing + 6)
             points = Passage.generate_passage_points(
                 start, RoomDirection.EAST,
-                end, RoomDirection.WEST
+                end, RoomDirection.WEST,
+                bend_positions=None
             )
             passage = Passage.from_grid_path(points.points)
             self.runner.map.add_element(passage)
@@ -508,7 +510,8 @@ class TestPassages:
             end = (ox + 25, oy + i * spacing + 3)
             points = Passage.generate_passage_points(
                 start, RoomDirection.EAST,
-                end, RoomDirection.WEST
+                end, RoomDirection.WEST,
+                bend_positions=None
             )
             passage = Passage.from_grid_path(points.points)
             self.runner.map.add_element(passage)
