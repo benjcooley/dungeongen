@@ -454,10 +454,12 @@ class TestPassages:
             # Generate L-shaped passage
             start = (ox + 2, oy + i * spacing + 2)
             end = (ox + 6, oy + i * spacing + 4)
+            # Generate random bends
+            bends = Passage.generate_random_bends(start, RoomDirection.EAST, end, RoomDirection.WEST)
             points = Passage.generate_passage_points(
                 start, RoomDirection.EAST,
                 end, RoomDirection.WEST,
-                bend_positions=None
+                bend_positions=bends
             )
             passage = Passage.from_grid_path(points.points)
             self._check_passage_bounds(passage)
