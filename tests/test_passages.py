@@ -187,8 +187,9 @@ class TestPassages:
             RoomDirection.EAST
         )
         
-        # Create and connect passage regardless of validation
+        # Create passage and verify bounds
         passage = Passage.from_grid_path(passage_points.points)  # Access the points list
+        passage._check_bounds_sanity()
         self.runner.map.add_element(passage)
         room1.connect_to(passage)
         room2.connect_to(passage)

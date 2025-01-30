@@ -418,6 +418,12 @@ class Passage(MapElement):
         """
         return cls(grid_points, start_direction, end_direction, allow_dead_end)
         
+    def _check_bounds_sanity(self) -> None:
+        """Verify that passage bounds are within reasonable limits."""
+        bounds = self.shape.bounds()
+        if any(abs(x) > 100 * CELL_SIZE for x in bounds):
+            raise ValueError(f"Passage bounds {bounds} exceed reasonable limits")
+            
     def draw_occupied(self, grid: 'OccupancyGrid', element_idx: int) -> None:
         """Draw this element's shape and blocked areas into the occupancy grid.
             
