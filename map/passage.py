@@ -1,5 +1,6 @@
 """Passage map element definition."""
 
+import random
 from dataclasses import dataclass
 from graphics.shapes import Rectangle, Shape, ShapeGroup
 from map.mapelement import MapElement
