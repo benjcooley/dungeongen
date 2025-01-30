@@ -464,6 +464,42 @@ class TestPassages:
             passage = Passage.from_grid_path(points.points)
             self.runner.map.add_element(passage)
             
+            # Validate passage bounds
+            passage_bounds = passage.shape.get_bounds()
+            expected_bounds = (ox + 16, oy + i * spacing, ox + 28, oy + i * spacing + 6)
+            assert (abs(passage_bounds[0] - expected_bounds[0]) <= CELL_SIZE and
+                   abs(passage_bounds[1] - expected_bounds[1]) <= CELL_SIZE and
+                   abs(passage_bounds[2] - expected_bounds[2]) <= CELL_SIZE and
+                   abs(passage_bounds[3] - expected_bounds[3]) <= CELL_SIZE), \
+                   f"Long zig-zag passage bounds {passage_bounds} outside expected {expected_bounds}"
+            
+            # Validate passage bounds
+            passage_bounds = passage.shape.get_bounds()
+            expected_bounds = (ox, oy + i * spacing, ox + 12, oy + i * spacing + 9)
+            assert (abs(passage_bounds[0] - expected_bounds[0]) <= CELL_SIZE and
+                   abs(passage_bounds[1] - expected_bounds[1]) <= CELL_SIZE and
+                   abs(passage_bounds[2] - expected_bounds[2]) <= CELL_SIZE and
+                   abs(passage_bounds[3] - expected_bounds[3]) <= CELL_SIZE), \
+                   f"Long L-shaped passage bounds {passage_bounds} outside expected {expected_bounds}"
+            
+            # Validate passage bounds
+            passage_bounds = passage.shape.get_bounds()
+            expected_bounds = (ox + 12, oy + i * spacing, ox + 20, oy + i * spacing + 4)
+            assert (abs(passage_bounds[0] - expected_bounds[0]) <= CELL_SIZE and
+                   abs(passage_bounds[1] - expected_bounds[1]) <= CELL_SIZE and
+                   abs(passage_bounds[2] - expected_bounds[2]) <= CELL_SIZE and
+                   abs(passage_bounds[3] - expected_bounds[3]) <= CELL_SIZE), \
+                   f"Zig-zag passage bounds {passage_bounds} outside expected {expected_bounds}"
+            
+            # Validate passage bounds
+            passage_bounds = passage.shape.get_bounds()
+            expected_bounds = (ox, oy + i * spacing, ox + 8, oy + i * spacing + 6)
+            assert (abs(passage_bounds[0] - expected_bounds[0]) <= CELL_SIZE and
+                   abs(passage_bounds[1] - expected_bounds[1]) <= CELL_SIZE and
+                   abs(passage_bounds[2] - expected_bounds[2]) <= CELL_SIZE and
+                   abs(passage_bounds[3] - expected_bounds[3]) <= CELL_SIZE), \
+                   f"L-shaped passage bounds {passage_bounds} outside expected {expected_bounds}"
+            
             # Create zig-zag test area (offset to right)
             z_rect = self.runner.map.create_rectangular_room(ox + 12, oy + i * spacing, 4, 4)
             z_rect2 = self.runner.map.create_rectangular_room(ox + 16, oy + i * spacing, 4, 4)
