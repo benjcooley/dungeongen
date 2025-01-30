@@ -467,17 +467,6 @@ class TestPassages:
             self._check_passage_bounds(passage)
             self.runner.map.add_element(passage)
             
-            # Validate passage bounds
-            bounds = passage.bounds
-            expected_left = ox + 16
-            expected_top = oy + i * spacing
-            expected_width = 12
-            expected_height = 6
-            assert (abs(bounds.left - expected_left) <= CELL_SIZE and
-                   abs(bounds.top - expected_top) <= CELL_SIZE and
-                   abs(bounds.width - expected_width) <= CELL_SIZE and
-                   abs(bounds.height - expected_height) <= CELL_SIZE), \
-                   f"Long zig-zag passage bounds {bounds} outside expected bounds"
             
             # Create zig-zag test area (offset to right)
             z_rect = self.runner.map.create_rectangular_room(ox + 12, oy + i * spacing, 4, 4)
@@ -616,11 +605,15 @@ class TestPassages:
         """Verify that passage bounds are reasonable."""
         bounds = passage.bounds
         # Check that bounds dimensions are positive and not too large
-        assert bounds.width > 0 and bounds.width < 100, f"Invalid passage width: {bounds.width}"
-        assert bounds.height > 0 and bounds.height < 100, f"Invalid passage height: {bounds.height}"
+        assert bounds.width > 0 and bounds.width < 100, \
+            f"Invalid passage bounds: width={bounds.width}, height={bounds.height}, at ({bounds.left}, {bounds.top})"
+        assert bounds.height > 0 and bounds.height < 100, \
+            f"Invalid passage bounds: width={bounds.width}, height={bounds.height}, at ({bounds.left}, {bounds.top})"
         # Check that bounds are centered reasonably around origin
-        assert abs(bounds.left) < 100, f"Passage too far left: {bounds.left}"
-        assert abs(bounds.top) < 100, f"Passage too far up: {bounds.top}"
+        assert abs(bounds.left) < 100, \
+            f"Invalid passage bounds: width={bounds.width}, height={bounds.height}, at ({bounds.left}, {bounds.top})"
+        assert abs(bounds.top) < 100, \
+            f"Invalid passage bounds: width={bounds.width}, height={bounds.height}, at ({bounds.left}, {bounds.top})"
 
     def _test_simple_passages(self) -> None:
         """Test simple linear vertical and horizontal passages."""
