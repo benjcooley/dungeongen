@@ -441,7 +441,8 @@ class TestPassages:
             number=1,
             name="Random Passage Generation",
             description="Test random passage generation for various configurations",
-            location=(ox, oy)
+            location=(ox, oy),
+            text_offset=(20, -20)  # Offset text to avoid overlapping with passages
         )
         
         # Generate short passages (manhattan distance < 10)
@@ -457,7 +458,8 @@ class TestPassages:
             end = (ox + 6, oy + i * spacing + 4)
             points = Passage.generate_passage_points(
                 start, RoomDirection.EAST,
-                end, RoomDirection.WEST
+                end, RoomDirection.WEST,
+                bend_positions=None
             )
             passage = Passage.from_grid_path(points.points)
             self.runner.map.add_element(passage)
