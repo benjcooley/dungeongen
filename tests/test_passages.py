@@ -450,11 +450,7 @@ class TestPassages:
         # Generate short passages (manhattan distance < 10)
         self.runner.add_test_label("Short Passages (<10)", (ox, oy - 1))
         
-        for i in range(short_passages):
-            # Create L-shaped test area
-            l_rect = self.runner.map.create_rectangular_room(ox, oy + i * spacing, 4, 4)
-            l_rect2 = self.runner.map.create_rectangular_room(ox + 4, oy + i * spacing + 2, 4, 4)
-            
+        for i in range(short_passages):            
             # Generate L-shaped passage
             start = (ox + 2, oy + i * spacing + 2)
             end = (ox + 6, oy + i * spacing + 4)
@@ -466,15 +462,10 @@ class TestPassages:
             passage = Passage.from_grid_path(points.points)
             self._check_passage_bounds(passage)
             self.runner.map.add_element(passage)
-            
-            
-            # Create zig-zag test area (offset to right)
-            z_rect = self.runner.map.create_rectangular_room(ox + 12, oy + i * spacing, 4, 4)
-            z_rect2 = self.runner.map.create_rectangular_room(ox + 16, oy + i * spacing, 4, 4)
-            
+                        
             # Generate zig-zag passage
             start = (ox + 14, oy + i * spacing + 2)
-            end = (ox + 18, oy + i * spacing + 2)
+            end = (ox + 18, oy + i * spacing + 2 + 4)
             points = Passage.generate_passage_points(
                 start, RoomDirection.EAST,
                 end, RoomDirection.WEST,
@@ -490,11 +481,9 @@ class TestPassages:
         # Generate long passages (manhattan distance > 10)
         self.runner.add_test_label("Long Passages (>10)", (ox, oy - 1))
         
+        spacing = 6  # Increase spacing for long passages
+
         for i in range(long_passages):
-            # Create L-shaped test area
-            l_rect = self.runner.map.create_rectangular_room(ox, oy + i * spacing, 6, 6)
-            l_rect2 = self.runner.map.create_rectangular_room(ox + 6, oy + i * spacing + 3, 6, 6)
-            
             # Generate L-shaped passage
             start = (ox + 3, oy + i * spacing + 3)
             end = (ox + 9, oy + i * spacing + 6)
@@ -507,13 +496,9 @@ class TestPassages:
             self._check_passage_bounds(passage)
             self.runner.map.add_element(passage)
             
-            # Create zig-zag test area (offset to right)
-            z_rect = self.runner.map.create_rectangular_room(ox + 16, oy + i * spacing, 6, 6)
-            z_rect2 = self.runner.map.create_rectangular_room(ox + 22, oy + i * spacing, 6, 6)
-            
             # Generate zig-zag passage
             start = (ox + 19, oy + i * spacing + 3)
-            end = (ox + 25, oy + i * spacing + 3)
+            end = (ox + 25, oy + i * spacing + 3 + 4) 
             points = Passage.generate_passage_points(
                 start, RoomDirection.EAST,
                 end, RoomDirection.WEST,
@@ -554,7 +539,7 @@ class TestPassages:
         return room1, room2
 
     def _get_l_shaped_directions(self, config: str) -> tuple[RoomDirection, RoomDirection]:
-        """Get the appropriate start/end directions for L-shaped passage configuration.
+        """Get the πappropriate start/end directions for L-shaped passage configuration.
         
         Args:
             config: The L-shape configuration name
@@ -605,15 +590,15 @@ class TestPassages:
         """Verify that passage bounds are reasonable."""
         bounds = passage.bounds
         # Check that bounds dimensions are positive and not too large
-        assert bounds.width > 0 and bounds.width < 100, \
-            f"Invalid passage bounds: width={bounds.width}, height={bounds.height}, at ({bounds.left}, {bounds.top})"
-        assert bounds.height > 0 and bounds.height < 100, \
-            f"Invalid passage bounds: width={bounds.width}, height={bounds.height}, at ({bounds.left}, {bounds.top})"
+        assert bounds.grid_width > 0 and bounds.grid_width < 100, \
+            f"Invalid passage bounds: width={bounds.grid_width}, height={bounds.grid_height}, at ({bounds.grid_x}, {bounds.grid_y})"
+        assert bounds.grid_height > 0 and bounds.grid_height < 100, \
+            f"Invalid passage bounds: width={bounds.grid_width}, height={bounds.grid_height}, at ({bounds.grid_x}, {bounds.grid_y})"
         # Check that bounds are centered reasonably around origin
-        assert abs(bounds.left) < 100, \
-            f"Invalid passage bounds: width={bounds.width}, height={bounds.height}, at ({bounds.left}, {bounds.top})"
-        assert abs(bounds.top) < 100, \
-            f"Invalid passage bounds: width={bounds.width}, height={bounds.height}, at ({bounds.left}, {bounds.top})"
+        assert abs(bounds.grid_x) < 100, \
+            f"Invalid passage bounds: width={bounds.grid_width}, height={bounds.grid_height}, at ({bounds.grid_x}, {bounds.grid_y})"
+        assert abs(bounds.grid_y) < 100, \
+            f"Invalid passage bounds: width={bounds.grid_width}, height={bounds.grid_height}, at ({bounds.grid_x}, {bounds.grid_y})"
 
     def _test_simple_passages(self) -> None:
         """Test simple linear vertical and horizontal passages."""
