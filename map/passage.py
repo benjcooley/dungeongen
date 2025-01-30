@@ -161,7 +161,7 @@ class Passage(MapElement):
         start_direction: RoomDirection,
         end: Tuple[int, int],
         end_direction: RoomDirection,
-        bend_positions: List[int],
+        bend_positions: Optional[List[int]],
         min_run_length: int = 1
     ) -> PassagePoints:
         """Generate a list of grid points for a passage using specified bend positions.
@@ -194,6 +194,10 @@ class Passage(MapElement):
         # First check if passage is possible
         if not Passage.can_connect(start, start_direction, end, end_direction):
             raise ValueError("Cannot connect points with given directions")
+
+        # Generate random bend positions if not provided
+        if bend_positions is None:
+            bend_positions = Passage.generate_random_bends(start, start_direction, end, end_direction)
 
         # Handle single grid case
         sx, sy = start
