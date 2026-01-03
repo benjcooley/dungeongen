@@ -151,6 +151,16 @@ image.save('my_dungeon.png', skia.kPNG)
 - `LAKES` - ~82% coverage
 - `FLOODED` - ~90% coverage
 
+## Acknowledgments
+
+This project was inspired by [**watabou's One Page Dungeon**](https://watabou.itch.io/one-page-dungeon), a fantastic procedural dungeon generator. The hand-drawn crosshatch aesthetic and overall visual style draw heavily from watabou's work.
+
+- **One Page Dungeon Generator**: https://watabou.itch.io/one-page-dungeon
+- **watabou's other generators**: https://watabou.itch.io/
+- **Source code (Haxe)**: https://github.com/watabou/one-page-dungeon
+
+Note: This project is a complete rewrite in Python, not a port. While inspired by watabou's visual style and procedural generation concepts, the algorithms and implementation are original.
+
 ## License
 
 MIT License - See [LICENSE](LICENSE) file for details.
