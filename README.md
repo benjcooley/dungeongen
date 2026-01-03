@@ -2,7 +2,7 @@
 
 A procedural dungeon generation and rendering system for tabletop RPG maps.
 
-![Example Dungeon](docs/dungeon_example.png)
+![Temple Dungeon](docs/dungeon_temple.png)
 
 ## Features
 
@@ -28,74 +28,80 @@ Procedural water generation using noise-based field generation:
 - **Organic shorelines** using marching squares with Chaikin smoothing
 - **Ripple effects** that follow contour curves
 
-![Temple Dungeon](docs/dungeon_temple.png)
-
 ## Project Structure
 
 ```
 dungeongen/
-├── layout/          # Dungeon layout generation
-│   ├── generator.py # Main procedural generator
-│   ├── models.py    # Room, Passage, Door data models
-│   ├── params.py    # Generation parameters
-│   └── validator.py # Layout validation
+├── src/dungeongen/      # Main package
+│   ├── layout/          # Dungeon layout generation
+│   │   ├── generator.py # Main procedural generator
+│   │   ├── models.py    # Room, Passage, Door data models
+│   │   ├── params.py    # Generation parameters
+│   │   └── validator.py # Layout validation
+│   │
+│   ├── map/             # Map rendering system
+│   │   ├── map.py       # Main renderer
+│   │   ├── room.py      # Room rendering
+│   │   ├── passage.py   # Passage rendering
+│   │   ├── water_layer.py # Water generation
+│   │   └── _props/      # Decorations (columns, altars, etc.)
+│   │
+│   ├── drawing/         # Drawing utilities
+│   │   ├── crosshatch.py    # Crosshatch shading
+│   │   └── water.py         # Water rendering
+│   │
+│   ├── algorithms/      # Generic algorithms
+│   │   ├── marching_squares.py  # Contour extraction
+│   │   ├── chaikin.py          # Curve smoothing
+│   │   └── poisson.py          # Poisson disk sampling
+│   │
+│   ├── graphics/        # Graphics utilities
+│   │   ├── noise.py     # Perlin noise, FBM
+│   │   └── shapes.py    # Shape primitives
+│   │
+│   └── webview/         # Interactive web preview
+│       ├── app.py       # Flask application
+│       └── templates/   # HTML templates
 │
-├── map/             # Map rendering system
-│   ├── map.py       # Main renderer
-│   ├── room.py      # Room rendering
-│   ├── passage.py   # Passage rendering
-│   ├── water_layer.py # Water generation
-│   └── _props/      # Decorations (columns, altars, etc.)
-│
-├── drawing/         # Drawing utilities
-│   ├── crosshatch.py    # Crosshatch shading
-│   └── water.py         # Water rendering
-│
-├── algorithms/      # Generic algorithms
-│   ├── marching_squares.py  # Contour extraction
-│   ├── chaikin.py          # Curve smoothing
-│   └── poisson.py          # Poisson disk sampling
-│
-├── graphics/        # Graphics utilities
-│   ├── noise.py     # Perlin noise, FBM
-│   └── shapes.py    # Shape primitives
-│
-└── webview/         # Interactive web preview
-    ├── app.py       # Flask application
-    └── templates/   # HTML templates
+├── tests/               # Test suite
+├── docs/                # Documentation
+└── pyproject.toml       # Package configuration
 ```
 
 ## Installation
 
+### From PyPI
 ```bash
-# Clone the repository
-git clone https://github.com/yourusername/dungeongen.git
-cd dungeongen
+pip install dungeongen
+```
 
-# Install dependencies
-pip install -r requirements.txt
+### From Source (for development)
+```bash
+git clone https://github.com/benjcooley/dungeongen.git
+cd dungeongen
+pip install -e .
 ```
 
 ### Dependencies
 - Python 3.10+
 - skia-python (rendering)
 - numpy (noise generation)
-- opensimplex (Simplex noise)
 - Flask (web preview)
+- rich (logging)
 
 ## Usage
 
 ### Web Preview
 ```bash
-python -m webview.app
+python -m dungeongen.webview.app
 ```
 Then open http://localhost:5050 in your browser.
 
 ### Python API
 ```python
-from layout import DungeonGenerator, GenerationParams, DungeonSize, SymmetryType
-from webview.adapter import convert_dungeon
-from map.water_layer import WaterDepth
+from dungeongen.layout import DungeonGenerator, GenerationParams, DungeonSize, SymmetryType
+from dungeongen.webview.adapter import convert_dungeon
+from dungeongen.map.water_layer import WaterDepth
 import skia
 
 # Configure generation
@@ -147,4 +153,8 @@ image.save('my_dungeon.png', skia.kPNG)
 
 ## License
 
-MIT License - See LICENSE file for details.
+MIT License - See [LICENSE](LICENSE) file for details.
+
+---
+
+![Example Dungeon](docs/dungeon_example.png)
