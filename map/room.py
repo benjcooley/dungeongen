@@ -64,8 +64,10 @@ class Room(MapElement):
                 y: float, \
                 width: float = 0, \
                 height: float = 0, \
-                room_type: RoomType = RoomType.RECTANGULAR) -> None:
+                room_type: RoomType = RoomType.RECTANGULAR, \
+                number: int = 0) -> None:
         self._room_type = room_type
+        self._number = number  # Room number for display
         if room_type == RoomType.CIRCULAR:
             if width != height:
                 raise ValueError("Circular rooms must have equal width and height.")
@@ -85,6 +87,16 @@ class Room(MapElement):
     def room_type(self) -> RoomType:
         """Get the room type."""
         return self._room_type
+    
+    @property
+    def number(self) -> int:
+        """Get the room number for display."""
+        return self._number
+    
+    @number.setter
+    def number(self, value: int) -> None:
+        """Set the room number for display."""
+        self._number = value
 
     def _draw_corner(self, canvas: skia.Canvas, corner: Point2D, left: Point2D, right: Point2D) -> None:
         """Draw a single corner decoration.
@@ -161,7 +173,78 @@ class Room(MapElement):
         """Draw the room and its props."""
         if layer == Layers.PROPS:
             self.draw_corners(canvas)
+        elif layer == Layers.TEXT:
+            self._draw_number(canvas)
         super().draw(canvas, layer)
+    
+    # Class-level font cache
+    _number_typeface: 'skia.Typeface' = None
+    
+    @classmethod
+    def _get_number_typeface(cls) -> 'skia.Typeface':
+        """Get or load the Roboto Condensed typeface (weight 400)."""
+        if cls._number_typeface is None:
+            import os
+            # Load from fonts directory
+            font_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'fonts')
+            font_path = os.path.join(font_dir, 'RobotoCondensed-Regular.ttf')
+            
+            if not os.path.exists(font_path):
+                raise FileNotFoundError(f"Font file not found: {font_path}")
+            
+            cls._number_typeface = skia.Typeface.MakeFromFile(font_path)
+            
+            if cls._number_typeface is None:
+                raise RuntimeError(f"Failed to load font from: {font_path}")
+            
+            print(f"[Room] Loaded font: {cls._number_typeface.getFamilyName()} from {font_path}")
+        return cls._number_typeface
+    
+    def _draw_number(self, canvas: 'skia.Canvas') -> None:
+        """Draw the room number in the center of the room as a path (for SVG compatibility)."""
+        if self._number <= 0:
+            return
+        
+        # Get room center
+        center_x = self._bounds.x + self._bounds.width / 2
+        center_y = self._bounds.y + self._bounds.height / 2
+        
+        # Fixed font size of 54pt (2/3 larger than 32)
+        font_size = 54
+        
+        # Create font - Roboto Condensed (loaded from file)
+        typeface = self._get_number_typeface()
+        font = skia.Font(typeface, font_size)
+        
+        # Create paint for text path
+        text_paint = skia.Paint(
+            Color=skia.ColorSetARGB(180, 0, 0, 0),  # Semi-transparent black
+            AntiAlias=True,
+            Style=skia.Paint.kFill_Style
+        )
+        
+        text = str(self._number)
+        
+        # Convert text to path for SVG embedding
+        path = skia.Path()
+        glyphs = font.textToGlyphs(text)
+        widths = font.getWidths(glyphs)
+        
+        # Calculate total width for centering
+        total_width = sum(widths)
+        x = center_x - total_width / 2
+        y = center_y + font_size / 3  # Approximate vertical centering
+        
+        # Add each glyph path
+        current_x = x
+        for i, glyph in enumerate(glyphs):
+            glyph_path = font.getPath(glyph)
+            if glyph_path:
+                glyph_path.offset(current_x, y)
+                path.addPath(glyph_path)
+            current_x += widths[i]
+        
+        canvas.drawPath(path, text_paint)
 
     @classmethod
     def from_grid(cls, \
@@ -169,7 +252,8 @@ class Room(MapElement):
                 grid_y: float, \
                 grid_width: float = 0, \
                 grid_height: float = 0, \
-                room_type: RoomType = RoomType.RECTANGULAR) -> 'Room':
+                room_type: RoomType = RoomType.RECTANGULAR, \
+                number: int = 0) -> 'Room':
         """Create a room using grid coordinates.
         
         Args:
@@ -177,14 +261,15 @@ class Room(MapElement):
             grid_y: Y coordinate in grid units
             grid_width: Width in map units
             grid_height: Height in map units            
-            grid_diameter: Diameter in map units
+            room_type: Type of room (rectangular or circular)
+            number: Room number for display
             
         Returns:
-            A new circular room instance
+            A new room instance
         """
         x, y = grid_to_map(grid_x, grid_y)
         w, h = grid_to_map(grid_width, grid_height)
-        return cls(x, y, width=w, height=h, room_type=room_type)
+        return cls(x, y, width=w, height=h, room_type=room_type, number=number)
         
     def draw_occupied(self, grid: 'OccupancyGrid', element_idx: int) -> None:
         """Draw this element's shape into the occupancy grid.

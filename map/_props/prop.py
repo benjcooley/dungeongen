@@ -48,16 +48,26 @@ class Prop(ABC):
                  rotation: Rotation = Rotation.ROT_0,
                  boundary_shape: Shape | None = None,
                  grid_size: Point | None = None) -> None:
-        """
-        Props are drawn relative to their center point. The default orientation (0° rotation)
-        has the prop facing right. Rotation happens counterclockwise in 90° increments.
+        """Initialize a prop.
+        
+        IMPORTANT - Position Semantics:
+        - For grid-aligned props (grid_size is set): `position` is the TOP-LEFT corner
+          of the grid bounds. The prop is drawn centered within those grid bounds.
+          To place a prop at a specific center point, use:
+            position = (center_x - grid_width/2, center_y - grid_height/2)
+          where grid_width = grid_size[0] * CELL_SIZE (or grid_size[1] for 90/270 rotation)
+        
+        - For non-grid props: `position` is the top-left of the boundary_shape bounds.
+        
+        Rotation is applied around the center of the grid_bounds (or bounds for non-grid props).
+        The default orientation (0° rotation) varies by prop type.
         
         Args:
             prop_type: Type info for the prop
-            position: Position to place prop in map units
+            position: TOP-LEFT corner of grid_bounds (for grid-aligned) or bounds (for others)
             boundary_shape: Shape defining the prop's collision boundary, centered at (0,0) at rotation 0
-            rotation: Rotation angle in 90° increments (default: facing right)
-            grid_size: Optional size in grid units prop occupies if prop is grid aligned
+            rotation: Rotation angle in 90° increments
+            grid_size: Optional size in grid units (width, height) the prop occupies
         """
         if boundary_shape is None:
             boundary_shape = prop_type.boundary_shape
@@ -390,7 +400,7 @@ class Prop(ABC):
     def center(self) -> Point:
         """Get the center position of the prop."""
         bounds = self._grid_bounds if self._grid_bounds is not None else self._bounds
-        return bounds.center() #type: ignore
+        return bounds.center
         
     @center.setter
     def center(self, pos: tuple[float, float]) -> None:
@@ -400,8 +410,9 @@ class Prop(ABC):
             pos: Tuple of (x,y) coordinates for the new center position
         """
         bounds = self._grid_bounds if self._grid_bounds is not None else self._bounds
-        dx = pos[0] - bounds.center()[0] #type: ignore
-        dy = pos[1] - bounds.center()[1] #type: ignore
+        current_center = bounds.center
+        dx = pos[0] - current_center[0]
+        dy = pos[1] - current_center[1]
         self.position = (self.position[0] + dx, self.position[1] + dy)
 
     def is_valid_position(self, x: float, y: float, rotation: Rotation = Rotation.ROT_0, container: Optional['MapElement'] = None) -> bool:

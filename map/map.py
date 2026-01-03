@@ -3,7 +3,7 @@
 import math
 import random
 from typing import Generic, Iterator, List, Optional, Sequence, Tuple, TypeVar, TYPE_CHECKING
-from tags import Tags
+from map.enums import Tags
 from logging_config import logger, LogTags
 from debug_config import debug_draw, DebugDrawFlags
 
@@ -13,6 +13,8 @@ from graphics.shapes import Circle, Rectangle, Shape, ShapeGroup
 from constants import CELL_SIZE
 from graphics.conversions import grid_to_map
 from drawing.crosshatch import draw_crosshatches
+from drawing.crosshatch_tiled import draw_crosshatches_tiled, generate_hatch_tile, HatchTileData
+from drawing.water import WaterStyle
 from map.enums import Layers
 from typing import Generic, Iterator, List, Optional, Sequence, Tuple, TypeVar, TYPE_CHECKING
 from map.grid import GridStyle, draw_region_grid
@@ -20,6 +22,7 @@ from map.mapelement import MapElement
 from map.occupancy import ElementType, OccupancyGrid
 from map.region import Region
 from map.room import Room, RoomType
+from map.water_layer import WaterLayer, WaterFieldParams, WaterDepth
 from options import Options
 
 if TYPE_CHECKING:
@@ -27,7 +30,7 @@ if TYPE_CHECKING:
     from map.door import Door, DoorType
     from map.room import Room, RoomType
     from map.passage import Passage
-    from map.stairs import Stairs
+    from map.exit import Exit
 
 REGION_INFLATE = CELL_SIZE * 0.025
 
@@ -44,6 +47,9 @@ class Map:
         self._bounds = Rectangle(0, 0, CELL_SIZE, CELL_SIZE)  # Default to single cell at origin
         self._bounds_dirty: bool = True
         self.occupancy = OccupancyGrid(200, 200)  # Initialize with default size
+        self._hatch_tile: Optional[HatchTileData] = None  # Cached crosshatch tile
+        self._water_layer: Optional[WaterLayer] = None  # Water generation layer
+        self._water_depth: float = WaterDepth.DRY  # Water depth level (0 = disabled)
     
     @staticmethod
     def get_invalid_map() -> 'Map':
@@ -57,6 +63,59 @@ class Map:
     def is_invalid(self) -> bool:
         """Check if this map is the 'invalid' map."""
         return self == Map.get_invalid_map()
+    
+    @property
+    def hatch_tile(self) -> HatchTileData:
+        """Get cached crosshatch tile, generating if needed."""
+        if self._hatch_tile is None:
+            self._hatch_tile = generate_hatch_tile(self._options, grid_cells=4, seed=4242)
+        return self._hatch_tile
+    
+    def set_water(self, depth: float, seed: int = 42, lf_scale: float = 0.018, resolution_scale: float = 0.2,
+                  stroke_width: float = 3.5, ripple_inset: float = 8.0) -> None:
+        """Enable water generation with the given depth level.
+        
+        Args:
+            depth: Water depth from WaterDepth constants (DRY, PUDDLES, POOLS, LAKES, FLOODED)
+            seed: Random seed for water generation
+            lf_scale: Noise scale for water features (0.016 = grid-scale blobs)
+            resolution_scale: Resolution scale (0.3 = 30% res, faster/coarser)
+            stroke_width: Shoreline stroke width
+            ripple_inset: Distance to inset ripple lines from shore
+        """
+        self._water_depth = depth
+        self._water_lf_scale = lf_scale
+        self._water_res_scale = resolution_scale
+        self._water_stroke_width = stroke_width
+        self._water_ripple_inset = ripple_inset
+        if depth > 0:
+            # Will be initialized lazily when bounds are known
+            self._water_seed = seed
+        else:
+            self._water_layer = None
+    
+    @property
+    def water_layer(self) -> Optional[WaterLayer]:
+        """Get water layer, generating if needed."""
+        if self._water_depth <= 0:
+            return None
+        
+        if self._water_layer is None:
+            # Generate water based on map bounds
+            bounds = self.bounds
+            width = int(bounds.width)
+            height = int(bounds.height)
+            
+            if width > 0 and height > 0:
+                params = WaterFieldParams(
+                    depth=self._water_depth,
+                    lf_scale=getattr(self, '_water_lf_scale', 0.015),
+                    resolution_scale=getattr(self, '_water_res_scale', 0.5)
+                )
+                self._water_layer = WaterLayer(width, height, self._water_seed, params)
+                self._water_layer.generate()
+        
+        return self._water_layer
 
     @property
     def elements(self) -> Sequence[MapElement]:
@@ -139,11 +198,19 @@ class Map:
     @property
     def doors(self) -> Iterator['Door']:
         """Returns a new iterable of all doors in the map."""
+        from map.door import Door
         return (elem for elem in self._elements if isinstance(elem, Door))
+    
+    @property
+    def exits(self) -> Iterator['Exit']:
+        """Returns a new iterable of all exits in the map."""
+        from map.exit import Exit
+        return (elem for elem in self._elements if isinstance(elem, Exit))
     
     @property
     def passages(self) -> Iterator['Passage']:
         """Returns a new iterable of all passages in the map."""
+        from map.passage import Passage
         return (elem for elem in self._elements if isinstance(elem, Passage))
     
     @property
@@ -155,8 +222,9 @@ class Map:
                               element: MapElement,
                               visited: set[MapElement],
                               region: list[MapElement]) -> None:
-        """Recursively trace connected elements that aren't separated by closed doors."""
+        """Recursively trace connected elements that aren't separated by closed doors or exits."""
         from map.door import Door
+        from map.exit import Exit
         
         if element in visited:
             return
@@ -167,7 +235,11 @@ class Map:
         for connection in element.connections:
             # If connection is a closed door, add its side shape but don't traverse
             if isinstance(connection, Door) and not connection.open:
-                region.append(element)
+                region.append(connection.get_side_shape(element))
+                continue
+            # If connection is an exit, add its chip shape but don't traverse (it's terminal)
+            if isinstance(connection, Exit):
+                region.append(connection.get_side_shape(element))
                 continue
             self._trace_connected_region(connection, visited, region)
     
@@ -219,6 +291,7 @@ class Map:
         Returns:
             List of Regions, each containing a ShapeGroup and the MapElements in that region.
         """
+        from map.exit import Exit
         
         visited: set[MapElement] = set()
         regions: list[Region] = []
@@ -228,20 +301,26 @@ class Map:
             if element in visited:
                 continue
             
+            # Skip Exits as starting points - they provide chips to connected regions
+            # but shouldn't start their own regions
+            if isinstance(element, Exit):
+                visited.add(element)
+                continue
+            
             # Trace this region
             region_elements: list[MapElement] = []
             self._trace_connected_region(element, visited, region_elements)
             
             # Create Region for this area if we found elements
             if region_elements:
-                # Get shapes from elements and any door shapes
+                # Get shapes from elements and any door/exit side shapes
                 shapes = []
                 final_elements = []
                 for item in region_elements:
                     if isinstance(item, MapElement):
                         shapes.append(item.shape.inflated(REGION_INFLATE))
                         final_elements.append(item)
-                    else:  # Rectangle from door side
+                    else:  # ShapeGroup from door/exit side
                         shapes.append(item)
                         
                 regions.append(Region(
@@ -470,8 +549,8 @@ class Map:
         )
         crosshatch_shape.draw(canvas, shading_paint)
         
-        # Draw crosshatching pattern
-        draw_crosshatches(self.options, crosshatch_shape, canvas)
+        # Draw crosshatching pattern using optimized tiled system
+        draw_crosshatches_tiled(canvas, crosshatch_shape, self.hatch_tile, self.options)
         
         # Draw room regions
         for region in regions:
@@ -513,6 +592,27 @@ class Map:
             if self.options.grid_style not in (None, GridStyle.NONE):
                 draw_region_grid(canvas, region, self.options)
 
+            # 5.5. Draw water if enabled (clipped by region shape)
+            if self.water_layer and self.water_layer.shapes:
+                # Translate water to map coordinates (water is generated at 0,0)
+                canvas.save()
+                canvas.translate(self.bounds.x, self.bounds.y)
+                
+                # Create custom style from map settings
+                water_style = WaterStyle(
+                    stroke_width=getattr(self, '_water_stroke_width', 3.0),
+                    ripple_width=getattr(self, '_water_stroke_width', 3.0) * 0.5,  # Ripples thinner than shore
+                    ripple_insets=(
+                        getattr(self, '_water_ripple_inset', 12.0),
+                        getattr(self, '_water_ripple_inset', 12.0) * 2
+                    )
+                )
+                
+                # Draw using pre-recorded picture for speed
+                self.water_layer.draw(canvas, style=water_style)
+                
+                canvas.restore()
+
             # 6. Draw region elements props
             for element in region.elements:
                 element.draw(canvas, Layers.PROPS)
@@ -540,6 +640,10 @@ class Map:
         # Draw doors layer after borders
         for element in self._elements:
             element.draw(canvas, Layers.OVERLAY)
+
+        # Draw text layer (room numbers)
+        for element in self._elements:
+            element.draw(canvas, Layers.TEXT)
 
         # Draw element numbers if enabled
         if debug_draw.is_enabled(DebugDrawFlags.ELEMENT_NUMBERS):

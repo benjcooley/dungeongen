@@ -39,7 +39,7 @@ from map.occupancy import ElementType
 from map.passage import Passage
 from map.room import Room, RoomType
 from options import Options
-from tags import Tags
+from map.enums import Tags
 
 class GrowDirection(Enum):
     """Direction to grow rooms during arrangement."""

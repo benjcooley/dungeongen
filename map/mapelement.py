@@ -106,8 +106,9 @@ class MapElement:
         if self.is_invalid:
             raise ValueError("Cannot add prop to 'invalid' map element")
                 
-        if not prop.container.is_invalid:
-            prop.container.remove_prop(prop)
+        # Remove from previous container if it has one
+        if prop._container is not None and not prop._container.is_invalid:
+            prop._container.remove_prop(prop)
             
         prop._container = self
         prop._map = self._map
@@ -121,7 +122,8 @@ class MapElement:
         if prop in self._props:
             self._props.remove(prop)
             prop._container = MapElement.get_invalid_map_element()
-            prop._map = Map.get_invalid_map()
+            # Use the cached global _invalid_map (populated during __init__)
+            prop._map = _invalid_map
     
     def recalculate_bounds(self) -> Rectangle:
         """Calculate the bounding rectangle that encompasses the shape."""

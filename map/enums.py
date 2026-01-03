@@ -5,6 +5,14 @@ from typing import Tuple
 import random
 from typing import Optional
 
+
+class Tags:
+    """Tags that can be used to customize random distributions."""
+    SMALL = "small"
+    MEDIUM = "medium"
+    LARGE = "large"
+
+
 class GridStyle(Enum):
     """Available grid drawing styles."""
     NONE = auto()  # No grid
@@ -15,6 +23,7 @@ class Layers(Enum):
     SHADOW = auto()    # Shadow layer drawn first
     PROPS = auto()     # Base layer for props and general elements
     OVERLAY = auto()   # Overlay layer that draws over room outlines (doors, etc)
+    TEXT = auto()      # Text layer for room numbers and labels
 
 class RockType(Enum):
     """Types of rocks that can be added to map elements."""

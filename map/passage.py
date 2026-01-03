@@ -307,7 +307,7 @@ class Passage(MapElement):
     ) -> None:
         dx = abs(end[0] - start[0])
         dy = abs(end[1] - start[1])
-        if dx < 2 or dy < 2:
+        if dx < 3 or dy < 3:
             return
         segment_len = dx + dy
         split_chance = 0.5 + (0.95 - 0.5) * (segment_len / (segment_len + 30))
@@ -356,6 +356,10 @@ class Passage(MapElement):
             bends.append(pos)
             p = (points[i][0], p[1]) if axis == 0 else (p[0], points[i][1])
             axis = axis ^ 1
+
+        # Make sure zig zag passages have odd bends
+        if start_direction.is_perpendicular(end_direction):
+            bends.pop()
 
         return bends
         

@@ -2,7 +2,7 @@
 
 from enum import Enum, auto
 from typing import Dict, Optional, Set, Tuple
-from tags import Tags
+from map.enums import Tags
 import skia
 from logging_config import logger, LogTags
 from graphics.math import Matrix2D, Point2D

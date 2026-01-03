@@ -8,4 +8,5 @@ __pycache__
 /*.png
 /*.svg
 /*.pdf
-
+/output/
+/attic/

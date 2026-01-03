@@ -2,5 +2,7 @@
     "python.defaultInterpreterPath": "/Users/benjamincooley/.pyenv/versions/3.12.5/bin/python",
     "python.analysis.diagnosticMode": "workspace",
     "python.analysis.typeCheckingMode": "basic",
-    "python.analysis.typeEvaluation.deprecateTypingAliases": true
+    "python.analysis.typeEvaluation.deprecateTypingAliases": true,
+    "cursorpyright.analysis.diagnosticMode": "workspace",
+    "cursorpyright.analysis.typeCheckingMode": "basic"
 }

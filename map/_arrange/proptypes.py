@@ -22,7 +22,7 @@ class PropType(StrEnum):
     COFFIN = auto()
     ROUND_COLUMN = auto()
     SQUARE_COLUMN = auto() 
-    DAIS = auto()
+    DIAS = auto()
     
     @classmethod
     def rock_types(cls) -> list['PropType']:

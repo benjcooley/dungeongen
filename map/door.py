@@ -144,6 +144,10 @@ class Door(MapElement):
         shape = self._calculate_shape()
         
         super().__init__(shape)
+        
+        # Override bounds to be the actual door position/size, not the shape bounds
+        # (closed doors have empty shapes but still need proper bounds for positioning)
+        self._bounds = Rectangle(self._x, self._y, self._width, self._height)
     
     def _calculate_shape(self) -> Shape:
         """Calculate the current shape based on open/closed state."""

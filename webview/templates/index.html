@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dungeon Layout Generator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0d0d14;
+            --bg-panel: #161622;
+            --bg-tile: #1e1e2e;
+            --bg-tile-hover: #282840;
+            --bg-tile-active: #3a3a5a;
+            --border: #2a2a3e;
+            --text: #c8c8d8;
+            --text-dim: #6a6a7a;
+            --accent: #7c6f9c;
+            --accent-bright: #a89cc8;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: monospace;
+            background: var(--bg-dark);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        header {
+            background: var(--bg-panel);
+            border-bottom: 1px solid var(--border);
+            padding: 12px 20px;
+        }
+        
+        .header-row {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        h1 {
+            font-size: 1.2rem;
+            color: var(--accent-bright);
+            letter-spacing: 2px;
+            white-space: nowrap;
+        }
+        
+        .options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            flex: 1;
+            align-items: center;
+        }
+        
+        .sep {
+            width: 1px;
+            height: 18px;
+            background: var(--border);
+            margin: 0 3px;
+        }
+        
+        .tile {
+            background: var(--bg-tile);
+            border: 1px solid var(--border);
+            color: var(--text-dim);
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 0.65rem;
+            cursor: pointer;
+            user-select: none;
+        }
+        
+        .tile:hover {
+            background: var(--bg-tile-hover);
+            color: var(--text);
+        }
+        
+        .tile.active {
+            background: var(--bg-tile-active);
+            border-color: var(--accent);
+            color: var(--accent-bright);
+        }
+        
+        .group-label {
+            font-size: 0.55rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-right: 2px;
+        }
+        
+        .seed-group {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .seed-group label {
+            font-size: 0.7rem;
+            color: var(--text-dim);
+        }
+        
+        .seed-group input {
+            background: var(--bg-tile);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 0.75rem;
+            width: 100px;
+        }
+        
+        .seed-group input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        
+        .generate-btn {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 6px 16px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+        
+        .generate-btn:hover {
+            box-shadow: 0 2px 12px rgba(124, 111, 156, 0.4);
+        }
+        
+        .view-buttons {
+            display: flex;
+            gap: 4px;
+        }
+        
+        .view-btn {
+            background: var(--bg-tile);
+            border: 1px solid var(--border);
+            color: var(--text-dim);
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            font-family: inherit;
+        }
+        
+        .view-btn:hover {
+            background: var(--bg-tile-hover);
+            color: var(--text);
+        }
+        
+        .view-btn.active {
+            background: var(--bg-tile-active);
+            border-color: var(--accent);
+            color: var(--accent-bright);
+        }
+        
+        main {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: auto;
+            position: relative;
+            background: var(--bg-dark);
+        }
+        
+        .dungeon-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            min-width: min-content;
+            min-height: min-content;
+        }
+        
+        .dungeon-container svg,
+        .dungeon-container img {
+            display: block;
+        }
+        
+        .view-toggle {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            display: flex;
+            gap: 2px;
+            background: rgba(22, 22, 34, 0.9);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 2px;
+            z-index: 10;
+        }
+        
+        footer {
+            background: var(--bg-panel);
+            border-top: 1px solid var(--border);
+            padding: 8px 20px;
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        footer span {
+            color: var(--accent-bright);
+        }
+        
+        .loading .dungeon-container {
+            opacity: 0.5;
+        }
+        
+        /* Loading spinner */
+        .render-loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-tile);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            min-height: 300px;
+        }
+        
+        .spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid var(--border);
+            border-top-color: var(--accent-bright);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .render-loading-text {
+            margin-top: 16px;
+            color: var(--text-dim);
+            font-size: 0.75rem;
+        }
+        
+        /* Render error display */
+        .render-error {
+            display: flex;
+            flex-direction: column;
+            background: var(--bg-tile);
+            border: 1px solid #ff4444;
+            border-radius: 4px;
+            padding: 16px;
+            max-height: 80vh;
+            overflow: auto;
+        }
+        
+        .render-error-title {
+            color: #ff6666;
+            font-weight: bold;
+            font-size: 1rem;
+            margin-bottom: 12px;
+        }
+        
+        .render-error-details {
+            color: #ffaaaa;
+            font-family: 'SF Mono', Monaco, 'Courier New', monospace;
+            font-size: 0.65rem;
+            line-height: 1.4;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            margin: 0;
+            padding: 8px;
+            background: rgba(255, 0, 0, 0.1);
+            border-radius: 4px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-row">
+            <h1>DUNGEON</h1>
+            
+            <div class="options">
+                <span class="group-label">Size:</span>
+                <div class="tile active" data-group="size" data-value="tiny">Tiny</div>
+                <div class="tile" data-group="size" data-value="small">Small</div>
+                <div class="tile" data-group="size" data-value="medium">Med</div>
+                <div class="tile" data-group="size" data-value="large">Large</div>
+                
+                <div class="sep"></div>
+                
+                <span class="group-label">Sym:</span>
+                <div class="tile" data-group="symmetry" data-value="none">None</div>
+                <div class="tile active" data-group="symmetry" data-value="bilateral">Mirror</div>
+                <div class="tile" data-group="symmetry" data-value="radial2">Rot2</div>
+                <div class="tile" data-group="symmetry" data-value="radial4">Rot4</div>
+                
+                <div class="sep"></div>
+                
+                <span class="group-label">Type:</span>
+                <div class="tile active" data-group="archetype" data-value="classic">Classic</div>
+                <div class="tile" data-group="archetype" data-value="warren">Warren</div>
+                <div class="tile" data-group="archetype" data-value="temple">Temple</div>
+                <div class="tile" data-group="archetype" data-value="lair">Lair</div>
+                
+                <div class="sep"></div>
+                
+                <span class="group-label">Cross:</span>
+                <div class="tile" data-group="cross" data-value="none">No</div>
+                <div class="tile" data-group="cross" data-value="low">Lo</div>
+                <div class="tile active" data-group="cross" data-value="med">Med</div>
+                <div class="tile" data-group="cross" data-value="high">Hi</div>
+                
+                <div class="sep"></div>
+                
+                <span class="label">PACK:</span>
+                <div class="tile" data-group="pack" data-value="sparse">Sparse</div>
+                <div class="tile active" data-group="pack" data-value="normal">Norm</div>
+                <div class="tile" data-group="pack" data-value="tight">Tight</div>
+                
+                <div class="sep"></div>
+                
+                <span class="label">ROOMS:</span>
+                <div class="tile active" data-group="roomsize" data-value="cozy">Cozy</div>
+                <div class="tile" data-group="roomsize" data-value="mixed">Mixed</div>
+                <div class="tile" data-group="roomsize" data-value="grand">Grand</div>
+                
+                <div class="sep"></div>
+                
+                <div class="tile" data-toggle="round_rooms">Round</div>
+                <div class="tile active" data-toggle="halls">Halls</div>
+                <div class="tile" data-toggle="secrets">Secret</div>
+                
+                <div class="sep"></div>
+                
+                <span class="group-label">Water:</span>
+                <div class="tile active" data-group="water" data-value="dry">Dry</div>
+                <div class="tile" data-group="water" data-value="puddles">Puddles</div>
+                <div class="tile" data-group="water" data-value="pools">Pools</div>
+                <div class="tile" data-group="water" data-value="lakes">Lakes</div>
+                <div class="tile" data-group="water" data-value="flooded">Flooded</div>
+                
+                <!-- Hidden water tuning controls (uncomment to show) -->
+                <div id="water-tuning" style="display:none;">
+                    <div class="sep"></div>
+                    
+                    <span class="group-label" style="color:#ff9900;">Scale:</span>
+                    <input type="range" id="water_scale" min="0.005" max="0.03" step="0.001" value="0.018" style="width:60px;">
+                    <span id="water_scale_val" style="font-size:0.6rem;color:#ff9900;">0.018</span>
+                    
+                    <span class="group-label" style="color:#ff9900;margin-left:6px;">Res:</span>
+                    <input type="range" id="water_res" min="0.1" max="0.5" step="0.05" value="0.2" style="width:50px;">
+                    <span id="water_res_val" style="font-size:0.6rem;color:#ff9900;">0.2</span>
+                    
+                    <span class="group-label" style="color:#ff9900;margin-left:6px;">Stroke:</span>
+                    <input type="range" id="water_stroke" min="0.5" max="6" step="0.5" value="3.5" style="width:50px;">
+                    <span id="water_stroke_val" style="font-size:0.6rem;color:#ff9900;">3.5</span>
+                    
+                    <span class="group-label" style="color:#ff9900;margin-left:6px;">Ripple:</span>
+                    <input type="range" id="water_ripple" min="4" max="24" step="2" value="8" style="width:50px;">
+                    <span id="water_ripple_val" style="font-size:0.6rem;color:#ff9900;">8</span>
+                </div>
+            </div>
+            
+            <div class="seed-group">
+                <label>Seed:</label>
+                <input type="text" id="seed" placeholder="random">
+            </div>
+            
+            <button class="generate-btn" onclick="generate()">Generate</button>
+        </div>
+    </header>
+    
+    <main>
+        <div class="view-toggle">
+            <button class="view-btn active" id="btn-render" onclick="setView('render')">Render</button>
+            <button class="view-btn" id="btn-map" onclick="setView('map')">Map</button>
+            <button class="view-btn" id="btn-debug" onclick="setView('debug')">Debug</button>
+        </div>
+        <div class="dungeon-container" id="dungeon">
+            <p style="padding: 40px; color: var(--text-dim);">Loading...</p>
+        </div>
+    </main>
+    
+    <footer>
+        <div id="stats">Press Generate or Space</div>
+        <div>Space = new | S = copy seed | D = cycle views</div>
+    </footer>
+
+    <script>
+        let currentSeed = null;
+        let currentSvg = null;
+        let currentDebugSvg = null;
+        let currentRenderSvg = null;
+        let renderAvailable = false;
+        let viewMode = 'render';  // 'render', 'map', or 'debug'
+        
+        document.querySelectorAll('.tile').forEach(tile => {
+            tile.addEventListener('click', function() {
+                const group = this.dataset.group;
+                const toggle = this.dataset.toggle;
+                
+                if (group) {
+                    document.querySelectorAll('.tile[data-group="' + group + '"]').forEach(t => {
+                        t.classList.remove('active');
+                    });
+                    this.classList.add('active');
+                } else if (toggle) {
+                    this.classList.toggle('active');
+                }
+            });
+        });
+        
+        function setView(mode) {
+            viewMode = mode;
+            // Update button states
+            document.getElementById('btn-render').classList.toggle('active', mode === 'render');
+            document.getElementById('btn-map').classList.toggle('active', mode === 'map');
+            document.getElementById('btn-debug').classList.toggle('active', mode === 'debug');
+            updateView();
+        }
+        
+        let isGenerating = false;
+        
+        let renderError = null;
+        
+        function updateView() {
+            const container = document.getElementById('dungeon');
+            if (viewMode === 'render') {
+                if (isGenerating) {
+                    // Show loading spinner while generating
+                    container.innerHTML = '<div class="render-loading"><div class="spinner"></div><div class="render-loading-text">Rendering...</div></div>';
+                } else if (renderAvailable && currentRenderSvg) {
+                    container.innerHTML = currentRenderSvg;
+                } else if (renderError) {
+                    // Show error message with full traceback
+                    const escapedError = renderError.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>');
+                    container.innerHTML = '<div class="render-error"><div class="render-error-title">RENDER FAILED</div><pre class="render-error-details">' + escapedError + '</pre></div>';
+                } else if (currentSvg) {
+                    // Fallback to map view if render not available
+                    container.innerHTML = '<div class="render-loading"><div class="render-loading-text" style="color:#ffaa66;">Render not available<br><small>Showing map view</small></div></div>';
+                }
+            } else if (viewMode === 'debug' && currentDebugSvg) {
+                container.innerHTML = currentDebugSvg;
+            } else if (currentSvg) {
+                container.innerHTML = currentSvg;
+            }
+        }
+        
+        // Water slider value display updates
+        document.getElementById('water_scale').addEventListener('input', function() {
+            document.getElementById('water_scale_val').textContent = this.value;
+        });
+        document.getElementById('water_res').addEventListener('input', function() {
+            document.getElementById('water_res_val').textContent = this.value;
+        });
+        document.getElementById('water_stroke').addEventListener('input', function() {
+            document.getElementById('water_stroke_val').textContent = this.value;
+        });
+        document.getElementById('water_ripple').addEventListener('input', function() {
+            document.getElementById('water_ripple_val').textContent = this.value;
+        });
+        
+        function getParams() {
+            const params = {};
+            
+            document.querySelectorAll('.tile.active[data-group]').forEach(tile => {
+                params[tile.dataset.group] = tile.dataset.value;
+            });
+            
+            document.querySelectorAll('.tile[data-toggle]').forEach(tile => {
+                params[tile.dataset.toggle] = tile.classList.contains('active');
+            });
+            
+            params.seed = document.getElementById('seed').value || null;
+            
+            // Water tuning sliders
+            params.water_scale = parseFloat(document.getElementById('water_scale').value);
+            params.water_res = parseFloat(document.getElementById('water_res').value);
+            params.water_stroke = parseFloat(document.getElementById('water_stroke').value);
+            params.water_ripple = parseFloat(document.getElementById('water_ripple').value);
+            
+            return params;
+        }
+        
+        async function generate() {
+            const container = document.getElementById('dungeon');
+            document.body.classList.add('loading');
+            isGenerating = true;
+            
+            // Show loading spinner immediately if in render view
+            if (viewMode === 'render') {
+                updateView();
+            }
+            
+            try {
+                const response = await fetch('/generate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(getParams())
+                });
+                
+                const data = await response.json();
+                currentSvg = data.svg;
+                currentDebugSvg = data.debug_svg;
+                currentRenderSvg = data.render_svg;
+                renderAvailable = data.render_available;
+                renderError = data.render_error;
+                currentSeed = data.seed;
+                
+                isGenerating = false;
+                updateView();
+                
+                var violations = data.violations > 0 ? 
+                    ' | <span style="color:#ff6666">' + data.violations + ' violations</span>' : 
+                    ' | <span style="color:#66ff66">✓ valid</span>';
+                document.getElementById('stats').innerHTML = 
+                    '<span>' + data.room_count + '</span> rooms | ' +
+                    '<span>' + data.passage_count + '</span> passages | ' +
+                    'seed: <span>' + data.seed + '</span>' + violations;
+                    
+            } catch (err) {
+                console.error('Generation failed:', err);
+                isGenerating = false;
+                container.innerHTML = '<p style="color: #aa6a6a; padding: 40px;">Generation failed: ' + err.message + '</p>';
+            }
+            
+            document.body.classList.remove('loading');
+        }
+        
+        document.addEventListener('keydown', function(e) {
+            if (e.target.tagName === 'INPUT') return;
+            
+            if (e.code === 'Space') {
+                e.preventDefault();
+                document.getElementById('seed').value = '';
+                generate();
+            } else if (e.code === 'KeyS' && currentSeed) {
+                navigator.clipboard.writeText(String(currentSeed));
+            } else if (e.code === 'KeyD') {
+                // Cycle through views: render -> map -> debug -> render
+                if (viewMode === 'render') {
+                    setView('map');
+                } else if (viewMode === 'map') {
+                    setView('debug');
+                } else {
+                    setView('render');
+                }
+            }
+        });
+        
+        generate();
+    </script>
+</body>
+</html>

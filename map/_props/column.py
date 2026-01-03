@@ -54,9 +54,9 @@ class Column(Prop):
         shape = (Circle(0, 0, COLUMN_SIZE/2) if self._column_type == ColumnType.ROUND
                 else Rectangle(-COLUMN_SIZE/2, -COLUMN_SIZE/2, COLUMN_SIZE, COLUMN_SIZE))
         
-        # Apply rotation to shape
+        # Apply rotation to shape (convert Rotation enum to degrees)
         if self.rotation != Rotation.ROT_0:
-            shape.rotate(self.rotation)
+            shape.rotate(self.rotation.degrees)
             
         if layer == Layers.SHADOW:
             # Draw slightly inflated shadow shape
