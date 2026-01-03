@@ -76,10 +76,11 @@ def _generate_spine_with_context(dungeon, start_x, start_y, length, ctx, parent_
             generate_spine_with_context(..., right_ctx, parent_room=room)
 ```
 
-### Radial (2-fold and 4-fold)
+### Radial (2-fold and 4-fold) - *Future*
 
-Creates rotationally symmetric dungeons:
+> **Note**: Radial symmetry modes are defined but not fully implemented yet.
 
+The planned approach:
 1. Place rooms in one quadrant (or half)
 2. Rotate placed rooms 180° (RADIAL_2) or 90°/180°/270° (RADIAL_4)
 3. Apply symmetry break chance to skip some rotations

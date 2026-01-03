@@ -75,8 +75,8 @@ params.size = DungeonSize.LARGE
 |------|-------------|
 | `NONE` | Asymmetric, organic layout |
 | `BILATERAL` | Mirror symmetry (left/right) |
-| `RADIAL_2` | 180° rotational symmetry |
-| `RADIAL_4` | 90° rotational symmetry (4-fold) |
+| `RADIAL_2` | 180° rotational symmetry *(future)* |
+| `RADIAL_4` | 90° rotational symmetry *(future)* |
 
 ```python
 params.symmetry = SymmetryType.BILATERAL
@@ -222,7 +222,7 @@ The web preview (`python -m dungeongen.webview.app`) provides an interactive UI:
 | Control | Description |
 |---------|-------------|
 | **SIZE** | Tiny, Small, Med, Large |
-| **SYM** | None, Mirror, Rot2, Rot4 |
+| **SYM** | None, Mirror |
 | **TYPE** | Classic, Warren, Temple, Crypt, Lair |
 | **CROSS** | Crosshatch density (No, Lo, Med, Hi) |
 | **PACK** | Room packing density (Sparse, Norm, Tight) |
@@ -304,7 +304,7 @@ for i in range(10):
 ### Batch Different Styles
 
 ```python
-for symmetry in [SymmetryType.NONE, SymmetryType.BILATERAL, SymmetryType.RADIAL_4]:
+for symmetry in [SymmetryType.NONE, SymmetryType.BILATERAL]:
     params.symmetry = symmetry
     generator = DungeonGenerator(params)
     dungeon = generator.generate(seed=42)

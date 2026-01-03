@@ -79,7 +79,7 @@ Output data structure from generation.
 
 **`DungeonSize`**: `TINY`, `SMALL`, `MEDIUM`, `LARGE`, `XLARGE`
 
-**`SymmetryType`**: `NONE`, `BILATERAL`, `RADIAL_2`, `RADIAL_4`
+**`SymmetryType`**: `NONE`, `BILATERAL`, `RADIAL_2` *(future)*, `RADIAL_4` *(future)*
 
 **`DungeonArchetype`**: `CLASSIC`, `WARREN`, `TEMPLE`, `CRYPT`, `CAVERN`, `FORTRESS`, `LAIR`
 

@@ -134,7 +134,7 @@ Each `MapElement.draw(canvas, layer)` is called once per layer, allowing props t
 **`DungeonGenerator`** - Main entry point for layout generation
 - Takes `GenerationParams` to configure size, symmetry, archetype
 - Uses recursive branching with spatial hashing for collision detection
-- Supports symmetry modes: bilateral (mirror), radial-2, radial-4
+- Supports symmetry modes: bilateral (mirror); radial modes planned for future
 - Implements "Jaquaying" - adding loops and alternate paths
 
 **`Dungeon`** - Output data structure
@@ -144,7 +144,7 @@ Each `MapElement.draw(canvas, layer)` is called once per layer, allowing props t
 
 **`GenerationParams`** - Configuration dataclass
 - `size`: TINY through XLARGE (affects room count)
-- `symmetry`: NONE, BILATERAL, RADIAL_2, RADIAL_4
+- `symmetry`: NONE, BILATERAL, RADIAL_2 *(future)*, RADIAL_4 *(future)*
 - `archetype`: CLASSIC, WARREN, TEMPLE, CRYPT, LAIR *(partially implemented - see note)*
 - `density`: Controls room spacing (sparse to tight)
 
