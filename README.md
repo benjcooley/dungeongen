@@ -2,7 +2,7 @@
 
 A procedural dungeon generation and rendering system for tabletop RPG maps.
 
-![Temple Dungeon](docs/dungeon_temple.png)
+![Temple Dungeon](https://raw.githubusercontent.com/benjcooley/dungeongen/main/docs/dungeon_temple.png)
 
 ## Quick Start
 
@@ -175,4 +175,4 @@ MIT License - See [LICENSE](LICENSE) file for details.
 
 ---
 
-![Example Dungeon](docs/dungeon_example.png)
+![Example Dungeon](https://raw.githubusercontent.com/benjcooley/dungeongen/main/docs/dungeon_example.png)
