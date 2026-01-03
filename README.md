@@ -157,7 +157,18 @@ This project was inspired by [**watabou's One Page Dungeon**](https://watabou.it
 - **watabou's other generators**: https://watabou.itch.io/
 - **Source code (Haxe)**: https://github.com/watabou/one-page-dungeon
 
-Note: This project is a complete rewrite in Python, not a port. While inspired by watabou's visual style and procedural generation concepts, the algorithms and implementation are original.
+### Differences from One Page Dungeon
+
+This is a complete rewrite in Python, not a port. Options do not work identically as this is a completely different codebase. Key differences:
+
+**Not yet implemented:**
+- Only bilateral (mirror) symmetry is supported; linear, radial, and other layout modes are planned
+- Some props are missing (casket, star, podium, curtains, barrels)
+- Various bugs and edge cases - not everything works perfectly
+
+**Will not be added:**
+- Auto-rotate transform for diagonal map views - this library outputs maps for further processing
+- Auto-generated text, titles, and descriptions - this is a map generator, not a complete document generator
 
 ## License
 
