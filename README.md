@@ -4,6 +4,14 @@ A procedural dungeon generation and rendering system for tabletop RPG maps.
 
 ![Temple Dungeon](docs/dungeon_temple.png)
 
+## Quick Start
+
+```bash
+pip install dungeongen
+python -m dungeongen.webview.app
+```
+Then open http://localhost:5050 in your browser to generate dungeons interactively.
+
 ## Features
 
 ### Layout Generation
