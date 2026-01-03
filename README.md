@@ -155,7 +155,6 @@ This project was inspired by [**watabou's One Page Dungeon**](https://watabou.it
 
 - **One Page Dungeon Generator**: https://watabou.itch.io/one-page-dungeon
 - **watabou's other generators**: https://watabou.itch.io/
-- **Source code (Haxe)**: https://github.com/watabou/one-page-dungeon
 
 ### Differences from One Page Dungeon
 

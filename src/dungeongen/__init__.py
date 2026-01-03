@@ -1,6 +1,6 @@
 """DungeonGen - A procedural dungeon map generator."""
 
-__version__ = "0.1.8"
+__version__ = "0.1.9"
 
 # Public API exports
 from dungeongen.map.map import Map
