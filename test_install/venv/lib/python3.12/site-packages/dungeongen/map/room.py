@@ -5,7 +5,7 @@ from enum import Enum, auto
 import math
 from typing import List, TYPE_CHECKING, Tuple, Optional
 import random
-from altair import Point
+from dungeongen.layout.spatial import Point
 import skia
 from dungeongen.map.occupancy import ElementType
 from dungeongen.logging_config import logger, LogTags
