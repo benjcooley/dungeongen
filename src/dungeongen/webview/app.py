@@ -220,6 +220,18 @@ def render_dungeon_to_svg(dungeon, grid_size=20, padding=40, water_depth=0.0, wa
     # Get dungeon bounds (same as SVG renderer uses)
     bounds = dungeon.bounds  # (min_x, min_y, max_x, max_y) in grid coords
     
+    # Pre-validate dungeon size to prevent Skia crashes
+    # Map uses 64 units per grid cell, limit is ~4200 map units
+    dungeon_width = bounds[2] - bounds[0]
+    dungeon_height = bounds[3] - bounds[1]
+    max_grid_size = 60  # ~3840 map units, safe margin below 4200 limit
+    
+    if dungeon_width > max_grid_size or dungeon_height > max_grid_size:
+        raise ValueError(
+            f"Dungeon too large for renderer: {dungeon_width}x{dungeon_height} grid cells "
+            f"(max {max_grid_size}x{max_grid_size}). Try a smaller size setting."
+        )
+    
     # Calculate canvas size to match SVG renderer exactly
     canvas_width = (bounds[2] - bounds[0]) * grid_size + padding * 2
     canvas_height = (bounds[3] - bounds[1]) * grid_size + padding * 2
