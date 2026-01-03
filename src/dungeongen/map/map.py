@@ -330,11 +330,20 @@ class Map:
         
         return regions
 
-    def _calculate_default_transform(self, canvas_width: int, canvas_height: int) -> skia.Matrix:
-        """Calculate a default transform to fit the map in the canvas.
+    def calculate_fit_transform(self, canvas_width: int, canvas_height: int) -> skia.Matrix:
+        """Calculate a transform matrix that scales and centers the map to fit a canvas.
         
+        The transform will:
+        - Scale the map uniformly to fit within the canvas dimensions
+        - Center the map horizontally and vertically
+        - Apply padding based on options.map_border_cells
+        
+        Args:
+            canvas_width: Width of the target canvas in pixels
+            canvas_height: Height of the target canvas in pixels
+            
         Returns:
-            A Skia Matrix configured to fit the map in the canvas
+            A Skia Matrix with scale and translation to fit the map in the canvas
         """
         bounds = self.bounds
         
@@ -414,7 +423,7 @@ class Map:
         canvas_height = canvas.imageInfo().height()
         
         # Calculate or use provided transform
-        matrix = transform if transform is not None else self._calculate_default_transform(canvas_width, canvas_height)
+        matrix = transform if transform is not None else self.calculate_fit_transform(canvas_width, canvas_height)
         
         # Clear canvas with background color
         background_paint = skia.Paint(
@@ -572,3 +581,31 @@ class Map:
 
         # Restore canvas state
         canvas.restore()
+
+    def render_to_png(self, filename: str, width: int = 1200, height: int = 1200) -> None:
+        """Render the map to a PNG file.
+        
+        Args:
+            filename: Output filename (should end in .png)
+            width: Image width in pixels (default 1200)
+            height: Image height in pixels (default 1200)
+        """
+        surface = skia.Surface(width, height)
+        canvas = surface.getCanvas()
+        self.render(canvas)
+        image = surface.makeImageSnapshot()
+        image.save(filename, skia.kPNG)
+
+    def render_to_svg(self, filename: str, width: int = 1200, height: int = 1200) -> None:
+        """Render the map to an SVG file.
+        
+        Args:
+            filename: Output filename (should end in .svg)
+            width: Image width in pixels (default 1200)
+            height: Image height in pixels (default 1200)
+        """
+        stream = skia.FILEWStream(filename)
+        canvas = skia.SVGCanvas.Make((width, height), stream)
+        self.render(canvas)
+        del canvas  # Flush and close the SVG
+        stream.flush()

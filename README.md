@@ -110,7 +110,6 @@ Then open http://localhost:5050 in your browser.
 from dungeongen.layout import DungeonGenerator, GenerationParams, DungeonSize, SymmetryType
 from dungeongen.webview.adapter import convert_dungeon
 from dungeongen.map.water_layer import WaterDepth
-import skia
 
 # Configure generation
 params = GenerationParams()
@@ -124,17 +123,9 @@ dungeon = generator.generate(seed=42)
 # Convert to renderable map with water
 dungeon_map = convert_dungeon(dungeon, water_depth=WaterDepth.POOLS)
 
-# Render to PNG
-width, height = 1200, 1200
-surface = skia.Surface(width, height)
-canvas = surface.getCanvas()
-canvas.clear(skia.Color(255, 255, 255))
-
-transform = dungeon_map._calculate_default_transform(width, height)
-dungeon_map.render(canvas, transform)
-
-image = surface.makeImageSnapshot()
-image.save('my_dungeon.png', skia.kPNG)
+# Render to PNG or SVG
+dungeon_map.render_to_png('my_dungeon.png')
+dungeon_map.render_to_svg('my_dungeon.svg')
 ```
 
 ## Configuration Options
