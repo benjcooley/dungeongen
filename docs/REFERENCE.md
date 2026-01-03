@@ -87,6 +87,92 @@ Output data structure from generation.
 
 ## Map Rendering
 
+### `MapElement`
+
+Base class for all renderable map elements (rooms, passages, doors, exits).
+
+```python
+from dungeongen.map.mapelement import MapElement
+```
+
+#### Properties
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `bounds` | `Rectangle` | Bounding box of the element |
+| `shape` | `Shape` | Geometric shape of the element |
+| `connections` | `Sequence[MapElement]` | Connected elements |
+| `props` | `Sequence[Prop]` | Props contained in this element |
+| `map` | `Map` | Parent map this element belongs to |
+
+#### Methods
+
+**`add_prop(prop: Prop) → None`**
+
+Add a prop to this element.
+
+**`remove_prop(prop: Prop) → None`**
+
+Remove a prop from this element.
+
+**`connect_to(other: MapElement) → None`**
+
+Create a bidirectional connection to another element.
+
+**`contains_point(x: float, y: float) → bool`**
+
+Check if a point is inside this element's shape.
+
+**`draw(canvas: skia.Canvas, layer: Layers) → None`**
+
+Draw this element on the specified layer.
+
+---
+
+### `Region`
+
+A group of connected map elements not separated by closed doors.
+
+```python
+from dungeongen.map.region import Region
+```
+
+#### Attributes
+
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `shape` | `Shape` | Combined shape of all elements |
+| `elements` | `List[MapElement]` | Elements in this region |
+
+#### Methods
+
+**`inflated(amount: float) → Region`**
+
+Return a new region with inflated shape (for crosshatch clipping).
+
+**`to_path() → skia.Path`**
+
+Convert the region's shape to a Skia path for rendering.
+
+---
+
+### `Layers`
+
+Enum defining the rendering layer order.
+
+```python
+from dungeongen.map.enums import Layers
+```
+
+| Value | Description |
+|-------|-------------|
+| `SHADOW` | Shadow layer, drawn first |
+| `PROPS` | Main prop layer |
+| `OVERLAY` | Overlay layer (doors drawn on top of borders) |
+| `TEXT` | Text layer (room numbers) |
+
+---
+
 ### `Map`
 
 Main container and renderer for dungeon maps.
@@ -241,6 +327,114 @@ This function:
 
 ---
 
+## Props
+
+### `Prop`
+
+Abstract base class for decorative map props.
+
+```python
+from dungeongen.map._props.prop import Prop, PropType
+```
+
+#### Constructor
+
+```python
+Prop(prop_type: PropType, position: Point, rotation: Rotation = Rotation.ROT_0,
+     boundary_shape: Shape = None, grid_size: Point = None)
+```
+
+#### Properties
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `position` | `Point` | Top-left of grid bounds (or bounds for non-grid) |
+| `center` | `Point` | Center of the prop |
+| `bounds` | `Rectangle` | Bounding rectangle |
+| `grid_bounds` | `Rectangle` | Grid-aligned bounds (if grid-aligned) |
+| `grid_size` | `Point` | Size in grid units (if grid-aligned) |
+| `rotation` | `Rotation` | Current rotation |
+| `shape` | `Shape` | Collision boundary |
+| `container` | `MapElement` | Element containing this prop |
+| `prop_type` | `PropType` | Type configuration |
+
+#### Methods
+
+**`draw(canvas: skia.Canvas, layer: Layers) → None`**
+
+Draw the prop. Handles coordinate transforms and calls `_draw_content`.
+
+**`place_random_position(max_attempts: int = 30) → Point | None`**
+
+Try to place prop at a valid random position within its container. Returns position if successful, None if all attempts fail.
+
+**`is_valid_position(x: float, y: float, rotation: Rotation = ROT_0) → bool`**
+
+Check if a position is valid (inside container, not overlapping other props).
+
+**`snap_valid_position(x: float, y: float) → Point | None`**
+
+Snap coordinates to nearest valid position for this prop type.
+
+---
+
+### `PropType`
+
+Configuration dataclass for prop behavior.
+
+```python
+from dungeongen.map._props.prop import PropType
+```
+
+#### Attributes
+
+| Attribute | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `is_decoration` | `bool` | `False` | Decorations don't block other props |
+| `is_wall_aligned` | `bool` | `False` | Snaps to walls based on rotation |
+| `is_grid_aligned` | `bool` | `False` | Snaps to grid cell intersections |
+| `grid_size` | `Point` | `None` | Size in grid units (width, height) |
+| `boundary_shape` | `Shape` | `None` | Collision shape centered at origin |
+
+---
+
+### `Rotation`
+
+Enum for 90° rotation increments.
+
+```python
+from dungeongen.graphics.rotation import Rotation
+```
+
+| Value | Degrees | Radians |
+|-------|---------|---------|
+| `ROT_0` | 0° | 0 |
+| `ROT_90` | 90° | π/2 |
+| `ROT_180` | 180° | π |
+| `ROT_270` | 270° | 3π/2 |
+
+---
+
+### Built-in Props
+
+```python
+from dungeongen.map._props.column import Column, ColumnType
+from dungeongen.map._props.altar import Altar
+from dungeongen.map._props.stairs import Stairs
+from dungeongen.map.door import Door, DoorState
+from dungeongen.map.exit import Exit
+```
+
+| Class | Description |
+|-------|-------------|
+| `Column` | Round or square columns (1/3 cell size) |
+| `Altar` | Rectangular altar tables |
+| `Stairs` | Up/down stairs with directional rendering |
+| `Door` | Open, closed, or secret doors |
+| `Exit` | Dungeon entrance/exit markers |
+
+---
+
 ## Layout Models
 
 These are the data models output by the layout generator.
@@ -284,6 +478,86 @@ from dungeongen.layout import Door, DoorType
 | `id` | `str` | Unique identifier |
 | `x`, `y` | `int` | Grid position |
 | `door_type` | `DoorType` | `OPEN`, `CLOSED`, `SECRET` |
+
+---
+
+## Layout Occupancy Grid
+
+The layout generator uses an occupancy grid for collision detection and pathfinding.
+
+### `OccupancyGrid`
+
+```python
+from dungeongen.layout.occupancy import OccupancyGrid, CellType, CellModifier
+```
+
+#### Methods
+
+**`is_empty(x: int, y: int) → bool`**
+
+Check if a cell is empty.
+
+**`get_type(x: int, y: int) → CellType`**
+
+Get the cell type at a position.
+
+**`can_place_room(x: int, y: int, width: int, height: int, margin: int = 1) → bool`**
+
+Check if a room can be placed at position with given margin.
+
+**`can_place_passage(cells: List[Tuple[int, int]]) → bool`**
+
+Check if a passage can occupy the given cells.
+
+**`mark_room(room_id: str, x: int, y: int, width: int, height: int, ...) → None`**
+
+Mark cells as occupied by a room (interior = ROOM, buffer = RESERVED, corners = BLOCKED).
+
+**`mark_passage(passage_id: str, cells: List[Tuple[int, int]], margin: int = 1) → None`**
+
+Mark cells as occupied by a passage with reserved buffer.
+
+**`find_path(start: Tuple[int, int], end: Tuple[int, int], ...) → List[Tuple[int, int]] | None`**
+
+A* pathfinding that avoids obstacles. Returns waypoints (turns only).
+
+---
+
+### `CellType`
+
+Enum for what occupies a grid cell.
+
+```python
+from dungeongen.layout.occupancy import CellType
+```
+
+| Value | Description | Passable? |
+|-------|-------------|-----------|
+| `EMPTY` | Nothing here | Yes |
+| `ROOM` | Room interior | No |
+| `PASSAGE` | Corridor cell | Yes (once) |
+| `WALL` | Room perimeter | No |
+| `DOOR` | Connection point | No |
+| `RESERVED` | Buffer around rooms | Yes (once) |
+| `BLOCKED` | Corners, exit adjacents | No |
+
+---
+
+### `CellModifier`
+
+Additional flags on cells.
+
+```python
+from dungeongen.layout.occupancy import CellModifier
+```
+
+| Value | Description |
+|-------|-------------|
+| `NONE` | No modifier |
+| `DOOR` | Cell has a door (blocks crossing) |
+| `JUNCTION` | T-junction or crossing |
+| `STAIRS` | Cell has stairs (blocks crossing) |
+| `EXIT` | Dungeon entrance/exit |
 
 ---
 
