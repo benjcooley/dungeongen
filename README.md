@@ -168,7 +168,7 @@ This is a complete rewrite in Python, not a port. Options do not work identicall
 
 **Will not be added:**
 - Auto-rotate transform for diagonal map views - this library outputs maps for further processing
-- Auto-generated text, titles, and descriptions - this is a map generator, not a complete document generator
+- Auto-generated text, titles, and descriptions - this is a map generator, not a complete document generator. That being said you're welcome to add your own dungeon bits. That being said you're welcome to add your own dungeon bits
 
 ## License
 
