@@ -17,8 +17,7 @@ Then open http://localhost:5050 in your browser to generate dungeons interactive
 ### Layout Generation
 - **Procedural room placement** with configurable room sizes and shapes (rectangular, circular)
 - **Intelligent passage routing** that connects rooms with hallways
-- **Multiple symmetry modes**: None, Bilateral (mirror), Radial-2, Radial-4
-- **Dungeon archetypes**: Classic, Warren, Temple, Crypt, Lair
+- **Symmetry modes**: None, Bilateral (mirror)
 - **Configurable density**: Sparse, Normal, Tight packing
 - **Automatic door placement** with open/closed states
 - **Stairs and dungeon exits**
@@ -140,8 +139,8 @@ dungeon_map.render_to_svg('my_dungeon.svg')
 ### Symmetry Types
 - `NONE` - Asymmetric layout
 - `BILATERAL` - Mirror symmetry (left/right)
-- `RADIAL_2` - 180° rotational symmetry
-- `RADIAL_4` - 90° rotational symmetry (4-fold)
+- `RADIAL_2` - 180° rotational symmetry *(future)*
+- `RADIAL_4` - 90° rotational symmetry *(future)*
 
 ### Water Depth
 - `DRY` - No water
