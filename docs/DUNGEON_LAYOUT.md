@@ -274,44 +274,101 @@ def _generate_doors(dungeon):
 
 ## Archetype Effects
 
-Archetypes modify generation parameters:
+> **Note**: Archetypes are currently **partially implemented**. They add semantic tags to rooms but do not yet modify generation parameters.
+
+### Currently Implemented
 
 | Archetype | Effect |
 |-----------|--------|
+| **LAIR** | Tags the largest room as 'lair' and 'boss' |
+| **TEMPLE** | Tags the most central room as 'sanctum' |
+
+### Planned (Not Yet Implemented)
+
+The following archetypes are defined but have no effect (yet) on generation:
+
+| Archetype | Intended Effect |
+|-----------|-----------------|
 | **CLASSIC** | Default balanced settings |
 | **WARREN** | Smaller rooms, higher density, more loops |
-| **TEMPLE** | Larger rooms, bilateral symmetry bias |
 | **CRYPT** | Linear layout, more dead ends |
-| **LAIR** | Central large room, radial passages |
 | **CAVERN** | Irregular shapes, organic passages |
 | **FORTRESS** | Regular grid, defensive layout |
 
-## Room Numbering
-
-Rooms are numbered using **breadth-first traversal** from the entrance:
+To achieve these effects manually, adjust `GenerationParams`:
 
 ```python
-def number_dungeon(dungeon):
-    # Start from entrance room (spine_start_room or first room)
-    start = dungeon.spine_start_room or next(iter(dungeon.rooms))
-    
-    visited = set()
-    queue = [start]
-    number = 1
-    
-    while queue:
-        room_id = queue.pop(0)
-        if room_id in visited:
-            continue
-        
-        dungeon.rooms[room_id].number = number
-        number += 1
-        visited.add(room_id)
-        
-        # Add connected rooms to queue
-        for connection in get_connected_rooms(room_id):
-            queue.append(connection)
+# Warren-style (dense maze)
+params.density = 0.9
+params.room_size_bias = -0.8  # Cozy/small rooms
+params.loop_factor = 0.5       # More loops
+
+# Crypt-style (linear)
+params.linearity = 0.8
+params.loop_factor = 0.1       # Few loops
+
+# Temple-style
+params.symmetry = SymmetryType.BILATERAL
+params.room_size_bias = 0.5    # Larger rooms
 ```
+
+## Room Numbering
+
+Rooms are numbered using a **branch-cluster algorithm** that assigns contiguous number blocks to each branch at junctions. This produces more intuitive numbering for players exploring the dungeon.
+
+### Algorithm Overview
+
+1. **Start from entrance room** (room #1)
+2. **At each junction**, order exits **clockwise** from the incoming direction
+3. **Process each branch as a cluster** - all rooms in a branch get contiguous numbers before moving to the next branch
+4. **Spine direction priority** - the spine continuation (straight ahead) is numbered before side branches
+
+### Why Clockwise Clustering?
+
+Simple BFS/DFS would interleave rooms from different branches:
+```
+BFS: 1 → 2,3,4 → 5,6,7...  (mixed branches)
+```
+
+Branch-cluster keeps branches together:
+```
+Branch-cluster: 1 → 2,3,4 (left branch) → 5,6 (right branch) → 7,8,9 (spine)
+```
+
+This matches how players typically explore - finishing one area before moving to the next.
+
+### Implementation
+
+```python
+class _DungeonNumberer:
+    def _process_junction_room(self, u, parent):
+        # Order exits clockwise from incoming direction
+        exits = self._ordered_exits(u, parent)
+        
+        for v in exits:
+            if v in self.visited:
+                continue
+            
+            # Find all rooms reachable through v (blocking u)
+            component = self._component_without_node(v, blocked=u)
+            
+            # Number entire branch as contiguous cluster
+            self._number_component_clustered(root=u, entry=v, component=component)
+    
+    def _sort_by_clockwise(self, u, parent, neighbors):
+        # Reference direction: from parent→u, or spine direction at entrance
+        if parent:
+            ref_dir = normalize(u_pos - parent_pos)
+        else:
+            ref_dir = self.spine_direction  # (0, 1) for south-going spine
+        
+        # Sort by clockwise angle from reference
+        return sorted(neighbors, key=lambda v: clockwise_angle(ref_dir, u→v))
+```
+
+### Spine Direction
+
+For symmetric spine layouts, the spine direction (typically south) determines which branch is numbered first. The room straight ahead along the spine gets priority over side branches.
 
 ## Output Data Structure
 

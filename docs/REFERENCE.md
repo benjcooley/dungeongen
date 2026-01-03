@@ -83,6 +83,8 @@ Output data structure from generation.
 
 **`DungeonArchetype`**: `CLASSIC`, `WARREN`, `TEMPLE`, `CRYPT`, `CAVERN`, `FORTRESS`, `LAIR`
 
+> **Note**: Only `LAIR` and `TEMPLE` currently have effects (tagging rooms). Other values are placeholders.
+
 ---
 
 ## Map Rendering

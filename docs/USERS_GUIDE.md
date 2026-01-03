@@ -84,18 +84,29 @@ params.symmetry = SymmetryType.BILATERAL
 
 ### Dungeon Archetypes
 
-Structural patterns that define dungeon character:
+> **Note**: Archetypes are currently **partially implemented**. They add semantic tags but don't change generation parameters. Use the manual parameters below to achieve different styles.
 
-| Archetype | Description |
-|-----------|-------------|
-| `CLASSIC` | Branching paths, dead-ends, treasure rooms |
-| `WARREN` | Dense maze of small interconnected chambers |
-| `TEMPLE` | Grand central nave, symmetrical wings |
-| `CRYPT` | Linear corridor with side chambers |
-| `LAIR` | Central boss chamber with approaches |
+| Archetype | Current Effect |
+|-----------|----------------|
+| `LAIR` | Tags largest room as 'lair'/'boss' |
+| `TEMPLE` | Tags central room as 'sanctum' |
+| `CLASSIC`, `WARREN`, `CRYPT`, `CAVERN`, `FORTRESS` | No effect (placeholder) |
+
+To achieve different dungeon styles, adjust parameters manually:
 
 ```python
-params.archetype = DungeonArchetype.TEMPLE
+# Warren-style (dense maze of small rooms)
+params.density = 0.9
+params.room_size_bias = -0.8  # Cozy
+params.loop_factor = 0.5
+
+# Crypt-style (linear with few branches)
+params.linearity = 0.8
+params.loop_factor = 0.1
+
+# Temple-style (large symmetric)
+params.symmetry = SymmetryType.BILATERAL
+params.room_size_bias = 0.5
 ```
 
 ### Room Size Bias

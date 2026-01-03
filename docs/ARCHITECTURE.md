@@ -145,8 +145,10 @@ Each `MapElement.draw(canvas, layer)` is called once per layer, allowing props t
 **`GenerationParams`** - Configuration dataclass
 - `size`: TINY through XLARGE (affects room count)
 - `symmetry`: NONE, BILATERAL, RADIAL_2, RADIAL_4
-- `archetype`: CLASSIC, WARREN, TEMPLE, CRYPT, LAIR
+- `archetype`: CLASSIC, WARREN, TEMPLE, CRYPT, LAIR *(partially implemented - see note)*
 - `density`: Controls room spacing (sparse to tight)
+
+> **Note on Archetypes**: Currently only LAIR (tags largest room) and TEMPLE (tags central room) have effects. Other archetypes are defined but do not modify generation. Use `density`, `room_size_bias`, and `loop_factor` manually to achieve different dungeon styles.
 
 ### Map System
 
