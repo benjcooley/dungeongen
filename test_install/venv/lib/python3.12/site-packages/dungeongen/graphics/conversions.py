@@ -1,0 +1,152 @@
+"""Utility functions for converting between grid and drawing coordinates."""
+
+from typing import TYPE_CHECKING, Union
+
+from dungeongen.graphics.aliases import Point
+from dungeongen.constants import CELL_SIZE
+import math
+from dungeongen.graphics.shapes import Rectangle
+
+if TYPE_CHECKING:
+    from dungeongen.options import Options
+
+def grid_to_map(grid_x: float, grid_y: float) -> Point:
+    """Convert grid coordinates to map (pixel) coordinates.
+    
+    Args:
+        grid_x: Grid x-coordinate
+        grid_y: Grid y-coordinate
+        
+    Returns:
+        Tuple of (map_x, map_y) coordinates
+    """
+    return (grid_x * CELL_SIZE, grid_y * CELL_SIZE)
+
+def map_to_grid(map_x: float, map_y: float) -> Point:
+    """Convert map (pixel) coordinates to grid coordinates.
+    
+    Args:
+        map_x: Map x-coordinate
+        map_y: Map y-coordinate
+        
+    Returns:
+        Tuple of (grid_x, grid_y) coordinates
+    """
+    return (math.floor(map_x / CELL_SIZE), math.floor(map_y / CELL_SIZE))
+
+def map_rect_to_grid_points(rect_x: float, rect_y: float, rect_width: float, rect_height: float) -> tuple[tuple[float, float], tuple[float, float]]:
+    """Convert a map rectangle into grid space corner points.
+    
+    Args:
+        rect_x: Rectangle X coordinate in map units
+        rect_y: Rectangle Y coordinate in map units
+        rect_width: Rectangle width in map units
+        rect_height: Rectangle height in map units
+        
+    Returns:
+        Tuple of ((grid_x1,grid_y1), (grid_x2,grid_y2)) representing corners in grid space.
+        For a 1x1 map unit rectangle, both points will be the same grid position.
+    """
+    p1 = map_to_grid(rect_x, rect_y)
+    p2 = map_to_grid(rect_x + rect_width, rect_y + rect_height)
+    p2 = (p2[0] - 1, p2[1] - 1)  # Subtract 1 from end grid coordinates to get inclusive range
+    return (p1, p2)
+
+def grid_points_to_map_rect(grid_x1: float, grid_y1: float, grid_x2: float, grid_y2: float) -> tuple[float, float, float, float]:
+    """Convert two grid points into a map space rectangle.
+    
+    Args:
+        grid_x1: First X coordinate in grid units
+        grid_y1: First Y coordinate in grid units
+        grid_x2: Second X coordinate in grid units
+        grid_y2: Second Y coordinate in grid units
+        
+    Returns:
+        Tuple of (rect_x, rect_y, rect_width, rect_height) in map units.
+        Grid points define corners, so width/height will be (grid_points + 1) * CELL_SIZE.
+    """
+    x = min(grid_x1, grid_x2) * CELL_SIZE
+    y = min(grid_y1, grid_y2) * CELL_SIZE
+    width = (abs(grid_x2 - grid_x1) + 1) * CELL_SIZE
+    height = (abs(grid_y2 - grid_y1) + 1) * CELL_SIZE
+    return (x, y, width, height)
+
+def grid_rect_from_points(start_x: float, start_y: float, end_x: float, end_y: float) -> tuple[float, float, float, float]:
+    """Convert two grid points into a proper grid-aligned rectangle.
+    
+    The x,y coordinates are the minimum values of the start/end points.
+    The width/height are calculated as (max - min + 1) to include both end points.
+    
+    Args:
+        start_x: Starting X coordinate in grid units
+        start_y: Starting Y coordinate in grid units
+        end_x: Ending X coordinate in grid units
+        end_y: Ending Y coordinate in grid units
+        
+    Returns:
+        Tuple of (rect_x, rect_y, rect_width, rect_height) in grid units
+    """
+    # Get min x,y for position
+    x = min(start_x, end_x)
+    y = min(start_y, end_y)
+    
+    # Calculate width/height as max - min + 1
+    width = abs(max(start_x, end_x) - x) + 1
+    height = abs(max(start_y, end_y) - y) + 1
+    
+    return (x, y, width, height)
+
+def map_to_grid_rect(rect: Union[Rectangle, tuple[float, float, float, float]]) -> tuple[float, float, float, float]:
+    """Convert a map rectangle to grid coordinates.
+    
+    Args:
+        rect: Rectangle or tuple of (x, y, width, height) in map units
+        
+    Returns:
+        Tuple of (grid_x, grid_y, grid_width, grid_height)
+    """
+    if isinstance(rect, Rectangle):
+        x, y, width, height = rect.x, rect.y, rect.width, rect.height
+    else:
+        x, y, width, height = rect
+        
+    grid_x = math.floor(x / CELL_SIZE)
+    grid_y = math.floor(y / CELL_SIZE)
+    grid_width = math.ceil((x + width) / CELL_SIZE) - grid_x
+    grid_height = math.ceil((y + height) / CELL_SIZE) - grid_y
+    return (grid_x, grid_y, grid_width, grid_height)
+
+def grid_to_map_rect(rect: Union[Rectangle, tuple[float, float, float, float]]) -> tuple[float, float, float, float]:
+    """Convert a grid rectangle to map coordinates.
+    
+    Args:
+        rect: Rectangle or tuple of (x, y, width, height) in grid units
+        
+    Returns:
+        Tuple of (map_x, map_y, map_width, map_height)
+    """
+    if isinstance(rect, Rectangle):
+        x, y, width, height = rect.x, rect.y, rect.width, rect.height
+    else:
+        x, y, width, height = rect
+        
+    map_x = x * CELL_SIZE
+    map_y = y * CELL_SIZE
+    map_width = (width + 1) * CELL_SIZE  # Add 1 to include end cell
+    map_height = (height + 1) * CELL_SIZE  # Add 1 to include end cell
+    return (map_x, map_y, map_width, map_height)
+
+def grid_rect_points(rect_x: float, rect_y: float, rect_width: float, rect_height: float) -> tuple[tuple[float, float], tuple[float, float]]:
+    """Convert a map rectangle into its corner points.
+    
+    Args:
+        rect_x: Rectangle X coordinate in map units
+        rect_y: Rectangle Y coordinate in map units
+        rect_width: Rectangle width in map units
+        rect_height: Rectangle height in map units
+        
+    Returns:
+        Tuple of ((x1,y1), (x2,y2)) representing top-left and bottom-right points
+    """
+    return ((rect_x, rect_y), (rect_x + rect_width, rect_y + rect_height))
+
