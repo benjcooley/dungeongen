@@ -16,7 +16,8 @@ from dungeongen.layout import RoomShape, DoorType as LayoutDoorType, Exit as Lay
 
 def convert_dungeon(layout_dungeon: Dungeon, water_depth: float = 0.0, 
                     water_scale: float = 0.016, water_res: float = 0.3,
-                    water_stroke: float = 3.0, water_ripple: float = 12.0) -> 'Map':
+                    water_stroke: float = 3.0, water_ripple: float = 12.0,
+                    show_numbers: bool = True) -> 'Map':
     """Convert a dungeonlayout Dungeon to a dungeongen Map.
     
     Args:
@@ -26,6 +27,7 @@ def convert_dungeon(layout_dungeon: Dungeon, water_depth: float = 0.0,
         water_res: Resolution scale for water (smaller = faster, coarser)
         water_stroke: Shoreline stroke width
         water_ripple: Ripple inset distance
+        show_numbers: Whether to display room numbers
     """
     from dungeongen.map.map import Map
     from dungeongen.map.room import Room
@@ -64,7 +66,7 @@ def convert_dungeon(layout_dungeon: Dungeon, water_depth: float = 0.0,
     
     # Convert rooms first
     for room_id, layout_room in layout_dungeon.rooms.items():
-        room = _convert_room(layout_room, dungeon_map, offset_x, offset_y)
+        room = _convert_room(layout_room, dungeon_map, offset_x, offset_y, show_numbers)
         if room:
             room_map[room_id] = room
             
@@ -199,7 +201,8 @@ def _adjacent_cells(pos: Tuple[int, int]) -> List[Tuple[int, int]]:
     return [(x-1, y), (x+1, y), (x, y-1), (x, y+1)]
 
 
-def _convert_room(layout_room: LayoutRoom, dungeon_map: 'Map', offset_x: int, offset_y: int) -> Optional['Room']:
+def _convert_room(layout_room: LayoutRoom, dungeon_map: 'Map', offset_x: int, offset_y: int, 
+                  show_numbers: bool = True) -> Optional['Room']:
     """Convert a layout room to a dungeongen room."""
     from dungeongen.map.room import Room, RoomType
     
@@ -211,7 +214,7 @@ def _convert_room(layout_room: LayoutRoom, dungeon_map: 'Map', offset_x: int, of
         grid_width=layout_room.width,
         grid_height=layout_room.height,
         room_type=room_type,
-        number=layout_room.number
+        number=layout_room.number if show_numbers else 0
     )
     
     dungeon_map.add_element(room)

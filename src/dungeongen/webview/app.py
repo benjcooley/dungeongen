@@ -129,6 +129,9 @@ def generate():
     water_stroke = data.get('water_stroke', 3.5)  # Shoreline stroke width
     water_ripple = data.get('water_ripple', 8.0)  # Ripple inset distance
     
+    # Display options
+    show_numbers = data.get('show_numbers', True)
+    
     # Seed
     seed = data.get('seed')
     if seed is not None and seed != '':
@@ -172,7 +175,8 @@ def generate():
             water_scale=water_scale,
             water_res=water_res,
             water_stroke=water_stroke,
-            water_ripple=water_ripple
+            water_ripple=water_ripple,
+            show_numbers=show_numbers
         )
         if render_svg:
             print(f"[Render] Success: {len(render_svg)} bytes SVG")
@@ -203,7 +207,7 @@ def generate():
     })
 
 
-def render_dungeon_to_svg(dungeon, grid_size=20, padding=40, water_depth=0.0, water_scale=0.018, water_res=0.2, water_stroke=3.5, water_ripple=8.0):
+def render_dungeon_to_svg(dungeon, grid_size=20, padding=40, water_depth=0.0, water_scale=0.018, water_res=0.2, water_stroke=3.5, water_ripple=8.0, show_numbers=True):
     """Render dungeon using dungeongen and return as SVG string.
     
     Renders with same framing as layout SVG so rooms align when switching views.
@@ -228,7 +232,8 @@ def render_dungeon_to_svg(dungeon, grid_size=20, padding=40, water_depth=0.0, wa
         water_scale=water_scale,
         water_res=water_res,
         water_stroke=water_stroke,
-        water_ripple=water_ripple
+        water_ripple=water_ripple,
+        show_numbers=show_numbers
     )
     
     # dungeongen uses 64 map units per grid cell (CELL_SIZE constant)
