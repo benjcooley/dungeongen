@@ -3,10 +3,10 @@
 import skia
 from typing import Tuple, Optional
 
-from constants import CELL_SIZE
-from graphics.conversions import grid_to_map
-from debug_config import debug_draw, DebugDrawFlags, DebugLayer
-from debug_draw import debug_draw_grid_cell, debug_draw_passage_check
+from dungeongen.constants import CELL_SIZE
+from dungeongen.graphics.conversions import grid_to_map
+from dungeongen.debug_config import debug_draw, DebugDrawFlags, DebugLayer
+from dungeongen.debug_draw import debug_draw_grid_cell, debug_draw_passage_check
 
 def draw_test_info(canvas: skia.Canvas, test_name: str, test_desc: str) -> None:
     """Draw test case information on the canvas."""

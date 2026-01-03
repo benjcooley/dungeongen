@@ -1,0 +1,64 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "dungeongen"
+version = "0.1.0"
+description = "A procedural dungeon map generator for tabletop RPGs"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.10"
+authors = [
+    { name = "Benjamin Cooley" }
+]
+keywords = ["dungeon", "procedural", "generator", "rpg", "maps", "tabletop"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Games/Entertainment :: Role-Playing",
+]
+dependencies = [
+    "skia-python>=87.0",
+    "numpy>=1.24.0",
+    "flask>=2.0.0",
+    "rich>=13.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pyright>=1.1",
+]
+
+[project.urls]
+Homepage = "https://github.com/benjcooley/dungeongen"
+Repository = "https://github.com/benjcooley/dungeongen"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/dungeongen"]
+
+[tool.hatch.build.targets.wheel.sources]
+"src" = ""
+
+[tool.hatch.build]
+# Include data files
+include = [
+    "src/dungeongen/**/*.py",
+    "src/dungeongen/data/**/*",
+]
+
+[tool.pyright]
+include = ["src"]
+pythonVersion = "3.10"
+typeCheckingMode = "basic"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+

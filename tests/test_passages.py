@@ -3,13 +3,13 @@
 import random
 import traceback
 from typing import Tuple
-from constants import CELL_SIZE
-from map.room import Room
-from map.passage import Passage
-from map.enums import RoomDirection
+from dungeongen.constants import CELL_SIZE
+from dungeongen.map.room import Room
+from dungeongen.map.passage import Passage
+from dungeongen.map.enums import RoomDirection
 from tests.test_runner import get_runner
 from tests.test_tags import TestTags
-from debug_config import debug_draw, DebugDrawFlags
+from dungeongen.debug_config import debug_draw, DebugDrawFlags
 
 def tag_test(*tags: TestTags):
     """Decorator to tag test methods with test categories."""

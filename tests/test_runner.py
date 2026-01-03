@@ -8,11 +8,11 @@ from dataclasses import dataclass
 from rich import print as rprint
 from rich.panel import Panel
 from rich.text import Text
-from debug_draw import debug_draw_init
-from map.map import Map 
-from options import Options
-from debug_config import debug_draw, DebugDrawFlags
-from constants import CELL_SIZE
+from dungeongen.debug_draw import debug_draw_init
+from dungeongen.map.map import Map 
+from dungeongen.options import Options
+from dungeongen.debug_config import debug_draw, DebugDrawFlags
+from dungeongen.constants import CELL_SIZE
 from tests.test_tags import TestTags
 @dataclass
 class TestCase:
