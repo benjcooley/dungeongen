@@ -56,6 +56,31 @@
             white-space: nowrap;
         }
         
+        h1 a {
+            color: var(--accent-bright);
+            text-decoration: none;
+        }
+        
+        h1 a:hover {
+            text-decoration: underline;
+        }
+        
+        .header-links {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        
+        .header-links a {
+            font-size: 0.55rem;
+            color: var(--text-dim);
+            text-decoration: none;
+        }
+        
+        .header-links a:hover {
+            color: var(--text);
+        }
+        
         .options {
             display: flex;
             flex-wrap: wrap;
@@ -293,7 +318,10 @@
 <body>
     <header>
         <div class="header-row">
-            <h1>DUNGEON</h1>
+            <div class="header-links">
+                <h1><a href="https://pypi.org/project/dungeongen/" target="_blank">DUNGEONGEN</a></h1>
+                <a href="https://github.com/benjcooley/dungeongen" target="_blank">GitHub</a>
+            </div>
             
             <div class="options">
                 <span class="group-label">Size:</span>
