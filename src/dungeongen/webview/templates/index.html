@@ -54,6 +54,7 @@
             color: var(--accent-bright);
             letter-spacing: 2px;
             white-space: nowrap;
+            margin: 0;
         }
         
         h1 a {
@@ -68,16 +69,16 @@
         .header-links {
             display: flex;
             flex-direction: column;
-            gap: 2px;
+            gap: 0;
         }
         
-        .header-links a {
-            font-size: 0.55rem;
+        .header-links .github-link {
+            font-size: 0.6rem;
             color: var(--text-dim);
             text-decoration: none;
         }
         
-        .header-links a:hover {
+        .header-links .github-link:hover {
             color: var(--text);
         }
         
@@ -320,7 +321,7 @@
         <div class="header-row">
             <div class="header-links">
                 <h1><a href="https://pypi.org/project/dungeongen/" target="_blank">DUNGEONGEN</a></h1>
-                <a href="https://github.com/benjcooley/dungeongen" target="_blank">GitHub</a>
+                <a class="github-link" href="https://github.com/benjcooley/dungeongen" target="_blank">GitHub</a>
             </div>
             
             <div class="options">
